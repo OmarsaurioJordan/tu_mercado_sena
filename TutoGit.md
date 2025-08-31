@@ -20,7 +20,7 @@ cuando esté en su computadora haciendo los comandos push por primera vez, le pe
 
 puedes guardar usuario y correo previamente así, necesario para hacer commits
 
-> git config --global user.name "tu_nombre"
+> git config --global user.name "tu_nombre"  
 > git config --global user.email "tu_correo"
 
 ## Crear un Proyecto Nuevo en GitHub
@@ -47,11 +47,11 @@ después remote add, allí vas a pegar el link de tu repositorio de GitHub, para
 
 finalmente el push sube los cambios del local a la nube, esto solo se puede hacer si tienes credenciales o permisos con ese repositorio en Github
 
-> git init
-> git add .
-> git commit -m "first_commit"
-> git branch -M main
-> git remote add origin link_repositorio
+> git init  
+> git add .  
+> git commit -m "first_commit"  
+> git branch -M main  
+> git remote add origin link_repositorio  
 > git push -u origin main
 
 ## Crear una Nueva Rama 
@@ -60,7 +60,7 @@ esto crea una rama llamada rama_nueva a partir de la rama en la cuál estés act
 
 luego actualiza los cambios en la nube, lo que creará allá la rama_nueva
 
-> git checkout -b rama_nueva
+> git checkout -b rama_nueva  
 > git push origin rama_nueva
 
 ## Moverse Entre Ramas y Obtener Información
@@ -69,8 +69,8 @@ el checkout permite posicionarse en una rama específica, si el proyecto no tien
 
 luego el branch muestra todas las ramas locales que existen y dice en cuál estás actualmente, es para obtener información, el -a hace lo mismo pero teniendo en cuenta también todas las ramas del repositorio en la nube
 
-> git checkout rama_name
-> git branch
+> git checkout rama_name  
+> git branch  
 > git branch -a
 
 ## Ciclo Básico de Guardado de Commits
@@ -81,17 +81,17 @@ lego el commit crea en efecto el "checkpoint" o punto de guardado, se pone un me
 
 finalmente se suben los datos del commit a la nube, para guardarlos en GitHub, rama_name suele llamarse main (si no has creado otras ramas)
 
-> git add .
-> git commit -m "mensaje"
+> git add .  
+> git commit -m "mensaje"  
 > git push origin rama_name
 
 ## Fusionar Ramas
 
 pararse en la rama que recibirá los cambios, luego traer los cambios desde la otra, el sistema mostrará qué archivos entran en conflicto, estos conflictos deben resolverse manualmente, a criterio de análisis, finalmente se guardan los cambios con el commit y push
 
-> git checkout rama_receptora
-> git merge rama_donadora
-> // si hay conflictos resolverlos
+> git checkout rama_receptora  
+> git merge rama_donadora  
+> // si hay conflictos resolverlos  
 > // hacer el guardado del commit (como siempre)
 
 ## Actualizar Local Desde la Nube
@@ -106,17 +106,17 @@ al usar el -u Git recordará la rama elegida, entonces la próxima vez solo es s
 
 lo mismo aplica al hacer el pull
 
-> git push -u origin rama_name
+> git push -u origin rama_name  
 > git push
 > 
-> git pull -u origin rama_name
+> git pull -u origin rama_name  
 > git pull
 
 ## Crear Punto Estable para Release
 
 cada tanto, se crea una versión estable de un proyecto, tag_name suele ser v1.0, v1.4-ext, v218, etc, de esta forma luego desde GitHub se puede crear un release, por ejemplo, subiendo un ejecutable .exe que los usuarios pueden descargar sin tener que tocar el código fuente
 
-> git tag tag_name
+> git tag tag_name  
 > git push origin tag_name
 
 ## Crear un Fork
@@ -144,25 +144,25 @@ usualmente presente en los proyectos, es un archivo de texto sin nombre (solo ex
 
 > #comentario
 > 
-> #ignora todos los archivos .txt el * es un comodín, cualquier nombre
+> #ignora todos los archivos .txt el * es un comodín, cualquier nombre  
 > *.txt
 > 
-> #ignora a data, no ignora cosas/data pues / al inicio especifica raíz (donde está el mismo .gitignore ahí debe estar data para ser ignorado)
+> #ignora a data, no ignora cosas/data pues / al inicio especifica raíz (donde está el mismo .gitignore ahí debe estar data para ser ignorado)  
 > /data
 > 
-> #el ! hace que el archivo sea incluído forzosamente, así haya un *.txt en .gitignore, y el hola.txt puede estar en cualquier subcarpeta
+> #el ! hace que el archivo sea incluído forzosamente, así haya un *.txt en .gitignore, y el hola.txt puede estar en cualquier subcarpeta  
 > !hola.txt
 > 
-> #acá si se incluye forsozamente el archivo solo si está en el nodo raíz
+> #acá si se incluye forsozamente el archivo solo si está en el nodo raíz  
 > !/cnfg.txt
 > 
-> #ignora los archivos dentro de algo, da igual dónde esté algo, ej: cosas/algo/
+> #ignora los archivos dentro de algo, da igual dónde esté algo, ej: cosas/algo/  
 > algo/
 > 
-> #ignora por ej: cosas/doc/hi.txt pero no ignorará a doc/lib/hi.txt
+> #ignora por ej: cosas/doc/hi.txt pero no ignorará a doc/lib/hi.txt  
 > doc/*.txt
 > 
-> #ignora cualquier .pdf en el directorio doc dentro de cualquiera de sus subdirectorios
+> #ignora cualquier .pdf en el directorio doc dentro de cualquiera de sus subdirectorios  
 > doc/**/*.pdf
 
 ## README.md
