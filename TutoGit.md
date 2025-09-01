@@ -94,7 +94,7 @@ pararse en la rama que recibirá los cambios, luego traer los cambios desde la o
 > // si hay conflictos resolverlos  
 > // hacer el guardado del commit (como siempre)
 
-## Actualizar Local Desde la Nube
+## Actualizar Local Desde la Nube Origin
 
 usualmente rama_name es main si no has creado más ramas, esto internaemente hace dos cosas: descarga los datos desde el repositorio en GitHub y los mezcla "merge" en la rama en la que te encuentras, por lo que podría haber conflictos que resolver
 
@@ -125,6 +125,22 @@ esto se hace desde la interfaz gráfica de GitHub, donde veas un repositorio, pu
 
 en tu fork de GitHub puedes actualizar cambios desde el original hacia tu fork, y proponer las PR, mismas que deben ser aprobadas por el propietario quién además deberá resolver conflictos de archivos
 
+una vez hecho el fork querrás trabajar en él, para ello primero lo clonas a tu computadora (como se explica más arriba), y agregamos un paso extra, acá el upstream apunta al repositorio desde el que se creó el fork, No el link del fork con el que se clonó
+
+el segundo comando sirve para ver los links (origin y upstream) asociados al repositorio
+
+> git remote add upstream link_repositorio_original  
+> git remote -v
+
+luego cuando quieras traer al repositorio local las actulizaciónes en el repositorio original (No el fork tuyo) haces
+
+> git pull upstream rama_name
+
+o también esto, es lo mismo pero con pasos extra, da más control a la hora de fusionar cambios y corregir colisiónes, la primera línea baja los datos y la segunda los mezcla con tu rama activa
+
+> git fetch upstream  
+> git merge upstream/rama_name
+
 ## Glosario
 
 - **repositorio:** es un proyecto como tal, digamos que es como la carpte raíz donde todo se guarda, pero tiene además opciónes de configuración, como por ejemplo: ser público o privado en GitHub
@@ -137,6 +153,8 @@ en tu fork de GitHub puedes actualizar cambios desde el original hacia tu fork, 
 - **release:** es un lanzamiento, software finalizado listo para ser usado
 - **fork:** es como un clone pero de una cuenta GitHub a otra, se le hace un fork al repositorio de otro usuario y queda copiado en tu cuenta
 - **pull request (PR):** es una solicitud para integrar cambios usualmente desde un fork al repositorio original, de este modo un proyecto puede recibir colaboración, pero su admin debe aceptar cambios y resolver conflictos
+- **origin:** refiere al repositorio (link) desde el que se clonó o conectó un repositorio local al ser creado, son los dos extremos: el local y el web
+- **upstream:** similar a origin, es un link a repositorio, pero esta vez no es una conexión directa, suele ser el repositorio original del que se creó un fork y luego del fork se clonó a un local, entonces el local se conecta al original mediante relación upstream (como el abuelo del repositorio local)
 
 ## .gitignore
 
@@ -174,3 +192,21 @@ los proyectos y las exportaciónes de software siempre suelen llevar este archiv
 Git crea en la carpeta local del proyecto una carpeta oculta .git, no la toque, destruirla eliminará el repositorio Git y deberá crearlo de nuevo, en esa carpeta Git guarda todo, todo el control de versiónes y ramas
 
 los archivos no se eliminan, cuando usted borra algo y actualiza el commit, pareciera que se han eliminado, pero quedan guardados en .git y en GitHub respectivamente, por si quiere "volver atrás" y ver una versión previa del proyecto, por eso debe ser muy cuidadoso con lo que hace, por ejemplo, no hacer que un commit arrastre basura de pesados archivos innecesarios (bueno si hay comandos para deshacer commits, pero la idea es no tener que usarlos)
+
+NO conectes un Git de computador público (como los del Sena) a tu GitHub, si no borras la conexión, alguien puede trollear tus proyectos, para trabajar en PC público descarga el repositorio con clone, trabaj en él, pero en lugar de subirlo, llevalo a casa por otro medio: .zip en Drive, y allá pones los archivos en tu repositorio local para luego hacer push
+
+Existen muchas más funcionalidades, por ejemplo, dar permisos directos de acceso a otros usuarios a tu repositorio, podrían hacer push directo a tu repositorio sin forks ni PR pero cuidado! también hay llaves de acceso para usar un repositorio sin usuario y contraseña, solo con la llave, que puede ser revocada
+
+## Para Trabajar en Tu Mercado Sena
+
+1. haz los primeros pasos, instalar Git y crear cuenta GitHub
+2. ve al respositorio original del proyecto y haz un fork
+3. clona tu fork a tu computadora y ponle el upstream
+4. trabaj en tus cosas, haz tus cambios locales
+5. has commit y push a origin para ir guardando tus avances en el fork
+6. si quieres puedes sincronizar cambios desde el proyecto original, para estar al día con lo que han hecho los demás (hay dos formas de hacer esto)
+7. cuando quieras puedes solicitar un PR para llevar tus cambios del fork al repositorio original
+
+## Para Practicar
+
+toma uno de tus proyectos hechos en el Sena y súbelo a un repositorio en tu cuenta, haz cambios en el proyecto y súbelos a tu repositorio, verás como queda todo en la nube, luego desde un PC del Sena puedes hacer un clone para bajar tu proyecto y verlo allí
