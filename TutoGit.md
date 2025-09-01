@@ -91,16 +91,20 @@ pararse en la rama que recibirá los cambios, luego traer los cambios desde la o
 
 > git checkout rama_receptora  
 > git merge rama_donadora  
-> // si hay conflictos resolverlos  
-> // hacer el guardado del commit (como siempre)
+> // si hay conflictos resolverlos y hacer el guardado del commit y push  
+> // sino, solo es suficiente con hacer push
 
-## Actualizar Local Desde la Nube Origin
+la rama_donadora no se destruye, puedes hacer eso opcionalmente si ya no la necesitas más, -d solo la destruye si ya ha sido mergeada, sino, con -D se puede forzar la destrucción, los archivos no se borran instantaneamente en Git, pero si no hay referencia que los apunte quedan como en una "papelera" la cuál se puede vaciar con: `git gc`
+
+> git branch -d rama_donadora
+
+## Actualizar Local Desde la Nube
 
 usualmente rama_name es main si no has creado más ramas, esto internaemente hace dos cosas: descarga los datos desde el repositorio en GitHub y los mezcla "merge" en la rama en la que te encuentras, por lo que podría haber conflictos que resolver
 
 > git pull origin rama_name
 
-## Recordar Rama de Push y Pull
+## Recordar Rama al Hacer Push y Pull
 
 al usar el -u Git recordará la rama elegida, entonces la próxima vez solo es suficiente con llamar a push sin parámetros, como en la segunda línea
 
@@ -141,6 +145,30 @@ o también esto, es lo mismo pero con pasos extra, da más control a la hora de 
 > git fetch upstream  
 > git merge upstream/rama_name
 
+## Moverse entre Commits
+
+primero que todo se obtiene la información de cada commit, esto para hallar el deseado y ver su hash ID, el --oneline muestra información resumida, también hay parámetros para cargar solo un número de commits recientes, la palabra GEAD se usa para identificar el commit que estamos viendo actualmente en el proyecto
+
+> git log --oneline
+
+luego digamos que queremos regresar a un commit solo para hacer pruebas o ver cosas, no para seguir trabajando desde ahí, necesitamos su commit_id
+
+> git checkout commit_id
+
+digamos que queremos eliminar el efecto de un commit (por ejemplo el último commit), con revert creamos un nuevo commit que lo que hace es aplicar un "anti commit_id" por así decirlo, sin eliminar nada del historial, hay que tener cuidado, si tenemos c1->c2->c3->c4->c5 y revertimos c4, puede haber conflictos si c5 depende de lo hecho en c4
+
+> git revert commit_id
+
+podemos también hacer una reversión en cadena, por ejemplo para quedar en c1->c2 como si no hubiese sucedido c3, c4, c5, revert puede recibir varios IDs idealmente de mayor a menor, el no commit evita que por cada uno se haga un commit, más bien se hace un solo commit de reversión en la 2da línea
+
+> git revert --no-commit c5_id c4_id c3_id  
+> git commit -m "revert c5 c4 c3"
+
+finalmente, si queremos volver al pasado y trabajar desde ahí, como si los commits futuros nunca hubiesen sucedido, esta acción es más agresiva y poco recomendada, solo es la primera línea, la 2da muestra cómo se forzan los cambios al hacer push a la nube
+
+> git reset --hard commit_id  
+> git push origin rama_name --force
+
 ## Glosario
 
 - **repositorio:** es un proyecto como tal, digamos que es como la carpte raíz donde todo se guarda, pero tiene además opciónes de configuración, como por ejemplo: ser público o privado en GitHub
@@ -155,6 +183,9 @@ o también esto, es lo mismo pero con pasos extra, da más control a la hora de 
 - **pull request (PR):** es una solicitud para integrar cambios usualmente desde un fork al repositorio original, de este modo un proyecto puede recibir colaboración, pero su admin debe aceptar cambios y resolver conflictos
 - **origin:** refiere al repositorio (link) desde el que se clonó o conectó un repositorio local al ser creado, son los dos extremos: el local y el web
 - **upstream:** similar a origin, es un link a repositorio, pero esta vez no es una conexión directa, suele ser el repositorio original del que se creó un fork y luego del fork se clonó a un local, entonces el local se conecta al original mediante relación upstream (como el abuelo del repositorio local)
+- **head:** puntero que dice cuál es el commit que actualmente se está mostrando, dónde está parado el usuario al ver el proyecto
+- **revert:** invierte o deshace los cambios de un commit sin dañar el historial
+- **reset:** vuelve al pasado en los commits, eliminando lo que hay de ahí en adelante como si nunca hubiese pasado (acción agresiva)
 
 ## .gitignore
 
@@ -206,6 +237,8 @@ Existen muchas más funcionalidades, por ejemplo, dar permisos directos de acces
 5. has commit y push a origin para ir guardando tus avances en el fork
 6. si quieres puedes sincronizar cambios desde el proyecto original, para estar al día con lo que han hecho los demás (hay dos formas de hacer esto)
 7. cuando quieras puedes solicitar un PR para llevar tus cambios del fork al repositorio original
+
+tener en cuenta que cada subgrupo (su líder) solo modificará la carpeta que le corresponde, esto para evitar colisiónes de archivos, y procurar manejar muy bien .gitignore, para no llenar el repositorio de basura, por ejemplo, imágenes de prueba en la carpeta del servidor, o archivos Laravel genéricos
 
 ## Para Practicar
 
