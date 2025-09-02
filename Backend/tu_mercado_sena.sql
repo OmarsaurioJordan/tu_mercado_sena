@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 27-08-2025 a las 16:38:37
+-- Tiempo de generación: 02-09-2025 a las 04:42:56
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -145,7 +145,8 @@ CREATE TABLE `chats` (
 --
 -- Estructura de tabla para la tabla `correos`
 --
--- Creación: 04-08-2025 a las 23:35:34
+-- Creación: 02-09-2025 a las 02:32:40
+-- Última actualización: 02-09-2025 a las 02:32:40
 --
 
 DROP TABLE IF EXISTS `correos`;
@@ -153,6 +154,7 @@ CREATE TABLE `correos` (
   `id` int(10) UNSIGNED NOT NULL,
   `correo` varchar(64) NOT NULL,
   `clave` varchar(32) NOT NULL COMMENT 'una combinación aleatoria que será enviada al correo, con un solo uso limitado por tiempo',
+  `pin` varchar(16) NOT NULL DEFAULT '' COMMENT 'para los administradores poder acceder al sistema cuando se bloquea por poco uso',
   `fecha_mail` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'guarda el momento en que se envio una solicitud al mail, para poder esperar y no enviarlas muy seguido'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -286,9 +288,31 @@ INSERT INTO `integridad` (`id`, `nombre`, `descripcion`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `login_ip`
+--
+-- Creación: 02-09-2025 a las 02:35:33
+--
+
+DROP TABLE IF EXISTS `login_ip`;
+CREATE TABLE `login_ip` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'qué admin ingrsó al sistema',
+  `informacion` varchar(128) NOT NULL COMMENT 'por ejemplo: IP, dirección geográfica, zona, etc',
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'cuándo sucedió el ingreso'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELACIONES PARA LA TABLA `login_ip`:
+--   `usuario_id`
+--       `usuarios` -> `id`
+--
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `mensajes`
 --
--- Creación: 19-08-2025 a las 01:54:04
+-- Creación: 02-09-2025 a las 02:27:46
 --
 
 DROP TABLE IF EXISTS `mensajes`;
@@ -296,9 +320,9 @@ CREATE TABLE `mensajes` (
   `id` int(10) UNSIGNED NOT NULL,
   `es_comprador` tinyint(3) UNSIGNED NOT NULL COMMENT 'el chat tiene usuario A y B, acá es 1 si lo escribió A o 0 si B',
   `chat_id` int(10) UNSIGNED NOT NULL COMMENT 'a que chat va, ahi estara el receptor',
-  `mensaje` varchar(512) NOT NULL COMMENT 'el texto como tal',
+  `mensaje` varchar(512) NOT NULL DEFAULT '' COMMENT 'el texto como tal',
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'automaticamente se establece cuando se creo el mensaje',
-  `es_imagen` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'en true significa que habra un archivo JPG, su nombre debe llevar el id'
+  `es_imagen` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'en true significa que habra un archivo JPG, su nombre debe llevar el id'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -388,6 +412,29 @@ CREATE TABLE `notificaciones` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `papelera`
+--
+-- Creación: 02-09-2025 a las 02:29:22
+--
+
+DROP TABLE IF EXISTS `papelera`;
+CREATE TABLE `papelera` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'quién es responsable de esta edición',
+  `mensaje` varchar(512) NOT NULL DEFAULT '' COMMENT 'texto que fué editado sea en perfil o producto o calificación de producto, cualquier parte donde se pueda editar',
+  `es_imagen` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'en true significa que habra un archivo JPG, su nombre debe llevar el id	',
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'cuándo se hizo el registro, la edición'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELACIONES PARA LA TABLA `papelera`:
+--   `usuario_id`
+--       `usuarios` -> `id`
+--
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `pqrs`
 --
 -- Creación: 19-08-2025 a las 02:10:27
@@ -418,14 +465,15 @@ CREATE TABLE `pqrs` (
 --
 -- Estructura de tabla para la tabla `productos`
 --
--- Creación: 19-08-2025 a las 01:55:26
+-- Creación: 28-08-2025 a las 15:39:03
+-- Última actualización: 29-08-2025 a las 03:00:47
 --
 
 DROP TABLE IF EXISTS `productos`;
 CREATE TABLE `productos` (
   `id` int(10) UNSIGNED NOT NULL,
   `nombre` varchar(64) NOT NULL,
-  `con_imagen` tinyint(1) NOT NULL COMMENT 'si es true, significa que habra un archivo del tipo img_id_producto.jpg en la carpeta correspondiente',
+  `con_imagen` tinyint(1) NOT NULL COMMENT 'si es true, significa que habra un archivo del tipo img_id.jpg en la carpeta correspondiente',
   `subcategoria_id` int(10) UNSIGNED NOT NULL COMMENT 'la subcategoria incluye a la categoria, por ejemplo, electrodomesticos, mobiliario, alimento, etc',
   `integridad_id` int(10) UNSIGNED NOT NULL COMMENT 'para saber si el producto es nuevo, de segunda pero en buen estado o si es un producto con fallas',
   `vendedor_id` int(10) UNSIGNED NOT NULL COMMENT 'apunta al id de usuario que es su creador',
@@ -678,6 +726,7 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 -- Estructura de tabla para la tabla `usuarios`
 --
 -- Creación: 19-08-2025 a las 02:02:32
+-- Última actualización: 29-08-2025 a las 03:00:45
 --
 
 DROP TABLE IF EXISTS `usuarios`;
@@ -806,6 +855,13 @@ ALTER TABLE `integridad`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `login_ip`
+--
+ALTER TABLE `login_ip`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `login_usuario` (`usuario_id`);
+
+--
 -- Indices de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
@@ -825,6 +881,13 @@ ALTER TABLE `notificaciones`
   ADD PRIMARY KEY (`id`),
   ADD KEY `notifi_motivo` (`motivo_id`),
   ADD KEY `notifi_usuario` (`usuario_id`);
+
+--
+-- Indices de la tabla `papelera`
+--
+ALTER TABLE `papelera`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `papelera_usuario` (`usuario_id`);
 
 --
 -- Indices de la tabla `pqrs`
@@ -940,6 +1003,12 @@ ALTER TABLE `integridad`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT de la tabla `login_ip`
+--
+ALTER TABLE `login_ip`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
@@ -955,6 +1024,12 @@ ALTER TABLE `motivos`
 -- AUTO_INCREMENT de la tabla `notificaciones`
 --
 ALTER TABLE `notificaciones`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `papelera`
+--
+ALTER TABLE `papelera`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
@@ -1043,6 +1118,12 @@ ALTER TABLE `favoritos`
   ADD CONSTRAINT `usuario_votante` FOREIGN KEY (`votante_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
 
 --
+-- Filtros para la tabla `login_ip`
+--
+ALTER TABLE `login_ip`
+  ADD CONSTRAINT `login_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+
+--
 -- Filtros para la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
@@ -1054,6 +1135,12 @@ ALTER TABLE `mensajes`
 ALTER TABLE `notificaciones`
   ADD CONSTRAINT `notifi_motivo` FOREIGN KEY (`motivo_id`) REFERENCES `motivos` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `notifi_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `papelera`
+--
+ALTER TABLE `papelera`
+  ADD CONSTRAINT `papelera_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `pqrs`
