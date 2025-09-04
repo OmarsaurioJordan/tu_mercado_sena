@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
+            $table->foreign('correo_id')->references('id')->on('correos')->onDelete('cascade');
+            $table->string('password', 64);
+            $table->foreign('roles_id')->references('id')->on('roles')->onDelete('cascade');
             $table->timestamps();
         });
     }
