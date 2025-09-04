@@ -10,4 +10,8 @@ class Categoria extends Model
     protected $fillable = [
         'nombre'
     ];
+
+    public function subCategorias() {
+        return $this->hasMany(SubCategoria::class, 'categoria_id');
+    }
 }
