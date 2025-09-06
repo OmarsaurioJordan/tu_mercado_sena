@@ -7,6 +7,7 @@ use App\Http\Controllers\IntegridadController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SubCategoriaController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\ProductoController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -16,3 +17,4 @@ Route::resource('/integridades', IntegridadController::class);
 Route::apiResource('/categorias', CategoriaController::class);
 Route::apiResource('/subcategorias', SubCategoriaController::class);
 Route::apiResource('/usuarios', UsuarioController::class);
+Route::apiResource('/productos', ProductoController::class);

@@ -14,6 +14,8 @@ class SubCategoria extends Model
         'categoria_id'
     ];
 
+    public $timestamps = false; // <- Esto desactiva los campos de tiempo
+
     public function categoria() {
         return $this->belongsTo(Categoria::class);
     }

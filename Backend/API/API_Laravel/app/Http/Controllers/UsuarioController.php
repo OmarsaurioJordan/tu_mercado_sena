@@ -66,7 +66,7 @@ class UsuarioController extends Controller
             'notifica_correo',
             'notifica_push',
             'uso_datos'
-        ])); // Usar método PATCH para actualizar los campos según el rol del usuario(Admin, Usuario)
+        ])); // Usar método PATCH no actualizar todos los campos
         return response()->json($usuario, 200);
     }
 

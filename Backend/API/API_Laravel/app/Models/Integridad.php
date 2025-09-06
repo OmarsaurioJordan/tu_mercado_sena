@@ -8,7 +8,7 @@ class Integridad extends Model
 {
     protected $table = 'integridad';
 
-    // public $timestamps = false; // <- Esto desactiva los campos de tiempo
+    public $timestamps = false; // <- Esto desactiva los campos de tiempo
 
 
     protected $fillable = [
