@@ -9,6 +9,7 @@ use App\Http\Controllers\SubCategoriaController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\FavoritoController;
+use App\Http\Controllers\ChatController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,3 +21,4 @@ Route::apiResource('/subcategorias', SubCategoriaController::class);
 Route::apiResource('/usuarios', UsuarioController::class);
 Route::apiResource('/productos', ProductoController::class);
 Route::apiResource('/favoritos', FavoritoController::class);
+Route::apiResource('/chats', ChatController::class);

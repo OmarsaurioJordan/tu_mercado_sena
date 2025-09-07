@@ -14,12 +14,4 @@ class Favorito extends Model
         'votante_id',
         'votado_id'
     ];
-
-    public function votante() {
-        return $this->belongsTo(Usuario::class, 'votante_id');
-    }
-
-    public function votado() {
-        return $this->belongsTo(Usuario::class, 'votado_id');
-    }
 }
