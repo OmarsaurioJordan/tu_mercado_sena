@@ -10,6 +10,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\FavoritoController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MensajeController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -22,3 +23,4 @@ Route::apiResource('/usuarios', UsuarioController::class);
 Route::apiResource('/productos', ProductoController::class);
 Route::apiResource('/favoritos', FavoritoController::class);
 Route::apiResource('/chats', ChatController::class);
+Route::apiResource('/mensajes', MensajeController::class);
