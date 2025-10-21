@@ -1,0 +1,7 @@
+__pycache__
+*.zip
+*.rar
+*.import
+*.tmp
+*.log
+*.exe
