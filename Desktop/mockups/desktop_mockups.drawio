@@ -1,0 +1,556 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" version="28.2.7" pages="7">
+  <diagram name="login" id="pidNsiPiKzRzzJUk8szl">
+    <mxGraphModel dx="1188" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="ahstduYUHTkHMrjq1es8-0" />
+        <mxCell id="ahstduYUHTkHMrjq1es8-1" parent="ahstduYUHTkHMrjq1es8-0" />
+        <mxCell id="ahstduYUHTkHMrjq1es8-2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="40" y="40" width="760" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="ahstduYUHTkHMrjq1es8-4" value="" style="group;fontStyle=0" vertex="1" connectable="0" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="279" y="110" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ahstduYUHTkHMrjq1es8-5" value="Tu Mercado Sena - Admin" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="ahstduYUHTkHMrjq1es8-4">
+          <mxGeometry x="60" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ahstduYUHTkHMrjq1es8-6" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.node_generic;" vertex="1" parent="ahstduYUHTkHMrjq1es8-4">
+          <mxGeometry width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="kZTpI2bsWUORsVngSAAj-2" value="" style="group" vertex="1" connectable="0" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="730" y="390" width="60" height="79" as="geometry" />
+        </mxCell>
+        <mxCell id="kZTpI2bsWUORsVngSAAj-0" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.globe_internet;" vertex="1" parent="kZTpI2bsWUORsVngSAAj-2">
+          <mxGeometry x="1" width="59" height="59" as="geometry" />
+        </mxCell>
+        <mxCell id="kZTpI2bsWUORsVngSAAj-1" value="webpage" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="kZTpI2bsWUORsVngSAAj-2">
+          <mxGeometry y="59" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="kZTpI2bsWUORsVngSAAj-7" value="mi_correo@sena.edu" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="313" y="220" width="201" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="kZTpI2bsWUORsVngSAAj-8" value="correo institucional" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="313" y="200" width="201" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="5darHEA8t9R52rzZPtof-0" value="********" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="313" y="270" width="201" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="5darHEA8t9R52rzZPtof-1" value="contraseña" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="313" y="250" width="201" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="5darHEA8t9R52rzZPtof-2" value="Ingresar" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=14;" vertex="1" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="354" y="310" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5darHEA8t9R52rzZPtof-3" value="v 1.0.2" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" vertex="1" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="50" y="50" width="70" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="dfpOrB33vxclZL4csn_N-0" value="" style="group" vertex="1" connectable="0" parent="ahstduYUHTkHMrjq1es8-1">
+          <mxGeometry x="50" y="390" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kZTpI2bsWUORsVngSAAj-5" value="&lt;div&gt;master admin name&lt;/div&gt;&lt;b&gt;tel&lt;/b&gt;: 666569&lt;div&gt;&lt;b&gt;mail&lt;/b&gt;: tmc@sena.edu&lt;/div&gt;&lt;div&gt;&lt;b&gt;dir&lt;/b&gt;: cra 100 cll 42-12&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" vertex="1" parent="dfpOrB33vxclZL4csn_N-0">
+          <mxGeometry y="20" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kZTpI2bsWUORsVngSAAj-6" value="&lt;div&gt;Info contacto:&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="dfpOrB33vxclZL4csn_N-0">
+          <mxGeometry width="150" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="menu" id="s56m-WUTO_DWzKvOB_0f">
+    <mxGraphModel dx="1188" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-0" />
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-1" parent="j83JuLjWtqwiQBVnaP8K-0" />
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="40" y="40" width="760" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-3" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="40" y="40" width="760" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-8" value="" style="group" vertex="1" connectable="0" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="50" y="50" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-9" value="Tu Mercado Sena - Admin" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-8">
+          <mxGeometry x="60" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-10" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.node_generic;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-8">
+          <mxGeometry width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-11" value="" style="group" vertex="1" connectable="0" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="480" y="50" width="40" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-12" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.whats_new;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-11">
+          <mxGeometry width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-13" value="3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-11">
+          <mxGeometry x="20" y="17.5" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-14" value="" style="group" vertex="1" connectable="0" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="580" y="50" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-15" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-14">
+          <mxGeometry width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-16" value="Nombre de administrador" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-14">
+          <mxGeometry x="10" y="5" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-17" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.users.user;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-14">
+          <mxGeometry x="170" y="5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="j83JuLjWtqwiQBVnaP8K-18" value="correo@sena.institucional" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;fontSize=10;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-14">
+          <mxGeometry x="10" y="20" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="yT64VYw0tXI6w7W1gruK-0" value="" style="group" vertex="1" connectable="0" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="730" y="390" width="60" height="79" as="geometry" />
+        </mxCell>
+        <mxCell id="yT64VYw0tXI6w7W1gruK-1" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.globe_internet;" vertex="1" parent="yT64VYw0tXI6w7W1gruK-0">
+          <mxGeometry x="1" width="59" height="59" as="geometry" />
+        </mxCell>
+        <mxCell id="yT64VYw0tXI6w7W1gruK-2" value="webpage" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="yT64VYw0tXI6w7W1gruK-0">
+          <mxGeometry y="59" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="yT64VYw0tXI6w7W1gruK-3" value="" style="group" vertex="1" connectable="0" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="50" y="390" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="yT64VYw0tXI6w7W1gruK-4" value="&lt;div&gt;master admin name&lt;/div&gt;&lt;b&gt;tel&lt;/b&gt;: 666569&lt;div&gt;&lt;b&gt;mail&lt;/b&gt;: tmc@sena.edu&lt;/div&gt;&lt;div&gt;&lt;b&gt;dir&lt;/b&gt;: cra 100 cll 42-12&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" vertex="1" parent="yT64VYw0tXI6w7W1gruK-3">
+          <mxGeometry y="20" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="yT64VYw0tXI6w7W1gruK-5" value="&lt;div&gt;Info contacto:&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="yT64VYw0tXI6w7W1gruK-3">
+          <mxGeometry width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-0" value="Bloquear" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=12;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="369" y="110" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-1" value="Salir" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=12;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="700" y="110" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-2" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="194" y="240" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-3" value="Estadísticas" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="194" y="300" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-4" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="314" y="240" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-5" value="Herramientas" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="314" y="300" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-6" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="434" y="240" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-7" value="Logins" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="434" y="300" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-8" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="554" y="240" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-9" value="Configuración" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="554" y="300" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-10" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.settings;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="570" y="246" width="48" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-11" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.sites.site_collection;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="328" y="250" width="52" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-12" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.users.universal_security_group;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="451.5" y="248" width="45" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="0VpV0YL46QE_3OQNRgPo-13" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.users.csv_file;" vertex="1" parent="j83JuLjWtqwiQBVnaP8K-1">
+          <mxGeometry x="204.5" y="251" width="59" height="43" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="bloqueo" id="Msw8J_HENHIhVShksUJ3">
+    <mxGraphModel dx="1426" dy="751" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-0" />
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-1" parent="6pj6R-QSEAwp-m4sbjEz-0" />
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="40" y="40" width="760" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-6" value="" style="group" vertex="1" connectable="0" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="730" y="390" width="60" height="79" as="geometry" />
+        </mxCell>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-7" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.globe_internet;" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-6">
+          <mxGeometry x="1" width="59" height="59" as="geometry" />
+        </mxCell>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-8" value="webpage" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-6">
+          <mxGeometry y="59" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-13" value="****" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="313" y="240" width="201" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-14" value="PIN de seguridad" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="313" y="220" width="201" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-15" value="Reingresar" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=14;" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="354" y="280" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vvvn6HB3juPi9OfT8E66-0" value="" style="group" vertex="1" connectable="0" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="50" y="390" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-9" value="&lt;div&gt;master admin name&lt;/div&gt;&lt;b&gt;tel&lt;/b&gt;: 666569&lt;div&gt;&lt;b&gt;mail&lt;/b&gt;: tmc@sena.edu&lt;/div&gt;&lt;div&gt;&lt;b&gt;dir&lt;/b&gt;: cra 100 cll 42-12&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" vertex="1" parent="vvvn6HB3juPi9OfT8E66-0">
+          <mxGeometry y="20" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="6pj6R-QSEAwp-m4sbjEz-10" value="&lt;div&gt;Info contacto:&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontStyle=1" vertex="1" parent="vvvn6HB3juPi9OfT8E66-0">
+          <mxGeometry width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-0" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="40" y="40" width="760" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-1" value="" style="group" vertex="1" connectable="0" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="50" y="50" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-2" value="Tu Mercado Sena - Admin" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="2FCBGRXeYtaw-J2862FD-1">
+          <mxGeometry x="60" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-3" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.node_generic;" vertex="1" parent="2FCBGRXeYtaw-J2862FD-1">
+          <mxGeometry width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-4" value="" style="group" vertex="1" connectable="0" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="480" y="50" width="40" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-5" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.whats_new;" vertex="1" parent="2FCBGRXeYtaw-J2862FD-4">
+          <mxGeometry width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-6" value="3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="2FCBGRXeYtaw-J2862FD-4">
+          <mxGeometry x="20" y="17.5" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-7" value="" style="group" vertex="1" connectable="0" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="580" y="50" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-8" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="2FCBGRXeYtaw-J2862FD-7">
+          <mxGeometry width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-9" value="Nombre de administrador" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;" vertex="1" parent="2FCBGRXeYtaw-J2862FD-7">
+          <mxGeometry x="10" y="5" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-10" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.users.user;" vertex="1" parent="2FCBGRXeYtaw-J2862FD-7">
+          <mxGeometry x="170" y="5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2FCBGRXeYtaw-J2862FD-11" value="correo@sena.institucional" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;fontSize=10;" vertex="1" parent="2FCBGRXeYtaw-J2862FD-7">
+          <mxGeometry x="10" y="20" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="Z_Q9M_8ryYCJU8R3Jh4V-0" value="Bloqueo por PIN" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="310" y="150" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Z_Q9M_8ryYCJU8R3Jh4V-1" value="Salir" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=14;" vertex="1" parent="6pj6R-QSEAwp-m4sbjEz-1">
+          <mxGeometry x="354" y="380" width="120" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="estadisticas" id="Iy2T1WTs24GQ4q5kqFxh">
+    <mxGraphModel dx="1426" dy="751" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="2DswKgISlsOtdur5Npr--0" />
+        <mxCell id="2DswKgISlsOtdur5Npr--1" parent="2DswKgISlsOtdur5Npr--0" />
+        <mxCell id="2DswKgISlsOtdur5Npr--2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="2DswKgISlsOtdur5Npr--1">
+          <mxGeometry x="40" y="40" width="760" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--3" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="2DswKgISlsOtdur5Npr--1">
+          <mxGeometry x="40" y="40" width="760" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--4" value="" style="group" vertex="1" connectable="0" parent="2DswKgISlsOtdur5Npr--1">
+          <mxGeometry x="380" y="50" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--5" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="2DswKgISlsOtdur5Npr--4">
+          <mxGeometry width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--6" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="2DswKgISlsOtdur5Npr--4">
+          <mxGeometry y="14.5" width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--7" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="2DswKgISlsOtdur5Npr--4">
+          <mxGeometry y="29.5" width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--8" value="" style="group" vertex="1" connectable="0" parent="2DswKgISlsOtdur5Npr--1">
+          <mxGeometry x="50" y="50" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--9" value="Tu Mercado Sena - Admin" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="2DswKgISlsOtdur5Npr--8">
+          <mxGeometry x="60" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--10" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.node_generic;" vertex="1" parent="2DswKgISlsOtdur5Npr--8">
+          <mxGeometry width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--11" value="" style="group" vertex="1" connectable="0" parent="2DswKgISlsOtdur5Npr--1">
+          <mxGeometry x="480" y="50" width="40" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--12" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.whats_new;" vertex="1" parent="2DswKgISlsOtdur5Npr--11">
+          <mxGeometry width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--13" value="3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="2DswKgISlsOtdur5Npr--11">
+          <mxGeometry x="20" y="17.5" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--14" value="" style="group" vertex="1" connectable="0" parent="2DswKgISlsOtdur5Npr--1">
+          <mxGeometry x="580" y="50" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--15" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="2DswKgISlsOtdur5Npr--14">
+          <mxGeometry width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--16" value="Nombre de administrador" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;" vertex="1" parent="2DswKgISlsOtdur5Npr--14">
+          <mxGeometry x="10" y="5" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--17" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.users.user;" vertex="1" parent="2DswKgISlsOtdur5Npr--14">
+          <mxGeometry x="170" y="5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="2DswKgISlsOtdur5Npr--18" value="correo@sena.institucional" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;fontSize=10;" vertex="1" parent="2DswKgISlsOtdur5Npr--14">
+          <mxGeometry x="10" y="20" width="150" height="15" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="configuracion" id="4q4xNP-UEzxF1qTnl3bs">
+    <mxGraphModel dx="1426" dy="751" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="q8eJDa8bchtlvXuj80z--0" />
+        <mxCell id="q8eJDa8bchtlvXuj80z--1" parent="q8eJDa8bchtlvXuj80z--0" />
+        <mxCell id="q8eJDa8bchtlvXuj80z--2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="q8eJDa8bchtlvXuj80z--1">
+          <mxGeometry x="40" y="40" width="760" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--3" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="q8eJDa8bchtlvXuj80z--1">
+          <mxGeometry x="40" y="40" width="760" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--4" value="" style="group" vertex="1" connectable="0" parent="q8eJDa8bchtlvXuj80z--1">
+          <mxGeometry x="380" y="50" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--5" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="q8eJDa8bchtlvXuj80z--4">
+          <mxGeometry width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--6" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="q8eJDa8bchtlvXuj80z--4">
+          <mxGeometry y="14.5" width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--7" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="q8eJDa8bchtlvXuj80z--4">
+          <mxGeometry y="29.5" width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--8" value="" style="group" vertex="1" connectable="0" parent="q8eJDa8bchtlvXuj80z--1">
+          <mxGeometry x="50" y="50" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--9" value="Tu Mercado Sena - Admin" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="q8eJDa8bchtlvXuj80z--8">
+          <mxGeometry x="60" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--10" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.node_generic;" vertex="1" parent="q8eJDa8bchtlvXuj80z--8">
+          <mxGeometry width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--11" value="" style="group" vertex="1" connectable="0" parent="q8eJDa8bchtlvXuj80z--1">
+          <mxGeometry x="480" y="50" width="40" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--12" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.whats_new;" vertex="1" parent="q8eJDa8bchtlvXuj80z--11">
+          <mxGeometry width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--13" value="3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="q8eJDa8bchtlvXuj80z--11">
+          <mxGeometry x="20" y="17.5" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--14" value="" style="group" vertex="1" connectable="0" parent="q8eJDa8bchtlvXuj80z--1">
+          <mxGeometry x="580" y="50" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--15" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="q8eJDa8bchtlvXuj80z--14">
+          <mxGeometry width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--16" value="Nombre de administrador" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;" vertex="1" parent="q8eJDa8bchtlvXuj80z--14">
+          <mxGeometry x="10" y="5" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--17" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.users.user;" vertex="1" parent="q8eJDa8bchtlvXuj80z--14">
+          <mxGeometry x="170" y="5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="q8eJDa8bchtlvXuj80z--18" value="correo@sena.institucional" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;fontSize=10;" vertex="1" parent="q8eJDa8bchtlvXuj80z--14">
+          <mxGeometry x="10" y="20" width="150" height="15" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="logins" id="mUkKlCIvPfV7gnTNUpQd">
+    <mxGraphModel dx="1426" dy="751" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-0" />
+        <mxCell id="xVHyQeSue1os2nmi_p1A-1" parent="xVHyQeSue1os2nmi_p1A-0" />
+        <mxCell id="xVHyQeSue1os2nmi_p1A-2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-1">
+          <mxGeometry x="40" y="40" width="760" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-3" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-1">
+          <mxGeometry x="40" y="40" width="760" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-4" value="" style="group" vertex="1" connectable="0" parent="xVHyQeSue1os2nmi_p1A-1">
+          <mxGeometry x="380" y="50" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-5" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-4">
+          <mxGeometry width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-6" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-4">
+          <mxGeometry y="14.5" width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-7" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-4">
+          <mxGeometry y="29.5" width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-8" value="" style="group" vertex="1" connectable="0" parent="xVHyQeSue1os2nmi_p1A-1">
+          <mxGeometry x="50" y="50" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-9" value="Tu Mercado Sena - Admin" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="xVHyQeSue1os2nmi_p1A-8">
+          <mxGeometry x="60" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-10" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.node_generic;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-8">
+          <mxGeometry width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-11" value="" style="group" vertex="1" connectable="0" parent="xVHyQeSue1os2nmi_p1A-1">
+          <mxGeometry x="480" y="50" width="40" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-12" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.whats_new;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-11">
+          <mxGeometry width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-13" value="3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-11">
+          <mxGeometry x="20" y="17.5" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-14" value="" style="group" vertex="1" connectable="0" parent="xVHyQeSue1os2nmi_p1A-1">
+          <mxGeometry x="580" y="50" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-15" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-14">
+          <mxGeometry width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-16" value="Nombre de administrador" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-14">
+          <mxGeometry x="10" y="5" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-17" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.users.user;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-14">
+          <mxGeometry x="170" y="5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xVHyQeSue1os2nmi_p1A-18" value="correo@sena.institucional" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;fontSize=10;" vertex="1" parent="xVHyQeSue1os2nmi_p1A-14">
+          <mxGeometry x="10" y="20" width="150" height="15" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="tools_user" id="hW8aprrV06yTY6iH7eAv">
+    <mxGraphModel dx="983" dy="518" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="F0WpOIUskKWkW1i-msGw-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="760" height="440" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="760" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-22" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="380" y="50" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-19" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-22">
+          <mxGeometry width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-20" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-22">
+          <mxGeometry y="14.5" width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-21" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.devices.switch;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-22">
+          <mxGeometry y="29.5" width="40" height="10.5" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-23" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="50" y="50" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-4" value="Tu Mercado Sena - Admin" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="F0WpOIUskKWkW1i-msGw-23">
+          <mxGeometry x="60" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-11" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.node_generic;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-23">
+          <mxGeometry width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-24" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="480" y="50" width="40" height="37.5" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-14" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.concepts.whats_new;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-24">
+          <mxGeometry width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-15" value="3" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-24">
+          <mxGeometry x="20" y="17.5" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-25" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="580" y="50" width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-5" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-25">
+          <mxGeometry width="210" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-6" value="Nombre de administrador" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-25">
+          <mxGeometry x="10" y="5" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-7" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.users.user;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-25">
+          <mxGeometry x="170" y="5" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-8" value="correo@sena.institucional" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;rounded=0;fontSize=10;" vertex="1" parent="F0WpOIUskKWkW1i-msGw-25">
+          <mxGeometry x="10" y="20" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-26" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="590" y="130" width="200" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-27" value="User" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-28" value="Cata" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="670" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-29" value="Pape" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="710" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-30" value="Histo" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="750" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-32" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="130" width="200" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-33" value="Prod" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-34" value="PQRS" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-35" value="Denu" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-36" value="Chat" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-37" value="Audi" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-38" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="130" width="240" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-39" value="Prod" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="170" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-40" value="User" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-41" value="Chat" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="290" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-42" value="PQRS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="210" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-43" value="Denu" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="250" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-44" value="Audi" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="330" y="110" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-45" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#36393d;" vertex="1" parent="1">
+          <mxGeometry x="360" y="130" width="10" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-46" value="" style="rounded=0;whiteSpace=wrap;html=1;fontColor=default;fillColor=light-dark(#505050, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="360" y="220" width="10" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-47" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#36393d;" vertex="1" parent="1">
+          <mxGeometry x="570" y="130" width="10" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-48" value="" style="rounded=0;whiteSpace=wrap;html=1;fontColor=default;fillColor=light-dark(#505050, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="570" y="140" width="10" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-49" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#36393d;" vertex="1" parent="1">
+          <mxGeometry x="780" y="130" width="10" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-50" value="" style="rounded=0;whiteSpace=wrap;html=1;fontColor=default;fillColor=light-dark(#505050, #ededed);" vertex="1" parent="1">
+          <mxGeometry x="780" y="140" width="10" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="F0WpOIUskKWkW1i-msGw-51" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="130" width="80" height="340" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
