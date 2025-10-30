@@ -2,21 +2,23 @@
 
 namespace App\Providers;
 
-
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\UserRepository;
 
+/**
+ * Provedor de servicios para los repositorios
+ * 
+ * Esta clase es el lugar central donde se configuran las inyecciones de dependecias
+ */
 
-
-class AppServiceProvider extends ServiceProvider
+class RepositoryServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Register services.
      */
     public function register(): void
     {
-        // 
         // Configurar la interfaz del repositorio del usuario y el repositorio
         $this->app->bind(
             UserRepositoryInterface::class, // Lo que se pide (interfaz)
@@ -25,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap services.
      */
     public function boot(): void
     {

@@ -13,16 +13,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('estados', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 32)->unique();
-            $table->timestamps();
+            $table->string('descripcion', 128)->nullable();
         });
 
-        DB::table('roles')->insert([
-            ['nombre' => 'prosumer'],
-            ['nombre' => 'administrador'],
-            ['nombre' => 'master']
+        DB::table('estados')->insert([
+            ['nombre' => 'activo', 'descripcion' => 'Usuario activo en el sistema'],
+            ['nombre' => 'invisible', 'descripcion' => 'Usuario invisible en el sistema'],
+            ['nombre' => 'eliminado', 'descripcion' => 'Usuario eliminado en el sistema'],
         ]);
     }
 
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('estados');
     }
 };

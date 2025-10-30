@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
     //
     use HasApiTokens, HasFactory, Notifiable;
@@ -17,6 +17,7 @@ class Usuario extends Model
 
     protected $fillable = [
         'correo_id',
+        'password',
         'rol_id',
         'nombre',
         'avatar',
@@ -39,5 +40,14 @@ class Usuario extends Model
     public function rol() {
         return $this->belongsTo(Rol::class, 'rol_id');
     }
-    
+
+    public function estado() {
+        return $this->belongsTo(Estado::class, 'estado_id');
+    }
+
+    // Método requerido por Laravel para la autenticación
+    public function getAuthIdentifierName(){
+        return 'correo_id';
+    }
+
 }
