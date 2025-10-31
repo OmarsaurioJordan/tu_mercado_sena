@@ -23,6 +23,8 @@ puedes guardar usuario y correo previamente así, necesario para hacer commits
 > git config --global user.name "tu_nombre"  
 > git config --global user.email "tu_correo"
 
+para salir de la sesión local, escribe "administrador de credenciales" en el buscador de Windows, al abrir la aplicación, selecciona "credenciales de windows" y elimina el registro referente a tu cuenta personal de GitHub
+
 ## Crear un Proyecto Nuevo en GitHub
 
 en GitHub está la opción de crear repositorio, repositorios -> nuevo, colocamos nombre y descripción, si va a ser público o privado, y elegimos algunos archivos como .gitignore y README.md
