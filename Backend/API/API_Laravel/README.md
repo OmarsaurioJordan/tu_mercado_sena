@@ -34,26 +34,29 @@ link	Debe ser una red social válida: YouTube, Instagram, Facebook, Twitter o Li
 
 Ejemplo JSON:
 
->{
-> "correo_id": "juan.perez@sena.edu.co",
-> "password": "Password123",
-> "password_confirmation": "Password123",
-> "nombre": "Juan Pérez",
->  "avatar": 1,
->  "descripcion": "Estudiante de desarrollo",
->  "link": "https://instagram.com/juanperez",
->  "device_name": "web"
->}
-
+'''JSON
+{
+ "correo_id": "juan.perez@sena.edu.co",
+ "password": "Password123",
+ "password_confirmation": "Password123",
+ "nombre": "Juan Pérez",
+  "avatar": 1,
+  "descripcion": "Estudiante de desarrollo",
+  "link": "https://instagram.com/juanperez",
+  "device_name": "web"
+}
+'''
 
 Respuesta (201 - Created):
 
->{
->  "user": { ... },
->  "token": "xxxxx",
->  "token_type": "bearer",
->  "expires_in": 3600
->}
+'''JSON
+{
+  "user": { ... },
+  "token": "xxxxx",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+'''
 
 2️⃣ Inicio de sesión
 
@@ -76,21 +79,24 @@ Mensajes posibles:
 
 Ejemplo JSON:
 
->{
->  "correo_id": "omar.jordan@sena.edu.co",
->  "password": "omarJordan1234",
->  "device_name": "desktop"
->}
-
+'''JSON
+{
+  "correo_id": "omar.jordan@sena.edu.co",
+  "password": "omarJordan1234",
+  "device_name": "desktop"
+}
+'''
 
 Respuesta (200 - OK):
 
->{
->  "user": { ... },
->  "token": "xxxxx",
->  "token_type": "bearer",
->  "expires_in": 3600
->}
+'''JSON
+{
+  "user": { ... },
+  "token": "xxxxx",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+'''
 
 🔒 RUTAS PROTEGIDAS
 
@@ -105,17 +111,19 @@ Ruta: http://localhost:8000/api/auth/logout
 
 Cuerpo opcional:
 
->{
->  "all_devices": false
->}
-
+'''JSON
+{
+  "all_devices": false
+}
+'''
 
 Respuesta:
 
->{
->  "message": "Sesión cerrada correctamente"
->}
-
+'''JSON
+{
+  "message": "Sesión cerrada correctamente"
+}
+'''
 
 💡 Si all_devices = true, se intentará cerrar sesión en todos los dispositivos. (En pruebas)
 
@@ -146,9 +154,11 @@ Ruta: http://localhost:8000/api/auth/me
 
 Respuesta:
 
->{
->  "user": { ... }
->}
+'''JSON
+{
+  "user": { ... }
+}
+'''
 
 🧩 ESTRUCTURA Y COMPONENTES DEL CÓDIGO
 📦 DTOs (Data Transfer Objects)
