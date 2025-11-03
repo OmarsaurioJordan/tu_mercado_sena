@@ -196,10 +196,10 @@ Método/Función
 Crea usuario y genera token
 **login()**  
 Valida credenciales, rol, estado y dispositivo
-**logout()**	
+**logout()**  
 Cierra sesión (actual o global)
-**refresh()**	Refresca token JWT
-**getCurrentUser()**	Retorna usuario autenticado
+**refresh()**  Refresca token JWT
+**getCurrentUqser()**  Retorna usuario autenticado
 **isRecentlyActive()**	Comprueba actividad reciente
 
 🗃️ Repositorio e Interfaz
