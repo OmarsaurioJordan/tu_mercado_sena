@@ -192,15 +192,30 @@ Centraliza la lógica de negocio de autenticación.
 Cumple con el principio Single Responsibility (SOLID).
 
 Método/Función
-**register()**  	
+
+**register()**
+
 Crea usuario y genera token
-**login()**  
+
+**login()**
+
 Valida credenciales, rol, estado y dispositivo
+
 **logout()**  
+
 Cierra sesión (actual o global)
-**refresh()**  Refresca token JWT
-**getCurrentUqser()**  Retorna usuario autenticado
-**isRecentlyActive()**	Comprueba actividad reciente
+
+**refresh()**  
+
+Refresca token JWT
+
+**getCurrentUser()**  
+
+Retorna usuario autenticado
+
+**isRecentlyActive()**	
+
+Comprueba actividad reciente
 
 🗃️ Repositorio e Interfaz
 UserRepositoryInterface
