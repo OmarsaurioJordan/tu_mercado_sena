@@ -129,15 +129,16 @@ Renueva el token cuando le queda menos de 5 minutos antes de expirar.
 
 Respuesta:
 
->{
->  "message": "Token refrescado correctamente",
->  "data": {
->    "token": "xxxxx",
->    "token_type": "bearer",
->    "expires_in": 3600
->  }
->}
-
+```JSON
+{
+  "message": "Token refrescado correctamente",
+  "data": {
+    "token": "xxxxx",
+    "token_type": "bearer",
+    "expires_in": 3600
+  }
+}
+```
 3️⃣ Obtener usuario autenticado
 
 Método: GET
