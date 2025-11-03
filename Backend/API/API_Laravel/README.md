@@ -191,13 +191,16 @@ getJWTCustomClaims() → Agrega información personalizada (correo, nombre, rol,
 Centraliza la lógica de negocio de autenticación.
 Cumple con el principio Single Responsibility (SOLID).
 
-Método	Función
-register()	Crea usuario y genera token
-login()	Valida credenciales, rol, estado y dispositivo
-logout()	Cierra sesión (actual o global)
-refresh()	Refresca token JWT
-getCurrentUser()	Retorna usuario autenticado
-isRecentlyActive()	Comprueba actividad reciente
+Método/Función
+**register()**  	
+Crea usuario y genera token
+**login()**  
+Valida credenciales, rol, estado y dispositivo
+**logout()**	
+Cierra sesión (actual o global)
+**refresh()**	Refresca token JWT
+**getCurrentUser()**	Retorna usuario autenticado
+**isRecentlyActive()**	Comprueba actividad reciente
 
 🗃️ Repositorio e Interfaz
 UserRepositoryInterface
