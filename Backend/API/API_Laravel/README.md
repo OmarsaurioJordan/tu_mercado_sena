@@ -1,7 +1,7 @@
  🛒 Tu Mercado SENA - Backend API
 
 **Versión:** 1.0  
-**Framework:** Laravel 11  
+**Framework:** Laravel 12
 **Autenticación:** JWT (Tymon JWTAuth)  
 **Formato de respuesta:** JSON  
 **Estado:** 🚧 *En desarrollo (faltan rutas que serán complementadas con el tiempo)*
