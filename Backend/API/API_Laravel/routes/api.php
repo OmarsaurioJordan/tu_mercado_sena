@@ -36,20 +36,22 @@ Route::prefix('auth')->group(function()  {
 /**
  * RUTAS PROTEGIDAS (Requieren autenticación)
  * 
- * El middleware 'auth:sanctum' verifica automaticamente el token.
- * Si el token es inválido o no existe, retorna 401 Unauthorized
+ * El middleware personalizado "jwtVerify" verifica el token.
+ * 
  */
-Route::middleware('auth:sanctum')->group(function () {
-    // POST /api/auth/logout
-    // Cierra la sesión actual y revoca el token
-    Route::post('/logout', [AuthController::class, 'logout']);
+Route::middleware('jwtVerify')->group(function (){
 
-    // GET /api/user
-    // Obtiene la información del usuario autenticado
-    Route::get('/user', [AuthController::class, 'user']);
+    // === AUTENTICACIÓN ===
+    Route::prefix('auth')->group(function () {
+        // Cerrar sesión
+        Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Aqui continua la lista de rutas protegidas
+        // Refrescar token
+        Route::post('/refresh', [AuthController::class, 'refresh']);
 
+        // Obtener usuario autenticado
+        Route::get('/me', [AuthController::class, 'me']);
+    });
 });
 
 /**

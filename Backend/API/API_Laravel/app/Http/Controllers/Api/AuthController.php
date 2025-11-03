@@ -59,8 +59,12 @@ class AuthController
             // Retornar la respuesta exitosa con el usuario y el token de acceso
             return response()->json([
                 'message' => 'Usuario registrado correctamente',
-                'user' => $result['user'],
-                'token' => $result['token'],
+                'data' => [
+                    'user' => $result['user'],
+                    'token' => $result['token'],
+                    'token_type' => 'bearer',
+                    'expires_in' => $result['expires_in'],
+                ]
             ], 201);
 
         } catch (ValidationException $e) {
@@ -98,8 +102,12 @@ class AuthController
             // Retornar JSON
             return response()->json([
                 'message' => 'Inicio de sesión exisoto',
-                'user' => $result['user'],
-                'token' => $result['token'],
+                'data' => [
+                    'user' => $result['user'],
+                    'token' => $result['token'],
+                    'token_type' => 'bearer',
+                    'expires_in' => $result['expires_in']
+                ]
             ], 200);
         } catch (ValidationException $e){
             throw $e;
@@ -140,7 +148,7 @@ class AuthController
             // Verificar si el usaurio quiere cerrar sesión en todos los dispositivos
             $allDevices = $request->input('all_devices', false);
 
-            // Llamar al servicio para revocar los tokens
+            // Llamar al servicio para invalidar el tokens
             $this->authService->logout($user, $allDevices);
 
             // Retornar confirmación
@@ -161,37 +169,103 @@ class AuthController
     }
 
     /**
+     * Refrescar token JWT
+     * 
+     * RUTA: POST /api/auth/refresh
+     * AUTENTICACIÓN: Requerida (middleware auth:api)
+     * 
+     * 
+     * PROPÓSITO:
+     * Permite obtener un nuevo token antes de que el actual expire
+     * sin necesidad de hacer login otra vez
+     * 
+     * USO RECOMENDADO EN EL FRONTEND:
+     * - Guardar expires_in cuando recibes el token
+     * - 5 minutos antes de expirar, llamar a /refresh
+     * - Reemplazar el token viejo por el nuevo
+     * 
+     * EJEMPLO (JavaScript):
+     * const tokenExpiry = Date.now() + (expires_in * 1000);
+     * setInterval(() => {
+     *   if (Date.now() >= tokenExpiry - 300000) { // 5 min antes
+     *     await refreshToken();
+     *   }
+     * }, 60000); // Check cada minuto
+     * 
+     * @return JsonResponse - JSON con nuevo token
+     */
+    public function refresh(): JsonResponse
+    {
+        try {
+            // Llamar al servicio para refrescar el token
+            // Internamente usa JWTAuth::refresh()
+            $result = $this->authService->refresh();
+
+            return response()->json([
+                'message' => 'Token refrescado exitosamente',
+                'data' => [
+                    'token' => $result['token'], // Nuevo token JWT
+                    'token_type' => $result['token_type'], // "bearer"
+                    'expires_in' => $result['expires_in'], // segundos
+                ]
+            ], 200);
+
+        } catch (ValidationException $e) {
+            // Token inválido o expirado hace mucho
+            throw $e;
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al refrescar token',
+                'error' => config('app.debug') 
+                    ? $e->getMessage() 
+                    : 'No se pudo refrescar el token'
+            ], 401); // 401 Unauthorized
+        }
+    }
+
+    /**
      * Obtener información del usuario actual
      * 
      * @param Request $request - Request con usuario autenticado
      * @return JsonResponse - Respuesta JSON con código 200
      */
-    public function user(Request $request): JsonResponse
+    /**
+     * Obtener información del usuario actual
+     * 
+     * Ruta: GET /api/auth/me
+     * AUTENTICACIÓN: requerida (middleware jwtVerify)
+     * 
+     * 
+     * @param Request $request - Request con usuario autenticado
+     * @return JsonResponse - JSON con datos del usuario
+     */
+    public function me(Request $request): JsonResponse
     {
-        try {
-            // Obtener el usuario autenticado
+        try{
+            // Obtener el usuario autenticado desde el JWTGuard
             $user = $request->user();
 
-            // Cargar las relaciones necesarias para la respuesta
-            // load() carga las relaciones sin hacer consultas adicionales
+            // Cargar relaciones necesarias si aplica
             $user->load('rol', 'estado');
 
-            // Obtener el usuario con lógica adicional del servicio
+            // Obtener el usuario con lógica adicional si es necesario
             $userData = $this->authService->getCurrentUser($user);
 
             // Agregar información adicional útil
             $userData->is_recently_active = $this->authService->isRecentlyActive($user);
 
-            // Retornar los datos del usuario
-            return response()->json([
-                'user' => $userData,
+            // Retornar datos del usuasrio
+            return Response()->json([
+                'data' => $userData,
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al obtener información del usuario',
-                'error' => config('app.debug') ? $e->getMessage() : "Error interno en el servidor"
-            ], 500);
+                'error' => config('app.debug')
+                    ? $e->getMessage()
+                    : 'error interno del servidor'
+            ]);
         }
     }
 }

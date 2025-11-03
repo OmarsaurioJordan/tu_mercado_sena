@@ -1,61 +1,266 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+ 🛒 Tu Mercado SENA - Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Versión:** 1.0  
+**Framework:** Laravel 11  
+**Autenticación:** JWT (Tymon JWTAuth)  
+**Formato de respuesta:** JSON  
+**Estado:** 🚧 *En desarrollo (faltan rutas que serán complementadas con el tiempo)*
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🧭 Descripción General
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+El **Backend de Tu Mercado SENA** fue diseñado para manejar peticiones HTTP, procesarlas, interactuar con la base de datos y devolver respuestas estructuradas en formato **JSON**.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sigue la arquitectura **MVC** y aplica el patrón **Repository-Service**, lo que garantiza una mejor separación de responsabilidades, escalabilidad y facilidad de mantenimiento.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🌐 RUTAS DE LA API
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+> ⚠️ **Nota:** Actualmente están disponibles solo las rutas del módulo de autenticación.  
+> Otras rutas (productos, chats, favoritos, etc.) serán añadidas progresivamente conforme avance el desarrollo.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+### 🔓 RUTAS PÚBLICAS
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+#### 1️⃣ Registro de usuario  
+**Método:** `POST`  
+**Ruta:** `http://localhost:8000/api/auth/register`
 
-### Premium Partners
+**Restricciones:**
+| Campo | Restricción |
+|-------|-------------|
+| `correo_id` | Solo se aceptan correos institucionales **@sena.edu.co** |
+| `password` | Mínimo **8 caracteres**, debe incluir **números**, no estar comprometida, y coincidir con `password_confirmation` |
+| `nombre` | Máximo **24 caracteres** |
+| `descripcion` | Máximo **300 caracteres** |
+| `link` | Debe ser una red social válida: *YouTube, Instagram, Facebook, Twitter o LinkedIn* |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**Ejemplo JSON:**
+```json
+{
+  "correo_id": "juan.perez@sena.edu.co",
+  "password": "Password123",
+  "password_confirmation": "Password123",
+  "nombre": "Juan Pérez",
+  "avatar": 1,
+  "descripcion": "Estudiante de desarrollo",
+  "link": "https://instagram.com/juanperez",
+  "device_name": "web"
+}
+Respuesta (201 - Created):
 
-## Contributing
+json
+Copiar código
+{
+  "user": { ... },
+  "token": "xxxxx",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+2️⃣ Inicio de sesión
+Método: POST
+Ruta: http://localhost:8000/api/auth/login
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Restricciones:
 
-## Code of Conduct
+Correo y contraseña son obligatorios.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+device_name solo puede ser: desktop, mobile o web.
 
-## Security Vulnerabilities
+Mensajes posibles:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+❌ Correo o contraseña incorrectos
 
-## License
+🚫 Esta cuenta ha sido desactivada.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+⚠️ No cuentas con el rol para acceder a este dispositivo.
+
+Ejemplo JSON:
+
+json
+Copiar código
+{
+  "correo_id": "omar.jordan@sena.edu.co",
+  "password": "omarJordan1234",
+  "device_name": "desktop"
+}
+Respuesta (200 - OK):
+
+json
+Copiar código
+{
+  "user": { ... },
+  "token": "xxxxx",
+  "token_type": "bearer",
+  "expires_in": 3600
+}
+🔒 RUTAS PROTEGIDAS
+Estas rutas requieren un token JWT válido en los headers:
+Authorization: Bearer {token}
+
+1️⃣ Cerrar sesión
+Método: POST
+Ruta: http://localhost:8000/api/auth/logout
+
+Cuerpo opcional:
+
+json
+Copiar código
+{
+  "all_devices": false
+}
+Respuesta:
+
+json
+Copiar código
+{
+  "message": "Sesión cerrada correctamente"
+}
+💡 Si all_devices = true, se intentará cerrar sesión en todos los dispositivos. (En pruebas)
+
+2️⃣ Refrescar token
+Método: POST
+Ruta: http://localhost:8000/api/auth/refresh
+
+Descripción:
+Renueva el token cuando le queda menos de 5 minutos antes de expirar.
+
+Respuesta:
+
+json
+Copiar código
+{
+  "message": "Token refrescado correctamente",
+  "data": {
+    "token": "xxxxx",
+    "token_type": "bearer",
+    "expires_in": 3600
+  }
+}
+3️⃣ Obtener usuario autenticado
+Método: GET
+Ruta: http://localhost:8000/api/auth/me
+
+Respuesta:
+
+json
+Copiar código
+{
+  "user": { ... }
+}
+🧩 ESTRUCTURA Y COMPONENTES DEL CÓDIGO
+📦 DTOs (Data Transfer Objects)
+Los DTOs encapsulan los datos que se transfieren entre capas, evitando manipular el request directamente y garantizando validación y seguridad.
+
+DTO	Atributos	Descripción
+LoginDTO	correo_id, password, device_name	Gestiona datos de inicio de sesión
+RegisterDTO	correo_id, password, nombre, avatar, descripcion, link	Gestiona datos del registro de usuario
+
+Métodos comunes:
+
+fromRequest() → Crea el DTO a partir del request validado.
+
+toArray() → Devuelve los datos como arreglo.
+
+👤 Modelo: Usuario
+Define la tabla usuarios y sus propiedades.
+Oculta el campo password y agrega relaciones con roles y estados.
+
+Métodos clave:
+
+getJWTIdentifier() → ID único del usuario para JWT
+
+getJWTCustomClaims() → Agrega información personalizada (correo, nombre, rol, estado, avatar)
+
+⚙️ Servicio de Autenticación (AuthService)
+Centraliza la lógica de negocio de autenticación.
+Cumple con el principio Single Responsibility (SOLID).
+
+Métodos principales:
+
+Método	Función
+register()	Crea usuario y genera token
+login()	Valida credenciales, rol, estado y dispositivo
+logout()	Cierra sesión (actual o global)
+refresh()	Refresca token JWT
+getCurrentUser()	Retorna usuario autenticado
+isRecentlyActive()	Comprueba actividad reciente
+
+🗃️ Repositorio e Interfaz
+UserRepositoryInterface
+Define los métodos base:
+
+create()
+
+findByEmail()
+
+findById()
+
+updateLastActivity()
+
+exists()
+
+invalidateAllTokens()
+
+UserRepository
+Implementa la interfaz usando Eloquent ORM:
+
+create() → Crea usuario, hashea contraseña y asigna rol/estado.
+
+findByEmail() / findById() → Búsqueda directa.
+
+updateLastActivity() → Actualiza fecha de actividad.
+
+invalidateAllTokens() → Cierra sesión global.
+
+🧱 Middleware: ValidateJWTToken
+Valida y protege las rutas que requieren autenticación.
+
+Funciones clave:
+
+Comprueba validez y expiración del token.
+
+Rechaza usuarios eliminados (estado_id = 3).
+
+Detecta tokens inválidos o expirados.
+
+Maneja errores personalizados:
+
+TokenExpiredException
+
+TokenInvalidException
+
+JWTException
+
+🧭 Controlador: AuthController
+Conecta las peticiones HTTP con el servicio AuthService.
+
+Responsabilidades:
+
+Recibir y validar el Request
+
+Crear DTOs
+
+Delegar la lógica al servicio
+
+Devolver respuestas JSON coherentes
+
+Códigos de respuesta:
+
+Código	Significado
+200	Operación exitosa
+201	Registro completado
+401	Token inválido / no autenticado
+422	Error de validación
+500	Error interno del servidor
+
+🧠 Conclusión
+El backend de Tu Mercado SENA está estructurado bajo principios de arquitectura limpia:
+Controller → Service → Repository → Model
+
+Esto permite mantener un código modular, escalable y de fácil mantenimiento.
+A medida que el proyecto avance, se integrarán nuevos módulos:
+productos, chats, favoritos, bloqueos, mensajes, compraventas, devoluciones, entre otros.

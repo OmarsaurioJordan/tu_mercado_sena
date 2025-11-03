@@ -56,4 +56,13 @@ interface UserRepositoryInterface
      * @return bool - true si existe, false si no existe
      */
     public function exists(string $email): bool;
+
+    /**
+     * Función requerida para invalidar todos los tokens de un usuario
+     * 
+     * 
+     * @param int $userId - ID del usuario
+     * @return bool - true si se invalidaron, false si hubo un error
+     */
+    public function invalidateAllTokens(int $userId): bool;
 }

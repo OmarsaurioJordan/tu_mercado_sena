@@ -2,17 +2,20 @@
 
 namespace App\Services;
 
-
 use App\DTOs\Auth\RegisterDTO;
 use App\DTOs\Auth\LoginDTO;
 use App\Models\Usuario;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use Illuminate\Database\Eloquent\Casts\AsUri;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Laravel\Sanctum\PersonalAccessToken;
 use Carbon\Carbon;
-
-
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\JWTGuard;
 
 /**
  * AuthService - Servicio de autenticación
@@ -44,11 +47,10 @@ class AuthService
      * al RepositoryServiceProvider
      */
     public function __construct(
-        private UserRepositoryInterface $userRepository
+        private UserRepositoryInterface $userRepository,
+        private JWTGuard $jwt
     )
-    {
-        $this->userRepository = $userRepository;
-    }
+    {}
 
     /**
      * Lógica de registro de usuario
@@ -76,13 +78,19 @@ class AuthService
         // Crear el usuario en la base de datos, además se encarga de hashear la contraseña, asignar el rol y el estado
         $user = $this->userRepository->create($dto);
 
-        // Crear el token de acceso que se guarda en la tabla personal_access_token
-        $token = $user->createToken($dto->device_name ?? 'web')->plainTextToken;
+        // Crear el token de acceso 
+        $token = $this->jwt->fromUser($user);
+
+        // Obtener el tiempo de expiración desde la config
+        // config('jwt.tll') Retorna los minutos configurados
+        $expiresIn = $this->jwt->factory()->getTTL() * 60;
 
         // Retornar el usuario y el token, el cliente debe guardar este token para futuras peticiones
         return [
             'user' => $user,
             'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => $expiresIn
         ];
     }
 
@@ -132,29 +140,29 @@ class AuthService
             ]);
         }
 
-        
-        // Revocar los tokens anteriores por seguridad
-        $user->tokens()->where('name', $dto->device_name)->delete();
-        
-        // Crear un nuevo token
-        $token = $user->createToken($dto->device_name)->plainTextToken;
-        
         // Si el un usuario prosumer intenta entrar a desktop (Unico del admin y master)
-        // Retirar los tokens y lanzar una excepción
+        // Lanzar una excepción
         if ($user->rol_id === 1 && $dto->device_name === 'desktop'){
-            $user->tokens()->where('name', $dto->device_name)->delete();
             throw ValidationException::withMessages([
                 'correo_id' => ['No cuentas con el rol para acceder']
             ]);
         }
         
-            // Actualizar fecha de última actividad
+        // Crear un nuevo token
+        $token = $this->jwt->fromUser($user);
+        
+        // Actualizar fecha de última actividad
         $this->userRepository->updateLastActivity($user->id);
+
+        // Obtener el tiempo de expiración configurado
+        $expiresIn = $this->jwt->factory()->getTTL() * 60;
 
         // Retornar el usuario y su nuevo token
         return [
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => $expiresIn,
         ];
     }
 
@@ -172,25 +180,96 @@ class AuthService
      */
     public function logout(Usuario $user, bool $allDevice = false): bool
     {
-        if($allDevice) {
-            // Revoca todos los tokens del usuario
-            $user->tokens()->delete();
-            return true;
-        }
-        
-        // Obtener el token actual 
-        $token = $user->currentAccessToken();
+       try {
+            // CASO 1: Cerrar sesión solo en el dispositivo actual
+            if (!$allDevice) {
+                // JWTAuth::invalidate() hace lo siguiente:
+                // 1. Obtiene el token del header Authorization
+                // 2. Lo decodifica y extrae el JTI (JWT ID único)
+                // 3. Agrega el JTI a la blacklist en cache
+                // 4. Cuando alguien intente usar ese token, lo rechazará
+                $this->jwt->logout();
+                return true;
+            }
 
-        // Eliminar el token del dispositivo actual
-        if ($token instanceof PersonalAccessToken) {
-            $token->delete();
+            // CASO 2: Cerrar sesión en "todos los dispositivos"
+            // PROBLEMA: Con JWT puro no podemos hacer esto fácilmente
+            // porque los tokens no están guardados en BD
+            
+            // SOLUCIÓN 1 (la que implementamos aquí):
+            // Guardar un timestamp "jwt_invalidated_at" en el usuario
+            // Luego en el middleware validar que el token sea posterior a esa fecha
+            $this->userRepository->invalidateAllTokens($user->id);
+            
+            // Invalidar también el token actual
+                $this->jwt->logout();
+            
             return true;
-        }
 
-        // No había token actual
-        return false;
+        } catch (JWTException $e) {
+            // Si ocurre algún error al invalidar el token
+            // (token ya expirado, token malformado, etc.)
+            return false;
+        }
     }
 
+    /**
+     * Refrescar token JWT
+     * 
+     * NUEVO MÉTODO (No existe en Sanctum)
+     * 
+     * PROPÓSITO:
+     * Cuando un token está por expirar, el cliente puede "refrescarlo"
+     * para obtener uno nuevo sin hacer login otra vez
+     * 
+     * PROCESO:
+     * 1. Recibe el token actual (aunque esté casi expirado)
+     * 2. Verifica que sea válido
+     * 3. Genera un nuevo token con nueva fecha de expiración
+     * 4. Opcionalmente invalida el token anterior (para que no se use)
+     * 
+     * CONFIGURACIÓN:
+     * - refresh_ttl en config/jwt.php define cuánto tiempo después
+     *   de expirado aún se puede refrescar (grace period)
+     * - Por defecto: 2 semanas
+     * 
+     * USO EN EL FRONTEND:
+     * Antes de que el token expire (ej: 5 min antes), hacer:
+     * POST /api/auth/refresh con el token actual
+     * 
+     * @return array - Nuevo token y metadata
+     * @throws JWTException - Si el token no se puede refrescar
+     */
+    public function refresh(): array
+    {
+        try {
+            // JWTAuth::refresh() hace lo siguiente:
+            // 1. Obtiene el token actual del header
+            // 2. Verifica que sea válido (o que esté en grace period)
+            // 3. Crea un nuevo token con los mismos claims
+            // 4. Invalida el token anterior (opcional según config)
+            // 5. Retorna el nuevo token
+            $newToken = $this->jwt->refresh();
+            
+            // Obtener tiempo de expiración
+            $expiresIn = $this->jwt->factory()->getTTL() * 60;
+
+            return [
+                'token' => $newToken,
+                'token_type' => 'bearer',
+                'expires_in' => $expiresIn,
+            ];
+
+        } catch (JWTException $e) {
+            throw ValidationException::withMessages([
+                'token' => ['No se pudo refrescar el token'],
+                'error' => [$e]
+            ]);
+        }
+    }
+
+    
+    
     /**
      * Obtener información del usuario autenticado
      * 
@@ -202,35 +281,17 @@ class AuthService
         // Retornar el usuario 
         return $user;
     }
-
+    
     /**
      * Verificar si un usuario esta "Recientemente conectado" (RNF009)
      * 
      * @param Usuario $user - Usuario a verificar
      * @return bool - true si estuvo activo
-     */
+    */
     public function isRecentlyActive(Usuario $user): bool
     {
         // now()->subDay-> Retorna la fecha/hora de hace 24 horas
         // isAfter() Verifica si la fecha_reciente es porsterior a las 24 horas
         return Carbon::parse($user->fecha_reciente)->isAfter(now()->subDay());
-    }
-
-    /**
-     * Revocar un token específico por su ID
-     * 
-     * Permite la funcionalidad de "Ver sesiones activas" y permite
-     * al administrador o al master cerrar sesiones específicas
-     * 
-     * @param Usuario $user - Usuario propietario del token
-     * @param int $tokenId - ID del token a revocar
-     * @return bool - true si se revocó, false si no existe o no pertenece al usuario
-     */
-    public function revokeToken(Usuario $user, int $tokenId): bool
-    {
-        // Buscar el token po ID y verificar que pertenezca al usuario
-        // Si lo encuentra lo elimina si no lo encuentra retorna false
-        return $user->tokens()->where('id', $tokenId)->delete() > 0;
-
     }
 }

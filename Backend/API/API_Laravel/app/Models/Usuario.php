@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Usuario extends Authenticatable
+class Usuario extends Authenticatable implements JWTSubject
 {
-    //
-    use HasApiTokens, HasFactory, Notifiable;
+    use Notifiable;
 
     protected $table = 'usuarios';
     public $timestamps = false;
@@ -27,13 +25,15 @@ class Usuario extends Authenticatable
     ];
 
     protected $hidden = [
-        'password'
+        'password',
+        'remember_token',
     ];
 
     protected $casts = [
         'notifica_correo' => 'boolean',
         'notifica_push' => 'boolean',
-        'uso_datos' => 'boolean'
+        'password' => 'string',
+        'uso_datos' => 'boolean',
     ];
 
     // Relaciones con otros modelos
@@ -48,6 +48,25 @@ class Usuario extends Authenticatable
     // Método requerido por Laravel para la autenticación
     public function getAuthIdentifierName(){
         return 'correo_id';
+    }
+
+    // Obtener identicador JWT
+    public function getJWTIdentifier()
+    {
+        // Retorna la clave primaria del modelo
+        return $this->getKey();
+    }
+
+    // Return una custom key array.
+    public function getJWTCustomClaims(): array
+    {
+        return [
+            'correo' => $this->correo_id,
+            'nombre' => $this->nombre,
+            'rol' => $this->rol->nombre ?? 'prosumer',
+            'estado' => $this->estado_id,
+            'avatar' => $this->avatar,
+        ];
     }
 
 }

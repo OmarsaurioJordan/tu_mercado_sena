@@ -6,6 +6,11 @@ use App\DTOs\Auth\RegisterDTO;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
+
+
+
+
 class UserRepository implements UserRepositoryInterface
 {
     /**
@@ -119,4 +124,31 @@ class UserRepository implements UserRepositoryInterface
     {
         return Usuario::where('correo_id', $email)->exists();
     }
+
+    /**
+     * Invalidar todos los tokens JWT del usuario
+     * 
+     * NUEVO MÉTODO PARA JWT
+     * 
+     * PROPÓSITO:
+     * Cuando el usuario hace "cerrar sesión en todos los dispositivos",
+     * guardamos un timestamp. Luego en el middleware validamos que
+     * los tokens sean posteriores a esta fecha.
+     * 
+     * 
+     * @param int $userId - ID del usuario
+     * @return bool - true si se actualizó
+     */
+    public function invalidateAllTokens(int $userId): bool
+    {
+        $user = Usuario::find($userId);
+
+        if ($user) {
+            $user->jwt_invalidated_at = Carbon::now();
+            return $user->save();
+        }
+
+        return false;
+    }
 }
+

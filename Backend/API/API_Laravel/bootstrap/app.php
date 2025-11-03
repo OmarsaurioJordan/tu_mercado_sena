@@ -15,6 +15,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         //
+        $middleware->alias([
+            'jwtVerify' => \App\Http\Middleware\ValidateJWTToken::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -4,8 +4,8 @@ namespace App\Providers;
 
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Contracts\UserRepositoryInterface;
-use App\Repositories\UserRepository;
+use Tymon\JWTAuth\JWTGuard;
+
 
 
 
@@ -16,12 +16,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // 
-        // Configurar la interfaz del repositorio del usuario y el repositorio
-        $this->app->bind(
-            UserRepositoryInterface::class, // Lo que se pide (interfaz)
-            UserRepository::class // Lo que da (Implementación)
-        );
+        // Crear la inyección de dependencias para el guard JWT
+        $this->app->bind(JWTGuard::class, function($app){
+            return auth('api');
+        });
     }
 
     /**
