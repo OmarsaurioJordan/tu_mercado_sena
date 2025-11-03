@@ -34,7 +34,7 @@ link	Debe ser una red social válida: YouTube, Instagram, Facebook, Twitter o Li
 
 Ejemplo JSON:
 
-'''JSON
+```JSON
 {
  "correo_id": "juan.perez@sena.edu.co",
  "password": "Password123",
@@ -45,18 +45,19 @@ Ejemplo JSON:
   "link": "https://instagram.com/juanperez",
   "device_name": "web"
 }
-'''
+```
 
 Respuesta (201 - Created):
 
-'''JSON
+
+```JSON
 {
   "user": { ... },
   "token": "xxxxx",
   "token_type": "bearer",
   "expires_in": 3600
 }
-'''
+```
 
 2️⃣ Inicio de sesión
 
@@ -73,30 +74,29 @@ Mensajes posibles:
 
 ❌ Correo o contraseña incorrectos
 
-🚫 Esta cuenta ha sido desactivada.
+🚫 Esta cuenta ha sido desactivada
 
-⚠️ No cuentas con el rol para acceder a este dispositivo.
-
+⚠️ No cuentas con el rol para acceder a este dispositivo
 Ejemplo JSON:
 
-'''JSON
+```JSON
 {
   "correo_id": "omar.jordan@sena.edu.co",
   "password": "omarJordan1234",
   "device_name": "desktop"
 }
-'''
+```
 
 Respuesta (200 - OK):
 
-'''JSON
+```JSON
 {
   "user": { ... },
   "token": "xxxxx",
   "token_type": "bearer",
   "expires_in": 3600
 }
-'''
+```
 
 🔒 RUTAS PROTEGIDAS
 
@@ -111,19 +111,19 @@ Ruta: http://localhost:8000/api/auth/logout
 
 Cuerpo opcional:
 
-'''JSON
+```JSON
 {
   "all_devices": false
 }
-'''
+```
 
 Respuesta:
 
-'''JSON
+```JSON
 {
   "message": "Sesión cerrada correctamente"
 }
-'''
+```
 
 💡 Si all_devices = true, se intentará cerrar sesión en todos los dispositivos. (En pruebas)
 
@@ -154,11 +154,11 @@ Ruta: http://localhost:8000/api/auth/me
 
 Respuesta:
 
-'''JSON
+```JSON
 {
   "user": { ... }
 }
-'''
+```
 
 🧩 ESTRUCTURA Y COMPONENTES DEL CÓDIGO
 📦 DTOs (Data Transfer Objects)
@@ -198,6 +198,7 @@ logout()	Cierra sesión (actual o global)
 refresh()	Refresca token JWT
 getCurrentUser()	Retorna usuario autenticado
 isRecentlyActive()	Comprueba actividad reciente
+
 🗃️ Repositorio e Interfaz
 UserRepositoryInterface
 
