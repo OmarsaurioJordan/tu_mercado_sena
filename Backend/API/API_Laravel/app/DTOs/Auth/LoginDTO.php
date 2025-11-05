@@ -2,12 +2,12 @@
 
 namespace App\DTOs\Auth;
 
-class LoginDTO
+final readonly class LoginDTO
 {
     public function __construct(
-        public readonly string $correo_id,
-        public readonly string $password,
-        public readonly string $device_name,
+        public string $correo_id,
+        public string $password,
+        public string $device_name,
     ) {}
 
     public static function fromRequest(array $data): self

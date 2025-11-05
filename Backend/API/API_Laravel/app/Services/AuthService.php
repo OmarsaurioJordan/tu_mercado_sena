@@ -6,14 +6,9 @@ use App\DTOs\Auth\RegisterDTO;
 use App\DTOs\Auth\LoginDTO;
 use App\Models\Usuario;
 use App\Repositories\Contracts\UserRepositoryInterface;
-use Illuminate\Database\Eloquent\Casts\AsUri;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\JWTGuard;
 

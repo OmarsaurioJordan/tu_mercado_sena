@@ -2,18 +2,18 @@
 
 namespace App\DTOs\Auth;
 
-class RegisterDTO
+final readonly class RegisterDTO
 {
     /**
      * Create a new class instance.
      */
     public function __construct(
-        public readonly string $correo_id,
-        public readonly string $password,
-        public readonly string $nombre,
-        public readonly int $avatar,
-        public readonly ?string $descripcion = null,
-        public readonly ?string $link = null
+        public string $correo_id,
+        public string $password,
+        public string $nombre,
+        public int $avatar,
+        public ?string $descripcion = null,
+        public ?string $link = null
     ){}
 
     // Crear una instacia del DTO a partir de un array de datos (procedente del request)

@@ -193,29 +193,17 @@ Cumple con el principio Single Responsibility (SOLID).
 
 Método/Función
 
-**register()**
+**register()** -> Crea usuario y genera token
 
-Crea usuario y genera token
+**login()** -> Valida credenciales, rol, estado y dispositivo
 
-**login()**
+**logout()** -> Cierra sesión (actual o global)
 
-Valida credenciales, rol, estado y dispositivo
+**refresh()** -> Refresca token JWT
 
-**logout()**  
+**getCurrentUser()** -> Retorna usuario autenticado
 
-Cierra sesión (actual o global)
-
-**refresh()**  
-
-Refresca token JWT
-
-**getCurrentUser()**  
-
-Retorna usuario autenticado
-
-**isRecentlyActive()**	
-
-Comprueba actividad reciente
+**isRecentlyActive()** -> Comprueba actividad reciente
 
 🗃️ Repositorio e Interfaz
 UserRepositoryInterface
@@ -238,13 +226,13 @@ UserRepository
 
 Implementa la interfaz usando Eloquent ORM:
 
-create() → Crea usuario, hashea contraseña y asigna rol/estado.
+**create()** → Crea usuario, hashea contraseña y asigna rol/estado.
 
-findByEmail() / findById() → Búsqueda directa.
+**findByEmail()** / findById() → Búsqueda directa.
 
-updateLastActivity() → Actualiza fecha de actividad.
+**updateLastActivity()** → Actualiza fecha de actividad.
 
-invalidateAllTokens() → Cierra sesión global.
+**invalidateAllTokens()** → Cierra sesión global.
 
 🧱 Middleware: ValidateJWTToken
 

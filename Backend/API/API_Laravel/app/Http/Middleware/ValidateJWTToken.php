@@ -5,12 +5,12 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\JWTGuard;
+use Illuminate\Support\Facades\Log;
 
 
 class ValidateJWTToken
@@ -71,6 +71,7 @@ class ValidateJWTToken
 
         } catch (TokenExpiredException $e) {
             // El token expiro
+            Log::error($e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token expirado. Por favor inicie sesión nuevamente'
