@@ -10,6 +10,7 @@ use App\DTOs\Auth\RegisterDTO;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\JWTGuard;
 
 /**
  * Controlador de autenticación
@@ -240,7 +241,7 @@ class AuthController
      * @param Request $request - Request con usuario autenticado
      * @return JsonResponse - JSON con datos del usuario
      */
-    public function me(Request $request): JsonResponse
+    public function me(JWTGuard $request): JsonResponse
     {
         try{
             // Obtener el usuario autenticado desde el JWTGuard

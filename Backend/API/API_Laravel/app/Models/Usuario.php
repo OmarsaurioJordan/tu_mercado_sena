@@ -21,19 +21,25 @@ class Usuario extends Authenticatable implements JWTSubject
         'avatar',
         'descripcion',
         'link',
-        'estado_id'
+        'estado_id',
+        'jwt_invalidated_at'
     ];
 
     protected $hidden = [
         'password',
-        'remember_token',
+        'jwt_invalidated_at'
     ];
 
     protected $casts = [
+        'id' => 'integer',
+        'correo_id' => 'string',  
+        'rol_id' => 'integer',
         'notifica_correo' => 'boolean',
         'notifica_push' => 'boolean',
         'password' => 'string',
         'uso_datos' => 'boolean',
+        'estado_id' => 'integer',
+        'jwt_invalidated_at' => 'datetime',
     ];
 
     // Relaciones con otros modelos
@@ -44,12 +50,7 @@ class Usuario extends Authenticatable implements JWTSubject
     public function estado() {
         return $this->belongsTo(Estado::class, 'estado_id');
     }
-
-    // Método requerido por Laravel para la autenticación
-    public function getAuthIdentifierName(){
-        return 'correo_id';
-    }
-
+    
     // Obtener identicador JWT
     public function getJWTIdentifier()
     {

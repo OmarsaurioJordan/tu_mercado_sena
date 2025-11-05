@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Usuario;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -9,16 +10,11 @@ use Carbon\Carbon;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
-use Tymon\JWTAuth\JWTGuard;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
-
 
 class ValidateJWTToken
 {
-    public function __construct(
-        private JWTGuard $jWTGuard
-    )
-    {}
     /**
      * Handle an incoming request.
      *
@@ -26,19 +22,19 @@ class ValidateJWTToken
      */
     public function handle(Request $request, Closure $next): Response
     {
-        try{
+        try {
             // Verificar y decodificar el token JWT
-            $user = $this->jWTGuard->user();
+            $user = JWTAuth::parseToken()->authenticate();
 
             // Verificar que el usuario exista
-            if (!$user) {
+            if (!$user instanceof Usuario) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Usuario no encontrado'
                 ], 404);
             }
 
-            // Verificar que el usuario este activo
+            // Verificar que el usuario esté activo
             // Estado_id: 1 = Activo, 2 = Invisible, 3 = Eliminado
             if ($user->estado_id === 3) {
                 return response()->json([
@@ -50,15 +46,13 @@ class ValidateJWTToken
             // Verificar jwt_invalidated_at (cerrar sesión en todos los dispositivos)
             if ($user->jwt_invalidated_at) {
                 // Obtener el payload del token para ver cuándo fue emitido
-                // $payload =  JWTAuth::getPayLoad();
-                $payload = $this->jWTGuard->getPayload();
+                $payload = JWTAuth::getPayload();
 
-
-                // 'ian => issued at (timestamp de cuando se creo el token),
+                // 'iat' => issued at (timestamp de cuando se creó el token)
                 $tokenIssuedAt = Carbon::createFromTimestamp($payload->get('iat'));
 
-                // Comparar ¿El token fue creado antes de invalidar todos los tokens?
-                if ($tokenIssuedAt->isBefere($user->jwt_invalidated_at)) {
+                // Comparar: ¿El token fue creado antes de invalidar todos los tokens?
+                if ($tokenIssuedAt->isBefore($user->jwt_invalidated_at)) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Token inválido. Por favor inicia sesión nuevamente'
@@ -66,29 +60,32 @@ class ValidateJWTToken
                 }
             }
 
-            // OK - Permitir que continue la petición
+            // OK - Permitir que continúe la petición
             return $next($request);
 
         } catch (TokenExpiredException $e) {
-            // El token expiro
-            Log::error($e->getMessage());
+            // El token expiró
+            Log::error('Token expirado: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token expirado. Por favor inicie sesión nuevamente'
             ], 401);
 
-        } catch (TokenInvalidException) {
+        } catch (TokenInvalidException $e) {
             // El token es inválido
+            Log::error('Token inválido: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Token inválido',
             ], 401);
 
-        } catch (JWTException) {
+        } catch (JWTException $e) {
+            // Token no proporcionado o error general
+            Log::error('JWT Exception: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Token no proporcionado',
-            ]);
+                'message' => 'Token no proporcionado o inválido',
+            ], 401);
         }
     }
 }
