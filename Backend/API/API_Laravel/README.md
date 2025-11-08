@@ -12,6 +12,10 @@ El Backend de Tu Mercado SENA fue diseñado para manejar peticiones HTTP, proces
 
 Sigue la arquitectura MVC y aplica el patrón Repository-Service, lo que garantiza una mejor separación de responsabilidades, escalabilidad y facilidad de mantenimiento.
 
+**Flujo que seguira el backed**
+
+![image alt](https://github.com/Br4h7an005/tu_mercado_sena/blob/c558675e226f56b0bfd018dce878b73e56554620/Backend/API/API_Laravel/Flujo%20Backend.jpg)
+
 🌐 RUTAS DE LA API
 
 ⚠️ Nota: Actualmente están disponibles solo las rutas del módulo de autenticación.
