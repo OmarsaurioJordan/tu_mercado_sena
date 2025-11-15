@@ -8,7 +8,7 @@ class UsuarioCard(QFrame):
 
     def __init__(self, usr_id, usr_nombre, usr_correo, usr_rol, usr_estado):
         super().__init__()
-        self.id = usr_id;
+        self.id = usr_id
 
         estado_color = {
             1: "#e6e5e5", # activo

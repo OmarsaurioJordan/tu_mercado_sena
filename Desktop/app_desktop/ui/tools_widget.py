@@ -2,6 +2,8 @@ from PySide6.QtWidgets import (
     QWidget, QTabWidget, QScrollArea, QHBoxLayout, QLabel
 )
 from PySide6.QtCore import Qt
+from ui.usuario_body import UsuarioBody
+from ui.usuario_filter import Usuariofilter
 
 class ToolsWidget(QWidget):
 
@@ -9,7 +11,7 @@ class ToolsWidget(QWidget):
         super().__init__()
 
         tabsFind = QTabWidget()
-        tabsFind.addTab(self.busqueda(), "Usuarios")
+        tabsFind.addTab(self.busqueda(Usuariofilter()), "Usuarios")
         tabsFind.addTab(self.busqueda(), "Productos")
         tabsFind.addTab(self.busqueda(), "PQRSs")
         tabsFind.addTab(self.busqueda(), "Denuncias")
@@ -24,7 +26,7 @@ class ToolsWidget(QWidget):
         tabsA.addTab(self.scroll(), "Auditoría")
 
         tabsB = QTabWidget()
-        tabsB.addTab(self.scroll(), "Usuario")
+        tabsB.addTab(self.scroll(UsuarioBody()), "Usuario")
         tabsB.addTab(self.scroll(), "Catálogo")
         tabsB.addTab(self.scroll(), "Papelera")
         tabsB.addTab(self.scroll(), "Historial")

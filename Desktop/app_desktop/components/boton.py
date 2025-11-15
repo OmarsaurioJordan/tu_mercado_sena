@@ -1,0 +1,28 @@
+from PySide6.QtWidgets import (
+    QPushButton
+)
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QIcon
+
+class Boton(QPushButton):
+    def __init__(self, texto="", icono=""):
+        super().__init__(texto)
+        if icono != "":
+            self.setIcon(QIcon("assets/sprites/" + icono + ".png"))
+            self.setIconSize(QSize(32, 32))
+        self.setStyleSheet("""
+            QPushButton {
+                padding: 6px 12px;
+                border: 1px solid #cccccc;
+                border-radius: 10px;
+                background-color: #f8f8f8;
+            }
+            QPushButton:hover {
+                background-color: #e8e8e8;
+                border: 1px solid #bbbbbb;
+            }
+            QPushButton:pressed {
+                background-color: #dcdcdc;
+                border: 1px solid #aaaaaa;
+            }
+        """)
