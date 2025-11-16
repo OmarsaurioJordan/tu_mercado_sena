@@ -1,5 +1,9 @@
-/__pycache__
-/img_backup
-/img_mensajes
-/img_productos
-/img_test
+__pycache__
+img_backup/*
+!img_backup/.gitkeep
+img_mensajes/*
+!img_backup/.gitkeep
+img_productos/*
+!img_productos/.gitkeep
+img_test/*
+!img_test/.gitkeep

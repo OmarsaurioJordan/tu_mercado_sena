@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-09-2025 a las 04:42:56
+-- Tiempo de generación: 16-11-2025 a las 22:52:03
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -104,7 +104,8 @@ INSERT INTO `categorias` (`id`, `nombre`) VALUES
 (10, 'mobiliario'),
 (11, 'vehículo'),
 (12, 'mascota'),
-(13, 'otro');
+(13, 'otro'),
+(14, 'adornos');
 
 -- --------------------------------------------------------
 
@@ -112,7 +113,6 @@ INSERT INTO `categorias` (`id`, `nombre`) VALUES
 -- Estructura de tabla para la tabla `chats`
 --
 -- Creación: 19-08-2025 a las 01:44:09
--- Última actualización: 19-08-2025 a las 01:44:09
 --
 
 DROP TABLE IF EXISTS `chats`;
@@ -146,7 +146,6 @@ CREATE TABLE `chats` (
 -- Estructura de tabla para la tabla `correos`
 --
 -- Creación: 02-09-2025 a las 02:32:40
--- Última actualización: 02-09-2025 a las 02:32:40
 --
 
 DROP TABLE IF EXISTS `correos`;
@@ -167,12 +166,13 @@ CREATE TABLE `correos` (
 --
 -- Estructura de tabla para la tabla `denuncias`
 --
--- Creación: 19-08-2025 a las 02:07:54
+-- Creación: 16-11-2025 a las 21:48:20
 --
 
 DROP TABLE IF EXISTS `denuncias`;
 CREATE TABLE `denuncias` (
   `id` int(10) UNSIGNED NOT NULL,
+  `denunciante_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'quién fué el usuario que creó la denuncia',
   `producto_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'si fué creada a partir de un producto',
   `usuario_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'si fué creada a partir de un usuario',
   `chat_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'si fué creada a partir de un chat / mensaje de comprador',
@@ -185,6 +185,8 @@ CREATE TABLE `denuncias` (
 -- RELACIONES PARA LA TABLA `denuncias`:
 --   `chat_id`
 --       `chats` -> `id`
+--   `denunciante_id`
+--       `usuarios` -> `id`
 --   `estado_id`
 --       `estados` -> `id`
 --   `motivo_id`
@@ -201,7 +203,6 @@ CREATE TABLE `denuncias` (
 -- Estructura de tabla para la tabla `estados`
 --
 -- Creación: 04-08-2025 a las 23:22:13
--- Última actualización: 19-08-2025 a las 03:22:18
 --
 
 DROP TABLE IF EXISTS `estados`;
@@ -261,7 +262,6 @@ CREATE TABLE `favoritos` (
 -- Estructura de tabla para la tabla `integridad`
 --
 -- Creación: 04-08-2025 a las 23:29:02
--- Última actualización: 19-08-2025 a las 01:58:01
 --
 
 DROP TABLE IF EXISTS `integridad`;
@@ -337,7 +337,6 @@ CREATE TABLE `mensajes` (
 -- Estructura de tabla para la tabla `motivos`
 --
 -- Creación: 19-08-2025 a las 02:19:57
--- Última actualización: 19-08-2025 a las 03:16:32
 --
 
 DROP TABLE IF EXISTS `motivos`;
@@ -466,7 +465,6 @@ CREATE TABLE `pqrs` (
 -- Estructura de tabla para la tabla `productos`
 --
 -- Creación: 28-08-2025 a las 15:39:03
--- Última actualización: 29-08-2025 a las 03:00:47
 --
 
 DROP TABLE IF EXISTS `productos`;
@@ -503,7 +501,7 @@ CREATE TABLE `productos` (
 -- Estructura de tabla para la tabla `roles`
 --
 -- Creación: 19-08-2025 a las 03:31:20
--- Última actualización: 19-08-2025 a las 03:32:08
+-- Última actualización: 16-11-2025 a las 21:49:10
 --
 
 DROP TABLE IF EXISTS `roles`;
@@ -523,7 +521,7 @@ CREATE TABLE `roles` (
 INSERT INTO `roles` (`id`, `nombre`) VALUES
 (1, 'master'),
 (2, 'administrador'),
-(3, 'usuario');
+(3, 'prosumer');
 
 -- --------------------------------------------------------
 
@@ -633,15 +631,15 @@ INSERT INTO `subcategorias` (`id`, `nombre`, `categoria_id`) VALUES
 (90, 'tapete', 10),
 (91, 'otro', 13),
 (92, 'otro', 3),
-(93, 'hoja', 3),
-(94, 'cartulina', 3),
-(95, 'pegamento', 3),
-(96, 'colores', 3),
-(97, 'lápiz', 3),
-(98, 'lapicero', 3),
-(99, 'marcador', 3),
-(100, 'borrador o sacapuntas', 3),
-(101, 'fomi o tela', 3),
+(93, 'cartónes o cajas', 3),
+(94, 'telas y costura', 3),
+(95, 'pegamentos', 3),
+(96, 'cuadernos, carpetas', 3),
+(97, 'colores, pinturas, pinceles', 3),
+(98, 'libros', 3),
+(99, 'lápices, marcadores, lapiceros', 3),
+(100, 'borradores, sacapuntas', 3),
+(101, 'papel, fomi, cartulina', 3),
 (102, 'otro', 8),
 (103, 'entrenamiento deportivo', 8),
 (104, 'eseñanza artística', 8),
@@ -681,7 +679,17 @@ INSERT INTO `subcategorias` (`id`, `nombre`, `categoria_id`) VALUES
 (138, 'falda', 1),
 (139, 'medias o guantes', 1),
 (140, 'chaleco o buzo', 1),
-(141, 'colgandijas', 1);
+(141, 'colgandijas', 1),
+(142, 'colgantes', 14),
+(143, 'figurillas', 14),
+(144, 'materas o jardín', 14),
+(145, 'de metal', 14),
+(146, 'de plástico', 14),
+(147, 'de madera', 14),
+(148, 'de porcelana', 14),
+(149, 'afiches o pinturas', 14),
+(150, 'peluches', 14),
+(151, 'otro', 14);
 
 -- --------------------------------------------------------
 
@@ -689,7 +697,6 @@ INSERT INTO `subcategorias` (`id`, `nombre`, `categoria_id`) VALUES
 -- Estructura de tabla para la tabla `sucesos`
 --
 -- Creación: 19-08-2025 a las 02:19:19
--- Última actualización: 19-08-2025 a las 02:53:58
 --
 
 DROP TABLE IF EXISTS `sucesos`;
@@ -726,7 +733,6 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 -- Estructura de tabla para la tabla `usuarios`
 --
 -- Creación: 19-08-2025 a las 02:02:32
--- Última actualización: 29-08-2025 a las 03:00:45
 --
 
 DROP TABLE IF EXISTS `usuarios`;
@@ -832,7 +838,8 @@ ALTER TABLE `denuncias`
   ADD KEY `denuncia_usuario` (`usuario_id`),
   ADD KEY `denuncia_producto` (`producto_id`),
   ADD KEY `denuncia_estado` (`estado_id`),
-  ADD KEY `denuncia_motivo` (`motivo_id`);
+  ADD KEY `denuncia_motivo` (`motivo_id`),
+  ADD KEY `denuncia_denunciante` (`denunciante_id`);
 
 --
 -- Indices de la tabla `estados`
@@ -964,7 +971,7 @@ ALTER TABLE `bloqueados`
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `chats`
@@ -1054,7 +1061,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `subcategorias`
 --
 ALTER TABLE `subcategorias`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
 
 --
 -- AUTO_INCREMENT de la tabla `sucesos`
@@ -1105,6 +1112,7 @@ ALTER TABLE `chats`
 --
 ALTER TABLE `denuncias`
   ADD CONSTRAINT `denuncia_chat` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `denuncia_denunciante` FOREIGN KEY (`denunciante_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `denuncia_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `denuncia_motivo` FOREIGN KEY (`motivo_id`) REFERENCES `motivos` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `denuncia_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
