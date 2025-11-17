@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-11-2025 a las 22:52:03
+-- Tiempo de generación: 17-11-2025 a las 01:30:07
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -732,7 +732,7 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 19-08-2025 a las 02:02:32
+-- Creación: 17-11-2025 a las 00:29:44
 --
 
 DROP TABLE IF EXISTS `usuarios`;
@@ -742,9 +742,9 @@ CREATE TABLE `usuarios` (
   `password` varchar(127) NOT NULL COMMENT 'debe guardarse como un hash',
   `rol_id` int(10) UNSIGNED NOT NULL COMMENT 'administra los permisos de acceso al sistema',
   `nombre` varchar(32) NOT NULL COMMENT 'el nickname del usuario, pueden repetirse',
-  `avatar` int(10) UNSIGNED NOT NULL COMMENT 'apunta a alguna configuracion de sprites (imagenes) o a un servicio web con ID de avatar',
-  `descripcion` varchar(512) NOT NULL COMMENT 'para que el usuario diga algo sobre si mismo en su perfil',
-  `link` varchar(128) NOT NULL COMMENT 'si el usuario quiere compartir redes sociales o algo asi',
+  `avatar` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'apunta a alguna configuracion de sprites (imagenes) o a un servicio web con ID de avatar',
+  `descripcion` varchar(512) NOT NULL DEFAULT '' COMMENT 'para que el usuario diga algo sobre si mismo en su perfil',
+  `link` varchar(128) NOT NULL DEFAULT '' COMMENT 'si el usuario quiere compartir redes sociales o algo asi',
   `estado_id` int(10) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'esto dice si el usuario esta pendiente de aprobacion, bloqueado del sistema, eliminado, etc',
   `notifica_correo` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'en true significa que desea recibir correos cuando alguien se pone en contacto',
   `notifica_push` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'en true significa que quiere recibir notificaciones emergentes en celular o computadora cuando algo sucede',

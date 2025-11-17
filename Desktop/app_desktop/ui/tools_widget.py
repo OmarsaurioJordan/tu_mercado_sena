@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from ui.usuario_body import UsuarioBody
 from ui.usuario_filter import Usuariofilter
+from ui.usuario_busqueda import UsuarioBusqueda
 
 class ToolsWidget(QWidget):
 
@@ -11,7 +12,7 @@ class ToolsWidget(QWidget):
         super().__init__()
 
         tabsFind = QTabWidget()
-        tabsFind.addTab(self.busqueda(Usuariofilter()), "Usuarios")
+        tabsFind.addTab(self.busqueda(Usuariofilter(), UsuarioBusqueda()), "Usuarios")
         tabsFind.addTab(self.busqueda(), "Productos")
         tabsFind.addTab(self.busqueda(), "PQRSs")
         tabsFind.addTab(self.busqueda(), "Denuncias")
@@ -63,11 +64,9 @@ class ToolsWidget(QWidget):
         layBusqueda.setSpacing(10)
         layBusqueda.setContentsMargins(0, 0, 0, 0)
         if widgetFiltro == None:
-            layBusqueda.addWidget(QLabel())
-        else:
-            layBusqueda.addWidget(widgetFiltro)
+            widgetFiltro = QLabel()
         if widgetResultado == None:
-            layBusqueda.addWidget(self.scroll(QLabel()))
-        else:
-            layBusqueda.addWidget(self.scroll(widgetResultado))
+            widgetResultado = QLabel()
+        layBusqueda.addWidget(widgetFiltro, 1)
+        layBusqueda.addWidget(self.scroll(widgetResultado), 4)
         return widgetBusqueda
