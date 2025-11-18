@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap, QIcon
 from components.usuario_card import UsuarioCard
 from components.boton import Boton
+from models.usuario import Usuario
 
 class HeaderLayout(QVBoxLayout):
 
@@ -46,10 +47,13 @@ class HeaderLayout(QVBoxLayout):
         layHorizontal.addWidget(notifica_denuncias)
         layHorizontal.addSpacing(10)
         layHorizontal.addStretch()
-        layHorizontal.addWidget(UsuarioCard(0, "Nombre de Usuario", "correo_usuario@sena.edu.co", 2, 1))
+        layHorizontal.addWidget(UsuarioCard(self.usuario_debug()))
         self.addWidget(header)
         
         if widget == None:
             self.addWidget(QLabel())
         else:
             self.addWidget(widget)
+
+    def usuario_debug(self):
+        return Usuario(0, "correo_administrativo@sena.edu.co", 1, "Usuario Administrador", 0, "", "", 1, "", "", "")

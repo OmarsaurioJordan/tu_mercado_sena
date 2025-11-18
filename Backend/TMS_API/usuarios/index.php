@@ -12,14 +12,7 @@ if ($nombre != "") {
     $vars[] = "%$nombre%";
 }
 
-$correo = isset($_GET["correo"]) ? $_GET["correo"] : "";
-if ($correo != "") {
-    $cond .= " AND c.correo = ?";
-    $vars[] = $correo;
-}
-
 $rol_id = isset($_GET["rol_id"]) ? $_GET["rol_id"] : "0";
-$cond .= " AND u.rol_id != 1";
 if ($rol_id != "0") {
     $cond .= ($rol_id == "1") ? " AND u.rol_id = 3" : " AND u.rol_id = 2";
 }
@@ -79,11 +72,34 @@ if ($registro_hasta != "") {
     $vars[] = $registro_hasta;
 }
 
-$cond = substr($cond, 5);
+$correo = isset($_GET["correo"]) ? $_GET["correo"] : "";
+if ($correo != "") {
+    # no lleva concatenacion porque correo sobreescribe a las otras condiciones
+    $cond = " AND c.correo = ?";
+    $vars = [$correo];
+}
+
+$limite = isset($_GET["limite"]) ? $_GET["limite"] : "";
+$lim = "";
+if ($limite != "") {
+    $lim = " LIMIT ?";
+    $vars[] = $limite;
+}
+
+$cursor_fecha = isset($_GET["cursor_fecha"]) ? $_GET["cursor_fecha"] : date("Y-m-d H:i:s");
+$cursor_id = isset($_GET["cursor_id"]) ? $_GET["cursor_id"] : "";
+$curs = "1";
+if ($cursor_id != "") {
+    $curs = "(u.fecha_registro = ? AND u.id < ?)";
+    array_unshift($vars, $cursor_id);
+    array_unshift($vars, $cursor_fecha);
+}
+array_unshift($vars, $cursor_fecha);
 
 $sql = "SELECT u.id AS id, c.correo AS correo, u.rol_id AS rol_id, u.nombre AS nombre, u.avatar AS avatar, u.descripcion AS descripcion, u.link AS link, u.estado_id AS estado_id, u.fecha_registro AS fecha_registro, u.fecha_actualiza AS fecha_actualiza, u.fecha_reciente AS fecha_reciente
 FROM usuarios u LEFT JOIN correos c ON u.correo_id = c.id
-WHERE $cond";
+WHERE (u.fecha_registro < ? OR $curs) AND u.rol_id != 1 $cond 
+ORDER BY u.fecha_registro DESC, u.id DESC $lim";
 
 $stmt = $conn->prepare($sql);
 if (count($vars) > 0) {

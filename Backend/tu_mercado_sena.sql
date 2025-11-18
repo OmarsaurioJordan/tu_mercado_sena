@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-11-2025 a las 01:30:07
+-- Tiempo de generación: 17-11-2025 a las 16:32:45
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -501,7 +501,6 @@ CREATE TABLE `productos` (
 -- Estructura de tabla para la tabla `roles`
 --
 -- Creación: 19-08-2025 a las 03:31:20
--- Última actualización: 16-11-2025 a las 21:49:10
 --
 
 DROP TABLE IF EXISTS `roles`;
@@ -732,7 +731,7 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 17-11-2025 a las 00:29:44
+-- Creación: 17-11-2025 a las 15:32:15
 --
 
 DROP TABLE IF EXISTS `usuarios`;
@@ -740,7 +739,7 @@ CREATE TABLE `usuarios` (
   `id` int(10) UNSIGNED NOT NULL,
   `correo_id` int(10) UNSIGNED NOT NULL COMMENT 'apunta a la tabla donde se guardan los correos y claves de un uso',
   `password` varchar(127) NOT NULL COMMENT 'debe guardarse como un hash',
-  `rol_id` int(10) UNSIGNED NOT NULL COMMENT 'administra los permisos de acceso al sistema',
+  `rol_id` int(10) UNSIGNED NOT NULL DEFAULT 3 COMMENT 'administra los permisos de acceso al sistema',
   `nombre` varchar(32) NOT NULL COMMENT 'el nickname del usuario, pueden repetirse',
   `avatar` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'apunta a alguna configuracion de sprites (imagenes) o a un servicio web con ID de avatar',
   `descripcion` varchar(512) NOT NULL DEFAULT '' COMMENT 'para que el usuario diga algo sobre si mismo en su perfil',

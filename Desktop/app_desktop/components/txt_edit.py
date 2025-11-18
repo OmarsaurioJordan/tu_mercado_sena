@@ -18,3 +18,6 @@ class TxtEdit(QWidget):
             layVertical.addWidget(lblTitulo)
         layVertical.addWidget(self.lineEdit)
         self.setLayout(layVertical)
+    
+    def get_value(self):
+        return self.lineEdit.text().strip()

@@ -15,14 +15,14 @@ class Usuario:
     @staticmethod
     def from_json(data):
         return Usuario(
-            id=data.get('id'),
+            id=int(data.get('id')),
             correo=data.get('correo'),
-            rol_id=data.get('rol_id'),
+            rol_id=int(data.get('rol_id')),
             nombre=data.get('nombre'),
-            avatar=data.get('avatar'),
+            avatar=int(data.get('avatar')),
             descripcion=data.get('descripcion'),
             link=data.get('link'),
-            estado_id=data.get('estado_id'),
+            estado_id=int(data.get('estado_id')),
             fecha_registro=data.get('fecha_registro'),
             fecha_actualiza=data.get('fecha_actualiza'),
             fecha_reciente=data.get('fecha_reciente')

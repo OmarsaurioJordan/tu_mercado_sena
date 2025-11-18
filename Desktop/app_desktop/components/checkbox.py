@@ -12,3 +12,9 @@ class Checkbox(QWidget):
         layout.addWidget(self.label)
         layout.addStretch()
         self.setLayout(layout)
+    
+    def get_value(self):
+        return self.checkbox.isChecked()
+    
+    def get_bool(self):
+        return 1 if self.checkbox.isChecked() else 0

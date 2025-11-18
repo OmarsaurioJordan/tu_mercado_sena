@@ -16,3 +16,6 @@ class SpinBox(QWidget):
         layout.addWidget(label)
         layout.addWidget(self.spin)
         self.setLayout(layout)
+    
+    def get_value(self):
+        return self.spin.value()

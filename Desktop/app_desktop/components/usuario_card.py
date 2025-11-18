@@ -1,21 +1,22 @@
 from PySide6.QtWidgets import (
     QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 
 class UsuarioCard(QFrame):
+    card_clic = Signal(int)
 
-    def __init__(self, usr_id, usr_nombre, usr_correo, usr_rol, usr_estado):
+    def __init__(self, usuario):
         super().__init__()
-        self.id = usr_id
+        self.id = usuario.id
 
         estado_color = {
             1: "#e6e5e5", # activo
             2: "#D2EDF8", # invisible
             3: "#999898", # eliminado
             4: "#f7d9ac" # bloqueado
-        }.get(usr_estado, "#f88eef") # error
+        }.get(usuario.estado_id, "#f88eef") # error
 
         self.setFrameShape(QFrame.Shape.StyledPanel)
         self.setFrameShadow(QFrame.Shadow.Raised)
@@ -34,7 +35,7 @@ class UsuarioCard(QFrame):
         avatar.setScaledContents(True)
         avatar.setFixedSize(48, 48)
 
-        nombre = QLabel(usr_nombre)
+        nombre = QLabel(usuario.nombre)
         nombre.setWordWrap(True)
         font = nombre.font()
         font.setBold(True)
@@ -43,7 +44,7 @@ class UsuarioCard(QFrame):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
 
-        correo = QLabel(usr_correo.split("@")[0])
+        correo = QLabel(usuario.correo.split("@")[0])
         correo.setWordWrap(True)
         correo.setStyleSheet("color: #777777;")
         correo.setAlignment(
@@ -54,8 +55,8 @@ class UsuarioCard(QFrame):
         layNombreCorreo.addWidget(nombre)
         layNombreCorreo.addWidget(correo)
 
-        if usr_rol != 3:
-            rol = QLabel("M" if usr_rol == 1 else "A")
+        if usuario.rol_id != 3:
+            rol = QLabel("M" if usuario.rol_id == 1 else "A")
             font = rol.font()
             font.setPointSize(8)
             rol.setFont(font)
@@ -67,6 +68,10 @@ class UsuarioCard(QFrame):
         layHorizontal = QHBoxLayout()
         layHorizontal.addLayout(layNombreCorreo)
         layHorizontal.addWidget(avatar)
-        if usr_rol != 3:
+        if usuario.rol_id != 3:
             layHorizontal.addLayout(layRol)
         self.setLayout(layHorizontal)
+
+    def mousePressEvent(self, event):
+        self.card_clic.emit(self.id)
+        super().mousePressEvent(event)

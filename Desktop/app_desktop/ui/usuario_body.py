@@ -21,7 +21,7 @@ class UsuarioBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.nombre = QLabel("Nombre de Usuario")
+        self.nombre = QLabel("*** ??? ***")
         self.nombre.setWordWrap(True)
         font = self.nombre.font()
         font.setBold(True)
@@ -31,7 +31,7 @@ class UsuarioBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.correo = QLabel("correo_usuario@sena.edu.co")
+        self.correo = QLabel("*** correo ***")
         self.correo.setWordWrap(True)
         self.correo.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -48,29 +48,27 @@ class UsuarioBody(QWidget):
         ], "estado...", "Estado", 0)
         laySelectores.addWidget(self.sel_estado)
 
-        self.link = QLabel("http://link_red_social_usuario.com")
+        self.link = QLabel("*** link ***")
         self.link.setWordWrap(True)
         self.link.setStyleSheet("color: #777777;")
         self.link.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.descripcion = QLabel(
-            "información adicional, un párrafo con lo que el usuario quiera poner"
-        )
+        self.descripcion = QLabel("*** descripción vacía ***")
         self.descripcion.setWordWrap(True)
         self.descripcion.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
         layFechas = QHBoxLayout()
-        self.registro = self.labelFechas("Registro\ndd/mm/yyyy")
+        self.registro = self.labelFechas("Registro")
         layFechas.addWidget(self.registro)
         layFechas.addSpacing(10)
-        self.edicion = self.labelFechas("Edición\ndd/mm/yyyy")
+        self.edicion = self.labelFechas("Edición")
         layFechas.addWidget(self.edicion)
         layFechas.addSpacing(10)
-        self.actividad = self.labelFechas("Actividad\ndd/mm/yyyy")
+        self.actividad = self.labelFechas("Actividad")
         layFechas.addWidget(self.actividad)
 
         groupRecuperacion = QGroupBox("Recuperación")
@@ -125,5 +123,21 @@ class UsuarioBody(QWidget):
         )
         return label
 
-    def actualize(self, usr_id):
-        self.id = usr_id
+    def actualiza(self, usuario):
+        self.id = usuario.id
+        self.correo.setText(usuario.correo)
+        self.nombre.setText(usuario.nombre)
+        if usuario.descripcion == "":
+            self.descripcion.setText("*** descripción vacía ***")
+        else:
+            self.descripcion.setText(usuario.descripcion)
+        if usuario.link == "":
+            self.link.setText("*** link ***")
+        else:
+            self.link.setText(usuario.link)
+        self.registro.setText("Registro\n" + usuario.fecha_registro.replace(" ", "\n"))
+        self.edicion.setText("Edición\n" + usuario.fecha_actualiza.replace(" ", "\n"))
+        self.actividad.setText("Actividad\n" + usuario.fecha_reciente.replace(" ", "\n"))
+        self.sel_rol.set_index(0 if usuario.rol_id == 3 else 1)
+        self.sel_estado.set_index(usuario.estado_id - 1)
+        #usuario.avatar

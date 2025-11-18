@@ -48,3 +48,12 @@ class Selector(QWidget):
             layVertical.addWidget(lblTitulo)
         layVertical.addWidget(self.combo)
         self.setLayout(layVertical)
+    
+    def get_index(self):
+        return self.combo.currentIndex()
+    
+    def get_text(self):
+        return self.combo.currentText()
+    
+    def set_index(self, index):
+        self.combo.setCurrentIndex(index)

@@ -18,3 +18,6 @@ class DateEdit(QWidget):
         layout.addWidget(label)
         layout.addWidget(self.dateedit)
         self.setLayout(layout)
+    
+    def get_value(self):
+        return self.dateedit.date().toString("yyyy-MM-dd")
