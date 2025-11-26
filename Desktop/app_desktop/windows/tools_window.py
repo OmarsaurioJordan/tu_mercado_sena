@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import (
     QMainWindow, QWidget
 )
-from ui.tools_widget import ToolsWidget
 from ui.header_layout import HeaderLayout
+from ui.tools_widget import ToolsWidget
 
 class ToolsWindow(QMainWindow):
 

@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QListView, QListWidget, QListWidgetItem
+    QListView, QListWidget, QListWidgetItem, QAbstractItemView
 )
 from PySide6.QtGui import (
     QStandardItemModel, QStandardItem
@@ -18,6 +18,8 @@ class UsuarioBusqueda(QListWidget):
         self.setSpacing(10)
         self.setWrapping(True)
         self.setFlow(QListWidget.LeftToRight)
+        self.setDragEnabled(False)
+        self.setDragDropMode(QAbstractItemView.NoDragDrop)
         self.verticalScrollBar().valueChanged.connect(self._check_scroll)
         #self.setMovement(QListWidget.Static)
     

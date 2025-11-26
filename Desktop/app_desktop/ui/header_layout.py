@@ -9,7 +9,7 @@ from models.usuario import Usuario
 
 class HeaderLayout(QVBoxLayout):
 
-    def __init__(self, widget=None):
+    def __init__(self, widget=None, con_btn_menu=True):
         super().__init__()
 
         image = QPixmap("assets/sprites/logo.png")
@@ -27,7 +27,10 @@ class HeaderLayout(QVBoxLayout):
             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
         )
 
-        btnMenu = Boton("MENÚ", "menu")
+        if con_btn_menu:
+            btnMenu = Boton("MENÚ", "menu")
+        else:
+            btnMenu = QLabel()
         
         notifica_pqrs = Boton("PQRS: 0","bell")
         notifica_denuncias = Boton("Denuncias: 0", "bell")

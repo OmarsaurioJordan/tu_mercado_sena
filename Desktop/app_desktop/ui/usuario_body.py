@@ -3,6 +3,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
+from core.app_config import DOMINIO_CORREO
 from components.selector import Selector
 from components.boton import Boton
 from components.txt_edit import TxtEdit
@@ -75,7 +76,7 @@ class UsuarioBody(QWidget):
         layRecup = QVBoxLayout()
         self.correo_recup = QLineEdit()
         self.correo_recup.setAlignment(Qt.AlignCenter)
-        self.correo_recup.setPlaceholderText("correo_usuario@sena.edu.co")
+        self.correo_recup.setPlaceholderText("correo_usuario" + DOMINIO_CORREO)
         layRecup.addWidget(self.correo_recup)
         layRecup.addSpacing(10)
         self.btnRecup = Boton("Recuperar clave")

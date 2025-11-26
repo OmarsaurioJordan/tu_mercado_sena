@@ -1,6 +1,7 @@
 import requests
-from core.app_config import API_LIMIT_ITEMS
-from core.app_config import API_BASE_URL
+from core.app_config import (
+    API_LIMIT_ITEMS, DEFAULT_INFO, API_BASE_URL
+)
 from models.usuario import Usuario
 
 class CtrlUsuario:
@@ -84,3 +85,28 @@ class CtrlUsuario:
                 return True
         lista.append(value)
         return False
+
+    def get_master_info(self):
+        descripcion = ""
+        response = requests.get(API_BASE_URL + "usuarios/master_info.php")
+        if response.status_code == 200:
+            descripcion = response.json().get('descripcion')
+        if descripcion == "":
+            return DEFAULT_INFO
+        return descripcion
+
+    def admin_login(self, correo="", password=""):
+        params = {"correo": correo, "password": password}
+        response = requests.get(API_BASE_URL + "usuarios/admin_login.php", params=params)
+        data = response.json()
+        if response.status_code == 200:
+            return {
+                "token": data.get('token'),
+                "error": ""
+            }
+        elif response.status_code == 404:
+            return {
+                "token": "",
+                "error": data.get('error')
+            }
+        return {"token": "", "error": ""}

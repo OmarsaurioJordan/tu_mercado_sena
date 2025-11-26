@@ -5,11 +5,11 @@ from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon
 
 class Boton(QPushButton):
-    def __init__(self, texto="", icono=""):
+    def __init__(self, texto="", icono="", size=32):
         super().__init__(texto)
         if icono != "":
             self.setIcon(QIcon("assets/sprites/" + icono + ".png"))
-            self.setIconSize(QSize(32, 32))
+            self.setIconSize(QSize(size, size))
         self.setStyleSheet("""
             QPushButton {
                 padding: 6px 12px;

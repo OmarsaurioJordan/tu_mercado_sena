@@ -1,13 +1,16 @@
-from PySide6.QtWidgets import QMainWindow, QPushButton, QTableWidget
+from PySide6.QtWidgets import (
+    QMainWindow, QWidget
+)
+from ui.header_layout import HeaderLayout
 
 class MenuWindow(QMainWindow):
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("TuMercadoSena-Desktop")
-        self.setGeometry(200, 200, 800, 600)
+        self.resize(800, 600)
 
-        self.table = QTableWidget(self)
-        self.setCentralWidget(self.table)
-
-        btn = QPushButton("Cargar Datos", self)
-        self.addToolBar("Acciones").addWidget(btn)
+        header = HeaderLayout(None, False)
+        central = QWidget()
+        central.setLayout(header)
+        self.setCentralWidget(central)

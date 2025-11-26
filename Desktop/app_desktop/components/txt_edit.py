@@ -21,3 +21,9 @@ class TxtEdit(QWidget):
     
     def get_value(self):
         return self.lineEdit.text().strip()
+    
+    def passwordMode(self, is_pass_mode=True):
+        if is_pass_mode:
+            self.lineEdit.setEchoMode(QLineEdit.Password)
+        else:
+            self.lineEdit.setEchoMode(QLineEdit.Normal)
