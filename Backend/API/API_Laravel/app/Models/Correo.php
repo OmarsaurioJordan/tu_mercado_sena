@@ -16,6 +16,10 @@ class Correo extends Model
         'intentos',
     ];
 
+    public $hidden = [
+        'clave'
+    ];
+
     protected $cast = [
         'fecha_mail' => 'datetime',
         'intentos' => 'integer'
@@ -33,8 +37,25 @@ class Correo extends Model
      */
     public function hasExpired(): bool
     {
-        return now()->isAfter($this->fecha_mail);
+        $duracion = 10; // minutos que dura el código
+        return now()->greaterThan(Carbon::parse($this->fecha_mail)->addMinutes($duracion));
+}
+    /**
+     * Genera una clave aleatoria de 6 caracteres (números y letras)
+     * Ejemplo: A3F7K2, B9D4E1
+     */
+    public static function generarClave(): string
+    {
+        $caracteres = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $clave = '';
+        
+        for ($i = 0; $i < 6; $i++) {
+            $clave .= $caracteres[rand(0, strlen($caracteres) - 1)];
+        }
+        
+        return $clave;
     }
+    
 
     /**
      * Verifica si la clave es valida
@@ -98,4 +119,24 @@ class Correo extends Model
      * 
      * Uso: Correo::expired()->delete();
      */
+    public function scopeExpired($query)
+    {
+        return $query->where('fecha_mail', '<', now());
+    }
+
+    /**
+     * Scope: Correos vigentes (no expirados)
+     */
+    public function scopeNotExpired($query)
+    {
+        return $query->where('fecha_mail', '>', now());
+    }
+
+    /**
+     * Scope: Buscar por correo
+     */
+    public function scopeByCorreo($query, string $correo)
+    {
+        return $query->where('correo', $correo);
+    }
 }

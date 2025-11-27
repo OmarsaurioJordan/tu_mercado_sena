@@ -2,14 +2,23 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DTOs\Auth\recuperarContrasena\ClaveDto;
+use App\DTOs\Auth\recuperarContrasena\CorreoDto;
+use App\DTOs\Auth\recuperarContrasena\NuevaContrasenaDto;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\AuthService;
 use App\DTOs\Auth\LoginDTO;
 use App\DTOs\Auth\RegisterDTO;
+use App\DTOs\Auth\VerifyCode;
+use App\Http\Requests\Auth\CodigoVerificacionRequest;
+use App\Http\Requests\Auth\RecuperarPasswordClaveRequest;
+use App\Http\Requests\Auth\RecuperarPasswordCorreoRequest;
+use App\Http\Requests\Auth\RecuperarPasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Nette\Utils\Json;
 use Tymon\JWTAuth\JWTGuard;
 
 /**
@@ -40,46 +49,76 @@ class AuthController
     ){}
 
     /**
-     * Registrar un nuevo usuario
+     * PASO 1:
      * 
-     * RUTA: POST /api/auth/register
+     * Iniciar el registro del usuario.
+     * El usuario envia sus datos de registro y el sistema 
+     * enviara el código de verificación a su correo 
+     * institucional
+     * 
+     * RUTA: POST /api/auth/iniciar-registro
      * 
      * @param RegisterRequest $request - Request con datos validados
      * @return JsonResponse - Respuesta JSON con código 201
      */
-    public function register(RegisterRequest $request): JsonResponse
+    public function iniciarRegistro(RegisterRequest $request): JsonResponse
     {
         try {
-            // Crear el DTO desde los datos validados del request
-            // valitated() retorna solo los campos que pasaron la validación
             $dto = RegisterDTO::fromRequest($request->validated());
 
-            // Llamar al servicio para realizar el servicio
-            $result = $this->authService->register($dto);
+            $result = $this->authService->iniciarRegistro($dto);
 
-            // Retornar la respuesta exitosa con el usuario y el token de acceso
             return response()->json([
-                'message' => 'Usuario registrado correctamente',
-                'data' => [
-                    'user' => $result['user'],
-                    'token' => $result['token'],
-                    'token_type' => 'bearer',
-                    'expires_in' => $result['expires_in'],
-                ]
-            ], 201);
+                'message' => $result['message'],
+                'correo' => $result['correo'],
+                'expira_en' => $result['expira_en'],
+                'datosEncriptados' => $result['datosEncriptados']
+            ], 200);
 
         } catch (ValidationException $e) {
-            // Si el servicio lanza un ValidationException (ej: Email duplicado)
             throw $e;
 
         } catch (\Exception $e) {
-            // Cualquier otro error inesperado
             return response()->json([
-                'message' => 'Error al registrar al usuario',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno del servidor, intentalo más tarde',
+                'message' => 'Error al iniciar el proceso de registro',
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde'
             ], 500);
         }
-        
+    }
+
+    /**
+     * PASO 2: Confirmar el código y registrar al usuario
+     * 
+     * RUTA: /api/auth/register
+     * 
+     * @param CodigoVerificacionRequest
+     * @return JsonResponse
+     */
+    public function register(CodigoVerificacionRequest $request): JsonResponse
+    {
+        try {
+            $datosEncriptados = $request->validated()['datosEncriptados'];
+            $dto = VerifyCode::fromArray($request->validated());
+    
+            $result = $this->authService->register($datosEncriptados, $dto);
+    
+            return response()->json([
+                'message' => 'Usuario registrado correctamente',
+                'user' => $result['user'],
+                'token' => $result['token'],
+                'token_type' => $result['token_type'],
+                'expires_in' => $result['expires_in'],
+            ], 201);
+
+        } catch (ValidationException $e) {
+            throw $e;
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al registrar al usuario',
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde'
+            ], 500);
+        }
     }
 
     /**
@@ -167,6 +206,62 @@ class AuthController
                 'error' => config('app.debug') ? $e->getMessage() : 'Error interno del servidor'
             ], 500);
         }
+    }
+
+    /**
+     * Iniciar proceso de reestablecimiento de contraseña
+     * 
+     * RUTA: /api/auth/recuperar-contrasena\validar-correo
+     * 
+     * @param RecuperarPasswordCorreoRequest $request
+     * @return JsonResponse
+     */
+    public function iniciarProcesoPassword(RecuperarPasswordCorreoRequest $request): JsonResponse
+    {
+        $dto = CorreoDto::fromRequest($request->validated());
+
+        $result = $this->authService->inicioNuevaPassword($dto);
+
+        return response()->json($result, 200);
+    }
+
+    /**
+     * Validar la contraseña que se le envio al usuario
+     * 
+     * RUTA: /api/auth/recuperar-password/validar-clave
+     * 
+     * @param RecuperarPasswordClaveRequest $request - Datos que llegan del frontend
+     * @return JsonResponse
+     */
+    public function validarClavePassword(RecuperarPasswordClaveRequest $request): JsonResponse
+    {
+        $correo = $request->validated('correo');
+        $dto = ClaveDto::fromRequest($request->validated());
+
+        $result = $this->authService->validarClaveRecuperacion($correo, $dto);
+
+        return response()->json($result, 200);
+    }
+
+    /**
+     * Recibir el id del usuario y el nuevo password del frontend
+     * 
+     * RUTA: /api/auth/recuperar-contrasena/restablecer-contrasena
+     *
+     * @param RecuperarPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function reestablecerPassword(RecuperarPasswordRequest $request): JsonResponse {
+        $id_usuario = $request->validated('id_usuario');
+        $dto = NuevaContrasenaDto::fromRequest($request->validated());
+
+        $result = $this->authService->nuevaPassword($id_usuario, $dto);
+
+        if(!$result['success']) {
+            return response()->json($result['message'], 500);
+        }
+
+        return response()->json($result, 204);
     }
 
     /**

@@ -4,13 +4,22 @@ namespace App\Services;
 
 use App\DTOs\Auth\RegisterDTO;
 use App\DTOs\Auth\LoginDTO;
+use App\DTOs\Auth\VerifyCode;
 use App\Models\Usuario;
+use App\Repositories\Contracts\ICorreoRepository;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\CorreoRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\JWTGuard;
+use App\DTOs\Auth\recuperarContrasena\ClaveDto;
+use App\DTOs\Auth\recuperarContrasena\CorreoDto;
+use App\DTOs\Auth\recuperarContrasena\NuevaContrasenaDto;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 /**
  * AuthService - Servicio de autenticación
@@ -43,50 +52,131 @@ class AuthService
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
+        private RegistroService $registroService,
+        private ICorreoRepository $correoRepository,
+        private RecuperarContrasenaService $nuevaPasswordService,
         private JWTGuard $jwt
     )
     {}
+    /**
+     * Iniciar el proceso de registro, el usuario envia los datos, se obtiene el correo que el usuario ingreso
+     * Se valida si el correo no esta en la base de datos y se envia el correo
+     * 
+     * @param RegisterDTO $dto - Datos del usuario a registrar
+     * @return array - Resultado del proceso
+     */
+    public function iniciarRegistro(RegisterDTO $dto): array
+    {
+        $correoUsuario = $dto->correo;
+        $inicioProceso =  $this->registroService->iniciarRegistro($correoUsuario);
+
+        if (!$inicioProceso['success']) {
+            throw ValidationException::withMessages([
+                'correo' => [$inicioProceso['message']]
+            ]);
+        }
+
+        $datosEncriptados = encrypt($dto->toArray());
+        
+        return [
+            'message' => $inicioProceso['message'],
+            'correo' => $inicioProceso['data']['correo'],
+            'expira_en' => $inicioProceso['data']['expira_en'],
+            'datosEncriptados' => $datosEncriptados,
+        ];
+        
+    }
 
     /**
      * Lógica de registro de usuario
      * 
      * PROCESO:
-     * 1. Recibe el DTO con los datos validados
-     * 2. Verifica que el email no exista (Doble seguridad)
+     * 1. Recibe los datos del usuario encriptados
      * 3. Crea el usuario usando el repositorio
-     * 4. Crea un token de Sanctum para el dispositivo
+     * 4. Crea un token JWT para el dispositivo
      * 5. Retorna el usuario y el token
      * 
-     * @param RegisterDTO $dto - Datos del usuario a registrar
+     * @param string $datosEncriptados - Datos encriptados del usuario a registrar
+     * @param VerifyCode $codigoDTO - Código de verificación
      * @return array{user: Usuario, token: string}
      * @throws ValidationException - Si el email ya existe
      */
-    public function register(RegisterDTO $dto): array
+    public function register(string $datosEncriptados, VerifyCode $codigoDTO): array
     {
-        // Válidar si el correo ya fue registrado
-        if ($this->userRepository->exists($dto->correo_id)) {
-            throw ValidationException::withMessages([
-                'correo_id' => ['El correo ya está registrado']
+        try {
+            $data = decrypt($datosEncriptados);
+    
+            $dto = RegisterDTO::fromArray($data);
+    
+            $correo = $this->correoRepository->findByCorreo($dto->correo);
+    
+            if ($this->userRepository->exists($dto->correo)) {
+                throw ValidationException::withMessages([
+                    'correo' => ['El correo ya está registrado']
             ]);
+            }
+    
+            $registro = $this->registroService->verificarClave($dto->correo, $codigoDTO);
+    
+            if (!$registro['success']) {
+                throw ValidationException::withMessages([
+                    'clave' => [$registro['message']]
+                ]);
+            }
+    
+            DB::beginTransaction();
+    
+            // Crear el usuario en la base de datos, además se encarga de hashear la contraseña, asignar el rol y el estado
+            $user = $this->userRepository->create([
+                'correo_id' => $correo->id,
+                'password' => bcrypt($dto->password),
+                'nombre' => $dto->nombre,
+                'avatar' => $dto->avatar,
+                'descripcion' => $dto->descripcion,
+                'link' => $dto->link,
+                'rol_id' => 1,
+                'estado_id' => 1
+            ]);
+    
+            // Crear el token de acceso 
+            $token = $this->jwt->fromUser($user);
+    
+            DB::commit();
+    
+            // Obtener el tiempo de expiración desde la config
+            // config('jwt.tll') Retorna los minutos configurados
+            $expiresIn = $this->jwt->factory()->getTTL() * 60;
+    
+            // Retornar el usuario y el token, el cliente debe guardar este token para futuras peticiones
+            return [
+                'user' => $user,
+                'token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => $expiresIn
+            ];
+
+        } catch (ValidationException $e) {
+            return [
+                'error' => $e->getMessage(),
+            ];
+
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            throw $e;
+
+        } catch (\Exception $e) {
+            Log::error('Error al registrar al usuario AuthService', [
+                'correo_id' => $correo->id
+            ]);
+
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            return [
+                'error' => $e->getMessage(),
+            ];
         }
-
-        // Crear el usuario en la base de datos, además se encarga de hashear la contraseña, asignar el rol y el estado
-        $user = $this->userRepository->create($dto);
-
-        // Crear el token de acceso 
-        $token = $this->jwt->fromUser($user);
-
-        // Obtener el tiempo de expiración desde la config
-        // config('jwt.tll') Retorna los minutos configurados
-        $expiresIn = $this->jwt->factory()->getTTL() * 60;
-
-        // Retornar el usuario y el token, el cliente debe guardar este token para futuras peticiones
-        return [
-            'user' => $user,
-            'token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $expiresIn
-        ];
     }
 
     /**
@@ -114,7 +204,7 @@ class AuthService
         // Lanzar excepción si las credenciales son incorrectas
         if (!$user) {
             throw ValidationException::withMessages([
-                'correo_id' => ['Correo o contraseña incorrectos']
+                'correo' => ['Correo o contraseña incorrectos']
             ]);
         }
 
@@ -123,7 +213,7 @@ class AuthService
         // Si no coincide, lanzamos excepción con el mismo mensaje genérico
         if (!Hash::check($dto->password, $user->password)) {
             throw ValidationException::withMessages([
-                'correo_id' => ['Correo o contraseña incorrectos']
+                'correo' => ['Correo o contraseña incorrectos']
             ]);
         }
 
@@ -131,7 +221,7 @@ class AuthService
         // estado_id: 1 = activo, 2 = invisible, 3 = eliminado
         if ($user->estado_id === 3) {
             throw ValidationException::withMessages([
-                'correo_id' => ['Esta cuenta ha sido desactivada']
+                'correo' => ['Esta cuenta ha sido desactivada']
             ]);
         }
 
@@ -139,7 +229,7 @@ class AuthService
         // Lanzar una excepción
         if ($user->rol_id === 1 && $dto->device_name === 'desktop'){
             throw ValidationException::withMessages([
-                'correo_id' => ['No cuentas con el rol para acceder']
+                'correo' => ['No cuentas con el rol para acceder']
             ]);
         }
         
@@ -159,6 +249,67 @@ class AuthService
             'token_type' => 'bearer',
             'expires_in' => $expiresIn,
         ];
+    }
+
+    /**
+     * Iniciar el proceso de cambio de contraseña en donde se le enviara al 
+     * Usuario un correo con el código de recuperación
+     * @param CorreoDto $dto - Correo del usuario
+     * @return array{message: string, correo: string, expira_en: string} $data
+     */
+    public function inicioNuevaPassword(CorreoDto $dto): array
+    {
+        $inicioProceso = $this->nuevaPasswordService->iniciarProceso($dto->correo);
+
+        if (!$inicioProceso['success']) {
+            throw ValidationException::withMessages([
+                'error' => [$inicioProceso['message']]
+            ]);
+        }
+
+        return [
+            'message' => $inicioProceso['message'],
+            'correo' => $inicioProceso['correo'],
+            'expira_en' => $inicioProceso['expira_en']
+        ];
+    }
+
+    /**
+     * Validar el código de recuperación del usuario
+     * @param string $correo - Correo para válidar que la clave de la BD corresponda a la ingresada por el usuario
+     * @param ClaveDto $dto - Clave que ingresa el usuario
+     * @return array{success: bool, message:string, id_usuario: int, clave_verificada: bool}
+     */
+    public function validarClaveRecuperacion(string $correo, ClaveDto $dto): array
+    {
+        $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($correo, $dto);
+
+        if(!$validarClave['success']) {
+            throw ValidationException::withMessages([
+                'error' => [$validarClave['message']]
+            ]);
+        }
+
+        return [
+            'success' => $validarClave['success'],
+            'message' => $validarClave['message'],
+            'id_usuario' => $validarClave['id_usuario'],
+            'clave_verificada' => $validarClave['clave_verificada']
+        ];
+    }
+
+    /**
+     * Lógica para cambiar el password del usuario
+     * 
+     * @param int $id_usuario - Id del usuario a cambiar la contraseña
+     * @param NuevaContrasenaDto $dto - Nueva contraseña del usuario 
+     * @return array{success: bool, message:string}
+     */
+    public function nuevaPassword(int $id_usuario, NuevaContrasenaDto $dto): array {
+
+        $resultado = $this->nuevaPasswordService->actualizarPassword($id_usuario, $dto);
+
+        return $resultado;
     }
 
     /**

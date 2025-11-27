@@ -24,6 +24,11 @@ class RepositoryServiceProvider extends ServiceProvider
             UserRepositoryInterface::class, // Lo que se pide (interfaz)
             UserRepository::class // Lo que da (Implementación)
         );
+
+        $this->app->bind(
+            \App\Repositories\Contracts\ICorreoRepository::class,
+            \App\Repositories\CorreoRepository::class
+        );
     }
 
     /**

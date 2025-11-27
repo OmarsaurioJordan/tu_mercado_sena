@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
-use App\DTOs\Auth\RegisterDTO;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Models\Usuario;
+use App\Models\Correo;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
@@ -26,10 +26,10 @@ class UserRepository implements UserRepositoryInterface
      * - Asignar valores por defecto (rol, estado)
      * 
      * 
-     * @param RegisterDTO $dto - Datos validados del nuevo usuario
+     * @param array $data - Datos validados del nuevo usuario
      * @return Usuario - El usuario recién creado
      */
-    public function create(RegisterDTO $dto): Usuario {
+    public function create(array $data): Usuario {
         /**
          * Crea un nuevo usuario en la base de datos
          * 
@@ -42,7 +42,6 @@ class UserRepository implements UserRepositoryInterface
          */
 
         // Convertir el DTO a array para usar con los datos
-        $data = $dto->toArray();
 
         // Hash::make hashea la contraseña usando bcrypt
         $data['password'] = Hash::make($data['password']);
@@ -149,6 +148,23 @@ class UserRepository implements UserRepositoryInterface
         }
 
         return false;
+    }
+
+    /**
+     * Buscar usuario por el id del correo, devolver al usuario o nulo
+     * 
+     * @param int $idCorreo - Id del correo
+     * @return Usuario|null
+     */
+    public function findByIdEmail(int $idCorreo): ?Usuario
+    {
+        $user = Usuario::whereHas('correo', fn($q) => $q->where('id', $idCorreo))->first();
+
+        if (!$user) {
+            return null;
+        }
+
+        return $user;
     }
 }
 

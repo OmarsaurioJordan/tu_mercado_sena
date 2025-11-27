@@ -16,10 +16,10 @@ interface UserRepositoryInterface
    /**
     * Crear un nuevo usuario en la base de datos
     *
-    *@param RegisterDTO $dto - Datos del usuario a crear
+    *@param array $datos - Datos del usuario a crear
     *@return Usuario - El usuario creado con su ID asignado
     */
-    public function create(RegisterDTO $dto): Usuario;
+    public function create(array $datos): Usuario;
 
     /**
      * Buscar un usuario por su email
@@ -65,4 +65,12 @@ interface UserRepositoryInterface
      * @return bool - true si se invalidaron, false si hubo un error
      */
     public function invalidateAllTokens(int $userId): bool;
+
+    /**
+     * Función para buscar un correo por su id o devolver un nulo
+     * 
+     * @param int $idCorreo
+     * @return Usuario|null
+     */
+    public function findByIdEmail(int $idCorreo): Usuario|null;
 }

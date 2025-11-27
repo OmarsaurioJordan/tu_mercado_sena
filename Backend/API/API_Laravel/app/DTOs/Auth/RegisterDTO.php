@@ -8,7 +8,7 @@ final readonly class RegisterDTO
      * Create a new class instance.
      */
     public function __construct(
-        public string $correo_id,
+        public string $correo,
         public string $password,
         public string $nombre,
         public int $avatar,
@@ -19,7 +19,7 @@ final readonly class RegisterDTO
     // Crear una instacia del DTO a partir de un array de datos (procedente del request)
     public static function fromRequest(array $data): self {
         return new self(
-            correo_id: $data['correo_id'],
+            correo: $data['correo'],
             password: $data['password'],
             nombre: $data['nombre'],
             avatar: $data['avatar'],
@@ -31,12 +31,23 @@ final readonly class RegisterDTO
     // Convertir el DTO a un array (para usar en la creación del usuario)
     public function toArray(): array {
         return [
-            'correo_id' => $this->correo_id,
+            'correo' => $this->correo,
             'password' => $this->password,
             'nombre' => $this->nombre,
             'avatar' => $this->avatar,
             'descripcion' => $this->descripcion,
             'link' => $this->link
         ];
+    }
+
+    public static function fromArray(array $data): self {
+        return new self(
+            correo: $data['correo'],
+            password: $data['password'],
+            nombre: $data['nombre'],
+            avatar: $data['avatar'],
+            descripcion: $data['descripcion'] ?? null,
+            link: $data['link'] ?? null
+        );
     }
 }

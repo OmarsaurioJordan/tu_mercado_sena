@@ -32,11 +32,8 @@ class Usuario extends Authenticatable implements JWTSubject
 
     protected $casts = [
         'id' => 'integer',
-        'correo_id' => 'string',  
+        'correo_id' => 'integer',  
         'rol_id' => 'integer',
-        'notifica_correo' => 'boolean',
-        'notifica_push' => 'boolean',
-        'password' => 'string',
         'uso_datos' => 'boolean',
         'estado_id' => 'integer',
         'jwt_invalidated_at' => 'datetime',
@@ -49,6 +46,10 @@ class Usuario extends Authenticatable implements JWTSubject
 
     public function estado() {
         return $this->belongsTo(Estado::class, 'estado_id');
+    }
+
+    public function correo() {
+        return $this->belongsTo(Correo::class, 'correo_id');
     }
     
     // Obtener identicador JWT
