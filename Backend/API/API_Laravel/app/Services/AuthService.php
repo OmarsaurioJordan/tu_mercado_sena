@@ -269,20 +269,20 @@ class AuthService
 
         return [
             'message' => $inicioProceso['message'],
-            'correo' => $inicioProceso['correo'],
+            'id_correo' => $inicioProceso['id_correo'],
             'expira_en' => $inicioProceso['expira_en']
         ];
     }
 
     /**
      * Validar el código de recuperación del usuario
-     * @param string $correo - Correo para válidar que la clave de la BD corresponda a la ingresada por el usuario
+     * @param int $id_correo - Id del correo para válidar que la clave de la BD corresponda a la ingresada por el usuario
      * @param ClaveDto $dto - Clave que ingresa el usuario
      * @return array{success: bool, message:string, id_usuario: int, clave_verificada: bool}
      */
-    public function validarClaveRecuperacion(string $correo, ClaveDto $dto): array
+    public function validarClaveRecuperacion(int $id_correo, ClaveDto $dto): array
     {
-        $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($correo, $dto);
+        $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($id_correo, $dto->clave);
 
         if(!$validarClave['success']) {
             throw ValidationException::withMessages([
@@ -307,7 +307,7 @@ class AuthService
      */
     public function nuevaPassword(int $id_usuario, NuevaContrasenaDto $dto): array {
 
-        $resultado = $this->nuevaPasswordService->actualizarPassword($id_usuario, $dto);
+        $resultado = $this->nuevaPasswordService->actualizarPassword($id_usuario, $dto->password);
 
         return $resultado;
     }

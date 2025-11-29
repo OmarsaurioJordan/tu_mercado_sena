@@ -28,6 +28,7 @@ class RecuperarPasswordCorreoRequest extends FormRequest
                 'email',
                 'max:64',
                 'regex:/^[\w\.-]+@soy\.sena\.edu\.co$/',
+                'exists:correos,correo'
             ]
         ];
     }
@@ -37,8 +38,9 @@ class RecuperarPasswordCorreoRequest extends FormRequest
         return [
             'correo.required' => 'El correo es obligatorio',
             'correo.email' => 'Debe ser un correo válido',
-            'correo.regex' => 'Debe usar un correo institucional del SENA (@soy.sena.edu.co).',
-            'correo.max' => 'El correo es muy largo'
+            'correo.regex' => 'Debe usar un correo institucional del SENA (@soy.sena.edu.co)',
+            'correo.max' => 'El correo es muy largo',
+            'correo.exists' => 'El correo no registrado'
         ];
     }
 }

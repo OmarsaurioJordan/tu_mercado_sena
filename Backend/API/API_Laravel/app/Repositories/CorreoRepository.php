@@ -139,5 +139,16 @@ class CorreoRepository implements ICorreoRepository
         return $correo->fresh(); // Recarga el modelo desde la BD
     }
 
+    /**
+     * Buscar Correo por su id
+     * 
+     * @param int $id - Id del correo
+     * @return ?Correo - Retorna el objeto del modelo correo o Null
+     */
+    public function findById(int $id): ?Correo
+    {
+        return Correo::find($id);
+    }
+
 
 }

@@ -235,10 +235,10 @@ class AuthController
      */
     public function validarClavePassword(RecuperarPasswordClaveRequest $request): JsonResponse
     {
-        $correo = $request->validated('correo');
+        $id_correo = $request->validated('id_correo');
         $dto = ClaveDto::fromRequest($request->validated());
 
-        $result = $this->authService->validarClaveRecuperacion($correo, $dto);
+        $result = $this->authService->validarClaveRecuperacion($id_correo, $dto);
 
         return response()->json($result, 200);
     }
@@ -261,7 +261,7 @@ class AuthController
             return response()->json($result['message'], 500);
         }
 
-        return response()->json($result, 204);
+        return response()->json($result, 201);
     }
 
     /**

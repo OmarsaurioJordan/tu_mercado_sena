@@ -22,12 +22,10 @@ class RecuperarPasswordClaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'correo' => [
+            'id_correo' => [
                 'required',
-                'string',
-                'email',
-                'max:64',
-                'regex:/^[\w\.-]+@soy\.sena\.edu\.co$/',
+                'integer',
+                'exists:correos,id'
             ],
 
             'clave' => [
@@ -42,10 +40,9 @@ class RecuperarPasswordClaveRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'correo.required' => 'El correo es obligatorio',
-            'correo.email' => 'Debe ser un correo válido',
-            'correo.regex' => 'Debe usar un correo institucional del SENA (@soy.sena.edu.co).',
-            'correo.max' => 'El correo es muy largo',
+            'id_correo.required' => 'El correo es obligatorio',
+            'id_correo.interger' => 'Correo Invalido',
+            'id_correo.exists' => 'Correo no registrado en la base de datos',
             
             'clave.required' => 'Debe ingresar el código de verificación',
             'clave.regex' => 'El código debe tener 6 caracteres'

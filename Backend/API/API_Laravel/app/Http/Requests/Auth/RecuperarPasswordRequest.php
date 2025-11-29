@@ -33,11 +33,20 @@ class RecuperarPasswordRequest extends FormRequest
                 'required',
                 'string',
                 'confirmed',
-                Password::min(8)
-                    ->mixedCase()
-                    ->numbers()
-                    ->uncompromised()
             ]
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'id_usuario.required' => 'Usuario obligatorio',
+            'id_usuario.integer' => 'Usuario invalido',
+            'id_usuario.exists' => 'Usuario no registrado',
+
+            'password.required' => 'Nueva contraseña requerida',
+            'password.string' => 'Contraseña invalida',
+            'password.confirmed' => 'Las contraseñas no coinciden'
         ];
     }
 }

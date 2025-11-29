@@ -74,6 +74,13 @@ interface ICorreoRepository
      */
     public function actualizarClave(Correo $correo, string $nuevaClave): Correo;
 
+    /**
+     * Buscar Correo por su id
+     * 
+     * @param int $id - Id del correo
+     * @return ?Correo - Retorna el objeto del modelo correo o Null
+     */
+    public function findById(int $id): ?Correo;
 }
 
 

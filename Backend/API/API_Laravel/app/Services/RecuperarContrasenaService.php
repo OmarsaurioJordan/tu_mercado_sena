@@ -8,12 +8,10 @@ use App\Repositories\Contracts\ICorreoRepository;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Services\RecuperarContrasenaCorreoService;
 use App\Models\Correo;
-use Tymon\JWTAuth\JWTGuard;
 use App\DTOs\Auth\recuperarContrasena\ClaveDto;
 use App\DTOs\Auth\recuperarContrasena\nuevaContrasenaDto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Tymon\JWTAuth\JWT;
 
 class RecuperarContrasenaService
 {
@@ -24,14 +22,12 @@ class RecuperarContrasenaService
     *@param ICorreoRepository $correoRepository - Repositorio del correo
     *@param UserRepositoryInterface $userRepository - Repositorio del usuario
     *@param RecuperarContrasenaCorreoService $codigoEmail - Servicio que envia el código de recuperación
-    *@param JWTGuard $jwt
     *@return void
     */
     public function __construct(
       private ICorreoRepository $correoRepository,
       private UserRepositoryInterface $userRepository,
       private RecuperarContrasenaCorreoService $codigoEmail,
-      private JWTGuard $jwt
     )
     {}
 
@@ -40,12 +36,16 @@ class RecuperarContrasenaService
     * Base de datos, validar si esta asociado a un usuario, si es asi entonces,
     * Enviar el código al usuario
     * * @param string $correo - Correo institucional del usuario
-    * @return array{success: bool, message: string, correo: ?string, expira_en: ?string}
+    * @return array{success: bool, message: string, id_correo: ?int, expira_en: ?string}
     */
    public function iniciarProceso(string $correo): array
       {
          // --- PASO 1: Búsqueda y Validaciones (Fuera de la Transacción) ---
          try {
+            Log::info('Inicio el proceso de recuperación de contrasena', [
+               'correo' => $correo
+            ]);
+
             $correoUsuario = $this->correoRepository->findByCorreo($correo);
 
             // Validar si el correo esta en la base de datos
@@ -94,7 +94,7 @@ class RecuperarContrasenaService
             return [
                   'success' => true,
                   'message' => 'Código de recuperación enviado correctamente',
-                  'correo' => $correoUsuario->correo,
+                  'id_correo' => $correoUsuario->id,
                   'expira_en' => $correoUsuario->fecha_mail->toDateString() // Asumiendo que el repositorio actualiza $correoUsuario
             ];
 
@@ -129,32 +129,48 @@ class RecuperarContrasenaService
 
     /**
      * Validar que el código de verificación
-     * @param string $correo - Correo para validar
-     * @param ClaveDto $dto - Código que llegara del front-end
-     * @return array{success: bool, message: string, correo: ?string, id_usuario: ?int, clave_verificada: bool}
+     * @param int $id_correo - Correo para validar
+     * @param string $clave - Código que llegara del front-end
+     * @return array{success: bool, message: string, id_correo: ?int, id_usuario: ?int}
      */
-    public function verificarClaveContrasena(string $correo, ClaveDto $dto): array
+    public function verificarClaveContrasena(int $id_correo, string $clave): array
     {
       try {
+         Log::info('Inicio el proceso de válidación de clave de recuperación', [
+            'correo_id' => $id_correo,
+            'clave ingresada' => $clave
+         ]);
+
          // Buscar el correo en la base de datos
-         $correoUsuario = $this->correoRepository->findByCorreo($correo);
+         $correoUsuario = $this->correoRepository->findById($id_correo);
+
+
 
          if (!$correoUsuario) {
+            Log::warning('Correo no registrado', [
+               'id_correo' => $id_correo,
+            ]);
+
             return [
                'success' => false,
                'message' => 'No se encontro el correo del usuario',
-               'correo' => null,
-               'clave_verificada' => false
+               'id_correo' => null,
+               'id_usuario' => null
             ];
          }
 
          // Verificar que la clave coincida
-         if (!$correoUsuario->isValidClave($dto->clave)) {
+         if (!$correoUsuario->isValidClave($clave)) {
+            Log::warning('Clave ingresada incorrecta',[
+               'correoUsuario' => $correoUsuario,
+                'clave' => $clave
+            ]);
+
             return [
                'success' => false,
                'message' => 'La clave es incorrecta',
-               'correo' => $correoUsuario->correo,
-               'clave_verificada' => false
+               'correo' => $correoUsuario->id,
+               'id_usuario' => null
             ];
          }
 
@@ -163,7 +179,6 @@ class RecuperarContrasenaService
          return [
             'success' => true,
             'message' => 'Código verificado correctamente',
-            'correo' => $correoUsuario->correo,
             'id_usuario' => $usuario->id,
             'clave_verificada' => true
          ];
@@ -172,7 +187,9 @@ class RecuperarContrasenaService
          Log::error('Error al verificar la clave', [
             'correo' => $correoUsuario->correo ?? null,
             'id_usuario' => $correoUsuario->usuario->id,
-            'error' => $e->getMessage()
+            'error' => $e->getMessage(),
+            'archivo' => $e->getFile(),
+            'linea' => $e->getLine()
          ]);
 
          return [
@@ -180,7 +197,6 @@ class RecuperarContrasenaService
             'message' => 'Ocurrió un error al verificar el código de verificación. Por favor, intentalo más tarde',
             'correo' => $correoUsuario->correo ?? null,
             'id_usuario' => $usuario->id ?? null,
-            'clave_verificada' => false
          ];
       }
     }
@@ -188,30 +204,34 @@ class RecuperarContrasenaService
    /**
     * Lógica para cambiar el password del usuario (con transacción)
     * @param int $idUsuario - Id del usuario a cambiar la contraseña
-    * @param NuevaContrasenaDto $dto - Nueva contraseña del usuario 
+    * @param string $nueva_password - Nueva contraseña del usuario 
     * @return array{success: bool, message:string}
     * @throws ModelNotFoundException Si el usuario no existe.
     */
-   public function actualizarPassword(int $idUsuario, NuevaContrasenaDto $dto): array {
+   public function actualizarPassword(int $idUsuario, string $nueva_password): array {
       
       DB::beginTransaction();
       
       try {
+         Log::info('Inicio del proceso de actualización de contraseña', [
+            'id_usuario' => $idUsuario,
+         ]);
          // 1. Buscar el usuario (findOrFail garantiza que se lanza una excepción si no existe)
-         $usuario = $this->userRepository->findById($idUsuario); // Asumiendo que el repositorio tiene findById
+         $usuario = $this->userRepository->findById($idUsuario);
          // O si no usas repositorio: $usuario = \App\Models\Usuario::findOrFail($idUsuario);
 
          if (!$usuario) {
-               throw new ('Usuario no encontrado.');
+            Log::warning('Usuario no registrado en la base de datos', [
+               'id_usuario' => $idUsuario
+            ]);
+
+            throw new ('Usuario no encontrado.');
          }
 
          // 2. Hashear y guardar la nueva contraseña (Escritura 1)
-         $nuevaPasswordH = Hash::make($dto->password);
+         $nuevaPasswordH = Hash::make($nueva_password);
          $usuario->password = $nuevaPasswordH;
          $usuario->save();
-
-         // 3. Cerrar sesión/invalidar tokens (Escritura 2)
-         $this->jwt->logout(); 
 
          // 4. Confirmar la transacción
          DB::commit();
@@ -222,11 +242,18 @@ class RecuperarContrasenaService
          ];
 
       } catch (\Exception $e) {
+         
+         Log::error('Error al actualizar contraseña', [
+            'id_usuario' => $idUsuario, 
+            'error' => $e->getMessage(),
+            'linea' => $e->getLine(),
+            'archivo' => $e->getFile()
+            ]
+         );
+
          if (DB::transactionLevel() > 0) {
                DB::rollBack();
          }
-         
-         Log::error('Error al actualizar contraseña', ['id_usuario' => $idUsuario, 'error' => $e->getMessage()]);
          
          // Relanzar si no se encuentra el modelo o manejar otros errores.
          throw $e; 

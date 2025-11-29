@@ -56,16 +56,16 @@ Route::prefix('auth')->group(function()  {
          * POST
          * RUTA: /api/auth/recuperar-contrasena/validar-clave-recuperacion
          */
-        Route::post('/validar-clave', [AuthController::class, 'validarClavePassword']);
+        Route::post('/validar-clave-recuperacion', [AuthController::class, 'validarClavePassword']);
     
         /**
          * Endpoint que recibe la nueva contraseña del usuario y actualiza en la base 
          * De datos
          * 
          *PATCH
-         *RUTA: /api/auth/
+         *RUTA: /api/auth/recuperar-contrasena/reestablecer-contrasena
          */
-        Route::patch('/reestablecer-contraseña', [AuthController::class, 'reestablecerPassword']);
+        Route::patch('/reestablecer-contrasena', [AuthController::class, 'reestablecerPassword']);
     });
 
 });
