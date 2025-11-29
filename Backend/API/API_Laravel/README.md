@@ -29,7 +29,7 @@ Otras rutas (productos, chats, favoritos, etc.) serán añadidas progresivamente
 
 1️⃣ Clonar el repositorio usando el comando git clone (url)
 
-2️⃣ En la dirección de carpeta ..../Backend_proyecto\Backend\API\API_Laravel usar el comando
+2️⃣ En la dirección de carpeta ....\Backend\API\API_Laravel usar el comando
 ```cmd
 composer install 
 ```
