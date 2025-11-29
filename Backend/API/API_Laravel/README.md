@@ -30,10 +30,15 @@ Ruta: http://localhost:8000/api/auth/inicio-registro
 Restricciones:
 
 Campo	Restricción
+
 correo_id	Solo se aceptan correos institucionales @soy.sena.edu.co
+
 password	Mínimo 8 caracteres, debe incluir números, no estar comprometida, y coincidir con password_confirmation
+
 nombre	Máximo 24 caracteres
+
 descripcion	Máximo 300 caracteres
+
 link	Debe ser una red social válida: YouTube, Instagram, Facebook, Twitter o LinkedIn
 
 Ejemplo JSON:
