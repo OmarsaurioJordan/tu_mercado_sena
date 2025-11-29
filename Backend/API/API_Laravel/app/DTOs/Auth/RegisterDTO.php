@@ -12,6 +12,8 @@ final readonly class RegisterDTO
         public string $password,
         public string $nombre,
         public int $avatar,
+        public int $estado_id,
+        public int $rol_id,
         public ?string $descripcion = null,
         public ?string $link = null
     ){}
@@ -23,6 +25,8 @@ final readonly class RegisterDTO
             password: $data['password'],
             nombre: $data['nombre'],
             avatar: $data['avatar'],
+            rol_id: $data['rol_id'],
+            estado_id: $data['estado_id'],
             descripcion: $data['descripcion'] ?? null,
             link: $data['link'] ?? null
         );
@@ -35,6 +39,8 @@ final readonly class RegisterDTO
             'password' => $this->password,
             'nombre' => $this->nombre,
             'avatar' => $this->avatar,
+            'rol_id' => $this->rol_id,
+            'estado_id' => $this->estado_id,
             'descripcion' => $this->descripcion,
             'link' => $this->link
         ];
@@ -46,6 +52,8 @@ final readonly class RegisterDTO
             password: $data['password'],
             nombre: $data['nombre'],
             avatar: $data['avatar'],
+            rol_id: $data['rol_id'],
+            estado_id: $data['estado_id'],
             descripcion: $data['descripcion'] ?? null,
             link: $data['link'] ?? null
         );

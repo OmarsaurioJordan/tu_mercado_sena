@@ -20,6 +20,7 @@ class LoginRequest extends FormRequest
                 'string',
                 'email',
                 'max:64',
+                'exists:correos,correo',
             ],
 
             'password' => [
@@ -40,7 +41,9 @@ class LoginRequest extends FormRequest
         return [
             'correo.required' => 'El correo es obligatorio.',
             'correo.email' => 'Debe ser un correo válido.',
+            'correo.exists' => 'Correo o contraseña incorrectos',
             'password.required' => 'La contraseña es obligatoria.',
+            'password.string' => 'Contraseña invalida',
             'device_name.in' => 'El dispositivo debe ser: web, mobile o desktop.',
         ];
     }

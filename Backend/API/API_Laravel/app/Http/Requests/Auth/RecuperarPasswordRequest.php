@@ -41,7 +41,7 @@ class RecuperarPasswordRequest extends FormRequest
     {
         return [
             'id_usuario.required' => 'Usuario obligatorio',
-            'id_usuario.integer' => 'Usuario invalido',
+            'id_usuario.integer' => 'Usuario inválido',
             'id_usuario.exists' => 'Usuario no registrado',
 
             'password.required' => 'Nueva contraseña requerida',

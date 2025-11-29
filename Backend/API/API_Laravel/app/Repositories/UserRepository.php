@@ -48,11 +48,15 @@ class UserRepository implements UserRepositoryInterface
 
         // Asignar el rol del usuario a normal por defecto
         // 1 = Prosumer, 2 = Administrador, 3 = Master
-        $data['rol_id'] = 1;
+        if ($data['rol_id'] === null) {
+            $data['rol_id'] = 1;
+        }
 
         // Asignar el estado del usuario por defecto
         // 1 = Activo, 2 = Invisible, 3 = Eliminado
-        $data['estado_id'] = 1;
+        if ($data['estado_id' === null]) {
+            $data['estado_id'] = 1;
+        }
 
         // Usuario::create() -> Inserta los datos en la BD y retorna el modelo con el ID asignado
         return Usuario::create($data);

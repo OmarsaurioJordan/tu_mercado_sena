@@ -46,6 +46,18 @@ class RegisterRequest extends FormRequest
                 'min:1',
             ],
 
+            'rol_id' => [
+                'nullable',
+                'integer',
+                'exists.roles,id'
+            ],
+
+            'estado_id' => [
+                'nullable',
+                'integer',
+                'exists.estados,id'
+            ],
+
             'descripcion' => [
                 'nullable',
                 'string',
@@ -74,6 +86,12 @@ class RegisterRequest extends FormRequest
             'password.mixed_case' => 'Debe contener mayúsculas y minúsculas.',
             'password.numbers' => 'Debe contener al menos un número.',
             'password.uncompromised' => 'La contraseña fue encontrada en filtraciones, usa otra.',
+
+            'rol_id.integer' => 'Rol inválido',
+            'rol_id.exists' => 'Rol no registrado',
+
+            'estado_id.integer' => 'Estado inválido',
+            'estado_id.exists' => 'Estado no registrado',
 
             'nombre.max' => 'El nombre no puede exceder los 24 caracteres.',
             'descripcion.max' => 'La descripción no puede exceder los 300 caracteres.',

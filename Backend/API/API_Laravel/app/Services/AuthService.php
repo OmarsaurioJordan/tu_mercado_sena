@@ -134,8 +134,8 @@ class AuthService
                 'avatar' => $dto->avatar,
                 'descripcion' => $dto->descripcion,
                 'link' => $dto->link,
-                'rol_id' => 1,
-                'estado_id' => 1
+                'rol_id' => $dto->rol_id,
+                'estado_id' => $dto->estado_id
             ]);
     
             // Crear el token de acceso 
@@ -193,62 +193,90 @@ class AuthService
      * 8. Retorna usuario y token
      * 
      * @param LoginDTO $dto - Credenciales de login
-     * @return array{user: Usuario, token: string}
+     * @return array{user: Usuario, token: string, login:string}
      * @throws ValidationException - Si las credenciales son inválidas
      */
     public function login(LoginDTO $dto): array
     {
-        // Buscar el usuario por email
-        $user = $this->userRepository->findByEmail($dto->correo_id);
-
-        // Lanzar excepción si las credenciales son incorrectas
-        if (!$user) {
-            throw ValidationException::withMessages([
-                'correo' => ['Correo o contraseña incorrectos']
+        try{
+            Log::info('Inicio del proceso Login', [
+                'correo' => $dto->correo
             ]);
-        }
 
-        // Válidar si la contraseña es correcta
-        // Hash::check() compara la contraseña en texto plano con el hash almacenado
-        // Si no coincide, lanzamos excepción con el mismo mensaje genérico
-        if (!Hash::check($dto->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'correo' => ['Correo o contraseña incorrectos']
+            $correo_usuario = $this->correoRepository->findByCorreo($dto->correo);
+
+            if(!$correo_usuario) {
+                Log::warning('Correo no encontrado en la base de datos', [
+                    'correo' => $dto->correo
+                ]);
+
+                throw ValidationException::withMessages([
+                    'login' => ['Correo o contraseña incorrectos']
+                ]);
+            }
+
+            $user = $this->userRepository->findByIdEmail($correo_usuario->id);
+    
+            // Lanzar excepción si las credenciales son incorrectas
+            if (!$user) {
+                throw ValidationException::withMessages([
+                    'login' => ['Correo o contraseña incorrectos']
+                ]);
+            }
+    
+            // Válidar si la contraseña es correcta
+            // Hash::check() compara la contraseña en texto plano con el hash almacenado
+            // Si no coincide, lanzamos excepción con el mismo mensaje genérico
+            if (!Hash::check($dto->password, $user->password)) {
+                throw ValidationException::withMessages([
+                    'login' => ['Correo o contraseña incorrectos']
+                ]);
+            }
+    
+            // Válidar que el usuario este activo
+            // estado_id: 1 = activo, 2 = invisible, 3 = eliminado
+            if ($user->estado_id === 3) {
+                throw ValidationException::withMessages([
+                    'login' => ['Esta cuenta ha sido desactivada']
+                ]);
+            }
+    
+            // Si el un usuario prosumer intenta entrar a desktop (Unico del admin y master)
+            // Lanzar una excepción
+            if ($user->rol_id === 1 && $dto->device_name === 'desktop'){
+                throw ValidationException::withMessages([
+                    'login' => ['No cuentas con el rol para acceder']
+                ]);
+            }
+            
+            // Crear un nuevo token
+            $token = $this->jwt->fromUser($user);
+            
+            // Actualizar fecha de última actividad
+            $this->userRepository->updateLastActivity($user->id);
+    
+            // Obtener el tiempo de expiración configurado
+            $expiresIn = $this->jwt->factory()->getTTL() * 60;
+    
+            // Retornar el usuario y su nuevo token
+            return [
+                'user' => $user,
+                'token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => $expiresIn,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error al loguearse', [
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ]);
+
+            return [
+                'correo' => $dto->correo,
+                'error' => $e->getMessage(),
+            ];
         }
-
-        // Válidar que el usuario este activo
-        // estado_id: 1 = activo, 2 = invisible, 3 = eliminado
-        if ($user->estado_id === 3) {
-            throw ValidationException::withMessages([
-                'correo' => ['Esta cuenta ha sido desactivada']
-            ]);
-        }
-
-        // Si el un usuario prosumer intenta entrar a desktop (Unico del admin y master)
-        // Lanzar una excepción
-        if ($user->rol_id === 1 && $dto->device_name === 'desktop'){
-            throw ValidationException::withMessages([
-                'correo' => ['No cuentas con el rol para acceder']
-            ]);
-        }
-        
-        // Crear un nuevo token
-        $token = $this->jwt->fromUser($user);
-        
-        // Actualizar fecha de última actividad
-        $this->userRepository->updateLastActivity($user->id);
-
-        // Obtener el tiempo de expiración configurado
-        $expiresIn = $this->jwt->factory()->getTTL() * 60;
-
-        // Retornar el usuario y su nuevo token
-        return [
-            'user' => $user,
-            'token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $expiresIn,
-        ];
     }
 
     /**
