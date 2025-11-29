@@ -1,15 +1,62 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 )
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QPixmap, QIcon
+from components.usuario_card import UsuarioCard
+from components.boton import Boton
+from models.usuario import Usuario
 
 class HeaderLayout(QVBoxLayout):
 
-    def __init__(self, widget=None):
+    def __init__(self, widget=None, con_btn_menu=True):
         super().__init__()
 
-        self.addWidget(QLabel("Tu Mercado Sena"))
+        image = QPixmap("assets/sprites/logo.png")
+        logo = QLabel()
+        logo.setPixmap(image)
+        logo.setScaledContents(True)
+        logo.setFixedSize(64, 64)
+
+        titulo = QLabel("Tu Mercado Sena")
+        font = titulo.font()
+        font.setPointSize(24)
+        font.setBold(True)
+        titulo.setFont(font)
+        titulo.setAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        )
+
+        if con_btn_menu:
+            btnMenu = Boton("MENÚ", "menu")
+        else:
+            btnMenu = QLabel()
+        
+        notifica_pqrs = Boton("PQRS: 0","bell")
+        notifica_denuncias = Boton("Denuncias: 0", "bell")
+
+        header = QWidget()
+        layHorizontal = QHBoxLayout(header)
+        layHorizontal.addWidget(logo)
+        layHorizontal.addSpacing(10)
+        layHorizontal.addWidget(titulo)
+        layHorizontal.addSpacing(10)
+        layHorizontal.addStretch()
+        layHorizontal.addWidget(btnMenu)
+        layHorizontal.addSpacing(10)
+        layHorizontal.addStretch()
+        layHorizontal.addWidget(notifica_pqrs)
+        layHorizontal.addSpacing(10)
+        layHorizontal.addWidget(notifica_denuncias)
+        layHorizontal.addSpacing(10)
+        layHorizontal.addStretch()
+        layHorizontal.addWidget(UsuarioCard(self.usuario_debug()))
+        self.addWidget(header)
         
         if widget == None:
             self.addWidget(QLabel())
         else:
             self.addWidget(widget)
+
+    def usuario_debug(self):
+        return Usuario(0, "correo_administrativo@sena.edu.co", 1, "Usuario Administrador", 0, "", "", 1, "", "", "")
