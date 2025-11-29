@@ -20,6 +20,8 @@ class Correo extends Model
         'clave'
     ];
 
+    //
+
     protected $cast = [
         'fecha_mail' => 'datetime',
         'intentos' => 'integer'
