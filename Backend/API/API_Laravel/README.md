@@ -106,7 +106,7 @@ Respuesta (201 - Created):
 }
 ```
 
-2️⃣ Recuperar contraseña: Validar Correo
+3️⃣ Recuperar contraseña: Validar Correo
 
 Método: POST
 Ruta: http://localhost:8000/api/auth/recuperar-contrasena/validar-correo
@@ -184,7 +184,7 @@ Respuesta (200 - OK):
 }
 ```
 
-4️⃣ Recuperar Contraseña: Reestablecer Contraseña
+5️⃣ Recuperar Contraseña: Reestablecer Contraseña
 
 Mensajes posibles:
 
@@ -228,7 +228,7 @@ Respuesta (201 - OK):
 }
 ```
 
-4️⃣ Login
+6️⃣ Login
 
 Mensajes posibles:
 
