@@ -21,6 +21,17 @@ Sigue la arquitectura MVC y aplica el patrón Repository-Service, lo que garanti
 ⚠️ Nota: Actualmente están disponibles solo las rutas del módulo de autenticación.
 Otras rutas (productos, chats, favoritos, etc.) serán añadidas progresivamente conforme avance el desarrollo.
 
+**IMPORTANTE**
+
+Para temas de desarrollo los endpoints de registro y reestablecer códigos pueden ser habilitados comentado:
+
+```PHP
+    public $hidden = [
+        'clave'
+    ];
+```
+Del archivo app/models/correo para asi no poner probar con un correo verdadero.
+
 🔓 RUTAS PÚBLICAS
 1️⃣ Registro de usuario
 
