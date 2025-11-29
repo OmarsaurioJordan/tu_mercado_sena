@@ -21,6 +21,7 @@ class Correo extends Model
     ];
 
     //
+    //
 
     protected $cast = [
         'fecha_mail' => 'datetime',
