@@ -23,14 +23,14 @@ Otras rutas (productos, chats, favoritos, etc.) serán añadidas progresivamente
 
 **IMPORTANTE**
 
-Para temas de desarrollo los endpoints de registro y reestablecer códigos pueden ser habilitados comentado:
+Para temas de desarrollo los endpoints de registro y reestablecer contraseña pueden mostrarse el código de validación que se le envia al usuario en las respuestas JSON comentado:
 
 ```PHP
     public $hidden = [
         'clave'
     ];
 ```
-Del archivo app/models/correo para asi no poner probar con un correo verdadero.
+Del archivo app/models/correos para asi no poner probar con un correo verdadero.
 
 🔓 RUTAS PÚBLICAS
 1️⃣ Registro de usuario
