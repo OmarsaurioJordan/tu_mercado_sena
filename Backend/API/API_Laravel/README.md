@@ -6,6 +6,7 @@ Autenticación: JWT (Tymon JWTAuth)
 Formato de respuesta: JSON
 Estado: 🚧 En desarrollo (faltan rutas que serán complementadas con el tiempo)
 
+
 🧭 Descripción General
 
 El Backend de Tu Mercado SENA fue diseñado para manejar peticiones HTTP, procesarlas, interactuar con la base de datos y devolver respuestas estructuradas en formato JSON.
@@ -23,6 +24,67 @@ Otras rutas (productos, chats, favoritos, etc.) serán añadidas progresivamente
 
 **IMPORTANTE**
 
+
+**Pasos para clonar Repositorio y configurar sus variables de entorno**
+
+1️⃣ Clonar el repositorio usando el comando git clone (url)
+
+2️⃣ En la dirección de carpeta ..../Backend_proyecto\Backend\API\API_Laravel usar el comando
+```cmd
+composer install 
+```
+Para actualizar las dependencias
+
+3️⃣ En la misma ventana de cmd usar el siguiente comando para generar un archivo .env
+```CMD
+cp .env.example .env
+```
+
+Si no funciona usar en la terminal de visual studio code
+
+4️⃣ Generar la llave para usar comandos php artisan usando el siguiente comando:
+```
+php artisan key:generate
+```
+
+5️⃣Generar la jwt key para los tokens de autenticación usando este comando en la terminal
+```
+php artisan jwt:secret
+```
+
+6️⃣ Configurar las variables de entorno:
+
+Configuración de la base de datos
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE={nombre de la base de datos}
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Configuración del servicio de mails (Configurar solo si se va comprobar que el correo se envio de manera exitosa a tu correo institucional):
+```ENV
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME={Tu Correo de gmail u otro servicio}
+MAIL_PASSWORD={Tu clave de aplicación de gmail o contraseña del servicio}
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS={Tu Correo de gmail u otro servicio}
+MAIL_FROM_NAME="Mercado Sena"
+```
+
+Configuración de JW
+```ENV
+AUTH_GUARD=api
+JWT_TTL=1440          # 24 horas en minutos
+JWT_REFRESH_TTL=20160 # 2 semanas en minutos
+JWT_ALGO=HS256
+JWT_BLACKLIST_ENABLED=true
+```
+
 Para temas de desarrollo los endpoints de registro y reestablecer contraseña pueden mostrarse el código de validación que se le envia al usuario en las respuestas JSON comentado:
 
 ```PHP
@@ -31,6 +93,8 @@ Para temas de desarrollo los endpoints de registro y reestablecer contraseña pu
     ];
 ```
 Del archivo app/models/correos para asi no poner probar con un correo verdadero.
+
+
 
 🔓 RUTAS PÚBLICAS
 1️⃣ Registro de usuario
@@ -59,8 +123,8 @@ Ejemplo JSON:
  "correo": "XXXXXXXXX@soy.sena.edu.co",
  "password": "XXXXXXXXX",
  "password_confirmation": "XXXXXXXX",
- "rol_id": 1, // Prosumer
- "estado_id": 1 // Activo
+ "rol_id": 1, # Prosumer
+ "estado_id": 1 # Activo
  "nombre": "Julian",
   "avatar": 1,
   "descripcion": "Estudiante de desarrollo",
@@ -85,7 +149,7 @@ Ejemplo JSON:
 
 ```JSON
 {
-  "clave": "FIVLO6" // Ejemplo,
+  "clave": "FIVLO6" # Ejemplo,
   "datosEncriptados": "eyJpdiI6I..."
 }
 ```
@@ -147,7 +211,7 @@ Respuesta (200 - OK):
 {
   "message": "Código de recuperación enviado correctamente",
   "id_correo": 5,
-  "expira_en": "2025-11-29" // 🚧 Falta mejorar este apartado 
+  "expira_en": "2025-11-29" # 🚧 Falta mejorar este apartado 
 }
 }
 ```
