@@ -24,9 +24,9 @@ class WindowManager:
         }
         self.change_tool("login")
 
-    def set_tools(self, token="", correo=""):
+    def set_tools(self, token="", correo="", id=0):
         ses = Session()
-        ses.set_login(token, correo)
+        ses.set_login(token, correo, id)
         self.views = {
             "menu": MenuWindow(),
             "tools": ToolsWindow(),

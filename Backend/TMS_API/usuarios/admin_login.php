@@ -44,7 +44,7 @@ $sql = "INSERT INTO login_ip (usuario_id, ip_direccion) VALUES (?, ?)";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("is", $admin_id, $admin_ip);
 $stmt->execute();
-if ($stmt->affected_rows > 0) {
+if ($stmt->errno === 0) {
 
     $token = bin2hex(random_bytes(32));
 
@@ -52,8 +52,8 @@ if ($stmt->affected_rows > 0) {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $token, $admin_id);
     $stmt->execute();
-    if ($stmt->affected_rows > 0) {
-        echo json_encode(["token" => $token]);
+    if ($stmt->errno === 0) {
+        echo json_encode(["token" => $token, "id" => $admin_id]);
         exit;
     }
 }
