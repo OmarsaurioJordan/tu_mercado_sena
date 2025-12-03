@@ -281,16 +281,20 @@ Ruta: http://localhost:8000/api/auth/recuperar-contrasena/reestablecer-contrasen
 
 Restricciones:
 
-id_correo = Debe ingresar el id del usuario.
+ id_usuario = Debe ingresar el id del usuario.
 
-clave = Clave que le llega al usuario al usuario.
+ password = La nueva contraseña del usuario.
+ 
+ password_confirmation = Confirmación de la nueva contraseña
+
 
 Ejemplo JSON:
 
 ```JSON
 {
-  "id_correo": 5,
-  "clave": "9AM50F"
+ "id_usuario": 3
+ "password": "XXXXXXXXX",
+ "password_confirmation": "XXXXXXXX",
 }
 ```
 
