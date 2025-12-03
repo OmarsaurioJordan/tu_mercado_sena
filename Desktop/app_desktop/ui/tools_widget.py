@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QWidget, QTabWidget, QHBoxLayout, QLabel
+    QWidget, QTabWidget, QHBoxLayout, QLabel, QApplication
 )
 from PySide6.QtCore import Qt
 from components.scroll import Scroll
@@ -7,14 +7,14 @@ from components.buscador import Buscador
 from ui.usuario_body import UsuarioBody
 from ui.usuario_filter import Usuariofilter
 from ui.usuario_busqueda import UsuarioBusqueda
-from controllers.ctrl_usuario import CtrlUsuario
 
 class ToolsWidget(QWidget):
 
     def __init__(self):
         super().__init__()
 
-        self.ctrlUsuario = CtrlUsuario()
+        manager = QApplication.instance().property("controls")
+        self.ctrlUsuario = manager.get_usuarios()
 
         tabsA = QTabWidget()
         tabsA.addTab(Scroll(), "Producto")

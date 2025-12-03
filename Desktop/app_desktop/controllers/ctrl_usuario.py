@@ -102,11 +102,13 @@ class CtrlUsuario:
         if response.status_code == 200:
             return {
                 "token": data.get('token'),
+                "id": int(data.get('id')),
                 "error": ""
             }
         elif response.status_code == 404:
             return {
                 "token": "",
+                "id": 0,
                 "error": data.get('error')
             }
         return {"token": "", "error": ""}

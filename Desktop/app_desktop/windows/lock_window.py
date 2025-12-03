@@ -1,7 +1,9 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
 )
 from ui.header_layout import HeaderLayout
+from components.boton import Boton
+from ui.info_menus import InfoMenus
 
 class LockWindow(QMainWindow):
 
@@ -10,7 +12,14 @@ class LockWindow(QMainWindow):
         self.setWindowTitle("TuMercadoSena-Desktop")
         self.resize(800, 600)
 
-        header = HeaderLayout(None, False)
+
+        layVert = QVBoxLayout()
+
+        menu = QWidget()
+        menu.setLayout(layVert)
+        contenido = InfoMenus(menu)
+
+        header = HeaderLayout(contenido, False)
         central = QWidget()
         central.setLayout(header)
         self.setCentralWidget(central)
