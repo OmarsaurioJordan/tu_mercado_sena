@@ -11,23 +11,17 @@ class UsuarioCard(QFrame):
         super().__init__()
         self.id = usuario.id
 
-        estado_color = {
+        self.estado_color = {
             1: "#e6e5e5", # activo
             2: "#D2EDF8", # invisible
             3: "#999898", # eliminado
             4: "#f7d9ac" # bloqueado
         }.get(usuario.estado_id, "#f88eef") # error
+        self.setPulsado()
 
         self.setFrameShape(QFrame.Shape.StyledPanel)
         self.setFrameShadow(QFrame.Shadow.Raised)
         self.setMaximumWidth(500)
-        self.setStyleSheet(f"""
-            UsuarioCard {{
-                background-color: {estado_color};
-                border: 1px solid #cccccc;
-                border-radius: 10px;
-            }}
-        """)
 
         image = QPixmap("assets/sprites/avatar.png")
         avatar = QLabel()
@@ -71,6 +65,24 @@ class UsuarioCard(QFrame):
         if usuario.rol_id != 3:
             layHorizontal.addLayout(layRol)
         self.setLayout(layHorizontal)
+
+    def setPulsado(self, is_pulsado=False):
+        if is_pulsado:
+            self.setStyleSheet(f"""
+                UsuarioCard {{
+                    background-color: {self.estado_color};
+                    border: 2px solid #696969;
+                    border-radius: 10px;
+                }}
+            """)
+        else:
+            self.setStyleSheet(f"""
+                UsuarioCard {{
+                    background-color: {self.estado_color};
+                    border: 1px solid #cccccc;
+                    border-radius: 10px;
+                }}
+            """)
 
     def mousePressEvent(self, event):
         self.card_clic.emit(self.id)

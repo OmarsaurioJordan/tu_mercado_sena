@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QApplication
+    QWidget, QHBoxLayout, QVBoxLayout, QLabel, QApplication
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
@@ -11,12 +11,10 @@ from components.txt_edit import TxtEdit
 from components.boton import Boton
 from components.alerta import Alerta
 
-class LoginWindow(QMainWindow):
+class LoginWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("TuMercadoSena-Desktop")
-        self.resize(800, 600)
 
         image = QPixmap("assets/sprites/logo.png")
         logo = QLabel()
@@ -68,7 +66,9 @@ class LoginWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(layCentro)
         central = InfoMenus(widget, False)
-        self.setCentralWidget(central)
+        layCentral = QHBoxLayout()
+        layCentral.addWidget(central)
+        self.setLayout(layCentral)
 
     def login(self):
         correo = self.textCorreo.get_value()

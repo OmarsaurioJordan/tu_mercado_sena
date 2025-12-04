@@ -1,5 +1,7 @@
 TAREAS:
 ...
+- desbloqueo por PIN usando la API
+- modificar estado de usuario con advertencia
 - obtener los productos filtrados:
   - API productos
   - controlador productos
@@ -8,13 +10,9 @@ TAREAS:
     - filtro productos
     - producto detalles
     - cargar imágenes
-- modificar estado de usuario con advertencia
-- resaltar ficha de perfil seleccionado
 - link de perfil de usuario navegable
-- desbloqueo por PIN usando la API
 - cargar fotos de usuarios
 - usar token en todas las llamadas API, seguridad
-- ventanas conservan tamaño global, no cada una por su cuenta
 - limpiar cosas de anterior seleccionado en tools
 - limpiar controladores al cerrar sesion
 ...

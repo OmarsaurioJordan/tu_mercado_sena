@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel
 )
 from PySide6.QtCore import Qt
 from ui.header_layout import HeaderLayout
@@ -7,12 +7,10 @@ from components.txt_edit import TxtEdit
 from components.boton import Boton
 from ui.info_menus import InfoMenus
 
-class LockWindow(QMainWindow):
+class LockWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("TuMercadoSena-Desktop")
-        self.resize(800, 600)
 
         titulo = QLabel("Bloqueo por PIN")
         font = titulo.font()
@@ -42,9 +40,7 @@ class LockWindow(QMainWindow):
         contenido = InfoMenus(menu)
 
         header = HeaderLayout(contenido, False)
-        central = QWidget()
-        central.setLayout(header)
-        self.setCentralWidget(central)
+        self.setLayout(header)
 
     def ingresar(self):
         pass

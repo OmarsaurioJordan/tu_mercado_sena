@@ -1,16 +1,14 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication
+    QWidget, QVBoxLayout, QHBoxLayout, QApplication
 )
 from ui.header_layout import HeaderLayout
 from components.boton import Boton
 from ui.info_menus import InfoMenus
 
-class MenuWindow(QMainWindow):
+class MenuWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("TuMercadoSena-Desktop")
-        self.resize(800, 600)
 
         btnBloquear = Boton("  Bloquear", "candado", 20)
         btnBloquear.clicked.connect(lambda: self.cambiaPagina("lock"))
@@ -38,9 +36,7 @@ class MenuWindow(QMainWindow):
         contenido = InfoMenus(menu)
 
         header = HeaderLayout(contenido, False)
-        central = QWidget()
-        central.setLayout(header)
-        self.setCentralWidget(central)
+        self.setLayout(header)
     
     def cambiaPagina(self, pagina=""):
         manager = QApplication.instance().property("manager")
