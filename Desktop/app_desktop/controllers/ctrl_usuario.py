@@ -112,3 +112,11 @@ class CtrlUsuario:
                 "error": data.get('error')
             }
         return {"token": "", "error": ""}
+
+    def admin_pin(self, correo="", pin=""):
+        params = {"correo": correo, "pin": pin}
+        response = requests.get(API_BASE_URL + "usuarios/admin_pin.php", params=params)
+        data = response.json()
+        if response.status_code == 200:
+            return int(data.get('Ok')) # 0 o 1
+        return 2 # error

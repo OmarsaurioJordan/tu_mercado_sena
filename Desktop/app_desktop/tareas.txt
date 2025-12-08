@@ -1,6 +1,5 @@
 TAREAS:
 ...
-- desbloqueo por PIN usando la API
 - modificar estado de usuario con advertencia
 - obtener los productos filtrados:
   - API productos
