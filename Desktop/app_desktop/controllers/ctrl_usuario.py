@@ -98,14 +98,15 @@ class CtrlUsuario:
     def admin_login(self, correo="", password=""):
         params = {"correo": correo, "password": password}
         response = requests.get(API_BASE_URL + "usuarios/admin_login.php", params=params)
-        data = response.json()
         if response.status_code == 200:
+            data = response.json()
             return {
                 "token": data.get('token'),
                 "id": int(data.get('id')),
                 "error": ""
             }
         elif response.status_code == 404:
+            data = response.json()
             return {
                 "token": "",
                 "id": 0,
@@ -120,3 +121,17 @@ class CtrlUsuario:
         if response.status_code == 200:
             return int(data.get('Ok')) # 0 o 1
         return 2 # error
+
+    def set_rol(self, id=0, rol_id=0):
+        params = {"id": id, "rol": rol_id}
+        response = requests.get(API_BASE_URL + "usuarios/set_rol.php", params=params)
+        if response.status_code == 200:
+            return response.json()["Ok"] == "1"
+        return False
+    
+    def set_estado(self, id=0, estado_id=0):
+        params = {"id": id, "estado": estado_id}
+        response = requests.get(API_BASE_URL + "usuarios/set_estado.php", params=params)
+        if response.status_code == 200:
+            return response.json()["Ok"] == "1"
+        return False

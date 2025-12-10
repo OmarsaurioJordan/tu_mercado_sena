@@ -23,11 +23,11 @@ class UsuarioCard(QFrame):
         self.setFrameShadow(QFrame.Shadow.Raised)
         self.setMaximumWidth(500)
 
-        image = QPixmap("assets/sprites/avatar.png")
-        avatar = QLabel()
-        avatar.setPixmap(image)
-        avatar.setScaledContents(True)
-        avatar.setFixedSize(48, 48)
+        self.avatar = QLabel()
+        self.avatar.setScaledContents(True)
+        self.avatar.setFixedSize(48, 48)
+        self.set_image(QPixmap("assets/sprites/avatar.png"))
+        usuario.img_signal.ok_image.connect(self.set_image)
 
         nombre = QLabel(usuario.nombre)
         nombre.setWordWrap(True)
@@ -61,7 +61,7 @@ class UsuarioCard(QFrame):
 
         layHorizontal = QHBoxLayout()
         layHorizontal.addLayout(layNombreCorreo)
-        layHorizontal.addWidget(avatar)
+        layHorizontal.addWidget(self.avatar)
         if usuario.rol_id != 3:
             layHorizontal.addLayout(layRol)
         self.setLayout(layHorizontal)
@@ -87,3 +87,6 @@ class UsuarioCard(QFrame):
     def mousePressEvent(self, event):
         self.card_clic.emit(self.id)
         super().mousePressEvent(event)
+
+    def set_image(self, image):
+        self.avatar.setPixmap(image)

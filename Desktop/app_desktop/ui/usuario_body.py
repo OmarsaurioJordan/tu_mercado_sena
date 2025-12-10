@@ -41,12 +41,12 @@ class UsuarioBody(QWidget):
         laySelectores = QHBoxLayout()
         self.sel_rol = Selector([
             "Prosumer", "Admin"
-        ], "rol...", "Rol", 0)
+        ], "rol...", "Rol", 0, "usuario_rol")
         laySelectores.addWidget(self.sel_rol)
         laySelectores.addSpacing(10)
         self.sel_estado = Selector([
             "Activo", "Invisible", "Eliminado", "Bloqueado"
-        ], "estado...", "Estado", 0)
+        ], "estado...", "Estado", 0, "usuario_estado")
         laySelectores.addWidget(self.sel_estado)
 
         self.link = QLabel("*** link ***")
@@ -141,4 +141,6 @@ class UsuarioBody(QWidget):
         self.actividad.setText("Actividad\n" + usuario.fecha_reciente.replace(" ", "\n"))
         self.sel_rol.set_index(0 if usuario.rol_id == 3 else 1)
         self.sel_estado.set_index(usuario.estado_id - 1)
-        #usuario.avatar
+        self.sel_rol.set_ente_id(usuario.id)
+        self.sel_estado.set_ente_id(usuario.id)
+        # cargar imagen
