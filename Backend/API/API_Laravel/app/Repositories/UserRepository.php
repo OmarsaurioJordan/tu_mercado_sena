@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Models\Usuario;
-use App\Models\Correo;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
@@ -44,18 +43,16 @@ class UserRepository implements UserRepositoryInterface
         // Convertir el DTO a array para usar con los datos
 
         // Hash::make hashea la contraseña usando bcrypt
-        $data['password'] = Hash::make($data['password']);
-
         // Asignar el rol del usuario a normal por defecto
         // 1 = Prosumer, 2 = Administrador, 3 = Master
-        if ($data['rol_id'] === null) {
-            $data['rol_id'] = 1;
+// 2. Asignar rol por defecto (Si no viene)
+        if (!isset($data['rol_id']) || $data['rol_id'] === null) {
+            $data['rol_id'] = 1; // Prosumer
         }
 
-        // Asignar el estado del usuario por defecto
-        // 1 = Activo, 2 = Invisible, 3 = Eliminado
-        if ($data['estado_id' === null]) {
-            $data['estado_id'] = 1;
+        // 3. Asignar estado por defecto (CORREGIDO)
+        if (!isset($data['estado_id']) || $data['estado_id'] === null) {
+            $data['estado_id'] = 1; // Activo
         }
 
         // Usuario::create() -> Inserta los datos en la BD y retorna el modelo con el ID asignado

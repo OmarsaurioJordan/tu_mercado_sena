@@ -19,10 +19,13 @@ class Correo extends Model
         'clave',
         'pin',
         'intentos',
+        'pin',
+        'password'
     ];
 
     public $hidden = [
-        'clave'
+        'clave',
+        'password'
     ];
 
     //

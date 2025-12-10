@@ -17,9 +17,10 @@ interface ICorreoRepository
      * 
      * @param string $correo - Correo institucional del usuario
      * @param string $clave - Código de verificación
+     * @param string $password - Password del usuario
      * @return $correo
      */
-    public function createOrUpdate(string $correo, string $clave): Correo;
+    public function createOrUpdate(string $correo, string $clave, string $password): Correo;
 
     /**
      * Buscar por correo

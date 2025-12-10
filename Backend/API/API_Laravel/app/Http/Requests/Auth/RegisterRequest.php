@@ -49,13 +49,13 @@ class RegisterRequest extends FormRequest
             'rol_id' => [
                 'nullable',
                 'integer',
-                'exists.roles,id'
+                'exists:roles,id'
             ],
 
             'estado_id' => [
                 'nullable',
                 'integer',
-                'exists.estados,id'
+                'exists:estados,id'
             ],
 
             'descripcion' => [

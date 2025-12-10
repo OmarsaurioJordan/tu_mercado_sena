@@ -6,6 +6,7 @@ use App\Repositories\Contracts\ICorreoRepository;
 use App\Models\Correo;
 use App\Models\Usuario;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Repositorio para la tabla de correos
@@ -28,8 +29,11 @@ class CorreoRepository implements ICorreoRepository
      * @param string $clave - Código de verificación
      * @return Correo - Registro creado o actualizado
      */
-    public function createOrUpdate(string $correo, string $clave): Correo
+    public function createOrUpdate(string $correo, string $clave, string $password): Correo
     {
+        Log::info('Iniciando proceso de creación de correo en repositorio',[
+            'correo' => $correo
+        ]);
         return Correo::updateOrCreate(
             // Criterios de búsqueda
             ['correo' => $correo],
@@ -37,6 +41,7 @@ class CorreoRepository implements ICorreoRepository
             // Datos a actualizar o crear
             [
                 'clave' => $clave,
+                'password' => bcrypt($password),
                 'fecha_mail' => Carbon::now(),
             ],
         );

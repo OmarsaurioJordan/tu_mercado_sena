@@ -27,15 +27,22 @@ class RegistroService
      * - Envía el correo con la clave
      * 
      * @param string $correo - Correo del usuario a registrar
+     * @param string $password - Password del usuario
      * @return array ['success' => bool, 'message' => string]
      */
-    public function iniciarRegistro(string $correo): array
+    public function iniciarRegistro(string $correo, string $password): array
     {
         DB::beginTransaction();
     
         try {
+            Log::info('Iniciando proceso de registro en el servicio',[
+                'correo' => $correo
+            ]);
             // Si el correo tiene un registro vigente, NO crees uno nuevo
             if ($this->correoRepository->isCorreoVigente($correo)) {
+                Log::warning('Usuario ya cuenta con un código de registro', [
+                    'correo' => $correo
+                ]);
                 DB::rollBack();
                 return [
                     'success' => false,
@@ -53,13 +60,18 @@ class RegistroService
                 $correo = $this->correoRepository->actualizarClave($correoExistente, $clave);
             } else {
                 // crear nuevo registro 
-                $correo = $this->correoRepository->createOrUpdate($correo, $clave);
+                $correo = $this->correoRepository->createOrUpdate($correo, $clave, $password);
             }
 
+            DB::commit();
+
             // Enviar correo
-            $emailEnviado = $this->correoService->enviarCodigoVerificacion($correo->correo, $clave);
+            $emailEnviado = $this->correoService->enviarCodigoVerificacion($correo->correo,$clave);
 
             if (!$emailEnviado) {
+                Log::error('Erro en el servicio de registro',[
+                    'correo' => $correo
+                ]);
                 DB::rollBack();
                 return [
                     'success' => false,
@@ -68,13 +80,15 @@ class RegistroService
                 ];
             }
 
-            DB::commit();
+            Log::info('Servicio concretado correctamente',[
+                'correo' => $correo->correo
+            ]);
 
             return [
                 'success' => true,
                 'message' => 'Código enviado correctamente',
                 'data' => [
-                    'correo' => $correo,
+                    'correo_id' => $correo->id,
                     'expira_en' => $correo->fecha_mail->toDateTimeString(),
                 ]
             ];
@@ -84,7 +98,7 @@ class RegistroService
 
             Log::error('Error iniciarRegistro', [
                 'error' => $e->getMessage(),
-                'correo' => $correo
+                'correo' => $correo->correo
             ]);
 
             return [

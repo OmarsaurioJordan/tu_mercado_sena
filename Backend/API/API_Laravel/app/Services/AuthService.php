@@ -68,7 +68,8 @@ class AuthService
     public function iniciarRegistro(RegisterDTO $dto): array
     {
         $correoUsuario = $dto->correo;
-        $inicioProceso =  $this->registroService->iniciarRegistro($correoUsuario);
+        $passwordUsuario = $dto->password;
+        $inicioProceso =  $this->registroService->iniciarRegistro($correoUsuario, $passwordUsuario);
 
         if (!$inicioProceso['success']) {
             throw ValidationException::withMessages([
@@ -80,7 +81,7 @@ class AuthService
         
         return [
             'message' => $inicioProceso['message'],
-            'correo' => $inicioProceso['data']['correo'],
+            'correo_id' => $inicioProceso['data']['correo_id'],
             'expira_en' => $inicioProceso['data']['expira_en'],
             'datosEncriptados' => $datosEncriptados,
         ];
@@ -101,14 +102,14 @@ class AuthService
      * @return array{user: Usuario, token: string}
      * @throws ValidationException - Si el email ya existe
      */
-    public function register(string $datosEncriptados, VerifyCode $codigoDTO): array
+    public function register(string $datosEncriptados, VerifyCode $codigoDTO, int $correo_id): array
     {
         try {
             $data = decrypt($datosEncriptados);
     
             $dto = RegisterDTO::fromArray($data);
     
-            $correo = $this->correoRepository->findByCorreo($dto->correo);
+            $correo = $this->correoRepository->findById($correo_id);
     
             if ($this->userRepository->exists($dto->correo)) {
                 throw ValidationException::withMessages([
@@ -129,13 +130,12 @@ class AuthService
             // Crear el usuario en la base de datos, además se encarga de hashear la contraseña, asignar el rol y el estado
             $user = $this->userRepository->create([
                 'correo_id' => $correo->id,
-                'password' => bcrypt($dto->password),
+                'estado_id' => $dto->estado_id,
+                'rol_id' => $dto->rol_id,
                 'nombre' => $dto->nombre,
                 'avatar' => $dto->avatar,
                 'descripcion' => $dto->descripcion,
                 'link' => $dto->link,
-                'rol_id' => $dto->rol_id,
-                'estado_id' => $dto->estado_id
             ]);
     
             // Crear el token de acceso 
@@ -148,6 +148,9 @@ class AuthService
             $expiresIn = $this->jwt->factory()->getTTL() * 60;
     
             // Retornar el usuario y el token, el cliente debe guardar este token para futuras peticiones
+            Log::info('Datos del usuario', [
+                'user' => $user
+            ]);
             return [
                 'user' => $user,
                 'token' => $token,
@@ -155,27 +158,25 @@ class AuthService
                 'expires_in' => $expiresIn
             ];
 
-        } catch (ValidationException $e) {
-            return [
-                'error' => $e->getMessage(),
-            ];
-
+            } catch (ValidationException $e) {
+            // 1. Asegurar el rollback si la transacción fue iniciada.
             if (DB::transactionLevel() > 0) {
                 DB::rollBack();
             }
+            // 2. RELANZAR la excepción para que el Controller la maneje.
+
             throw $e;
 
         } catch (\Exception $e) {
             Log::error('Error al registrar al usuario AuthService', [
-                'correo_id' => $correo->id
+                'correo_id' => $correo_id
             ]);
 
             if (DB::transactionLevel() > 0) {
                 DB::rollBack();
             }
-            return [
-                'error' => $e->getMessage(),
-            ];
+
+            throw $e;
         }
     }
 
@@ -215,10 +216,14 @@ class AuthService
                 ]);
             }
 
-            $user = $this->userRepository->findByIdEmail($correo_usuario->id);
+            $correo_registrado = $this->correoRepository->findByID($correo_usuario->id);
     
             // Lanzar excepción si las credenciales son incorrectas
-            if (!$user) {
+            if (!$correo_registrado) {
+                Log::warning('Correo incorrecto',[
+                    'correo_registrado' => $correo_registrado
+                ]);
+
                 throw ValidationException::withMessages([
                     'login' => ['Correo o contraseña incorrectos']
                 ]);
@@ -227,12 +232,17 @@ class AuthService
             // Válidar si la contraseña es correcta
             // Hash::check() compara la contraseña en texto plano con el hash almacenado
             // Si no coincide, lanzamos excepción con el mismo mensaje genérico
-            if (!Hash::check($dto->password, $user->password)) {
+            if (!Hash::check($dto->password, $correo_registrado->password)) {
+                Log::warning('Contraseña Incorrecta', [
+                    'password' => null
+                ]);
+
                 throw ValidationException::withMessages([
                     'login' => ['Correo o contraseña incorrectos']
                 ]);
             }
-    
+            
+            $user = $this->userRepository->findByIdEmail($correo_registrado->id);
             // Válidar que el usuario este activo
             // estado_id: 1 = activo, 2 = invisible, 3 = eliminado
             if ($user->estado_id === 3) {
@@ -272,10 +282,7 @@ class AuthService
                 'linea' => $e->getLine()
             ]);
 
-            return [
-                'correo' => $dto->correo,
-                'error' => $e->getMessage(),
-            ];
+            throw $e;
         }
     }
 

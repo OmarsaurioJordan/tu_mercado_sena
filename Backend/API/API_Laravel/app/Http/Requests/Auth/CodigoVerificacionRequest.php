@@ -26,6 +26,10 @@ class CodigoVerificacionRequest extends FormRequest
                 'required',
                 'string'
             ],
+            'correo_id' => [
+                'required',
+                'exists:correos,id'
+            ],
             'clave' => [
               'required',
               'string',
@@ -39,6 +43,7 @@ class CodigoVerificacionRequest extends FormRequest
     {
         return [
             'datosEncriptados.required' => 'No hay datos del usuario a registrar',
+            'correo_id.exists' => 'Correo no registrado en la base de datos',
             'clave.required' => 'Debe ingresar el código de verificación',
             'clave.regex' => 'El código debe tener 6 caracteres'
         ];

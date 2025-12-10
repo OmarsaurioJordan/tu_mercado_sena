@@ -13,11 +13,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::create('estados', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 32)->unique();
             $table->string('descripcion', 128)->nullable();
         });
+        Schema::enableForeignKeyConstraints();
 
         DB::table('estados')->insert([
             ['nombre' => 'activo', 'descripcion' => 'Usuario activo en el sistema'],
@@ -31,6 +33,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('estados');
+        Schema::enableForeignKeyConstraints();
     }
 };

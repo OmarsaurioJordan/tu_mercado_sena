@@ -19,13 +19,12 @@ class Usuario extends Authenticatable implements JWTSubject
 
     protected $fillable = [
         'correo_id',
-        'password',
+        'estado_id',
         'rol_id',
         'nombre',
         'avatar',
         'descripcion',
         'link',
-        'estado_id',
         'jwt_invalidated_at'
     ];
 

@@ -70,7 +70,7 @@ class AuthController
 
             return response()->json([
                 'message' => $result['message'],
-                'correo' => $result['correo'],
+                'correo_id' => $result['correo_id'],
                 'expira_en' => $result['expira_en'],
                 'datosEncriptados' => $result['datosEncriptados']
             ], 200);
@@ -98,9 +98,10 @@ class AuthController
     {
         try {
             $datosEncriptados = $request->validated()['datosEncriptados'];
+            $correo_id = $request->validated()['correo_id'];
             $dto = VerifyCode::fromArray($request->validated());
     
-            $result = $this->authService->register($datosEncriptados, $dto);
+            $result = $this->authService->register($datosEncriptados, $dto, $correo_id);
     
             return response()->json([
                 'message' => 'Usuario registrado correctamente',
@@ -116,7 +117,8 @@ class AuthController
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al registrar al usuario',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde'
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde',
+                'line' => $e->getFile()
             ], 500);
         }
     }
