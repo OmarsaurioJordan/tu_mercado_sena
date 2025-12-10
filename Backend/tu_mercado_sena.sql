@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-11-2025 a las 03:00:50
+-- Tiempo de generación: 10-12-2025 a las 23:32:58
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 --
 -- Estructura de tabla para la tabla `auditorias`
 --
--- Creación: 19-08-2025 a las 02:16:26
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `auditorias`;
@@ -51,7 +51,7 @@ CREATE TABLE `auditorias` (
 --
 -- Estructura de tabla para la tabla `bloqueados`
 --
--- Creación: 19-08-2025 a las 01:35:00
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `bloqueados`;
@@ -74,7 +74,7 @@ CREATE TABLE `bloqueados` (
 --
 -- Estructura de tabla para la tabla `categorias`
 --
--- Creación: 13-05-2025 a las 21:22:41
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `categorias`;
@@ -112,7 +112,7 @@ INSERT INTO `categorias` (`id`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `chats`
 --
--- Creación: 19-08-2025 a las 01:44:09
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `chats`;
@@ -143,22 +143,29 @@ CREATE TABLE `chats` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `correos`
+-- Estructura de tabla para la tabla `cuentas`
 --
--- Creación: 26-11-2025 a las 01:57:39
--- Última actualización: 26-11-2025 a las 01:57:17
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
-DROP TABLE IF EXISTS `correos`;
-CREATE TABLE `correos` (
+DROP TABLE IF EXISTS `cuentas`;
+CREATE TABLE `cuentas` (
   `id` int(10) UNSIGNED NOT NULL,
-  `correo` varchar(64) NOT NULL,
+  `email` varchar(64) NOT NULL COMMENT 'correo institucional, debe ser unico',
+  `password` varchar(127) NOT NULL DEFAULT '' COMMENT 'debe guardarse como un hash',
   `clave` varchar(32) NOT NULL DEFAULT '' COMMENT 'una combinación aleatoria que será enviada al correo, con un solo uso limitado por tiempo',
-  `fecha_mail` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'guarda el momento en que se envio una solicitud al mail, para poder esperar y no enviarlas muy seguido'
+  `notifica_correo` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'en true significa que desea recibir correos cuando alguien se pone en contacto',
+  `notifica_push` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'en true significa que quiere recibir notificaciones emergentes en celular o computadora cuando algo sucede',
+  `uso_datos` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'en false reduce el consumo de datos de la aplicacion evitando cargar imagenes',
+  `pin` varchar(4) NOT NULL DEFAULT '' COMMENT 'para bloqueo de interfaces sin logout',
+  `token_web` varchar(32) NOT NULL DEFAULT '' COMMENT 'para un acceso a web',
+  `token_movil` varchar(32) NOT NULL DEFAULT '' COMMENT 'para un acceso a móvil',
+  `token_admin` varchar(32) NOT NULL DEFAULT '' COMMENT 'para un acceso a desktop',
+  `fecha_clave` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'guarda el momento en que se envio una solicitud al mail, para poder esperar y no enviarlas muy seguido'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- RELACIONES PARA LA TABLA `correos`:
+-- RELACIONES PARA LA TABLA `cuentas`:
 --
 
 -- --------------------------------------------------------
@@ -166,7 +173,7 @@ CREATE TABLE `correos` (
 --
 -- Estructura de tabla para la tabla `denuncias`
 --
--- Creación: 16-11-2025 a las 21:48:20
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `denuncias`;
@@ -202,7 +209,7 @@ CREATE TABLE `denuncias` (
 --
 -- Estructura de tabla para la tabla `estados`
 --
--- Creación: 04-08-2025 a las 23:22:13
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `estados`;
@@ -238,7 +245,7 @@ INSERT INTO `estados` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `favoritos`
 --
--- Creación: 19-08-2025 a las 01:52:18
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `favoritos`;
@@ -261,7 +268,7 @@ CREATE TABLE `favoritos` (
 --
 -- Estructura de tabla para la tabla `integridad`
 --
--- Creación: 04-08-2025 a las 23:29:02
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `integridad`;
@@ -290,8 +297,7 @@ INSERT INTO `integridad` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `login_ip`
 --
--- Creación: 26-11-2025 a las 01:48:15
--- Última actualización: 26-11-2025 a las 01:47:11
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `login_ip`;
@@ -314,7 +320,7 @@ CREATE TABLE `login_ip` (
 --
 -- Estructura de tabla para la tabla `mensajes`
 --
--- Creación: 02-09-2025 a las 02:27:46
+-- Creación: 10-12-2025 a las 22:05:15
 --
 
 DROP TABLE IF EXISTS `mensajes`;
@@ -324,7 +330,7 @@ CREATE TABLE `mensajes` (
   `chat_id` int(10) UNSIGNED NOT NULL COMMENT 'a que chat va, ahi estara el receptor',
   `mensaje` varchar(512) NOT NULL DEFAULT '' COMMENT 'el texto como tal',
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'automaticamente se establece cuando se creo el mensaje',
-  `es_imagen` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'en true significa que habra un archivo JPG, su nombre debe llevar el id'
+  `con_imagen` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'si es true, significa que habra un archivo del tipo cht_id.jpg en la carpeta correspondiente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -338,7 +344,7 @@ CREATE TABLE `mensajes` (
 --
 -- Estructura de tabla para la tabla `motivos`
 --
--- Creación: 19-08-2025 a las 02:19:57
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `motivos`;
@@ -389,7 +395,7 @@ INSERT INTO `motivos` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `notificaciones`
 --
--- Creación: 19-08-2025 a las 02:13:57
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `notificaciones`;
@@ -415,7 +421,7 @@ CREATE TABLE `notificaciones` (
 --
 -- Estructura de tabla para la tabla `papelera`
 --
--- Creación: 02-09-2025 a las 02:29:22
+-- Creación: 10-12-2025 a las 22:03:53
 --
 
 DROP TABLE IF EXISTS `papelera`;
@@ -423,7 +429,7 @@ CREATE TABLE `papelera` (
   `id` int(10) UNSIGNED NOT NULL,
   `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'quién es responsable de esta edición',
   `mensaje` varchar(512) NOT NULL DEFAULT '' COMMENT 'texto que fué editado sea en perfil o producto o calificación de producto, cualquier parte donde se pueda editar',
-  `es_imagen` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'en true significa que habra un archivo JPG, su nombre debe llevar el id	',
+  `con_imagen` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'si es true, significa que habra un archivo del tipo grb_id.jpg en la carpeta correspondiente',
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'cuándo se hizo el registro, la edición'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -438,7 +444,7 @@ CREATE TABLE `papelera` (
 --
 -- Estructura de tabla para la tabla `pqrs`
 --
--- Creación: 19-08-2025 a las 02:10:27
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `pqrs`;
@@ -466,14 +472,14 @@ CREATE TABLE `pqrs` (
 --
 -- Estructura de tabla para la tabla `productos`
 --
--- Creación: 28-08-2025 a las 15:39:03
+-- Creación: 10-12-2025 a las 22:05:34
 --
 
 DROP TABLE IF EXISTS `productos`;
 CREATE TABLE `productos` (
   `id` int(10) UNSIGNED NOT NULL,
   `nombre` varchar(64) NOT NULL,
-  `con_imagen` tinyint(1) NOT NULL COMMENT 'si es true, significa que habra un archivo del tipo img_id.jpg en la carpeta correspondiente',
+  `con_imagen` tinyint(1) NOT NULL COMMENT 'si es true, significa que habra un archivo del tipo prd_id.jpg en la carpeta correspondiente',
   `subcategoria_id` int(10) UNSIGNED NOT NULL COMMENT 'la subcategoria incluye a la categoria, por ejemplo, electrodomesticos, mobiliario, alimento, etc',
   `integridad_id` int(10) UNSIGNED NOT NULL COMMENT 'para saber si el producto es nuevo, de segunda pero en buen estado o si es un producto con fallas',
   `vendedor_id` int(10) UNSIGNED NOT NULL COMMENT 'apunta al id de usuario que es su creador',
@@ -502,7 +508,7 @@ CREATE TABLE `productos` (
 --
 -- Estructura de tabla para la tabla `roles`
 --
--- Creación: 19-08-2025 a las 03:31:20
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `roles`;
@@ -529,7 +535,7 @@ INSERT INTO `roles` (`id`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `subcategorias`
 --
--- Creación: 19-08-2025 a las 01:55:55
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `subcategorias`;
@@ -697,7 +703,7 @@ INSERT INTO `subcategorias` (`id`, `nombre`, `categoria_id`) VALUES
 --
 -- Estructura de tabla para la tabla `sucesos`
 --
--- Creación: 19-08-2025 a las 02:19:19
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `sucesos`;
@@ -733,27 +739,19 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 26-11-2025 a las 01:56:52
+-- Creación: 10-12-2025 a las 22:01:10
 --
 
 DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
   `id` int(10) UNSIGNED NOT NULL,
-  `correo_id` int(10) UNSIGNED NOT NULL COMMENT 'apunta a la tabla donde se guardan los correos y claves de un uso',
-  `password` varchar(127) NOT NULL COMMENT 'debe guardarse como un hash',
+  `cuenta_id` int(10) UNSIGNED NOT NULL,
+  `nickname` varchar(32) NOT NULL COMMENT 'el nickname del usuario, pueden repetirse',
+  `con_avatar` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'si es true, significa que habra un archivo del tipo usr_id.jpg en la carpeta correspondiente',
+  `descripcion` varchar(512) NOT NULL DEFAULT '''''' COMMENT 'para que el usuario diga algo sobre si mismo en su perfil',
+  `link` varchar(128) NOT NULL DEFAULT '''''' COMMENT 'si el usuario quiere compartir redes sociales o algo asi',
   `rol_id` int(10) UNSIGNED NOT NULL DEFAULT 3 COMMENT 'administra los permisos de acceso al sistema',
-  `nombre` varchar(32) NOT NULL COMMENT 'el nickname del usuario, pueden repetirse',
-  `avatar` int(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'apunta a alguna configuracion de sprites (imagenes) o a un servicio web con ID de avatar',
-  `descripcion` varchar(512) NOT NULL DEFAULT '' COMMENT 'para que el usuario diga algo sobre si mismo en su perfil',
-  `link` varchar(128) NOT NULL DEFAULT '' COMMENT 'si el usuario quiere compartir redes sociales o algo asi',
   `estado_id` int(10) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'esto dice si el usuario esta pendiente de aprobacion, bloqueado del sistema, eliminado, etc',
-  `notifica_correo` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'en true significa que desea recibir correos cuando alguien se pone en contacto',
-  `notifica_push` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'en true significa que quiere recibir notificaciones emergentes en celular o computadora cuando algo sucede',
-  `uso_datos` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'en false reduce el consumo de datos de la aplicacion evitando cargar imagenes',
-  `pin` varchar(4) NOT NULL DEFAULT '' COMMENT 'para cuando las interfaces se bloquean sin logout, acceso rápido y protección dentro de la sesión',
-  `token_web` varchar(32) DEFAULT NULL COMMENT 'para un acceso a web',
-  `token_movil` varchar(32) DEFAULT NULL COMMENT 'para un acceso a móvil',
-  `token_admin` varchar(32) DEFAULT NULL COMMENT 'para un acceso a desktop',
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'esto no se cambia, solo se pone automaticamente cuando el usuario se registra',
   `fecha_actualiza` timestamp NOT NULL DEFAULT '2000-01-01 05:00:00' COMMENT 'se actualizara cada que el usuario edita su perfil, para dar una ventana de tiempo entre ediciones',
   `fecha_reciente` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'utilizado para saber si el usuario ha estado activo recientemente'
@@ -761,12 +759,12 @@ CREATE TABLE `usuarios` (
 
 --
 -- RELACIONES PARA LA TABLA `usuarios`:
+--   `cuenta_id`
+--       `cuentas` -> `id`
 --   `estado_id`
 --       `estados` -> `id`
 --   `rol_id`
 --       `roles` -> `id`
---   `correo_id`
---       `correos` -> `id`
 --
 
 -- --------------------------------------------------------
@@ -774,7 +772,7 @@ CREATE TABLE `usuarios` (
 --
 -- Estructura de tabla para la tabla `vistos`
 --
--- Creación: 19-08-2025 a las 02:02:58
+-- Creación: 10-12-2025 a las 21:55:57
 --
 
 DROP TABLE IF EXISTS `vistos`;
@@ -828,11 +826,11 @@ ALTER TABLE `chats`
   ADD KEY `chat_estado` (`estado_id`);
 
 --
--- Indices de la tabla `correos`
+-- Indices de la tabla `cuentas`
 --
-ALTER TABLE `correos`
+ALTER TABLE `cuentas`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `correo_unico` (`correo`);
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indices de la tabla `denuncias`
@@ -944,9 +942,10 @@ ALTER TABLE `sucesos`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nickname` (`nickname`),
   ADD KEY `usuario_estado` (`estado_id`),
-  ADD KEY `usuarios_correo` (`correo_id`),
-  ADD KEY `usuario_rol` (`rol_id`);
+  ADD KEY `usuario_rol` (`rol_id`),
+  ADD KEY `usuario_cuenta` (`cuenta_id`);
 
 --
 -- Indices de la tabla `vistos`
@@ -985,9 +984,9 @@ ALTER TABLE `chats`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `correos`
+-- AUTO_INCREMENT de la tabla `cuentas`
 --
-ALTER TABLE `correos`
+ALTER TABLE `cuentas`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
@@ -1182,9 +1181,9 @@ ALTER TABLE `subcategorias`
 -- Filtros para la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
+  ADD CONSTRAINT `usuario_cuenta` FOREIGN KEY (`cuenta_id`) REFERENCES `cuentas` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `usuario_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_rol` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuarios_correo` FOREIGN KEY (`correo_id`) REFERENCES `correos` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `usuario_rol` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`) ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `vistos`
