@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-12-2025 a las 23:32:58
+-- Tiempo de generación: 11-12-2025 a las 00:29:07
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -266,6 +266,28 @@ CREATE TABLE `favoritos` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `fotos`
+--
+-- Creación: 10-12-2025 a las 23:28:28
+--
+
+DROP TABLE IF EXISTS `fotos`;
+CREATE TABLE `fotos` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `producto_id` int(10) UNSIGNED NOT NULL COMMENT 'a que producto pertenecene las fotos',
+  `imagen` varchar(80) NOT NULL COMMENT 'nombre del archivo con extension, para buscarlo en almacenamiento',
+  `actualiza` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'cuando se cambio la foto'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- RELACIONES PARA LA TABLA `fotos`:
+--   `producto_id`
+--       `productos` -> `id`
+--
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `integridad`
 --
 -- Creación: 10-12-2025 a las 21:55:57
@@ -321,6 +343,7 @@ CREATE TABLE `login_ip` (
 -- Estructura de tabla para la tabla `mensajes`
 --
 -- Creación: 10-12-2025 a las 22:05:15
+-- Última actualización: 10-12-2025 a las 23:27:18
 --
 
 DROP TABLE IF EXISTS `mensajes`;
@@ -329,8 +352,8 @@ CREATE TABLE `mensajes` (
   `es_comprador` tinyint(3) UNSIGNED NOT NULL COMMENT 'el chat tiene usuario A y B, acá es 1 si lo escribió A o 0 si B',
   `chat_id` int(10) UNSIGNED NOT NULL COMMENT 'a que chat va, ahi estara el receptor',
   `mensaje` varchar(512) NOT NULL DEFAULT '' COMMENT 'el texto como tal',
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'automaticamente se establece cuando se creo el mensaje',
-  `con_imagen` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'si es true, significa que habra un archivo del tipo cht_id.jpg en la carpeta correspondiente'
+  `imagen` varchar(80) NOT NULL DEFAULT '''''' COMMENT 'nombre del archivo de imagen con extension, en el almacenamiento',
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'automaticamente se establece cuando se creo el mensaje'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -429,7 +452,7 @@ CREATE TABLE `papelera` (
   `id` int(10) UNSIGNED NOT NULL,
   `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'quién es responsable de esta edición',
   `mensaje` varchar(512) NOT NULL DEFAULT '' COMMENT 'texto que fué editado sea en perfil o producto o calificación de producto, cualquier parte donde se pueda editar',
-  `con_imagen` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'si es true, significa que habra un archivo del tipo grb_id.jpg en la carpeta correspondiente',
+  `imagen` varchar(80) NOT NULL DEFAULT '' COMMENT 'nombre del archivo de imagen con extension, en el almacenamiento',
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'cuándo se hizo el registro, la edición'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -472,14 +495,14 @@ CREATE TABLE `pqrs` (
 --
 -- Estructura de tabla para la tabla `productos`
 --
--- Creación: 10-12-2025 a las 22:05:34
+-- Creación: 10-12-2025 a las 23:24:46
+-- Última actualización: 10-12-2025 a las 23:24:46
 --
 
 DROP TABLE IF EXISTS `productos`;
 CREATE TABLE `productos` (
   `id` int(10) UNSIGNED NOT NULL,
   `nombre` varchar(64) NOT NULL,
-  `con_imagen` tinyint(1) NOT NULL COMMENT 'si es true, significa que habra un archivo del tipo prd_id.jpg en la carpeta correspondiente',
   `subcategoria_id` int(10) UNSIGNED NOT NULL COMMENT 'la subcategoria incluye a la categoria, por ejemplo, electrodomesticos, mobiliario, alimento, etc',
   `integridad_id` int(10) UNSIGNED NOT NULL COMMENT 'para saber si el producto es nuevo, de segunda pero en buen estado o si es un producto con fallas',
   `vendedor_id` int(10) UNSIGNED NOT NULL COMMENT 'apunta al id de usuario que es su creador',
@@ -739,7 +762,7 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 10-12-2025 a las 22:01:10
+-- Creación: 10-12-2025 a las 23:26:22
 --
 
 DROP TABLE IF EXISTS `usuarios`;
@@ -747,7 +770,7 @@ CREATE TABLE `usuarios` (
   `id` int(10) UNSIGNED NOT NULL,
   `cuenta_id` int(10) UNSIGNED NOT NULL,
   `nickname` varchar(32) NOT NULL COMMENT 'el nickname del usuario, pueden repetirse',
-  `con_avatar` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'si es true, significa que habra un archivo del tipo usr_id.jpg en la carpeta correspondiente',
+  `imagen` varchar(80) NOT NULL COMMENT 'nombre del archivo de imagen con extension, en el almacenamiento',
   `descripcion` varchar(512) NOT NULL DEFAULT '''''' COMMENT 'para que el usuario diga algo sobre si mismo en su perfil',
   `link` varchar(128) NOT NULL DEFAULT '''''' COMMENT 'si el usuario quiere compartir redes sociales o algo asi',
   `rol_id` int(10) UNSIGNED NOT NULL DEFAULT 3 COMMENT 'administra los permisos de acceso al sistema',
@@ -857,6 +880,14 @@ ALTER TABLE `favoritos`
   ADD PRIMARY KEY (`id`),
   ADD KEY `usuario_votante` (`votante_id`),
   ADD KEY `usuario_votado` (`votado_id`) USING BTREE;
+
+--
+-- Indices de la tabla `fotos`
+--
+ALTER TABLE `fotos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `filename` (`imagen`),
+  ADD KEY `foto_producto` (`producto_id`);
 
 --
 -- Indices de la tabla `integridad`
@@ -1008,6 +1039,12 @@ ALTER TABLE `favoritos`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `fotos`
+--
+ALTER TABLE `fotos`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `integridad`
 --
 ALTER TABLE `integridad`
@@ -1128,6 +1165,12 @@ ALTER TABLE `denuncias`
 ALTER TABLE `favoritos`
   ADD CONSTRAINT `usuario_votado` FOREIGN KEY (`votado_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `usuario_votante` FOREIGN KEY (`votante_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `fotos`
+--
+ALTER TABLE `fotos`
+  ADD CONSTRAINT `foto_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `login_ip`
