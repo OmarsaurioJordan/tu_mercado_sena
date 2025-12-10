@@ -13,20 +13,15 @@ return new class extends Migration
     {
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
-            $table->string('correo_id', 64)->unique();
-            $table->string('password', 127);
-            $table->foreignId('rol_id')->constrained('roles');
+            $table->foreignId('correo_id')->constrained('correos');
+            $table->foreignId('rol_id')->constrained('estados');
             $table->string('nombre', 32);
-            $table->integer('avatar')->unsigned();
-            $table->string('descripcion', 512)->nullable();
-            $table->string('link', 128)->nullable();
-            $table->foreignId('estado_id')->constrained('estados');
-            $table->boolean('notifica_correo')->default(true);
-            $table->boolean('notifica_push')->default(true);
-            $table->boolean('uso_datos')->default(true);
-            $table->timestamp('fecha_registro')->useCurrent();
-            $table->timestamp('fecha_actualiza')->useCurrent()->useCurrentOnUpdate();
-            $table->timestamp('fecha_reciente')->useCurrent();
+            $table->integer('avatar');
+            $table->string('descripcion', 512);
+            $table->string('link', 128);
+            $table->timestamp('fecha_registro')->useCurrent(); 
+            $table->timestamp('fecha_actualiza')->useCurrentOnUpdate();
+            $table->timestamp('fecha_reciente')->nullable();
         });
     }
 

@@ -11,7 +11,11 @@ class Usuario extends Authenticatable implements JWTSubject
     use Notifiable;
 
     protected $table = 'usuarios';
-    public $timestamps = false;
+    public $timestamps = true;
+
+    const CREATED_AT = 'fecha_registro';
+    const UPDATED_AT = 'fecha_actualiza';
+
 
     protected $fillable = [
         'correo_id',

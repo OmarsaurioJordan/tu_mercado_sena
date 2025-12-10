@@ -13,14 +13,11 @@ return new class extends Migration
     {
         Schema::create('correos', function (Blueprint $table) {
             $table->id();
-            $table->string('correo', 64)->unique();
-            $table->string('clave', 6);
-            $table->string('pin', 8)->nullable();
-            $table->timestamp('fecha_mail');
-            $table->integer('intentos')->default(0);
-            $table->timestamps();
-            $table->index('correo');
-            $table->index('fecha_mail');
+            $table->string('correo', 64);
+            $table->string('clave', 32);
+            $table->boolean('notifica_push')->default(false);
+            $table->boolean('uso_datos')->default(false);
+            $table->timestamp('fecha_mail')->useCurrent();
         });
     }
 

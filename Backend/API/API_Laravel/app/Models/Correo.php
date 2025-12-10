@@ -8,11 +8,16 @@ use Carbon\Carbon;
 class Correo extends Model
 {
     protected $table = 'correos';
+    public $timestamps = true;
+
+    const CREATED_AT = 'fecha_mail';
+    const UPDATED_AT = null;
+
+
     public $fillable = [
         'correo',
         'clave',
         'pin',
-        'fecha_mail',
         'intentos',
     ];
 
@@ -23,7 +28,7 @@ class Correo extends Model
     //
     //
 
-    protected $cast = [
+    protected $casts = [
         'fecha_mail' => 'datetime',
         'intentos' => 'integer'
     ];
@@ -107,9 +112,8 @@ class Correo extends Model
         // Generar nueva clave alfanúmerica de 6 caracteres
         $this->clave = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 6));
 
-        // Extender expiración a 1 hora más
-        $this->fecha_mail = Carbon::now()->addHour();
-
+        // Extender expiración a 10 hora más
+        $this->fecha_mail = Carbon::now()->addMinutes(10);
         // Resetear intentos
         $this->intentos = 0;
 
