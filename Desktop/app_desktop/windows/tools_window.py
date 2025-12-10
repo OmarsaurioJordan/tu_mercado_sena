@@ -1,17 +1,13 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget
+    QWidget
 )
 from ui.header_layout import HeaderLayout
 from ui.tools_widget import ToolsWidget
 
-class ToolsWindow(QMainWindow):
+class ToolsWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("TuMercadoSena-Desktop")
-        self.resize(800, 600)
 
         header = HeaderLayout(ToolsWidget())
-        central = QWidget()
-        central.setLayout(header)
-        self.setCentralWidget(central)
+        self.setLayout(header)

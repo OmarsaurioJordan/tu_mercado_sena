@@ -51,5 +51,12 @@ class UsuarioBusqueda(QListWidget):
             ids.add(widget.id)
         return ids
     
+    def set_sombrear(self, user_id=0):
+        for i in range(self.count()):
+            item = self.item(i)
+            widget = self.itemWidget(item)
+            widget.setPulsado(widget.id == user_id)
+    
     def _click_event(self, user_id):
         self.card_clic.emit(user_id)
+        self.set_sombrear(user_id)
