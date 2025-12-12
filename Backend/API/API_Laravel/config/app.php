@@ -127,10 +127,7 @@ return [
     /*
     * Laravel Framework Service Providers...
     */
-        Illuminate\Auth\AuthServiceProvider::class,  // 👈 DEBE ESTAR
-        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
-        App\Providers\RepositoryServiceProvider::class,
-        App\Providers\AppServiceProvider::class,
+        Illuminate\Auth\AuthServiceProvider::class,  
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
         Illuminate\Bus\BusServiceProvider::class,
@@ -152,7 +149,10 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        App\Providers\AppServiceProvider::class,
+        App\Providers\Auth\RepositoriesProviders::class,
+        App\Providers\Auth\ServicesProviders::class
     ],
 
     

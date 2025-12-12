@@ -19,11 +19,6 @@ final readonly class LoginDTO
         );
     }
 
-    /**
-     * 
-     * 
-     */
-
     public function toArray(): array
     {
         return [

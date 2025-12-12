@@ -34,16 +34,16 @@ class RegisterRequest extends FormRequest
                     ->uncompromised()
             ],
 
-            'nombre' => [
+            'nickname' => [
                 'required',
                 'string',
-                'max:24',
+                'max:32',
             ],
 
-            'avatar' => [
+            'imagen' => [
                 'required',
-                'integer',
-                'min:1',
+                'string',
+                'max:80'
             ],
 
             'rol_id' => [

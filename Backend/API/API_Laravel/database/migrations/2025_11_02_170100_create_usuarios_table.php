@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('correo_id')->constrained('correos')->cascadeOnDelete();
-            $table->foreignId('estado_id')->constrained('estados')->cascadeOnDelete();
-            $table->foreignId('rol_id')->constrained('roles')->cascadeOnDelete();
-            $table->string('nombre', 32);
-            $table->integer('avatar');
+            $table->foreignId('cuenta_id')->unique()->constrained('cuentas')->cascadeOnDelete();
+            $table->string('nickname', 32)->unique();
+            $table->string('imagen', 80);
             $table->string('descripcion', 512);
-            $table->string('link', 128);
+            $table->string('link', 128)->nullable();
+            $table->foreignId('rol_id')->constrained('roles')->cascadeOnDelete();
+            $table->foreignId('estado_id')->constrained('estados')->cascadeOnDelete();
             $table->timestamp('fecha_registro')->useCurrent(); 
             $table->timestamp('fecha_actualiza')->useCurrent()->useCurrentOnUpdate();
             $table->timestamp('fecha_reciente')->nullable();

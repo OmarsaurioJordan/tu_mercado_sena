@@ -7,10 +7,10 @@ use App\DTOs\Auth\recuperarContrasena\CorreoDto;
 use App\DTOs\Auth\recuperarContrasena\NuevaContrasenaDto;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Services\AuthService;
+use App\Contracts\Auth\Services\IAuthService;
 use App\DTOs\Auth\LoginDTO;
-use App\DTOs\Auth\RegisterDTO;
-use App\DTOs\Auth\VerifyCode;
+use App\DTOs\Auth\Registro\RegisterDTO;
+use App\DTOs\Auth\Registro\VerifyCode;
 use App\Http\Requests\Auth\CodigoVerificacionRequest;
 use App\Http\Requests\Auth\RecuperarPasswordClaveRequest;
 use App\Http\Requests\Auth\RecuperarPasswordCorreoRequest;
@@ -18,7 +18,6 @@ use App\Http\Requests\Auth\RecuperarPasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Nette\Utils\Json;
 use Tymon\JWTAuth\JWTGuard;
 
 /**
@@ -42,10 +41,10 @@ class AuthController
     /**
      * Constructor con intección de dependencias
      *
-     * @param AuthService $authService - Servicio (Lógica) de autenticación 
+     * @param IAuthService $authService - Servicio (Lógica) de autenticación 
      */
     public function __construct(
-        private AuthService $authService
+        private IAuthService $authService
     ){}
 
     /**
@@ -70,7 +69,7 @@ class AuthController
 
             return response()->json([
                 'message' => $result['message'],
-                'correo_id' => $result['correo_id'],
+                'cuenta_id' => $result['cuenta_id'],
                 'expira_en' => $result['expira_en'],
                 'datosEncriptados' => $result['datosEncriptados']
             ], 200);
@@ -80,8 +79,10 @@ class AuthController
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al iniciar el proceso de registro',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde'
+                'message' => 'Error al iniciar en el controlador',
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde',
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ], 500);
         }
     }
@@ -98,10 +99,11 @@ class AuthController
     {
         try {
             $datosEncriptados = $request->validated()['datosEncriptados'];
-            $correo_id = $request->validated()['correo_id'];
+            $cuenta_id = $request->validated()['cuenta_id'];
+            $dispositivo = $request->validated()['device_name'];
             $dto = VerifyCode::fromArray($request->validated());
     
-            $result = $this->authService->register($datosEncriptados, $dto, $correo_id);
+            $result = $this->authService->completarRegistro($datosEncriptados, $dto->clave, $cuenta_id, $dispositivo);
     
             return response()->json([
                 'message' => 'Usuario registrado correctamente',
@@ -118,7 +120,8 @@ class AuthController
             return response()->json([
                 'message' => 'Error al registrar al usuario',
                 'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde',
-                'line' => $e->getFile()
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ], 500);
         }
     }

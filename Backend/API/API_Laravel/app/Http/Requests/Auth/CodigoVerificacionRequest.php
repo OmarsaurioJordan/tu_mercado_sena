@@ -26,15 +26,20 @@ class CodigoVerificacionRequest extends FormRequest
                 'required',
                 'string'
             ],
-            'correo_id' => [
+            'cuenta_id' => [
                 'required',
-                'exists:correos,id'
+                'exists:cuentas,id'
             ],
             'clave' => [
               'required',
               'string',
               'size:6',
               'regex:/^[A-Za-z0-9]{6}$/'            
+            ],
+            'device_name' => [
+                'nullable',
+                'string',
+                'in:web,mobile,desktop',
             ],
         ];
     }
@@ -43,9 +48,10 @@ class CodigoVerificacionRequest extends FormRequest
     {
         return [
             'datosEncriptados.required' => 'No hay datos del usuario a registrar',
-            'correo_id.exists' => 'Correo no registrado en la base de datos',
+            'cuenta_id.exists' => 'Cuenta no registrado en la base de datos',
             'clave.required' => 'Debe ingresar el código de verificación',
-            'clave.regex' => 'El código debe tener 6 caracteres'
+            'clave.regex' => 'El código debe tener 6 caracteres',
+            'device_name.in' => 'El dispositivo debe ser: web, mobile o desktop.',
         ];
     }
 }
