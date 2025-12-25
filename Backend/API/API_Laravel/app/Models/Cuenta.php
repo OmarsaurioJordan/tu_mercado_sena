@@ -17,7 +17,8 @@ class Cuenta extends Authenticatable implements JWTSubject
         'email' => 'string',
         'notifica_correo' => 'boolean',
         'notifica_push' => 'boolean',
-        'uso_datos' => 'boolean'
+        'uso_datos' => 'boolean',
+        'fecha_clave' => 'datetime:Y-m-d H:i:s'
     ];
 
     protected $hidden = [

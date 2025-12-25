@@ -27,6 +27,11 @@ class Usuario extends Model
         'estado_id'
     ];
 
+    protected $casts = [
+        'fecha_registro' => 'datetime:Y-m-d H:i:s', // Muestra: 2025-12-12 18:50:11
+        'fecha_actualiza' => 'datetime:Y-m-d H:i:s',
+    ];      
+
     public function cuenta()
     {
         return $this->belongsTo(Cuenta::class, 'cuenta_id');

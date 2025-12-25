@@ -22,13 +22,13 @@ class RecuperarPasswordCorreoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'correo' => [
+            'email' => [
                 'required',
                 'string',
                 'email',
                 'max:64',
                 'regex:/^[\w\.-]+@soy\.sena\.edu\.co$/',
-                'exists:correos,correo'
+                'exists:cuentas,email'
             ]
         ];
     }

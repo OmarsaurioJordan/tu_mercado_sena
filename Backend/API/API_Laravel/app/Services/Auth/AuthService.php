@@ -5,9 +5,7 @@ namespace App\Services\Auth;
 use App\Contracts\Auth\Services\IAuthService;
 use App\DTOs\Auth\Registro\RegisterDTO;
 use App\DTOs\Auth\LoginDTO;
-use App\DTOs\Auth\Registro\VerifyCode;
 use App\Models\Usuario;
-use App\Contracts\Auth\Repositories\ICorreoRepository;
 use App\Contracts\Auth\Repositories\ICuentaRepository;
 
 ;
@@ -24,7 +22,6 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Contracts\Auth\Services\IRegistroService;
-use App\Models\TokensDeSesion;
 
 /**
  * AuthService - Servicio de autenticación
@@ -95,85 +92,26 @@ class AuthService implements IAuthService
     }
 
     /**
-     * Lógica de registro de usuario
-     * 
-     * PROCESO:
-     * 1. Recibe los datos del usuario encriptados
-     * 3. Crea el usuario usando el repositorio
-     * 4. Crea un token JWT para el dispositivo
-     * 5. Retorna el usuario y el token
-     * 
-     * @param string $datosEncriptados - Datos encriptados del usuario a registrar
-     * @param string $clave - Código de verificación
-     * @return array{user: Usuario, token: string}
-     * @throws ValidationException - Si el email ya existe
+     * Terminar el proceso de registro priorizando las transacciones para que no haya datos volando
+     * @param string $datosEncriptado - Datos del formulario encriptados
+     * @param string $clave - Código que le llega al usuario a su correo
+     * @param int $cuenta_id - ID de la cuenta que recibe el usuario en la respuesta JSON anterior
+     * @param string $dispositivo - Dispositivo de donde ingreso el usuario
+     * @return array{status: bool, data: array{user:Usuario, token: string, token_type: string, expires_in: int}}
      */
     public function completarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array
     {
         try {
-            $registroTerminado = $this->registroService->terminarRegistro($datosEncriptados, $clave, $cuenta_id);
+            $registroTerminado = $this->registroService->terminarRegistro($datosEncriptados, $clave, $cuenta_id, $dispositivo);
 
             if ($registroTerminado['status'] !== 'success') {
-                throw new Exception('Error en el authServicio: Register');
+                Log::error('Error en el AuthService');
+                throw new Exception('Error al registrar usuario', 401);
             }
 
-            $cuentaUsuario = $this->cuentaRepository->findById($cuenta_id);
-
-            $user = $registroTerminado['usuario'];
-            $token = $this->jwt->fromUser($cuentaUsuario);
-            $this->jwt->setToken($token); 
-            $payload = $this->jwt->getPayload();
-            $jti = $payload->get('jti');
-            $expiresIn = $this->jwt->factory()->getTTL() * 60;
-
-            // Transacción para en caso de error no hacer registro en la base de datos
-            DB::beginTransaction();
-
-            $registro_token = DB::table('tokens_de_sesion')->insert([
-                'cuenta_id' => $cuenta_id,
-                'dispositivo' => $dispositivo,
-                'jti' => $jti,
-                'ultimo_uso' => Carbon::now()
-            ]);
-
-            if (!$registro_token) {
-                Log::error('Error al registrar el token de inicio de sesión en la tabla');
-
-                if (DB::transactionLevel() > 0) {
-                    DB::rollBack();
-                    throw new Exception("Error al registrar token de registro");
-                }
-            }
-            DB::commit();
-
-            Log::info('Datos del usuario', [
-                'user' => $user
-            ]);
-
-            return [
-                'user' => $user,
-                'token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => $expiresIn
-            ];
-
-            } catch (ValidationException $e) {
-            // 1. Asegurar el rollback si la transacción fue iniciada.
-            if (DB::transactionLevel() > 0) {
-                DB::rollBack();
-            }
-            throw $e;
-
+           return $registroTerminado;
+            
         } catch (Exception $e) {
-            Log::error('Error al registrar al usuario AuthService', [
-                'cuenta_id' => $cuenta_id,
-                'archivo' => $e->getFile(),
-            ]);
-
-            if (DB::transactionLevel() > 0) {
-                DB::rollBack();
-            }
-
             throw $e;
         }
     }
@@ -199,14 +137,14 @@ class AuthService implements IAuthService
     {
         try{
             Log::info('Inicio del proceso Login', [
-                'correo' => $dto->correo
+                'email' => $dto->email
             ]);
 
-            $cuentaRegistrada = $this->cuentaRepository->findByCorreo($dto->correo);
+            $cuentaRegistrada = $this->cuentaRepository->findByCorreo($dto->email);
 
             if(!$cuentaRegistrada) {
                 Log::warning('Correo no encontrado en la base de datos', [
-                    'correo' => $dto->correo
+                    'correo' => $dto->email
                 ]);
 
                 throw ValidationException::withMessages([
@@ -227,7 +165,7 @@ class AuthService implements IAuthService
                 ]);
             }
             
-            $user = $this->userRepository->findByIdEmail($cuentaRegistrada->id);
+            $user = $this->userRepository->findByIdCuenta($cuentaRegistrada->id);
             // Válidar que el usuario este activo
             // estado_id: 1 = activo, 2 = invisible, 3 = eliminado
             if ($user->estado_id === 3) {
@@ -245,7 +183,7 @@ class AuthService implements IAuthService
             }
             
             // Crear un nuevo token
-            $token = $this->jwt->fromUser($user);
+            $token = $this->jwt->fromUser($cuentaRegistrada);
             $this->jwt->setToken($token); 
             $payload = $this->jwt->getPayload();
             $jti = $payload->get('jti');
@@ -264,6 +202,10 @@ class AuthService implements IAuthService
                 'dispositivo' => $dto->device_name,
                 'jti' => $jti,
                 'ultimo_uso' => Carbon::now()
+            ]);
+
+            DB::table('usuarios')->update([
+                'fecha_reciente' => Carbon::now()
             ]);
 
             DB::commit();
@@ -300,7 +242,7 @@ class AuthService implements IAuthService
      */
     public function inicioNuevaPassword(CorreoDto $dto): array
     {
-        $inicioProceso = $this->nuevaPasswordService->iniciarProceso($dto->correo);
+        $inicioProceso = $this->nuevaPasswordService->iniciarProceso($dto->email);
 
         if (!$inicioProceso['success']) {
             throw ValidationException::withMessages([
@@ -310,20 +252,20 @@ class AuthService implements IAuthService
 
         return [
             'message' => $inicioProceso['message'],
-            'id_correo' => $inicioProceso['id_correo'],
+            'cuenta_id' => $inicioProceso['cuenta_id'],
             'expira_en' => $inicioProceso['expira_en']
         ];
     }
 
     /**
      * Validar el código de recuperación del usuario
-     * @param int $id_correo - Id del correo para válidar que la clave de la BD corresponda a la ingresada por el usuario
+     * @param int $id_cuenta - Id del correo para válidar que la clave de la BD corresponda a la ingresada por el usuario
      * @param ClaveDto $dto - Clave que ingresa el usuario
      * @return array{success: bool, message:string, id_usuario: int, clave_verificada: bool}
      */
-    public function validarClaveRecuperacion(int $id_correo, ClaveDto $dto): array
+    public function validarClaveRecuperacion(int $id_cuenta, ClaveDto $dto): array
     {
-        $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($id_correo, $dto->clave);
+        $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($id_cuenta, $dto->clave);
 
         if(!$validarClave['success']) {
             throw ValidationException::withMessages([
@@ -365,7 +307,7 @@ class AuthService implements IAuthService
      * @param bool $allDevices - true, cierra sesión en todos los dispositivos
      * @return bool - true si se cerro correctamente
      */
-    public function logout(TokensDeSesion $tokensDeSesion, bool $allDevice = false): array
+    public function logout(bool $allDevice = false): array
     {
         try{
             $token = $this->jwt->getToken();
@@ -384,7 +326,12 @@ class AuthService implements IAuthService
                 $cuenta_id = $payload->get('sub');
             
             } catch (Exception $e) {
-                Log::warning('Token Inválido o expirado');
+                // Logs para debbugin
+                Log::warning('Token Inválido o expirado',[
+                    'archivo' => $e->getFile(),
+                    'linea' => $e->getLine()
+                ]);
+
                 return [
                     'status' => false,
                     'message' => 'Token Inválido o expirado'
@@ -401,13 +348,6 @@ class AuthService implements IAuthService
                 $revokedCount = DB::table('tokens_de_sesion')
                     ->where('jti', $jti)
                     ->delete();
-            }
-
-            if (!$revokedCount) {
-                Log::info('No se pudo revocar token(s)');
-                if (DB::transactionLevel() > 0) {
-                    DB::rollBack();
-                }
             }
 
             DB::commit();

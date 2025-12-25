@@ -11,6 +11,7 @@ use App\Services\Auth\RecuperarContrasenaCorreoService;
 use App\Models\Cuenta;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class RecuperarContrasenaService implements IRecuperarContrasenaService
 {
@@ -24,7 +25,7 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
     *@return void
     */
     public function __construct(
-      private ICuentaRepository $correoRepository,
+      private ICuentaRepository $cuentaRepository,
       private UserRepositoryInterface $userRepository,
       private RecuperarContrasenaCorreoService $codigoEmail,
     )
@@ -34,36 +35,36 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
     * Validar que el correo esta en la base de datos del sistema, si esta en la
     * Base de datos, validar si esta asociado a un usuario, si es asi entonces,
     * Enviar el código al usuario
-    * * @param string $correo - Correo institucional del usuario
+    * * @param string $email - Correo institucional del usuario
     * @return array{success: bool, message: string, id_cuenta: ?int, expira_en: ?string}
     */
-   public function iniciarProceso(string $correo): array
+   public function iniciarProceso(string $email): array
       {
          // --- PASO 1: Búsqueda y Validaciones (Fuera de la Transacción) ---
          try {
             Log::info('Inicio el proceso de recuperación de contrasena', [
-               'correo' => $correo
+               'email' => $email
             ]);
 
-            $correoUsuario = $this->correoRepository->findByCorreo($correo);
+            $cuentaUsuario = $this->cuentaRepository->findByCorreo($email);
 
             // Validar si el correo esta en la base de datos
-            if (!$correoUsuario) {
+            if (!$cuentaUsuario) {
                   return [
                      'success' => false,
-                     'message' => 'El correo no esta registrado',
+                     'message' => 'La cuenta no esta registrada',
                      'correo' => null,
                      'expira_en' => null
                   ];
             }
 
-            $usuario = $this->userRepository->findByIdEmail($correoUsuario->id);
+            $usuario = $this->userRepository->findByIdCuenta($cuentaUsuario->id);
 
             if (!$usuario) {
                   return [
                      'success' => false,
                      'message' => 'Usuario no registrado en la base de datos',
-                     'correo' => $correoUsuario->correo,
+                     'correo' => $cuentaUsuario->correo,
                      'expira_en' => null
                   ];
             }
@@ -71,14 +72,12 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
             // --- PASO 2: Operaciones de Escritura y Envío (Dentro de la Transacción) ---
             DB::beginTransaction();
 
-            $clave = Correo::generarClave();
+            $clave = Cuenta::generarClave();
 
-            // 1. Renovar la clave en la tabla correo (Operación de DB)
-            // Se ejecuta dentro de la transacción.
-            $this->correoRepository->actualizarClave($correoUsuario, $clave);
 
-            // 2. Enviar correo (Operación crítica que puede fallar)
-            $emailEnviado = $this->codigoEmail->enviarCodigoVerificacion($correoUsuario->correo, $clave);
+            $this->cuentaRepository->actualizarClave($cuentaUsuario, $clave);
+
+            $emailEnviado = $this->codigoEmail->enviarCodigoVerificacion($cuentaUsuario->correo, $clave);
 
             if (!$emailEnviado) {
                   // Si el correo no se pudo enviar, forzamos un error para activar el catch
@@ -89,12 +88,14 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
             // 3. Si todo fue bien (Actualización de DB + Envío de Email), CONFIRMAR los cambios
             DB::commit();
 
+            $fecha_clave_actual = $cuentaUsuario->fecha_clave;
+
             // --- PASO 3: Retorno de Éxito ---
             return [
                   'success' => true,
                   'message' => 'Código de recuperación enviado correctamente',
-                  'id_correo' => $correoUsuario->id,
-                  'expira_en' => $correoUsuario->fecha_mail->toDateString() // Asumiendo que el repositorio actualiza $correoUsuario
+                  'id_correo' => $cuentaUsuario->id,
+                  'expira_en' => $fecha_clave_actual = Carbon::now()->addMinutes(10)
             ];
 
          } catch (\Exception $e) {
@@ -105,7 +106,7 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
             }
 
             // Manejo de errores para el Log
-            $errorCorreo = isset($correoUsuario->correo) ? $correoUsuario->correo : $correo;
+            $errorCorreo = isset($cuentaUsuario->correo) ? $cuentaUsuario->correo : $email;
             $errorMessage = $e->getMessage();
             $isServerError = str_contains($errorMessage, 'El servicio de correo falló');
 
@@ -128,26 +129,26 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
 
     /**
      * Validar que el código de verificación
-     * @param int $id_correo - Correo para validar
+     * @param int $cuenta_id - Correo para validar
      * @param string $clave - Código que llegara del front-end
-     * @return array{success: bool, message: string, id_correo: ?int, id_usuario: ?int}
+     * @return array{success: bool, message: string, cuenta_id: ?int, id_usuario: ?int}
      */
-    public function verificarClaveContrasena(int $id_correo, string $clave): array
+    public function verificarClaveContrasena(int $cuenta_id, string $clave): array
     {
       try {
          Log::info('Inicio el proceso de válidación de clave de recuperación', [
-            'correo_id' => $id_correo,
+            'cuenta' => $cuenta_id,
             'clave ingresada' => $clave
          ]);
 
          // Buscar el correo en la base de datos
-         $correoUsuario = $this->correoRepository->findById($id_correo);
+         $cuentaUsuario = $this->cuentaRepository->findById($cuenta_id);
 
 
 
-         if (!$correoUsuario) {
+         if (!$cuentaUsuario) {
             Log::warning('Correo no registrado', [
-               'id_correo' => $id_correo,
+               'cuenta_id' => $cuenta_id,
             ]);
 
             return [
@@ -159,21 +160,21 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
          }
 
          // Verificar que la clave coincida
-         if (!$correoUsuario->isValidClave($clave)) {
+         if (!$cuentaUsuario->isValidClave($clave)) {
             Log::warning('Clave ingresada incorrecta',[
-               'correoUsuario' => $correoUsuario,
+               'cuentaUsuario' => $cuentaUsuario,
                 'clave' => $clave
             ]);
 
             return [
                'success' => false,
                'message' => 'La clave es incorrecta',
-               'correo' => $correoUsuario->id,
+               'cuenta_id' => $cuentaUsuario->id,
                'id_usuario' => null
             ];
          }
 
-         $usuario = $correoUsuario->usuario;
+         $usuario = $cuentaUsuario->usuario;
 
          return [
             'success' => true,
@@ -184,8 +185,8 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
 
       } catch (\Exception $e) {
          Log::error('Error al verificar la clave', [
-            'correo' => $correoUsuario->correo ?? null,
-            'id_usuario' => $correoUsuario->usuario->id,
+            'correo' => $cuentaUsuario->correo ?? null,
+            'id_usuario' => $cuentaUsuario->usuario->id,
             'error' => $e->getMessage(),
             'archivo' => $e->getFile(),
             'linea' => $e->getLine()
@@ -194,7 +195,7 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
          return [
             'success' => false,
             'message' => 'Ocurrió un error al verificar el código de verificación. Por favor, intentalo más tarde',
-            'correo' => $correoUsuario->correo ?? null,
+            'correo' => $cuentaUsuario->correo ?? null,
             'id_usuario' => $usuario->id ?? null,
          ];
       }
@@ -202,26 +203,25 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
 
    /**
     * Lógica para cambiar el password del usuario (con transacción)
-    * @param int $idUsuario - Id del usuario a cambiar la contraseña
+    * @param int $id_usuario - Id del usuario a cambiar la contraseña
     * @param string $nueva_password - Nueva contraseña del usuario 
     * @return array{success: bool, message:string}
     * @throws ModelNotFoundException Si el usuario no existe.
     */
-   public function actualizarPassword(int $id_cuenta, string $nueva_password): array {
+   public function actualizarPassword(int $id_usuario, string $nueva_password): array {
       
       DB::beginTransaction();
       
       try {
          Log::info('Inicio del proceso de actualización de contraseña', [
-            'id_usuario' => $idUsuario,
+            'id_usuario' => $id_usuario,
          ]);
          // 1. Buscar el usuario (findOrFail garantiza que se lanza una excepción si no existe)
-         $usuario = $this->userRepository->findById($idUsuario);
-         // O si no usas repositorio: $usuario = \App\Models\Usuario::findOrFail($idUsuario);
+         $usuario = $this->userRepository->findById($id_usuario);
 
          if (!$usuario) {
             Log::warning('Usuario no registrado en la base de datos', [
-               'id_usuario' => $idUsuario
+               'id_usuario' => $id_usuario
             ]);
 
             throw new ('Usuario no encontrado.');
@@ -243,7 +243,7 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
       } catch (\Exception $e) {
          
          Log::error('Error al actualizar contraseña', [
-            'id_usuario' => $idUsuario, 
+            'id_usuario' => $id_usuario, 
             'error' => $e->getMessage(),
             'linea' => $e->getLine(),
             'archivo' => $e->getFile()

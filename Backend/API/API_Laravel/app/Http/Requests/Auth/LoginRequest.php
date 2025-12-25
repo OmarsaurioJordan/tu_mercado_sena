@@ -15,12 +15,12 @@ class LoginRequest extends FormRequest
     {
         return [
             // CORREO (texto, no ID)
-            'correo' => [
+            'email' => [
                 'required',
                 'string',
                 'email',
                 'max:64',
-                'exists:correos,correo',
+                'exists:cuentas,email',
             ],
 
             'password' => [
@@ -31,7 +31,7 @@ class LoginRequest extends FormRequest
             'device_name' => [
                 'nullable',
                 'string',
-                'in:web,mobile,desktop',
+                'in:web,movil,desktop',
             ],
         ];
     }
@@ -39,9 +39,9 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'correo.required' => 'El correo es obligatorio.',
-            'correo.email' => 'Debe ser un correo válido.',
-            'correo.exists' => 'Correo o contraseña incorrectos',
+            'email.required' => 'El correo es obligatorio.',
+            'email.email' => 'Debe ser un correo válido.',
+            'email.exists' => 'Correo o contraseña incorrectos',
             'password.required' => 'La contraseña es obligatoria.',
             'password.string' => 'Contraseña invalida',
             'device_name.in' => 'El dispositivo debe ser: web, mobile o desktop.',

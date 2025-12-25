@@ -39,7 +39,7 @@ class CodigoVerificacionRequest extends FormRequest
             'device_name' => [
                 'nullable',
                 'string',
-                'in:web,mobile,desktop',
+                'in:web,movil,desktop',
             ],
         ];
     }

@@ -56,10 +56,10 @@ interface UserRepositoryInterface
     public function invalidateAllTokens(int $userId): bool;
 
     /**
-     * Función para buscar un correo por su id o devolver un nulo
+     * Función para buscar un usuario por el id de su cuenta o devolver un nulo
      * 
      * @param int $cuenta_id
      * @return Usuario|null
      */
-    public function findByIdEmail(int $id_cuenta): Usuario|null;
+    public function findByIdCuenta(int $id_cuenta): Usuario|null;
 }

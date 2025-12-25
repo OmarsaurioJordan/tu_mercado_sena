@@ -57,7 +57,16 @@ class UserRepository implements UserRepositoryInterface
         // Usuario::create() -> Inserta los datos en la BD y retorna el modelo con el ID asignado
         $usuario = Usuario::create($data);
 
-        $usuario->load('estado', 'rol');
+        $usuario->load([
+            'estado' => function ($query) {
+                // Obtenemos solo 'id' y 'nombre' de la tabla 'estados'
+                $query->select('id', 'nombre'); 
+            },
+            'rol' => function ($query) {
+                // Obtenemos solo 'id' y 'nombre' de la tabla 'roles'
+                $query->select('id', 'nombre'); 
+            }
+        ]);
 
         return $usuario;
         
@@ -133,14 +142,14 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Buscar usuario por el id del correo, devolver al usuario o nulo
+     * Buscar usuario por el id de la cuenta, devolver al usuario o nulo
      * 
-     * @param int $idCorreo - Id del correo
+     * @param int $cuenta_id - Id de la cuenta
      * @return Usuario|null
      */
-    public function findByIdEmail(int $idCorreo): ?Usuario
+    public function findByIdCuenta(int $cuenta_id): ?Usuario
     {
-        $user = Usuario::whereHas('correo', fn($q) => $q->where('id', $idCorreo))->first();
+        $user = Usuario::whereHas('cuenta', fn($q) => $q->where('id', $cuenta_id))->first();
 
         if (!$user) {
             return null;

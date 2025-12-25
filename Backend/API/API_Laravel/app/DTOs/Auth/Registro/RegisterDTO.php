@@ -8,7 +8,7 @@ final readonly class RegisterDTO
      * Create a new class instance.
      */
     public function __construct(
-        public string $correo,
+        public string $email,
         public string $password,
         public string $nickname,
         public string $imagen,

@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Usuario;
+use App\Models\Cuenta;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,6 +12,7 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ValidateJWTToken
 {
@@ -24,40 +25,40 @@ class ValidateJWTToken
     {
         try {
             // Verificar y decodificar el token JWT
-            $user = JWTAuth::parseToken()->authenticate();
+            $cuenta = JWTAuth::parseToken()->authenticate();
 
             // Verificar que el usuario exista
-            if (!$user instanceof Usuario) {
+            if (!$cuenta instanceof Cuenta) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Usuario no encontrado'
+                    'message' => 'Cuenta no encontrada'
                 ], 404);
             }
 
+            $usuario = $cuenta->usuario;
+
             // Verificar que el usuario esté activo
             // Estado_id: 1 = Activo, 2 = Invisible, 3 = Eliminado
-            if ($user->estado_id === 3) {
+            if ($usuario->estado_id === 3) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Usuario eliminado'
                 ], 403);
             }
 
-            // Verificar jwt_invalidated_at (cerrar sesión en todos los dispositivos)
-            if ($user->jwt_invalidated_at) {
-                // Obtener el payload del token para ver cuándo fue emitido
-                $payload = JWTAuth::getPayload();
+            $payload = JWTAuth::getPayload();
+            $jti = $payload->get('jti');
 
-                // 'iat' => issued at (timestamp de cuando se creó el token)
-                $tokenIssuedAt = Carbon::createFromTimestamp($payload->get('iat'));
-
-                // Comparar: ¿El token fue creado antes de invalidar todos los tokens?
-                if ($tokenIssuedAt->isBefore($user->jwt_invalidated_at)) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Token inválido. Por favor inicia sesión nuevamente'
-                    ], 401);
-                }
+            $tokenActivo = DB::table('tokens_de_sesion')
+                ->where('jti', $jti)
+                ->where('cuenta_id', $cuenta->id)
+                ->first();
+            
+            if (!$tokenActivo) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Sesión terminada. Inicie sesión nuevamente'
+                ]);
             }
 
             // OK - Permitir que continúe la petición

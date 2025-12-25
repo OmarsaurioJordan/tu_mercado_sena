@@ -6,11 +6,11 @@ final readonly class CorreoDto
 {
     /**
      * Constructor del DTO
-     * @param string $correo - Correo que llega del front-end
+     * @param string $email - Correo que llega del front-end
      * @return void
      */
     public function __construct(
-        public string $correo
+        public string $email
     ) {}
 
     /**
@@ -20,15 +20,15 @@ final readonly class CorreoDto
      */
     public static function fromRequest(array $data): self
     {
-        return new self(correo: $data['correo']);
+        return new self(email: $data['email']);
     }
 
     /**
      * Convertir el DTO a un array asociativo
-     * @return array{correo: string}
+     * @return array{email: string}
      */
     public function toArray(): array
     {
-        return ['correo' => $this->correo];
+        return ['email' => $this->email];
     }
 }

@@ -7,10 +7,14 @@ use App\Contracts\Auth\Repositories\UserRepositoryInterface;
 use App\Contracts\Auth\Services\IRegistroService;
 use App\DTOs\Auth\Registro\RegisterDTO;
 use App\Models\Cuenta;
+use App\Models\Usuario;
+use Carbon\Carbon;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Tymon\JWTAuth\JWTGuard;
+
 
 
 class RegistroService implements IRegistroService
@@ -22,6 +26,7 @@ class RegistroService implements IRegistroService
         private ICuentaRepository $cuentaRepository,
         private UserRepositoryInterface $userRepository,
         private CorreoService $correoService,
+        private JWTGuard $jwt 
     )
     {}
 
@@ -177,7 +182,16 @@ class RegistroService implements IRegistroService
         }
     }
 
-    public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id): array
+    /**
+     * Terminar el proceso de registro priorizando las transacciones para que no haya datos volando
+     * @param string $datosEncriptado - Datos del formulario encriptados
+     * @param string $clave - Código que le llega al usuario a su correo
+     * @param int $cuenta_id - ID de la cuenta que recibe el usuario en la respuesta JSON anterior
+     * @param string $dispositivo - Dispositivo de donde ingreso el usuario
+     * @return array{status: bool, data: array{user:Usuario, token: string, token_type: string, expires_in: int}}
+     */
+
+    public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array
     {
         try {
             $data = decrypt($datosEncriptados);
@@ -194,6 +208,7 @@ class RegistroService implements IRegistroService
                 throw new ValidationException($registro['message']);
             }
 
+            // Iniciar transacción
             DB::beginTransaction();
 
             $usuario = $this->userRepository->create([
@@ -214,11 +229,39 @@ class RegistroService implements IRegistroService
                 throw new \Exception('Error al crear usuario');
             }
 
+            $token = $this->jwt->fromUser($cuenta);
+            $this->jwt->setToken($token);
+            $payload = $this->jwt->getPayload();
+            $jti = $payload->get('jti');
+            $expiresIn = $this->jwt->factory()->getTTL() * 60;
+
+            $registroToken = DB::table('tokens_de_sesion')->insert([
+                'cuenta_id' => $cuenta->id,
+                'dispositivo' => $dispositivo,
+                'jti' => $jti,
+                'ultimo_uso' => Carbon::now()
+            ]);
+
+            if (!$registroToken) {
+                Log::error('Error al registrar el token de inicio de sesión en la tabla');
+
+                if (DB::transactionLevel() > 0) {
+                    DB::rollBack();
+                    throw new \Tymon\JWTAuth\Exceptions\JWTException("Error al registrar token de registro");
+                }
+            }
+
+            // Si todo fue exitoso envia los datos a la BD
             DB::commit();
 
             return [
                 'status' => 'success',
-                'usuario' => $usuario
+                'data' => [
+                    'user' => $usuario,
+                    'token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => $expiresIn
+                ]
             ];
 
         } catch (\Exception $e) {

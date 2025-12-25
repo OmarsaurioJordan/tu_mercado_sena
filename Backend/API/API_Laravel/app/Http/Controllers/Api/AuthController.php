@@ -107,10 +107,10 @@ class AuthController
     
             return response()->json([
                 'message' => 'Usuario registrado correctamente',
-                'user' => $result['user'],
-                'token' => $result['token'],
-                'token_type' => $result['token_type'],
-                'expires_in' => $result['expires_in'],
+                'user' => $result['data']['user'],
+                'token' => $result['data']['token'],
+                'token_type' => $result['data']['token_type'],
+                'expires_in' => $result['data']['expires_in'],
             ], 201);
 
         } catch (ValidationException $e) {
@@ -187,14 +187,11 @@ class AuthController
     public function logout(Request $request): JsonResponse
     {
         try {
-            // $request->user() contiene el usuario autenticado
-            $user = $request->user();
-
             // Verificar si el usaurio quiere cerrar sesión en todos los dispositivos
             $allDevices = $request->input('all_devices', false);
 
             // Llamar al servicio para invalidar el tokens
-            $this->authService->logout($user, $allDevices);
+            $this->authService->logout($allDevices);
 
             // Retornar confirmación
             $message = $allDevices 

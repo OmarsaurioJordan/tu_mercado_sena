@@ -23,11 +23,12 @@ interface IRegistroService
     public function verificarClave(string $correoExistente, string $clave): array;
 
     /**
-     * Terminar el proceso de registro
-     * @param string $datosEncriptados - Datos para el registro del usuario
-     * @param string $clave - Clave que le llega al usuario al correo
-     * @param int $cuenta_id - Id de la cuenta para asociarla al usuario
-     * @return array{status: bool, usuario: Usuario}
+     * Terminar el proceso de registro priorizando las transacciones para que no haya datos volando
+     * @param string $datosEncriptado - Datos del formulario encriptados
+     * @param string $clave - Código que le llega al usuario a su correo
+     * @param int $cuenta_id - ID de la cuenta que recibe el usuario en la respuesta JSON anterior
+     * @param string $dispositivo - Dispositivo de donde ingreso el usuario
+     * @return array{status: bool, data: array{user:Usuario, token: string, token_type: string, expires_in: int}}
      */
-    public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id): array;
+    public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array;
 }
