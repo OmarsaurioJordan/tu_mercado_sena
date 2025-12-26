@@ -1,16 +1,25 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QApplication
 )
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap, QIcon
 from components.usuario_card import UsuarioCard
 from components.boton import Boton
 from models.usuario import Usuario
+from core.session import Session
 
 class HeaderLayout(QVBoxLayout):
 
     def __init__(self, widget=None, con_btn_menu=True):
         super().__init__()
+
+        manager = QApplication.instance().property("controls")
+        ctrlUsuario = manager.get_usuarios()
+        admin_id = Session().get_login()["id"]
+        if admin_id == 0:
+            admin = self.usuario_debug()
+        else:
+            admin = ctrlUsuario.get_usuario(admin_id)
 
         image = QPixmap("assets/sprites/logo.png")
         logo = QLabel()
@@ -29,6 +38,7 @@ class HeaderLayout(QVBoxLayout):
 
         if con_btn_menu:
             btnMenu = Boton("MENÚ", "menu")
+            btnMenu.clicked.connect(lambda: self.cambiaPagina("menu"))
         else:
             btnMenu = QLabel()
         
@@ -50,7 +60,7 @@ class HeaderLayout(QVBoxLayout):
         layHorizontal.addWidget(notifica_denuncias)
         layHorizontal.addSpacing(10)
         layHorizontal.addStretch()
-        layHorizontal.addWidget(UsuarioCard(self.usuario_debug()))
+        layHorizontal.addWidget(UsuarioCard(admin))
         self.addWidget(header)
         
         if widget == None:
@@ -60,3 +70,7 @@ class HeaderLayout(QVBoxLayout):
 
     def usuario_debug(self):
         return Usuario(0, "correo_administrativo@sena.edu.co", 1, "Usuario Administrador", 0, "", "", 1, "", "", "")
+
+    def cambiaPagina(self, pagina=""):
+        manager = QApplication.instance().property("manager")
+        manager.change_tool(pagina)

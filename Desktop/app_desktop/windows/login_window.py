@@ -1,40 +1,20 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLineEdit, QLabel, QMessageBox, QApplication
+    QWidget, QHBoxLayout, QVBoxLayout, QLabel, QApplication
 )
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QPixmap, QDesktopServices
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
 from core.app_config import (
-    DOMINIO_CORREO, VERSION, WEB_LINK
+    DOMINIO_CORREO
 )
+from ui.info_menus import InfoMenus
 from components.txt_edit import TxtEdit
 from components.boton import Boton
-from controllers.ctrl_usuario import CtrlUsuario
 from components.alerta import Alerta
-from core.session import Session
 
-class LoginWindow(QMainWindow):
+class LoginWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("TuMercadoSena-Desktop")
-        self.resize(800, 600)
-
-        self.ctrlUsuario = CtrlUsuario()
-
-        version = QLabel("v" + VERSION)
-        descripcion = QLabel(self.ctrlUsuario.get_master_info())
-
-        layIzq = QVBoxLayout()
-        layIzq.addWidget(version)
-        layIzq.addStretch()
-        layIzq.addWidget(descripcion)
-
-        btnWeb = Boton("Página\nWeb", "logo", 48)
-        btnWeb.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(WEB_LINK)))
-
-        layDer = QVBoxLayout()
-        layDer.addStretch()
-        layDer.addWidget(btnWeb)
 
         image = QPixmap("assets/sprites/logo.png")
         logo = QLabel()
@@ -64,7 +44,7 @@ class LoginWindow(QMainWindow):
         self.textPassword = TxtEdit("Contraseña", "******")
         self.textPassword.passwordMode()
 
-        btnIngresar = Boton("Ingresar")
+        btnIngresar = Boton("  Ingresar", "login", 20)
         btnIngresar.clicked.connect(self.login)
 
         layCentro = QVBoxLayout()
@@ -83,17 +63,12 @@ class LoginWindow(QMainWindow):
         layCentro.addSpacing(100)
         layCentro.addStretch()
 
-        layFondo = QHBoxLayout()
-        layFondo.addLayout(layIzq)
-        layFondo.addStretch()
-        layFondo.addLayout(layCentro)
-        layFondo.addStretch()
-        layFondo.addLayout(layDer)
-        layFondo.setContentsMargins(20, 20, 20, 20)
-
-        central = QWidget()
-        central.setLayout(layFondo)
-        self.setCentralWidget(central)
+        widget = QWidget()
+        widget.setLayout(layCentro)
+        central = InfoMenus(widget, False)
+        layCentral = QHBoxLayout()
+        layCentral.addWidget(central)
+        self.setLayout(layCentral)
 
     def login(self):
         correo = self.textCorreo.get_value()
@@ -101,9 +76,11 @@ class LoginWindow(QMainWindow):
         if correo == "" or password == "":
             Alerta("Alerta", "Ingrese sus credenciales", 1)
         else:
-            result = self.ctrlUsuario.admin_login(correo, password)
+            manager = QApplication.instance().property("controls")
+            ctrlUsuario = manager.get_usuarios()
+            result = ctrlUsuario.admin_login(correo, password)
             if result["token"] != "":
                 manager = QApplication.instance().property("manager")
-                manager.set_tools(result["token"], correo)
+                manager.set_tools(result["token"], correo, result["id"])
             elif result["error"] != "":
                 Alerta("Alerta", result["error"], 1)

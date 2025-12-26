@@ -1,0 +1,17 @@
+TAREAS:
+...
+- al modificar estado usuario, recargar modelo
+- imagenes se guardan en modelo, este hace el hilo
+- obtener los productos filtrados:
+  - API productos
+  - controlador productos
+  - interfaz productos
+    - fichas productos
+    - filtro productos
+    - producto detalles
+    - cargar imágenes
+- link de perfil de usuario navegable
+- usar token en todas las llamadas API, seguridad
+- limpiar cosas de anterior seleccionado en tools
+- limpiar controladores al cerrar sesion
+...
