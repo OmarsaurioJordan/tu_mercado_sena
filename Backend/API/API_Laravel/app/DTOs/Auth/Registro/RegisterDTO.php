@@ -22,7 +22,7 @@ final readonly class RegisterDTO
     // Crear una instacia del DTO a partir de un array de datos (procedente del request)
     public static function fromRequest(array $data): self {
         return new self(
-            correo: $data['correo'],
+            email: $data['email'],
             password: $data['password'],
             nickname: $data['nickname'],
             imagen: $data['imagen'],
@@ -37,7 +37,7 @@ final readonly class RegisterDTO
     // Convertir el DTO a un array (para usar en la creación del usuario)
     public function toArray(): array {
         return [
-            'correo' => $this->correo,
+            'email' => $this->email,
             'password' => $this->password,
             'nickname' => $this->nickname,
             'imagen' => $this->imagen,
@@ -51,7 +51,7 @@ final readonly class RegisterDTO
 
     public static function fromArray(array $data): self {
         return new self(
-            correo: $data['correo'],
+            email: $data['email'],
             password: $data['password'],
             nickname: $data['nickname'],
             imagen: $data['imagen'],

@@ -69,7 +69,7 @@ class AuthService implements IAuthService
      */
     public function iniciarRegistro(RegisterDTO $dto): array
     {
-        $correoUsuario = $dto->correo;
+        $correoUsuario = $dto->email;
         $passwordUsuario = $dto->password;
         $inicioProceso =  $this->registroService->iniciarRegistro($correoUsuario, $passwordUsuario);
 
@@ -263,9 +263,9 @@ class AuthService implements IAuthService
      * @param ClaveDto $dto - Clave que ingresa el usuario
      * @return array{success: bool, message:string, id_usuario: int, clave_verificada: bool}
      */
-    public function validarClaveRecuperacion(int $id_cuenta, ClaveDto $dto): array
+    public function validarClaveRecuperacion(int $cuenta_id, ClaveDto $dto): array
     {
-        $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($id_cuenta, $dto->clave);
+        $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($cuenta_id, $dto->clave);
 
         if(!$validarClave['success']) {
             throw ValidationException::withMessages([
@@ -284,13 +284,13 @@ class AuthService implements IAuthService
     /**
      * Lógica para cambiar el password del usuario
      * 
-     * @param int $id_usuario - Id del usuario a cambiar la contraseña
+     * @param int $cuenta_id - Id de la cuenta a cambiar la contraseña
      * @param NuevaContrasenaDto $dto - Nueva contraseña del usuario 
      * @return array{success: bool, message:string}
      */
-    public function nuevaPassword(int $id_usuario, NuevaContrasenaDto $dto): array {
+    public function nuevaPassword(int $cuenta_id, NuevaContrasenaDto $dto): array {
 
-        $resultado = $this->nuevaPasswordService->actualizarPassword($id_usuario, $dto->password);
+        $resultado = $this->nuevaPasswordService->actualizarPassword($cuenta_id, $dto->password);
 
         return $resultado;
     }

@@ -36,11 +36,11 @@ class RecuperarPasswordCorreoRequest extends FormRequest
     public function messages()
     {
         return [
-            'correo.required' => 'El correo es obligatorio',
-            'correo.email' => 'Debe ser un correo válido',
-            'correo.regex' => 'Debe usar un correo institucional del SENA (@soy.sena.edu.co)',
-            'correo.max' => 'El correo es muy largo',
-            'correo.exists' => 'El correo no registrado'
+            'email.required' => 'El correo es obligatorio',
+            'email.email' => 'Debe ser un correo válido',
+            'email.regex' => 'Debe usar un correo institucional del SENA (@soy.sena.edu.co)',
+            'email.max' => 'El correo es muy largo',
+            'email.exists' => 'El correo no registrado'
         ];
     }
 }

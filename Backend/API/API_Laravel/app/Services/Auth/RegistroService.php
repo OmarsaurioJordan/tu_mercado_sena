@@ -202,7 +202,7 @@ class RegistroService implements IRegistroService
                 throw new ValidationException("El correo ya fue registrado");
             }
     
-            $registro = $this->verificarClave($dto->correo, $clave);
+            $registro = $this->verificarClave($dto->email, $clave);
     
             if (!$registro['success']) {
                 throw new ValidationException($registro['message']);

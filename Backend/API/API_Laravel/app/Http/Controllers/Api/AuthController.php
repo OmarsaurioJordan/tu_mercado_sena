@@ -146,7 +146,7 @@ class AuthController
 
             // Retornar JSON
             return response()->json([
-                'message' => 'Inicio de sesión exisoto',
+                'message' => 'Inicio de sesión exitoso',
                 'data' => [
                     'user' => $result['user'],
                     'token' => $result['token'],
@@ -237,10 +237,10 @@ class AuthController
      */
     public function validarClavePassword(RecuperarPasswordClaveRequest $request): JsonResponse
     {
-        $id_correo = $request->validated('id_correo');
+        $cuenta_id = $request->validated('cuenta_id');
         $dto = ClaveDto::fromRequest($request->validated());
 
-        $result = $this->authService->validarClaveRecuperacion($id_correo, $dto);
+        $result = $this->authService->validarClaveRecuperacion($cuenta_id, $dto);
 
         return response()->json($result, 200);
     }
@@ -254,10 +254,10 @@ class AuthController
      * @return JsonResponse
      */
     public function reestablecerPassword(RecuperarPasswordRequest $request): JsonResponse {
-        $id_usuario = $request->validated('id_usuario');
+        $cuenta_id = $request->validated('cuenta_id');
         $dto = NuevaContrasenaDto::fromRequest($request->validated());
 
-        $result = $this->authService->nuevaPassword($id_usuario, $dto);
+        $result = $this->authService->nuevaPassword($cuenta_id, $dto);
 
         if(!$result['success']) {
             return response()->json($result['message'], 500);
@@ -342,10 +342,9 @@ class AuthController
     {
         try{
             // Obtener el usuario autenticado desde el JWTGuard
-            $user = $request->user();
+            $cuenta_usuario = $request->user();
 
-            // Cargar relaciones necesarias si aplica
-            $user->load('rol', 'estado');
+            $user = $cuenta_usuario->usuario;
 
             // Obtener el usuario con lógica adicional si es necesario
             $userData = $this->authService->getCurrentUser($user);

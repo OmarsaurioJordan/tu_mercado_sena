@@ -22,7 +22,7 @@ class RecuperarPasswordClaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_cuentas' => [
+            'cuenta_id' => [
                 'required',
                 'integer',
                 'exists:cuentas,id'
@@ -40,9 +40,9 @@ class RecuperarPasswordClaveRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'id_cuenta.required' => 'El correo es obligatorio',
-            'id_cuenta.interger' => 'Correo Invalido',
-            'id_cuenta.exists' => 'Cuenta no registrada en la base de datos',
+            'cuenta_id.required' => 'El correo es obligatorio',
+            'cuenta_id.interger' => 'Correo Invalido',
+            'cuenta_id.exists' => 'Cuenta no registrada en la base de datos',
             
             'clave.required' => 'Debe ingresar el código de verificación',
             'clave.regex' => 'El código debe tener 6 caracteres'

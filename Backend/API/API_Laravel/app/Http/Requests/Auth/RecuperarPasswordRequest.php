@@ -23,10 +23,10 @@ class RecuperarPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_usuario' => [
+            'cuenta_id' => [
                 'required',
                 'integer',
-                'exists:usuarios,id'
+                'exists:cuentas,id'
             ],
 
             'password' => [
@@ -40,9 +40,9 @@ class RecuperarPasswordRequest extends FormRequest
     public function messages()
     {
         return [
-            'id_usuario.required' => 'Usuario obligatorio',
-            'id_usuario.integer' => 'Usuario inválido',
-            'id_usuario.exists' => 'Usuario no registrado',
+            'cuenta_id.required' => 'Usuario obligatorio',
+            'cuenta_id.integer' => 'Usuario inválido',
+            'cuenta_id.exists' => 'Usuario no registrado',
 
             'password.required' => 'Nueva contraseña requerida',
             'password.string' => 'Contraseña invalida',
