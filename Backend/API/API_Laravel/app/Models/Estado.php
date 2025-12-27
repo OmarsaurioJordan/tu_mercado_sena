@@ -3,19 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Usuario;
 
 class Estado extends Model
 {
-    //
     protected $table = 'estados';
-    public $timestamps = false;
-
-    protected $fillable = [
-        'nombre',
-        'descripcion'
-    ];
-
-    public function usuarios(){
-        return $this->hasMany(Usuario::class, 'estado_id');
+    
+    public function usuario()
+    {
+        return $this->hasMany(Usuario::class);
     }
 }

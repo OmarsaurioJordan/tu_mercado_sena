@@ -2,73 +2,46 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Cuenta;
+use App\Models\Rol;
+use App\Models\Estado;
 
-class Usuario extends Authenticatable implements JWTSubject
+
+class Usuario extends Model
 {
-    use Notifiable;
-
     protected $table = 'usuarios';
-    public $timestamps = false;
+
+    public $timestamps = true;
+
+    const CREATED_AT = 'fecha_registro';
+    const UPDATED_AT = 'fecha_actualiza';
 
     protected $fillable = [
-        'correo_id',
-        'password',
-        'rol_id',
-        'nombre',
-        'avatar',
+        'cuenta_id',
+        'nickname',
+        'imagen',
         'descripcion',
         'link',
-        'estado_id',
-        'jwt_invalidated_at'
-    ];
-
-    protected $hidden = [
-        'password',
-        'jwt_invalidated_at'
+        'rol_id',
+        'estado_id'
     ];
 
     protected $casts = [
-        'id' => 'integer',
-        'correo_id' => 'integer',  
-        'rol_id' => 'integer',
-        'uso_datos' => 'boolean',
-        'estado_id' => 'integer',
-        'jwt_invalidated_at' => 'datetime',
-    ];
+        'fecha_registro' => 'datetime:Y-m-d H:i:s', // Muestra: 2025-12-12 18:50:11
+        'fecha_actualiza' => 'datetime:Y-m-d H:i:s',
+    ];      
 
-    // Relaciones con otros modelos
-    public function rol() {
+    public function cuenta()
+    {
+        return $this->belongsTo(Cuenta::class, 'cuenta_id');
+    }
+
+    public function rol(){
         return $this->belongsTo(Rol::class, 'rol_id');
     }
 
-    public function estado() {
+    public function estado(){
         return $this->belongsTo(Estado::class, 'estado_id');
     }
-
-    public function correo() {
-        return $this->belongsTo(Correo::class, 'correo_id');
-    }
-    
-    // Obtener identicador JWT
-    public function getJWTIdentifier()
-    {
-        // Retorna la clave primaria del modelo
-        return $this->getKey();
-    }
-
-    // Return una custom key array.
-    public function getJWTCustomClaims(): array
-    {
-        return [
-            'correo' => $this->correo_id,
-            'nombre' => $this->nombre,
-            'rol' => $this->rol->nombre ?? 'prosumer',
-            'estado' => $this->estado_id,
-            'avatar' => $this->avatar,
-        ];
-    }
-
 }

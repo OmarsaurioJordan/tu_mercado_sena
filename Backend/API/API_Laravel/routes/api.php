@@ -2,17 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\IntegridadController;
-use App\Http\Controllers\CategoriaController;
-use App\Http\Controllers\SubCategoriaController;
-use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\FavoritoController;
-use App\Http\Controllers\ChatController;
-use App\Http\Controllers\MensajeController;
-use App\Services\AuthService;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -100,12 +91,5 @@ Route::get('/ping', function () {
     return response()->json([
         'message' => 'pong',
         'timestamp' => now()->toIso8601String()
-    ]);
-});
-
-Route::get('test-injection', function (AuthService $authService) {
-    return response()->json([
-        'message' => 'Inyección de dependencias funciona correctamente',
-        'service_class' => get_class($authService),
     ]);
 });

@@ -15,7 +15,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'correo' => [
+            'email' => [
                 'required',
                 'string',
                 'email',
@@ -34,28 +34,28 @@ class RegisterRequest extends FormRequest
                     ->uncompromised()
             ],
 
-            'nombre' => [
+            'nickname' => [
                 'required',
                 'string',
-                'max:24',
+                'max:32',
             ],
 
-            'avatar' => [
+            'imagen' => [
                 'required',
-                'integer',
-                'min:1',
+                'string',
+                'max:80'
             ],
 
             'rol_id' => [
                 'nullable',
                 'integer',
-                'exists.roles,id'
+                'exists:roles,id'
             ],
 
             'estado_id' => [
                 'nullable',
                 'integer',
-                'exists.estados,id'
+                'exists:estados,id'
             ],
 
             'descripcion' => [
@@ -77,9 +77,9 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'correo.regex' => 'Debe usar un correo institucional del SENA (@soy.sena.edu.co).',
-            'correo.email' => 'Debe ser un correo válido.',
-            'correo.required' => 'El correo es obligatorio.',
+            'email.regex' => 'Debe usar un correo institucional del SENA (@soy.sena.edu.co).',
+            'email.email' => 'Debe ser un correo válido.',
+            'email.required' => 'El correo es obligatorio.',
 
             'password.min' => 'La contraseña debe contener al menos 8 caracteres.',
             'password.confirmed' => 'Las contraseñas no coinciden.',

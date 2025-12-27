@@ -13,11 +13,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 32)->unique();
-            $table->timestamps();
         });
+        Schema::enableForeignKeyConstraints();
 
         DB::table('roles')->insert([
             ['nombre' => 'prosumer'],
@@ -31,6 +32,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('roles');
+        Schema::enableForeignKeyConstraints();
+
     }
 };

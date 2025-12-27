@@ -7,10 +7,10 @@ use App\DTOs\Auth\recuperarContrasena\CorreoDto;
 use App\DTOs\Auth\recuperarContrasena\NuevaContrasenaDto;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Services\AuthService;
+use App\Contracts\Auth\Services\IAuthService;
 use App\DTOs\Auth\LoginDTO;
-use App\DTOs\Auth\RegisterDTO;
-use App\DTOs\Auth\VerifyCode;
+use App\DTOs\Auth\Registro\RegisterDTO;
+use App\DTOs\Auth\Registro\VerifyCode;
 use App\Http\Requests\Auth\CodigoVerificacionRequest;
 use App\Http\Requests\Auth\RecuperarPasswordClaveRequest;
 use App\Http\Requests\Auth\RecuperarPasswordCorreoRequest;
@@ -18,7 +18,6 @@ use App\Http\Requests\Auth\RecuperarPasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Nette\Utils\Json;
 use Tymon\JWTAuth\JWTGuard;
 
 /**
@@ -42,10 +41,10 @@ class AuthController
     /**
      * Constructor con intección de dependencias
      *
-     * @param AuthService $authService - Servicio (Lógica) de autenticación 
+     * @param IAuthService $authService - Servicio (Lógica) de autenticación 
      */
     public function __construct(
-        private AuthService $authService
+        private IAuthService $authService
     ){}
 
     /**
@@ -70,7 +69,7 @@ class AuthController
 
             return response()->json([
                 'message' => $result['message'],
-                'correo' => $result['correo'],
+                'cuenta_id' => $result['cuenta_id'],
                 'expira_en' => $result['expira_en'],
                 'datosEncriptados' => $result['datosEncriptados']
             ], 200);
@@ -80,8 +79,10 @@ class AuthController
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al iniciar el proceso de registro',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde'
+                'message' => 'Error al iniciar en el controlador',
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde',
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ], 500);
         }
     }
@@ -98,16 +99,18 @@ class AuthController
     {
         try {
             $datosEncriptados = $request->validated()['datosEncriptados'];
+            $cuenta_id = $request->validated()['cuenta_id'];
+            $dispositivo = $request->validated()['device_name'];
             $dto = VerifyCode::fromArray($request->validated());
     
-            $result = $this->authService->register($datosEncriptados, $dto);
+            $result = $this->authService->completarRegistro($datosEncriptados, $dto->clave, $cuenta_id, $dispositivo);
     
             return response()->json([
                 'message' => 'Usuario registrado correctamente',
-                'user' => $result['user'],
-                'token' => $result['token'],
-                'token_type' => $result['token_type'],
-                'expires_in' => $result['expires_in'],
+                'user' => $result['data']['user'],
+                'token' => $result['data']['token'],
+                'token_type' => $result['data']['token_type'],
+                'expires_in' => $result['data']['expires_in'],
             ], 201);
 
         } catch (ValidationException $e) {
@@ -116,7 +119,9 @@ class AuthController
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al registrar al usuario',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde'
+                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde',
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ], 500);
         }
     }
@@ -141,7 +146,7 @@ class AuthController
 
             // Retornar JSON
             return response()->json([
-                'message' => 'Inicio de sesión exisoto',
+                'message' => 'Inicio de sesión exitoso',
                 'data' => [
                     'user' => $result['user'],
                     'token' => $result['token'],
@@ -182,14 +187,11 @@ class AuthController
     public function logout(Request $request): JsonResponse
     {
         try {
-            // $request->user() contiene el usuario autenticado
-            $user = $request->user();
-
             // Verificar si el usaurio quiere cerrar sesión en todos los dispositivos
             $allDevices = $request->input('all_devices', false);
 
             // Llamar al servicio para invalidar el tokens
-            $this->authService->logout($user, $allDevices);
+            $this->authService->logout($allDevices);
 
             // Retornar confirmación
             $message = $allDevices 
@@ -235,10 +237,10 @@ class AuthController
      */
     public function validarClavePassword(RecuperarPasswordClaveRequest $request): JsonResponse
     {
-        $id_correo = $request->validated('id_correo');
+        $cuenta_id = $request->validated('cuenta_id');
         $dto = ClaveDto::fromRequest($request->validated());
 
-        $result = $this->authService->validarClaveRecuperacion($id_correo, $dto);
+        $result = $this->authService->validarClaveRecuperacion($cuenta_id, $dto);
 
         return response()->json($result, 200);
     }
@@ -252,10 +254,10 @@ class AuthController
      * @return JsonResponse
      */
     public function reestablecerPassword(RecuperarPasswordRequest $request): JsonResponse {
-        $id_usuario = $request->validated('id_usuario');
+        $cuenta_id = $request->validated('cuenta_id');
         $dto = NuevaContrasenaDto::fromRequest($request->validated());
 
-        $result = $this->authService->nuevaPassword($id_usuario, $dto);
+        $result = $this->authService->nuevaPassword($cuenta_id, $dto);
 
         if(!$result['success']) {
             return response()->json($result['message'], 500);
@@ -340,10 +342,9 @@ class AuthController
     {
         try{
             // Obtener el usuario autenticado desde el JWTGuard
-            $user = $request->user();
+            $cuenta_usuario = $request->user();
 
-            // Cargar relaciones necesarias si aplica
-            $user->load('rol', 'estado');
+            $user = $cuenta_usuario->usuario;
 
             // Obtener el usuario con lógica adicional si es necesario
             $userData = $this->authService->getCurrentUser($user);

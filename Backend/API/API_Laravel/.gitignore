@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/storage/framework/.gitignore
+/bootstrap/cache/*
+/bootstrap/cache/.gitignore
+

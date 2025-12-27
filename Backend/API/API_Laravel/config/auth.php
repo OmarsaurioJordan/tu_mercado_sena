@@ -38,7 +38,7 @@ return [
     'guards' => [
         'api' => [
             'driver' => 'jwt',
-            'provider' => 'usuarios',
+            'provider' => 'cuentas',
         ],
     ],
 
@@ -60,9 +60,9 @@ return [
     */
 
     'providers' => [
-        'usuarios' => [
+        'cuentas' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Usuario::class
+            'model' => App\Models\Cuenta::class
         ],
 
         // 'users' => [
