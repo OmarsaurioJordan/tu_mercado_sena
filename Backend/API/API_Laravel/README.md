@@ -89,11 +89,11 @@ JWT_BLACKLIST_ENABLED=true
 
 **⚠️Importante**
 
-Y poner en los headers:
+Y poner en los headers lo siguiente:  Accept: application/json
 
-Accept: application/json
 
 🔓 RUTAS PÚBLICAS
+
 1️⃣ Registro de usuario
 
 Método: POST
