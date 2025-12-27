@@ -53,7 +53,7 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
                   return [
                      'success' => false,
                      'message' => 'La cuenta no esta registrada',
-                     'correo' => null,
+                     'email' => null,
                      'expira_en' => null
                   ];
             }
@@ -64,7 +64,7 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
                   return [
                      'success' => false,
                      'message' => 'Usuario no registrado en la base de datos',
-                     'correo' => $cuentaUsuario->email,
+                     'email' => $cuentaUsuario->email,
                      'expira_en' => null
                   ];
             }
@@ -85,17 +85,17 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
                   throw new \Exception('El servicio de correo falló al intentar enviar el código.');
             }
 
+            $cuentaUsuario->fecha_clave = Carbon::now();
+
             // 3. Si todo fue bien (Actualización de DB + Envío de Email), CONFIRMAR los cambios
             DB::commit();
-
-            $fecha_clave_actual = $cuentaUsuario->fecha_clave;
 
             // --- PASO 3: Retorno de Éxito ---
             return [
                   'success' => true,
                   'message' => 'Código de recuperación enviado correctamente',
                   'cuenta_id' => $cuentaUsuario->id,
-                  'expira_en' => $fecha_clave_actual = Carbon::now()->addMinutes(10)
+                  'expira_en' => $cuentaUsuario->fecha_clave->copy()->addMinutes(10)->format('Y-m-d H:i:s'),
             ];
 
          } catch (\Exception $e) {
@@ -154,8 +154,6 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
             return [
                'success' => false,
                'message' => 'No se encontro el correo del usuario',
-               'id_correo' => null,
-               'id_usuario' => null
             ];
          }
 
@@ -170,7 +168,6 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
                'success' => false,
                'message' => 'La clave es incorrecta',
                'cuenta_id' => $cuentaUsuario->id,
-               'id_usuario' => null
             ];
          }
 
@@ -183,8 +180,7 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
 
       } catch (\Exception $e) {
          Log::error('Error al verificar la clave', [
-            'correo' => $cuentaUsuario->correo ?? null,
-            'id_usuario' => $cuentaUsuario->usuario->id,
+            'email' => $cuentaUsuario->email ?? null,
             'error' => $e->getMessage(),
             'archivo' => $e->getFile(),
             'linea' => $e->getLine()
@@ -194,7 +190,6 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
             'success' => false,
             'message' => 'Ocurrió un error al verificar el código de verificación. Por favor, intentalo más tarde',
             'correo' => $cuentaUsuario->correo ?? null,
-            'id_usuario' => $usuario->id ?? null,
          ];
       }
     }

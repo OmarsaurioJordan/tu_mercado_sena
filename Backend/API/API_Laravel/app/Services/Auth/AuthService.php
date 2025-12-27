@@ -276,7 +276,7 @@ class AuthService implements IAuthService
         return [
             'success' => $validarClave['success'],
             'message' => $validarClave['message'],
-            'id_usuario' => $validarClave['id_usuario'],
+            'cuenta_id' => $validarClave['cuenta_id'],
             'clave_verificada' => $validarClave['clave_verificada']
         ];
     }
@@ -397,11 +397,25 @@ class AuthService implements IAuthService
     public function refresh(): array
     {
         try {
-
+            // Refresca el token actual
             $newToken = $this->jwt->refresh();
-            
-            // Obtener tiempo de expiración
+
+            // Setear el nuevo token para poder leer su payload
+            $this->jwt->setToken($newToken);
+            $payload = $this->jwt->getPayload();
+
+            // Datos importantes del nuevo token
+            $jti = $payload->get('jti');
+            $cuentaId = $payload->get('sub'); // ID de la cuenta
             $expiresIn = $this->jwt->factory()->getTTL() * 60;
+
+            // Actualizar token en BD
+            DB::table('tokens_de_sesion')
+                ->where('cuenta_id', $cuentaId)
+                ->update([
+                    'jti' => $jti,
+                    'ultimo_uso' => Carbon::now(),
+                ]);
 
             return [
                 'token' => $newToken,
@@ -412,7 +426,6 @@ class AuthService implements IAuthService
         } catch (JWTException $e) {
             throw ValidationException::withMessages([
                 'token' => ['No se pudo refrescar el token'],
-                'error' => [$e->getMessage()]
             ]);
         }
     }
