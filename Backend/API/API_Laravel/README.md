@@ -306,7 +306,7 @@ Ejemplo JSON:
 
 ```JSON
 {
- "id_usuario": 1
+ "cuenta_id": 1
  "password": "XXXXXXXXX",
  "password_confirmation": "XXXXXXXX",
 }
