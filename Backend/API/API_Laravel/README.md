@@ -1,6 +1,6 @@
 🛒 Tu Mercado SENA - Backend API
 
-Versión: 1.0
+Versión: 1.1
 Framework: Laravel 12
 Autenticación: JWT (Tymon JWTAuth)
 Formato de respuesta: JSON
@@ -21,6 +21,8 @@ Sigue la arquitectura MVC y aplica el patrón Repository-Service, lo que garanti
 
 ⚠️ Nota: Actualmente están disponibles solo las rutas del módulo de autenticación.
 Otras rutas (productos, chats, favoritos, etc.) serán añadidas progresivamente conforme avance el desarrollo.
+
+⚠️ Nota: Esta versión 1.1 se ajusto a la nueva bd con un cambio en donde se creo una tabla en donde guardara los tokens de sesion de los usuarios junto a los dispositivos.
 
 **IMPORTANTE**
 
@@ -85,16 +87,11 @@ JWT_ALGO=HS256
 JWT_BLACKLIST_ENABLED=true
 ```
 
-Para temas de desarrollo los endpoints de registro y reestablecer contraseña pueden mostrarse el código de validación que se le envia al usuario en las respuestas JSON comentado:
+**⚠️Importante**
 
-```PHP
-    public $hidden = [
-        'clave'
-    ];
-```
-Del archivo app/models/correos para asi no poner probar con un correo verdadero.
+Y poner en los headers:
 
-
+Accept: application/json
 
 🔓 RUTAS PÚBLICAS
 1️⃣ Registro de usuario
@@ -106,7 +103,7 @@ Restricciones:
 
 Campo	Restricción
 
-correo_id	Solo se aceptan correos institucionales @soy.sena.edu.co
+email:    Solo se aceptan correos institucionales @soy.sena.edu.co
 
 password	Mínimo 8 caracteres, debe incluir números, no estar comprometida, y coincidir con password_confirmation
 
@@ -118,24 +115,36 @@ link	Debe ser una red social válida: YouTube, Instagram, Facebook, Twitter o Li
 
 Ejemplo JSON:
 
+**rol_id: 1** = prosumer
+
+**estado_id** = activo
+
 ```JSON
 {
- "correo": "XXXXXXXXX@soy.sena.edu.co",
- "password": "XXXXXXXXX",
- "password_confirmation": "XXXXXXXX",
- "rol_id": 1, # Prosumer
- "estado_id": 1 # Activo
- "nombre": "Julian",
-  "avatar": 1,
-  "descripcion": "Estudiante de desarrollo",
-  "link": "https://instagram.com/Julian",
-  "device_name": "web"
+ "email": "xxxxxxx@soy.sena.edu.co",
+ "password": "contraseña_prueba123",
+ "password_confirmation": "contraseña_prueba123",
+ "rol_id": 1, 
+ "estado_id": 1,
+ "nickname": "julian1223",
+ "descripcion": "Estudiante de desarrollo",
+ "link": "https://instagram.com/julian.https",
+ "device_name": "web",
+ "imagen": "Foto.jpg"
 }
 ```
 
 Respuesta (201 - Created):
 
-🔓 RUTAS PÚBLICAS
+```JSON
+{
+    "message": "Código enviado correctamente",
+    "cuenta_id": 1,
+    "expira_en": "2025-12-27 00:50:18",
+    "datosEncriptados": "eyJpdiI6Im52VVRZTUVaaFV4UkpIc..."
+}
+```
+
 2️⃣ Completar el registro del usuario
 
 Método: POST
@@ -149,8 +158,10 @@ Ejemplo JSON:
 
 ```JSON
 {
-  "clave": "FIVLO6" # Ejemplo,
-  "datosEncriptados": "eyJpdiI6I..."
+  "cuenta_id": 1,
+  "clave": "IAO4LG",
+  "datosEncriptados": "eyJpdiI...",
+   "device_name": "web"
 }
 ```
 
@@ -160,24 +171,28 @@ Respuesta (201 - Created):
 {
   "message": "Usuario registrado correctamente",
   "user": {
-    "correo_id": 5,
-    "nombre": "Julian",
-    "avatar": 1,
+    "cuenta_id": 1,
+    "nickname": "Julian1223",
+    "imagen": "Foto.jpg",
     "descripcion": "Estudiante de desarrollo",
-    "link": "https://instagram.com/Julian",
+    "link": "https://instagram.com/julian.https",
     "rol_id": 1,
     "estado_id": 1,
-    "id": 3,
+    "fecha_actualiza": "2025-12-27 05:46:43",
+    "fecha_registro": "2025-12-27 05:46:43",
+    "id": 1,
+    "estado": {
+      "id": 1,
+      "nombre": "activo"
+    },
     "rol": {
       "id": 1,
-      "nombre": "prosumer",
-      "created_at": null,
-      "updated_at": null
+      "nombre": "prosumer"
     }
   },
-  "token": "Token"
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJI..",
   "token_type": "bearer",
-  "expires_in": 86400 // tiempo de expiración del token JWT
+  "expires_in": 86400
 }
 ```
 
@@ -200,7 +215,7 @@ Ejemplo JSON:
 
 ```JSON
 {
-  "correo": "bxxxxxxxx@soy.sena.edu.co"
+  "email": "bxxxxxxxx@soy.sena.edu.co"
 }
 ```
 
@@ -208,11 +223,9 @@ Respuesta (200 - OK):
 
 ```JSON
 {
-{
   "message": "Código de recuperación enviado correctamente",
-  "id_correo": 5,
-  "expira_en": "2025-11-29" # 🚧 Falta mejorar este apartado 
-}
+  "cuenta_id": 1,
+  "expira_en": "2025-12-27 01:10:19"
 }
 ```
 
@@ -236,7 +249,7 @@ Ruta: http://localhost:8000/api/auth/recuperar-contrasena/validar-clave-recupera
 
 Restricciones:
 
-id_correo = Debe ingresar el id del usuario.
+cuenta_id = Debe ingresar el id del usuario.
 
 clave = Clave que le llega al usuario al usuario.
 
@@ -244,8 +257,8 @@ Ejemplo JSON:
 
 ```JSON
 {
-  "id_correo": 5,
-  "clave": "9AM50F"
+  "cuenta_id": 1,
+  "clave": "OYB0UE"
 }
 ```
 
@@ -255,7 +268,8 @@ Respuesta (200 - OK):
 {
   "success": true,
   "message": "Código verificado correctamente",
-  "id_usuario": 3,
+  "cuenta_id": 1,
+  "clave_verificada": true
 }
 ```
 
@@ -281,7 +295,7 @@ Ruta: http://localhost:8000/api/auth/recuperar-contrasena/reestablecer-contrasen
 
 Restricciones:
 
- id_usuario = Debe ingresar el id del usuario.
+ cuenta_id = Debe ingresar el id de la cuenta.
 
  password = La nueva contraseña del usuario.
  
@@ -292,7 +306,7 @@ Ejemplo JSON:
 
 ```JSON
 {
- "id_usuario": 3
+ "id_usuario": 1
  "password": "XXXXXXXXX",
  "password_confirmation": "XXXXXXXX",
 }
@@ -343,8 +357,8 @@ Ejemplo JSON:
 
 ```JSON
 {
-  "correo": "xxxxxx@soy.sena.edu.co",
-  "password": "XXXXXXX",
+  "email": "xxxxxxxxxx@soy.sena.edu.co",
+  "password": "xxxxxxxx",
   "device_name": "web"
 }
 ```
@@ -353,32 +367,24 @@ Respuesta (201 - OK):
 
 ```JSON
 {
-  "message": "Inicio de sesión exisoto",
+  "message": "Inicio de sesión exitoso",
   "data": {
     "user": {
-      "id": 3,
-      "correo_id": 5,
-      "rol_id": 1,
-      "nombre": "Julian",
-      "avatar": 1,
+      "id": 1,
+      "cuenta_id": 1,
+      "nickname": "xxxxxxxx",
+      "imagen": "Foto.jpg",
       "descripcion": "Estudiante de desarrollo",
-      "link": "https://instagram.com/Julian",
+      "link": "https://instagram.com/whoIsBrahian",
+      "rol_id": 1,
       "estado_id": 1,
-      "notifica_correo": 1,
-      "notifica_push": 1,
-      "uso_datos": true,
-      "fecha_registro": "2025-11-29 00:45:32",
-      "fecha_actualiza": "2025-11-29 02:22:47",
-      "fecha_reciente": "2025-11-29 00:45:32",
-      "rol": {
-        "id": 1,
-        "nombre": "prosumer",
-        "created_at": null,
-        "updated_at": null
-      }
+      "fecha_registro": "2025-12-27 05:46:43",
+      "fecha_actualiza": "2025-12-27 06:06:12",
+      "fecha_reciente": "2025-12-27 01:06:12"
     },
-    "token": "eyJ0eXA..." // Token JWT
-    "expires_in": 86400 // Tiempo de expiracion
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUW...",
+    "token_type": "bearer",
+    "expires_in": 86400
   }
 }
 ```
@@ -394,7 +400,7 @@ Authorization: Bearer {token}
 Método: POST
 Ruta: http://localhost:8000/api/auth/logout
 
-Cuerpo opcional:
+**Cuerpo opcional:**
 
 ```JSON
 {
@@ -424,11 +430,11 @@ Respuesta:
 
 ```JSON
 {
-  "message": "Token refrescado correctamente",
+  "message": "Token refrescado exitosamente",
   "data": {
-    "token": "xxxxx",
+    "token": "eyJ0eXAiOiJKV1QiLCJhk3NTBhMzNjZSIsInVzdWFya...",
     "token_type": "bearer",
-    "expires_in": 3600
+    "expires_in": 86400
   }
 }
 ```
@@ -440,120 +446,24 @@ Ruta: http://localhost:8000/api/auth/me
 Respuesta:
 
 ```JSON
-{
-  "user": { ... }
+ {
+  "data": {
+    "id": 1,
+    "cuenta_id": 1,
+    "nickname": "xxxxx",
+    "imagen": "Foto.jpg",
+    "descripcion": "Estudiante de desarrollo",
+    "link": "https://instagram.com/xxxx",
+    "rol_id": 1,
+    "estado_id": 1,
+    "fecha_registro": "2025-12-27 05:46:43",
+    "fecha_actualiza": "2025-12-27 06:10:14",
+    "fecha_reciente": "2025-12-27 01:10:14",
+    "is_recently_active": true
+  }
 }
 ```
 
-🧩 ESTRUCTURA Y COMPONENTES DEL CÓDIGO
-📦 DTOs (Data Transfer Objects)
-
-Los DTOs encapsulan los datos que se transfieren entre capas, evitando manipular directamente el request y garantizando validación y seguridad.
-
-DTO	Atributos	Descripción
-LoginDTO	correo_id, password, device_name	Gestiona datos de inicio de sesión
-RegisterDTO	correo_id, password, nombre, avatar, descripcion, link	Gestiona datos del registro de usuario
-
-Métodos comunes:
-
-fromRequest() → Crea el DTO a partir del request validado.
-
-toArray() → Devuelve los datos como arreglo.
-
-👤 Modelo: Usuario
-
-Define la tabla usuarios y sus propiedades.
-Oculta el campo password y agrega relaciones con roles y estados.
-
-Métodos clave:
-
-getJWTIdentifier() → ID único del usuario para JWT
-
-getJWTCustomClaims() → Agrega información personalizada (correo, nombre, rol, estado, avatar)
-
-⚙️ Servicio de Autenticación (AuthService)
-
-Centraliza la lógica de negocio de autenticación.
-Cumple con el principio Single Responsibility (SOLID).
-
-Método/Función
-
-**register()** -> Crea usuario y genera token
-
-**login()** -> Valida credenciales, rol, estado y dispositivo
-
-**logout()** -> Cierra sesión (actual o global)
-
-**refresh()** -> Refresca token JWT
-
-**getCurrentUser()** -> Retorna usuario autenticado
-
-**isRecentlyActive()** -> Comprueba actividad reciente
-
-🗃️ Repositorio e Interfaz
-UserRepositoryInterface
-
-Define los métodos base:
-
-create()
-
-findByEmail()
-
-findById()
-
-updateLastActivity()
-
-exists()
-
-invalidateAllTokens()
-
-UserRepository
-
-Implementa la interfaz usando Eloquent ORM:
-
-**create()** → Crea usuario, hashea contraseña y asigna rol/estado.
-
-**findByEmail()** / findById() → Búsqueda directa.
-
-**updateLastActivity()** → Actualiza fecha de actividad.
-
-**invalidateAllTokens()** → Cierra sesión global.
-
-🧱 Middleware: ValidateJWTToken
-
-Valida y protege las rutas que requieren autenticación.
-
-Funciones clave:
-
-Comprueba validez y expiración del token.
-
-Rechaza usuarios eliminados (estado_id = 3).
-
-Detecta tokens inválidos o expirados.
-
-Maneja errores personalizados:
-
-TokenExpiredException
-
-TokenInvalidException
-
-JWTException
-
-🧭 Controlador: AuthController
-
-Conecta las peticiones HTTP con el servicio AuthService.
-
-Responsabilidades:
-
-Recibir y validar el Request
-
-Crear DTOs
-
-Delegar la lógica al servicio
-
-Devolver respuestas JSON coherentes
-
-Códigos de respuesta:
 
 Código	Significado
 200	Operación exitosa
@@ -561,9 +471,3 @@ Código	Significado
 401	Token inválido / no autenticado
 422	Error de validación
 500	Error interno del servidor
-🧠 Conclusión
-
-El backend de Tu Mercado SENA está estructurado bajo principios de arquitectura limpia:
-Controller → Service → Repository → Model
-
-Esto permite mantener un código modular, escalable y de fácil mantenimiento.
