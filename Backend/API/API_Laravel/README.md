@@ -468,7 +468,7 @@ Respuesta:
 
 Método: PATCH
 
-ruta: Ruta: http://localhost:8000/api/editar-perfil
+ruta: Ruta: http://localhost:8000/api/editar-perfil/{id}
 
 Ejemplo de uso:
 
