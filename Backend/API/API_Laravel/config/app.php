@@ -154,7 +154,9 @@ return [
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\Auth\RepositoriesProviders::class,
-        App\Providers\Auth\ServicesProviders::class
+        App\Providers\Auth\ServicesProviders::class,
+        App\Providers\Usuario\RepositoriesProviders::class,
+        App\Providers\Usuario\ServicesProviders::class,
     ],
 
     

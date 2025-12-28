@@ -3,22 +3,23 @@
 namespace App\Services\Usuario;
 
 use App\Contracts\Usuario\Services\IUsuarioService;
-use App\Contracts\Usuario\Repositories\IUsuarioReposory;
+use App\Contracts\Usuario\Repositories\IUsuarioRepository;
 use App\DTOs\Usuario\EditarPerfil\InputDto;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Auth;
 
 
 class UsuarioService implements IUsuarioService
 {
     public function __construct(
-        private IUsuarioReposory $usuarioRepository
+        private IUsuarioRepository $usuarioRepository
     ) 
     {}
 
     public function update(int $id, InputDto $dto)
     {
-        $authUserId = auth()->id();
+        $authUserId = Auth::id();
     
         if ($authUserId !== $id) {
             throw new AuthorizationException(

@@ -13,11 +13,17 @@ class UsuarioRepository implements IUsuarioRepository
      * @param array $data - Datos del usuario a actualizar
      * @return Usuario $usuario
      */
-    public function update(int $id, array $data): User
+    public function findById(int $id)
+    {
+        $usuario = Usuario::find($id);
+        return $usuario;
+    }
+
+    public function update(int $id, array $data): Usuario
     {
         $usuario = Usuario::findOrFail($id);
         $usuario->update($data);
 
-        return $user;
+        return $usuario;
     }
 }

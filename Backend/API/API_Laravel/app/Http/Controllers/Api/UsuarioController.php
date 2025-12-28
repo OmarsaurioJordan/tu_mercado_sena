@@ -21,6 +21,13 @@ class UsuarioController
 
         $perfil = $this->usuarioService->update($id, $dto);
 
+        if (!$perfil) {
+            response()->json([
+                'status' => "Error",
+                'message' => 'No se pudo completar la acción'
+            ], 401);
+        }
+
         return response()->json($perfil);
     }
 }

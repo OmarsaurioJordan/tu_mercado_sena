@@ -83,7 +83,7 @@ class RegisterRequest extends FormRequest
 
             'password.min' => 'La contraseña debe contener al menos 8 caracteres.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
-            'password.mixed_case' => 'Debe contener mayúsculas y minúsculas.',
+            'password.mixedCase' => 'Debe contener mayúsculas y minúsculas.',
             'password.numbers' => 'Debe contener al menos un número.',
             'password.uncompromised' => 'La contraseña fue encontrada en filtraciones, usa otra.',
 
