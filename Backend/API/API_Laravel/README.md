@@ -389,7 +389,7 @@ Respuesta (201 - OK):
 }
 ```
 
-🔒 RUTAS PROTEGIDAS
+**🔒 RUTAS PROTEGIDAS**
 
 Estas rutas requieren un token JWT válido en los headers:
 
@@ -463,6 +463,45 @@ Respuesta:
   }
 }
 ```
+
+4️⃣ Editar Perfil usuario
+
+Método: PATCH
+
+ruta: Ruta: http://localhost:8000/api/editar-perfil
+
+Ejemplo de uso:
+
+```JSON
+{
+  "imagen": "Nueva_foto",
+  "nickname": "Nuevo Nickname",
+  "descripcion": "Nueva_descripcioón",
+  "link": "Nueva red social"
+}
+```
+
+**⚠️Nota:** Se pueden enviar los 4 datos o se pueden mandar uno, no tendra ninguna afectación al momento de actualizar los datos
+
+Respuesta:
+
+```JSON
+{
+  "id": 1,
+  "cuenta_id": 1,
+  "nickname": "Nuevo Nickname",
+  "imagen": "Nueva_foto",
+  "descripcion": "Nueva_descripcioón",
+  "link": "Nueva red social",
+  "rol_id": 1,
+  "estado_id": 1,
+  "fecha_registro": "2025-12-28 19:14:28",
+  "fecha_actualiza": "2025-12-28 19:45:56",
+  "fecha_reciente": "2025-12-28 14:23:56"
+}
+```
+
+
 
 
 Código	Significado
