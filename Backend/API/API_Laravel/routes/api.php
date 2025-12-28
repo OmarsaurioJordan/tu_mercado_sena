@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UsuarioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -80,6 +81,9 @@ Route::middleware('jwtVerify')->group(function (){
         // Obtener usuario autenticado
         Route::get('/me', [AuthController::class, 'me']);
     });
+
+    // === EDITAR PERFIL ===
+    Route::patch("/editar-perfil/{id}", [UsuarioController::class, 'update']);
 });
 
 /**
