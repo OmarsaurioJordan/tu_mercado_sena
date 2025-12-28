@@ -375,7 +375,7 @@ Respuesta (201 - OK):
       "nickname": "xxxxxxxx",
       "imagen": "Foto.jpg",
       "descripcion": "Estudiante de desarrollo",
-      "link": "https://instagram.com/whoIsBrahian",
+      "link": "https://instagram.com/julian.https",
       "rol_id": 1,
       "estado_id": 1,
       "fecha_registro": "2025-12-27 05:46:43",
