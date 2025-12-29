@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Usuario;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EditarPerfilRequest extends FormRequest
 {
@@ -29,9 +30,9 @@ class EditarPerfilRequest extends FormRequest
             ],
             'nickname' => [
                 'sometimes',
-                'unique:usuarios,nickname',
                 'string',
-                'max:32'
+                'max:32',
+                Rule::unique('usuarios', 'nickname')->ignore($this->user()->id)            
             ],
             'descripcion' => [
                 'sometimes',
@@ -52,7 +53,7 @@ class EditarPerfilRequest extends FormRequest
         return [
             'imagen.max' => 'Se exedio el limite de caracteres permitidos',
 
-            'nickname.unique' => 'Nickname ya en uso',
+            'nickname.unique' => 'Este nickname ya está registrado por otro usuario.',            
             'nickname.string' => 'Nickname inválido',
             'nickname.max' => 'El nickname alcanzo el limite de caracteres',
 
