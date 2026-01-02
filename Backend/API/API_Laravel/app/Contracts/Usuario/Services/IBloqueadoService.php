@@ -10,7 +10,7 @@ interface IBloqueadoService
 {
     public function ejecutarBloqueo(int $bloqueadorId, int $bloqueadoId): OutputDto;
 
-    public function ejecutarDesbloqueo(int $bloqueadorId, int $bloqueadoId): OutputDto;
+    public function ejecutarDesbloqueo(int $bloqueadorId, int $bloqueadoId): array;
 
-    public function solicitarBloqueadosPorUsuario(int $bloqueadorId): Collection;
+    public function solicitarBloqueadosPorUsuario(int $bloqueadorId): Collection|array;
 }

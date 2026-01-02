@@ -21,9 +21,9 @@ class BloqueadoService implements IBloqueadoService
     /**
      * Obtener la lista de usuarios bloqueados por un usuario.
      * @param int $bloqueador_id
-     * @return Collection<int, OutputDto>
+     * @return Collection<OutputDto>|array
      */
-    public function solicitarBloqueadosPorUsuario(int $bloqueador_id): Collection
+    public function solicitarBloqueadosPorUsuario(int $bloqueador_id): Collection|array
     {
         Log::info('Obteniendo lista de usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
 
@@ -37,6 +37,13 @@ class BloqueadoService implements IBloqueadoService
         }
 
         $bloqueados = $this->bloqueadoRepository->obtenerBloqueadosPorUsuario($authUserId);
+
+        if ($bloqueados->isEmpty()) {
+            Log::info('El usuario no tiene usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
+            return [
+                'message' => 'No tienes usuarios bloqueados.'
+            ];
+        }
 
         return OutputDto::fromModelCollection($bloqueados);
     }
@@ -83,7 +90,7 @@ class BloqueadoService implements IBloqueadoService
         }
     }
 
-    public function ejecutarDesbloqueo(int $bloqueador_id, int $bloqueado_id): OutputDto
+    public function ejecutarDesbloqueo(int $bloqueador_id, int $bloqueado_id): array
     {
         Log::info('Ejecutando desbloqueo de usuario', ['bloqueador_id' => $bloqueador_id, 'bloqueado_id' => $bloqueado_id]); 
     
@@ -113,7 +120,10 @@ class BloqueadoService implements IBloqueadoService
 
             DB::commit();
 
-            return OutputDto::fromModel($usuarioDesbloqueado);
+            return [
+                'success' => true,
+                'message' => 'Usuario desbloqueado exitosamente.'
+            ];
 
         } catch (\Exception $e) {
             Log::error('Error al desbloquear usuario', [
