@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Cuenta;
 use App\Models\Rol;
 use App\Models\Estado;
+use App\Models\Bloqueado;
 
 
 class Usuario extends Model
@@ -27,15 +28,19 @@ class Usuario extends Model
         'estado_id'
     ];
 
+    // Datos que no se quieren mostrar en las respuestas
     protected $hidden = [
         'fecha_registro',
         'fecha_actualiza'
     ];
 
+    // Cast de tipos de datos
     protected $casts = [
         'fecha_registro' => 'datetime:Y-m-d H:i:s', // Muestra: 2025-12-12 18:50:11
         'fecha_actualiza' => 'datetime:Y-m-d H:i:s',
-    ];      
+    ];     
+    
+    // Relaciones
 
     public function cuenta()
     {
@@ -48,5 +53,15 @@ class Usuario extends Model
 
     public function estado(){
         return $this->belongsTo(Estado::class, 'estado_id');
+    }
+
+    public function bloqueadores()
+    {
+        return $this->hasMany(Bloqueado::class, 'bloqueador_id', 'id');
+    }
+
+    public function bloqueados()
+    {
+        return $this->hasMany(Bloqueado::class, 'bloqueado_id', 'id');
     }
 }
