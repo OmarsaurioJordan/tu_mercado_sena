@@ -47,8 +47,6 @@ readonly class OutputDto implements Arrayable
 
     public static function fromModelCollection(ModelCollection $bloqueados): BaseCollection
     {
-        return $bloqueados->map(function (Bloqueado $bloqueado) {
-            return self::fromModel($bloqueado);
-        });
+        return $bloqueados->map(fn (Bloqueado $bloqueado) => self::fromModel($bloqueado));
     }
 }

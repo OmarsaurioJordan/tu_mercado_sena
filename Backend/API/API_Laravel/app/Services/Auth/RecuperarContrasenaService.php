@@ -237,7 +237,7 @@ class RecuperarContrasenaService implements IRecuperarContrasenaService
       } catch (\Exception $e) {
          
          Log::error('Error al actualizar contraseña', [
-            'id_usuario' => $id_usuario, 
+            'cuenta_id' => $cuenta_id, 
             'error' => $e->getMessage(),
             'linea' => $e->getLine(),
             'archivo' => $e->getFile()
