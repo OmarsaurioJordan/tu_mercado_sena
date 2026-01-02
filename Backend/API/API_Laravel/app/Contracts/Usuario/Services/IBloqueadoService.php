@@ -12,5 +12,5 @@ interface IBloqueadoService
 
     public function ejecutarDesbloqueo(int $bloqueadorId, int $bloqueadoId): array;
 
-    public function solicitarBloqueadosPorUsuario(int $bloqueadorId): Collection|array;
+    public function solicitarBloqueadosPorUsuario(int $bloqueadorId): array;
 }

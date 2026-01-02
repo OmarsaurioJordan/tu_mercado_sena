@@ -23,7 +23,7 @@ class BloqueadoService implements IBloqueadoService
      * @param int $bloqueador_id
      * @return Collection<OutputDto>|array
      */
-    public function solicitarBloqueadosPorUsuario(int $bloqueador_id): Collection|array
+    public function solicitarBloqueadosPorUsuario(int $bloqueador_id): array
     {
         Log::info('Obteniendo lista de usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
 
@@ -41,11 +41,15 @@ class BloqueadoService implements IBloqueadoService
         if ($bloqueados->isEmpty()) {
             Log::info('El usuario no tiene usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
             return [
-                'message' => 'No tienes usuarios bloqueados.'
+                'message' => 'No tienes usuarios bloqueados.',
+                'data' => []
             ];
         }
 
-        return OutputDto::fromModelCollection($bloqueados);
+        return [
+            'message' => 'Usuarios bloqueados',
+            'data' => OutputDto::fromModelCollection($bloqueados)
+        ];
     }
 
     public function ejecutarBloqueo(int $bloqueador_id, int $bloqueado_id): OutputDto
