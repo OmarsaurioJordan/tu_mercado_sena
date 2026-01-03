@@ -5,7 +5,6 @@ namespace App\DTOs\Usuario\Bloqueados;
 use App\Models\Bloqueado;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
-use Illuminate\Support\Collection as BaseCollection;
 
 
 
@@ -36,17 +35,17 @@ readonly class OutputDto implements Arrayable
             bloqueador_id: $bloqueado->bloqueador_id,
             bloqueado_id: $bloqueado->bloqueado_id,
             usuario_bloqueado: [
-                'id' => $bloqueado->bloqueado->id,
-                'nickname' => $bloqueado->bloqueado->nickname,
-                'imagen' => $bloqueado->bloqueado->imagen,
-                'descripcion' => $bloqueado->bloqueado->descripcion,
-                'link' => $bloqueado->bloqueado->link,
+                'id' => $bloqueado->bloqueado?->id,
+                'nickname' => $bloqueado->bloqueado?->nickname,
+                'imagen' => $bloqueado->bloqueado?->imagen,
+                'descripcion' => $bloqueado->bloqueado?->descripcion,
+                'link' => $bloqueado->bloqueado?->link,
             ],
         );
     }
 
-    public static function fromModelCollection(ModelCollection $bloqueados): BaseCollection
+    public static function fromModelCollection(ModelCollection $bloqueados): array
     {
-        return $bloqueados->map(fn (Bloqueado $bloqueado) => self::fromModel($bloqueado));
+        return $bloqueados->map(fn (Bloqueado $bloqueado) => self::fromModel($bloqueado)->toArray())->all();
     }
 }

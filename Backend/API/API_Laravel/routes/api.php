@@ -82,8 +82,16 @@ Route::middleware('jwtVerify')->group(function (){
         Route::get('/me', [AuthController::class, 'me']);
     });
 
-    // === EDITAR PERFIL ===
-    Route::patch("/editar-perfil/{id}", [UsuarioController::class, 'update']);
+    Route::prefix('usuarios')->group(function () {
+        // === EDITAR PERFIL ===
+        Route::patch("/editar-perfil/{id}", [UsuarioController::class, 'update']);
+
+        // === BLOQUEADOS    ===
+        Route::get('bloqueados', [UsuarioController::class, 'listaUsuariosBloqueados']);
+        Route::post('bloqueados', [UsuarioController::class, 'bloquearUsuario']);
+        Route::delete('bloqueados/{bloqueado_id}', [UsuarioController::class, 'desbloquearUsuario']);
+
+    });
 });
 
 /**

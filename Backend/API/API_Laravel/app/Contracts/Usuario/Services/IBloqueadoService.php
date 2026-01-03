@@ -2,15 +2,14 @@
 
 namespace App\Contracts\Usuario\Services;
 
-use App\DTOs\Usuario\Bloqueados\OutputDto;
-use Illuminate\Support\Collection;
+use App\DTOs\Usuario\Bloqueados\InputDto;
 
 
 interface IBloqueadoService
 {
-    public function ejecutarBloqueo(int $bloqueadorId, int $bloqueadoId): OutputDto;
+    public function ejecutarBloqueo(InputDto $dto): array;
 
-    public function ejecutarDesbloqueo(int $bloqueadorId, int $bloqueadoId): array;
+    public function ejecutarDesbloqueo(InputDto $dto): array;
 
     public function solicitarBloqueadosPorUsuario(int $bloqueadorId): array;
 }

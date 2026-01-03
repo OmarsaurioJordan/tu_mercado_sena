@@ -4,6 +4,7 @@ namespace App\Services\Usuario;
 
 use App\Contracts\Usuario\Services\IBloqueadoService;
 use App\DTOs\Usuario\Bloqueados\OutputDto;
+use App\DTOs\Usuario\Bloqueados\InputDto;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use App\Contracts\Usuario\Repositories\IBloqueadoRepository;
@@ -27,112 +28,93 @@ class BloqueadoService implements IBloqueadoService
     {
         Log::info('Obteniendo lista de usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
 
-        // Validar si el Id del bloqueador es válido
-        $authUserId = Auth::id();
-
-        if ($authUserId !== $bloqueador_id) {
-            throw new AuthorizationException(
-                'No puedes ver la lista de bloqueados de otro usuario.'
-            );
-        }
-
-        $bloqueados = $this->bloqueadoRepository->obtenerBloqueadosPorUsuario($authUserId);
+        $bloqueados = $this->bloqueadoRepository->obtenerBloqueadosPorUsuario($bloqueador_id);
 
         if ($bloqueados->isEmpty()) {
             Log::info('El usuario no tiene usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
             return [
+                'true' => true,
                 'message' => 'No tienes usuarios bloqueados.',
                 'data' => []
             ];
         }
 
         return [
+            'success' => true,
             'message' => 'Usuarios bloqueados',
             'data' => OutputDto::fromModelCollection($bloqueados)
         ];
     }
 
-    public function ejecutarBloqueo(int $bloqueador_id, int $bloqueado_id): OutputDto
+    public function ejecutarBloqueo(InputDto $dto): array
     {
-        Log::info('Ejecutando bloqueo de usuario', ['bloqueador_id' => $bloqueador_id, 'bloqueado_id' => $bloqueado_id]); 
+        Log::info('Ejecutando bloqueo de usuario', $dto->toArray()); 
     
         try {
             // Lógica para bloquear al usuario
-            $authUserId = Auth::id();
-    
-            if ($authUserId !== $bloqueador_id) {
-                throw new AuthorizationException(
-                    'No puedes bloquear usuarios en nombre de otro usuario.'
-                );
-            }
-    
-            $estaBloqueado = $this->bloqueadoRepository->estaBloqueado($bloqueador_id, $bloqueado_id);
+            $estaBloqueado = $this->bloqueadoRepository->estaBloqueado($dto->bloqueador_id, $dto->bloqueado_id);
             if ($estaBloqueado) {
                 throw new \Exception('El usuario ya está bloqueado.');
             }
     
-            DB::beginTransaction();
+            return DB::transaction(function () use ($dto) {
+                    $usuarioBloqueado = $this->bloqueadoRepository->bloquearUsuario(
+                        $dto->bloqueador_id, 
+                        $dto->bloqueado_id
+                );
 
-            $usuarioBloqueado = $this->bloqueadoRepository->bloquearUsuario($bloqueador_id, $bloqueado_id);
-
-            if (!$usuarioBloqueado) {
-                DB::rollBack();
-                throw new \Exception('Error al bloquear el usuario.');
-            }
-
-            DB::commit();
-
-            return OutputDto::fromModel($usuarioBloqueado);
+                if (!$usuarioBloqueado) {
+                    throw new \Exception('Error al bloquear el usuario.');
+                }
+                
+                return [
+                    'success' => true,
+                    'message' => 'Usuario bloqueado exitosamente.',
+                    'data' => OutputDto::fromModel($usuarioBloqueado)
+                ];
+            });
 
         } catch (\Exception $e) {
             Log::error('Error al bloquear usuario', [
-                'bloqueador_id' => $bloqueador_id,
-                'bloqueado_id' => $bloqueado_id,
+                'bloqueador_id' => $dto->bloqueador_id,
+                'bloqueado_id' => $dto->bloqueado_id,
                 'error' => $e->getMessage(),
             ]);
             throw $e;
         }
     }
 
-    public function ejecutarDesbloqueo(int $bloqueador_id, int $bloqueado_id): array
+    public function ejecutarDesbloqueo(InputDto $dto): array
     {
-        Log::info('Ejecutando desbloqueo de usuario', ['bloqueador_id' => $bloqueador_id, 'bloqueado_id' => $bloqueado_id]); 
+        Log::info('Ejecutando desbloqueo de usuario', ['bloqueador_id' => $dto->bloqueador_id, 'bloqueado_id' => $dto->bloqueado_id]); 
     
         try {
             // Lógica para desbloquear al usuario
-            $authUserId = Auth::id();
-    
-            if ($authUserId !== $bloqueador_id) {
-                throw new AuthorizationException(
-                    'No puedes desbloquear usuarios en nombre de otro usuario.'
-                );
-            }
-    
-            $estaBloqueado = $this->bloqueadoRepository->estaBloqueado($bloqueador_id, $bloqueado_id);
+            $estaBloqueado = $this->bloqueadoRepository->estaBloqueado($dto->bloqueador_id, $dto->bloqueado_id);
             if (!$estaBloqueado) {
                 throw new \Exception('El usuario no está bloqueado.');
             }
-    
-            DB::beginTransaction();
 
-            $usuarioDesbloqueado = $this->bloqueadoRepository->desbloquearUsuario($bloqueador_id, $bloqueado_id);
+            return DB::transaction(function () use ($dto) {
+                $desbloqueoExitoso = $this->bloqueadoRepository->desbloquearUsuario(
+                    $dto->bloqueador_id, 
+                    $dto->bloqueado_id
+                );
 
-            if (!$usuarioDesbloqueado) {
-                DB::rollBack();
-                throw new \Exception('Error al desbloquear el usuario.');
-            }
+                if (!$desbloqueoExitoso) {
+                    throw new \Exception('Error al desbloquear el usuario.');
+                }
 
-            DB::commit();
-
-            return [
-                'success' => true,
-                'message' => 'Usuario desbloqueado exitosamente.'
-            ];
+                return [
+                    'success' => true,
+                    'message' => 'Usuario desbloqueado exitosamente.'
+                ];
+            });
 
         } catch (\Exception $e) {
             Log::error('Error al desbloquear usuario', [
-                'bloqueador_id' => $bloqueador_id,
-                'bloqueado_id' => $bloqueado_id,
+                'bloqueador_id' => $dto->bloqueador_id,
+                'bloqueado_id' => $dto->bloqueado_id,
                 'error' => $e->getMessage(),
             ]);
             throw $e;

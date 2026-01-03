@@ -4,6 +4,7 @@ namespace App\Http\Requests\Usuario;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class EditarPerfilRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class EditarPerfilRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::check(); 
     }
 
     /**
