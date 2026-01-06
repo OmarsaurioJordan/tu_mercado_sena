@@ -501,6 +501,88 @@ Respuesta:
 }
 ```
 
+**Modulo de Bloqueados**
+
+**1️⃣Bloquear Usuario**
+
+Método: **Post**
+
+Ruta: **http://127.0.0.1:8000/api/bloqueados**
+
+```JSON
+{
+  "bloqueador_id": 2,
+  "bloqueado_id": 1
+}
+```
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "message": "Usuarios bloqueados",
+  "data": [
+    {
+      "id": 3,
+      "bloqueador_id": 2,
+      "bloqueado_id": 1,
+      "usuario_bloqueado": {
+        "id": 1,
+        "nickname": "Nickname",
+        "imagen": "Imagen.jpg",
+        "descripcion": "XXXXXXXXX",
+        "link": null
+      }
+    }
+  ]
+}
+```
+
+**2️⃣Ver usuarios bloqueados**
+Método: **GET**
+
+Ruta: **http://127.0.0.1:8000/api/bloqueados**
+
+**Respuesta**
+```
+{
+  "success": true,
+  "message": "Usuarios bloqueados",
+  "data": [
+    {
+      "id": 3,
+      "bloqueador_id": 2,
+      "bloqueado_id": 1,
+      "usuario_bloqueado": {
+        "id": 1,
+        "nickname": "XXXXXXXXX",
+        "imagen": "Imagen.jpg",
+        "descripcion": "XXXXX",
+        "link": null
+      }
+    }
+  ]
+}
+```
+
+**3️⃣Desbloquear usuario**
+
+
+Método: **DELETE**
+
+Ruta: **http://127.0.0.1:8000/api/bloqueados/{bloqueado_id}**
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "message": "Usuario desbloqueado exitosamente."
+}
+```
+
+
 
 
 
