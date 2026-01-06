@@ -89,7 +89,9 @@ JWT_BLACKLIST_ENABLED=true
 
 **⚠️Importante**
 
-Y poner en los headers lo siguiente:  Accept: application/json
+1️⃣ Poner en los headers lo siguiente:  **Accept: application/json**
+
+2️⃣ Hacer las migraciones de las tablas usando este comando en la terminal: **php artisan migrate:fresh** teniendo el servidor ya creado
 
 
 🔓 RUTAS PÚBLICAS
