@@ -22,9 +22,15 @@ class BloqueadoRepository implements IBloqueadoRepository
 
     public function desbloquearUsuario(int $bloqueadorId, int $bloqueadoId): Bloqueado
     {
-        return Bloqueado::where('bloqueador_id', $bloqueadorId)
+        $registro = Bloqueado::where('bloqueador_id', $bloqueadorId)
             ->where('bloqueado_id', $bloqueadoId)
-            ->delete();
+            ->first();
+        
+        if ($registro) {
+            $registro->delete();
+        }
+
+        return $registro;
     }
 
     public function estaBloqueado(int $bloqueadorId, int $bloqueadoId): bool
