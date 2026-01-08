@@ -49,6 +49,9 @@ class BloquearUsuarioRequest extends FormRequest
         return [
             'bloqueado_id.different' => 'No puedes realizar esta acción sobre ti mismo.',
             'bloqueado_id.exists' => 'El usuario especificado no existe.',
+
+            'bloqueador_id.exists' => 'El usuario bloqueador no existe.',
+            'bloqueador_id.required' => 'El ID del usuario bloqueador es obligatorio.',
         ];
     }
 }
