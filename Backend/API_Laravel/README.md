@@ -95,7 +95,7 @@ JWT_BLACKLIST_ENABLED=true
 **Accept: application/json**
 
 
-2️⃣ Hacer las migraciones de las tablas usando este comando en la terminal teniendo el servidor ya creado: 
+2️⃣ Hacer las migraciones de las tablas usando este comando en la terminal teniendo la base de datos ya creada: 
 
 ```CMD
 php artisan migrate:refresh
