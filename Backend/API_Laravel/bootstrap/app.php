@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\UserRepository;
+
+$app = Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        //
+        $middleware->alias([
+            'jwtVerify' => \App\Http\Middleware\ValidateJWTToken::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
+    })
+    ->create();
+
+// Solo necesitamos registrar el repositorio
+// Laravel resolverá automáticamente AuthService
+$app->bind(UserRepositoryInterface::class, UserRepository::class);
+
+return $app;
