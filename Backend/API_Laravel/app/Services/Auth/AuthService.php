@@ -83,6 +83,7 @@ class AuthService implements IAuthService
         $datosEncriptados = encrypt($dto->toArray());
         
         return [
+            'success' => $inicioProceso['success'],
             'message' => $inicioProceso['message'],
             'cuenta_id' => $inicioProceso['data']['cuenta_id'],
             'expira_en' => $inicioProceso['data']['expira_en'],
@@ -105,7 +106,11 @@ class AuthService implements IAuthService
             $registroTerminado = $this->registroService->terminarRegistro($datosEncriptados, $clave, $cuenta_id, $dispositivo);
 
             if ($registroTerminado['status'] !== 'success') {
-                Log::error('Error en el AuthService');
+                Log::error('Error en el Registro del usuario', [
+                    'cuenta_id' => $cuenta_id,
+                    'dispositivo' => $dispositivo,
+                    'Archivo' => 'RegistroService.php'
+                ]);
                 throw new Exception('Error al registrar usuario', 401);
             }
 
@@ -189,41 +194,37 @@ class AuthService implements IAuthService
             $jti = $payload->get('jti');
             $expiresIn = $this->jwt->factory()->getTTL() * 60;
             
-            DB::beginTransaction();
+            return DB::transaction(function () use ($cuentaRegistrada, $dto, $jti, $user, $token, $expiresIn) {
 
-            DB::table('tokens_de_sesion')
-                ->where('cuenta_id', $cuentaRegistrada->id)
-                ->where('dispositivo', $dto->device_name)
-                ->delete();
-            
+                DB::table('tokens_de_sesion')
+                    ->where('cuenta_id', $cuentaRegistrada->id)
+                    ->where('dispositivo', $dto->device_name)
+                    ->delete();
 
-            DB::table('tokens_de_sesion')->insert([
-                'cuenta_id' => $cuentaRegistrada->id,
-                'dispositivo' => $dto->device_name,
-                'jti' => $jti,
-                'ultimo_uso' => Carbon::now()
-            ]);
+                DB::table('tokens_de_sesion')->insert([
+                    'cuenta_id'   => $cuentaRegistrada->id,
+                    'dispositivo' => $dto->device_name,
+                    'jti'         => $jti,
+                    'ultimo_uso'  => Carbon::now()
+                ]);
 
-            DB::table('usuarios')->update([
-                'fecha_reciente' => Carbon::now()
-            ]);
+                DB::table('usuarios')
+                    ->where('id', $cuentaRegistrada->id)
+                    ->update([
+                        'fecha_reciente' => Carbon::now()
+                    ]);
 
-            DB::commit();
-        
-
-            // Retornar el usuario y su nuevo token
-            return [
-                'user' => $user,
-                'token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => $expiresIn,
-            ];
+                // 3. Return anidado (resultado final del servicio)
+                return [
+                    'success' => true,
+                    'user' => $user,
+                    'token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => $expiresIn,
+                ];
+            });
 
         } catch (Exception $e) {
-            if (DB::transactionLevel() > 0) {
-                    DB::rollBack();
-            }
-
             Log::error('Error al loguearse', [
                 'error' => $e->getMessage(),
                 'archivo' => $e->getFile(),

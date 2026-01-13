@@ -26,10 +26,13 @@ class BloqueadoService implements IBloqueadoService
      */
     public function solicitarBloqueadosPorUsuario(int $bloqueador_id): array
     {
+        # Log de seguimiento
         Log::info('Obteniendo lista de usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
 
+        # Llamar al repositorio para obtener los resultados desde la base de datos
         $bloqueados = $this->bloqueadoRepository->obtenerBloqueadosPorUsuario($bloqueador_id);
 
+        # Validar si la colección esta vacía
         if ($bloqueados->isEmpty()) {
             Log::info('El usuario no tiene usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
             return [
@@ -51,12 +54,13 @@ class BloqueadoService implements IBloqueadoService
         Log::info('Ejecutando bloqueo de usuario', $dto->toArray()); 
     
         try {
-            // Lógica para bloquear al usuario
+            // Verificar que el usuario no esté ya bloqueado
             $estaBloqueado = $this->bloqueadoRepository->estaBloqueado($dto->bloqueador_id, $dto->bloqueado_id);
             if ($estaBloqueado) {
                 throw new \Exception('El usuario ya está bloqueado.');
             }
-    
+            
+            # Realizar una transacción para el bloqueo y así evitar inconsistencias
             return DB::transaction(function () use ($dto) {
                     $usuarioBloqueado = $this->bloqueadoRepository->bloquearUsuario(
                         $dto->bloqueador_id, 

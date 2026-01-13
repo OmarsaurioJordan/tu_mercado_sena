@@ -18,6 +18,10 @@ readonly class OutputDto implements Arrayable
     )
     {}
 
+    /**
+     * Convierte el DTO a un array
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [
@@ -28,8 +32,14 @@ readonly class OutputDto implements Arrayable
         ];
     }
 
+    /**
+     * Crea una instancia de este DTO a partir de un modelo Bloqueado
+     * @param Bloqueado $bloqueado
+     * @return self
+     */
     public static function fromModel(Bloqueado $bloqueado): self
     {
+        #$bloqueado es una instancia de App\Models\Bloqueado con la relacion 'bloqueado' cargada
         return new self(
             id: $bloqueado->id,
             bloqueador_id: $bloqueado->bloqueador_id,
@@ -37,13 +47,16 @@ readonly class OutputDto implements Arrayable
             usuario_bloqueado: [
                 'id' => $bloqueado->bloqueado?->id,
                 'nickname' => $bloqueado->bloqueado?->nickname,
-                'imagen' => $bloqueado->bloqueado?->imagen,
-                'descripcion' => $bloqueado->bloqueado?->descripcion,
-                'link' => $bloqueado->bloqueado?->link,
+                'imagen' => $bloqueado->bloqueado?->imagen
             ],
         );
     }
 
+    /**
+     * Crea un array de este DTO a partir de una colección de modelos Bloqueado
+     * @param ModelCollection<int, Bloqueado> $bloqueados
+     * @return array<int, array<string, mixed>>
+     */
     public static function fromModelCollection(ModelCollection $bloqueados): array
     {
         return $bloqueados->map(fn (Bloqueado $bloqueado) => self::fromModel($bloqueado)->toArray())->all();
