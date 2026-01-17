@@ -2,7 +2,7 @@
 
 return [
 
-    'paths' => ['api/*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
@@ -10,7 +10,6 @@ return [
         'http://localhost:3000',  // React
         'http://localhost:5173',  // Vite
         'http://localhost',       // apps locales
-        '*'                       // permitir acceso desde móvil, ngrok, dominio, etc.
     ],
 
     'allowed_origins_patterns' => [],
