@@ -18,6 +18,7 @@ use App\Http\Requests\Auth\RecuperarPasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Translation\CatalogueMetadataAwareInterface;
 use Tymon\JWTAuth\JWTGuard;
 
 /**
@@ -75,15 +76,10 @@ class AuthController
                 'datosEncriptados' => $result['datosEncriptados']
             ], 200);
 
-        } catch (ValidationException $e) {
-            throw $e;
-
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al iniciar en el controlador',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde',
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
+                'success' => false,
+                'message' => 'Error al iniciar el proceso de registro',
             ], 500);
         }
     }
@@ -120,10 +116,8 @@ class AuthController
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al registrar al usuario',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde',
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
+                'success' => false,
+                'message' => 'Error al registrar el usuario',
             ], 500);
         }
     }
@@ -163,8 +157,8 @@ class AuthController
         } catch (\Exception $e){
             // Error inesperado
             return response()->json([
+                'success' => false,
                 'message' => 'Error al iniciar sesión',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno, intentalo más tarde'
             ], 500);
         }
     }
@@ -207,8 +201,8 @@ class AuthController
 
         } catch (\Exception $e) {
             return response()->json([
+                'success' => false,
                 'message' => 'Error al cerrar sesión',
-                'error' => config('app.debug') ? $e->getMessage() : 'Error interno del servidor'
             ], 500);
         }
     }
@@ -223,11 +217,19 @@ class AuthController
      */
     public function iniciarProcesoPassword(RecuperarPasswordCorreoRequest $request): JsonResponse
     {
-        $dto = CorreoDto::fromRequest($request->validated());
+        try{
+            $dto = CorreoDto::fromRequest($request->validated());
+    
+            $result = $this->authService->inicioNuevaPassword($dto);
+    
+            return response()->json($result, 200);
 
-        $result = $this->authService->inicioNuevaPassword($dto);
-
-        return response()->json($result, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al iniciar el proceso de recuperación de contraseña',
+            ], 500);
+        }
     }
 
     /**
@@ -240,12 +242,20 @@ class AuthController
      */
     public function validarClavePassword(RecuperarPasswordClaveRequest $request): JsonResponse
     {
-        $cuenta_id = $request->validated('cuenta_id');
-        $dto = ClaveDto::fromRequest($request->validated());
+        try {
+            $cuenta_id = $request->validated('cuenta_id');
+            $dto = ClaveDto::fromRequest($request->validated());
+    
+            $result = $this->authService->validarClaveRecuperacion($cuenta_id, $dto);
+    
+            return response()->json($result, 200);
 
-        $result = $this->authService->validarClaveRecuperacion($cuenta_id, $dto);
-
-        return response()->json($result, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al validar la clave de recuperación',
+            ], 500);
+        }
     }
 
     /**
@@ -311,16 +321,10 @@ class AuthController
                 ]
             ], 200);
 
-        } catch (ValidationException $e) {
-            // Token inválido o expirado hace mucho
-            throw $e;
-
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al refrescar token',
-                'error' => config('app.debug') 
-                    ? $e->getMessage() 
-                    : 'No se pudo refrescar el token'
+                'success' => false,
+                'message' => 'Error al refrescar token'
             ], 401); // 401 Unauthorized
         }
     }
@@ -361,11 +365,9 @@ class AuthController
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
+                'success' => false,
                 'message' => 'Error al obtener información del usuario',
-                'error' => config('app.debug')
-                    ? $e->getMessage()
-                    : 'error interno del servidor'
-            ]);
+            ], 500);
         }
     }
 }

@@ -69,27 +69,36 @@ class AuthService implements IAuthService
      */
     public function iniciarRegistro(RegisterDTO $dto): array
     {
-        $correoUsuario = $dto->email;
-        $passwordUsuario = $dto->password;
-        $inicioProceso =  $this->registroService->iniciarRegistro($correoUsuario, $passwordUsuario);
+        try{
+            $correoUsuario = $dto->email;
+            $passwordUsuario = $dto->password;
+            $inicioProceso =  $this->registroService->iniciarRegistro($correoUsuario, $passwordUsuario);
+    
+            if (!$inicioProceso['success']) {
+                throw ValidationException::withMessages([
+                    'inicio_registro' => [$inicioProceso['message']]
+                    
+                ]);
+            }
+    
+            $datosEncriptados = encrypt($dto->toArray());
+            
+            return [
+                'success' => $inicioProceso['success'],
+                'message' => $inicioProceso['message'],
+                'cuenta_id' => $inicioProceso['data']['cuenta_id'],
+                'expira_en' => $inicioProceso['data']['expira_en'],
+                'datosEncriptados' => $datosEncriptados,
+            ];
 
-        if (!$inicioProceso['success']) {
-            throw ValidationException::withMessages([
-                'inicio_registro' => [$inicioProceso['message']]
-                
+        } catch (Exception $e) {
+            Log::error('Error al iniciar el proceso de registro', [
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ]);
+            throw $e;
         }
-
-        $datosEncriptados = encrypt($dto->toArray());
-        
-        return [
-            'success' => $inicioProceso['success'],
-            'message' => $inicioProceso['message'],
-            'cuenta_id' => $inicioProceso['data']['cuenta_id'],
-            'expira_en' => $inicioProceso['data']['expira_en'],
-            'datosEncriptados' => $datosEncriptados,
-        ];
-        
     }
 
     /**
@@ -117,6 +126,11 @@ class AuthService implements IAuthService
            return $registroTerminado;
             
         } catch (Exception $e) {
+            Log::error('Error al completar el proceso de registro', [
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
+            ]);
             throw $e;
         }
     }
@@ -243,19 +257,29 @@ class AuthService implements IAuthService
      */
     public function inicioNuevaPassword(CorreoDto $dto): array
     {
-        $inicioProceso = $this->nuevaPasswordService->iniciarProceso($dto->email);
+        try {
+            $inicioProceso = $this->nuevaPasswordService->iniciarProceso($dto->email);
+    
+            if (!$inicioProceso['success']) {
+                throw ValidationException::withMessages([
+                    'error' => [$inicioProceso['message']]
+                ]);
+            }
+    
+            return [
+                'message' => $inicioProceso['message'],
+                'cuenta_id' => $inicioProceso['cuenta_id'],
+                'expira_en' => $inicioProceso['expira_en']
+            ];
 
-        if (!$inicioProceso['success']) {
-            throw ValidationException::withMessages([
-                'error' => [$inicioProceso['message']]
+        } catch (Exception $e) {
+            Log::error('Error al iniciar el proceso de recuperación de contraseña', [
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ]);
+            throw $e;
         }
-
-        return [
-            'message' => $inicioProceso['message'],
-            'cuenta_id' => $inicioProceso['cuenta_id'],
-            'expira_en' => $inicioProceso['expira_en']
-        ];
     }
 
     /**
@@ -266,20 +290,30 @@ class AuthService implements IAuthService
      */
     public function validarClaveRecuperacion(int $cuenta_id, ClaveDto $dto): array
     {
-        $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($cuenta_id, $dto->clave);
+        try {
+            $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($cuenta_id, $dto->clave);
+    
+            if(!$validarClave['success']) {
+                throw ValidationException::withMessages([
+                    'error' => [$validarClave['message']]
+                ]);
+            }
+    
+            return [
+                'success' => $validarClave['success'],
+                'message' => $validarClave['message'],
+                'cuenta_id' => $validarClave['cuenta_id'],
+                'clave_verificada' => $validarClave['clave_verificada']
+            ];
 
-        if(!$validarClave['success']) {
-            throw ValidationException::withMessages([
-                'error' => [$validarClave['message']]
+        } catch (Exception $e) {
+            Log::error('Error al validar la clave de recuperación', [
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ]);
+            throw $e;
         }
-
-        return [
-            'success' => $validarClave['success'],
-            'message' => $validarClave['message'],
-            'cuenta_id' => $validarClave['cuenta_id'],
-            'clave_verificada' => $validarClave['clave_verificada']
-        ];
     }
 
     /**
@@ -289,11 +323,21 @@ class AuthService implements IAuthService
      * @param NuevaContrasenaDto $dto - Nueva contraseña del usuario 
      * @return array{success: bool, message:string}
      */
-    public function nuevaPassword(int $cuenta_id, NuevaContrasenaDto $dto): array {
+    public function nuevaPassword(int $cuenta_id, NuevaContrasenaDto $dto): array 
+    {
+        try {
+            $resultado = $this->nuevaPasswordService->actualizarPassword($cuenta_id, $dto->password);
+    
+            return $resultado;
 
-        $resultado = $this->nuevaPasswordService->actualizarPassword($cuenta_id, $dto->password);
-
-        return $resultado;
+        } catch (Exception $e) {
+            Log::error('Error al actualizar la nueva contraseña', [
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
+            ]);
+            throw $e;
+        }
     }
 
     /**
@@ -425,9 +469,12 @@ class AuthService implements IAuthService
             ];
 
         } catch (JWTException $e) {
-            throw ValidationException::withMessages([
-                'token' => ['No se pudo refrescar el token'],
+            Log::error('Error al refrescar el token', [
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
             ]);
+            throw $e;
         }
     }
 
@@ -441,8 +488,17 @@ class AuthService implements IAuthService
      */
     public function getCurrentUser(Usuario $user): Usuario
     {
-        // Retornar el usuario 
-        return $user;
+        try {
+            return $user;
+
+        } catch (Exception $e) {
+            Log::error('Error al obtener información del usuario', [
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
+            ]);
+            throw $e;
+        }
     }
     
     /**

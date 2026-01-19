@@ -49,7 +49,7 @@ class UsuarioController
         } catch (\Exception $e) {
             return response()->json([
                 'status' => "Error",
-                'message' => $e->getMessage()
+                'message' => 'Error al bloquear el usuario. Intentalo más tarde',
             ], 422);
         }
     }
@@ -66,7 +66,7 @@ class UsuarioController
         } catch (\Exception $e) {
             return response()->json([
                 'status' => "Error",
-                'message' => $e->getMessage()
+                'message' => 'Error al desbloquear el usuario. Intentalo más tarde',
             ], 422);
         }
     }
@@ -81,13 +81,13 @@ class UsuarioController
         } catch (AuthorizationException $e) {
             return response()->json([
                 'status' => "Error",
-                'message' => $e->getMessage()
+                'message' => 'No tienes permiso para realizar esta acción.',
             ], 403);
 
         } catch (\Exception $e) {
             return response()->json([
                 'status' => "Error",
-                'message' => $e->getMessage()
+                'message' => 'Error al obtener la lista de usuarios bloqueados. Intentalo más tarde',
             ], 422);
         }
     }

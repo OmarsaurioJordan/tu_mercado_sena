@@ -80,6 +80,7 @@ class BloqueadoService implements IBloqueadoService
 
         } catch (\Exception $e) {
             Log::error('Error al bloquear usuario', [
+                'archivo' => $e->getFile(),
                 'bloqueador_id' => $dto->bloqueador_id,
                 'bloqueado_id' => $dto->bloqueado_id,
                 'error' => $e->getMessage(),

@@ -3,6 +3,7 @@
 namespace App\Contracts\Usuario\Services;
 
 use App\DTOs\Usuario\Bloqueados\InputDto;
+use App\DTOs\Usuario\Bloqueados\OutputDto;
 
 
 interface IBloqueadoService
@@ -17,7 +18,7 @@ interface IBloqueadoService
     /**
      * Realiza el desbloqueo de un usuario y retorna un array con el resultado.
      * @param InputDto $dto
-     * @return array
+     * @return array{'success': bool, 'message': string, 'data': array}
      */
     public function ejecutarDesbloqueo(InputDto $dto): array;
 
