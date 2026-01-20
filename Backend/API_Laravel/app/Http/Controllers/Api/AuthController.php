@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Translation\CatalogueMetadataAwareInterface;
 use Tymon\JWTAuth\JWTGuard;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Controlador de autenticación
@@ -101,9 +102,9 @@ class AuthController
             $dto = VerifyCode::fromArray($request->validated());
     
             $result = $this->authService->completarRegistro($datosEncriptados, $dto->clave, $cuenta_id, $dispositivo);
-    
+
             return response()->json([
-                'success' => $result['success'],
+                'success' => true,
                 'message' => 'Usuario registrado correctamente',
                 'user' => $result['data']['user'],
                 'token' => $result['data']['token'],
@@ -111,14 +112,11 @@ class AuthController
                 'expires_in' => $result['data']['expires_in'],
             ], 201);
 
-        } catch (ValidationException $e) {
-            throw $e;
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error al registrar el usuario',
-            ], 500);
+            ], 401);
         }
     }
 
