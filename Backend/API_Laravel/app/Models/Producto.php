@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Producto extends Model
 {
     protected $table = 'productos';
-    public $timestamps = false; // Laravel NO maneja timestamps
-
+    public $timestamps = false; 
+    
     protected $fillable = [
         'nombre',
         'subcategoria_id',
@@ -32,6 +32,25 @@ class Producto extends Model
         'fecha_registro' => 'datetime',
         'fecha_actualiza' => 'datetime',
     ];
+
+    protected $attributes = [
+        'fecha_actualiza' => '2000-01-01 00:00:00',
+    ];
+
+    /**
+     * Scope: productos de un vendedor específico
+     */
+    public function scopePorVendedor($query, int $vendedorId)
+    {
+        return $query->where('vendedor_id', $vendedorId);
+    }
+    /**
+     * Scope: productos activos
+     */
+    public function scopeActivos($query)
+    {
+        return $query->where('estado_id', 1);
+    }
 
     public function subcategoria()
     {

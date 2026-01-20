@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UsuarioController;
+use App\Http\Controllers\Api\ProductoController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,7 +50,6 @@ Route::prefix('auth')->group(function()  {
          * RUTA: /api/auth/recuperar-contrasena/validar-clave-recuperacion
          */
         Route::post('/validar-clave-recuperacion', [AuthController::class, 'validarClavePassword']);
-    
         /**
          * Endpoint que recibe la nueva contraseña del usuario y actualiza en la base 
          * De datos
@@ -82,13 +82,95 @@ Route::middleware('jwtVerify')->group(function (){
         Route::get('/me', [AuthController::class, 'me']);
     });
 
-        // === EDITAR PERFIL ===
+    // === EDITAR PERFIL ===
     Route::patch("/editar-perfil/{id}", [UsuarioController::class, 'update']);
 
-    // === BLOQUEADOS    ===
+    // === BLOQUEADOS ===
     Route::get('bloqueados', [UsuarioController::class, 'obtenerBloqueadosPorUsuario']);
     Route::post('bloqueados', [UsuarioController::class, 'bloquearUsuario']);
     Route::delete('bloqueados/{bloqueado_id}', [UsuarioController::class, 'desbloquearUsuario']);
+
+    // ========================================
+    // === PRODUCTOS (RUTAS PROTEGIDAS) ===
+    // ========================================
+    
+    Route::prefix('productos')->group(function () {
+        /**
+         * Buscar productos por texto en nombre o descripción
+         * 
+         * GET /api/productos/buscar?q=laptop&per_page=15
+         */
+        Route::get('/buscar', [ProductoController::class, 'buscar']);
+        
+        /**
+         * Obtener productos de un vendedor específico
+         * 
+         * GET /api/productos/vendedor/{vendedorId}
+         */
+        Route::get('/vendedor/{vendedorId}', [ProductoController::class, 'porVendedor']);
+        
+        /**
+         * Listar productos con filtros opcionales
+         * 
+         * GET /api/productos
+         * Query params: ?categoria_id=1&subcategoria_id=5&integridad_id=1&vendedor_id=10&per_page=15
+         */
+        Route::get('/', [ProductoController::class, 'index']);
+        
+        /**
+         * Obtener un producto específico por ID
+         * 
+         * GET /api/productos/{id}
+         */
+        Route::get('/{id}', [ProductoController::class, 'show']);
+
+        /**
+         * Crear un nuevo producto
+         * 
+         * POST /api/productos
+         * Body (form-data):
+         *   - nombre
+         *   - descripcion
+         *   - subcategoria_id
+         *   - integridad_id
+         *   - precio
+         *   - disponibles
+         *   - imagenes[] (opcional, máx 5)
+         */
+        Route::post('/', [ProductoController::class, 'store']);
+        
+        /**
+         * Actualizar un producto existente
+         * 
+         * PUT /api/productos/{id}
+         * PATCH /api/productos/{id}
+         * Body: igual que crear
+         */
+        Route::put('/{id}', [ProductoController::class, 'update']);
+        Route::patch('/{id}', [ProductoController::class, 'update']);
+        
+        /**
+         * Eliminar un producto
+         * 
+         * DELETE /api/productos/{id}
+         */
+        Route::delete('/{id}', [ProductoController::class, 'destroy']);
+        
+        /**
+         * Cambiar el estado de un producto
+         * 
+         * PATCH /api/productos/{id}/estado
+         * Body: { "estado_id": 1 }  // 1=activo, 2=invisible, 3=eliminado
+         */
+        Route::patch('/{id}/estado', [ProductoController::class, 'cambiarEstado']);
+    });
+
+    /**
+     * Obtener los productos del usuario autenticado
+     * 
+     * GET /api/mis-productos
+     */
+    Route::get('/mis-productos', [ProductoController::class, 'misProductos']);
 
 });
 

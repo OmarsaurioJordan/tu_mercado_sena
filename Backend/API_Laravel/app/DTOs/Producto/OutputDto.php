@@ -81,8 +81,9 @@ readonly class OutputDto implements Arrayable
             descripcion: $producto->descripcion,
             precio: $producto->precio,
             disponibles: $producto->disponibles,
-            fecha_registro: $producto->fecha_registro->format('Y-m-d H:i:s'),
-            fecha_actualiza: $producto->fecha_actualiza->format('Y-m-d H:i:s'),
+            //OPERADOR NULLSAFE ?-> - Evita errores si la fecha es null
+            fecha_registro: $producto->fecha_registro?->format('Y-m-d H:i:s') ?? now()->format('Y-m-d H:i:s'),
+            fecha_actualiza: $producto->fecha_actualiza?->format('Y-m-d H:i:s') ?? '2000-01-01 00:00:00',
             vendedor: $producto->relationLoaded('vendedor') && $producto->vendedor ? [
                 'id' => $producto->vendedor->id,
                 'nickname' => $producto->vendedor->nickname,
@@ -111,7 +112,8 @@ readonly class OutputDto implements Arrayable
                 $producto->fotos->map(fn($foto) => [
                     'id' => $foto->id,
                     'url' => asset("storage/productos/{$foto->imagen}"),
-                    'actualiza' => $foto->actualiza->format('Y-m-d H:i:s'),
+                   
+                    'actualiza' => $foto->actualiza?->format('Y-m-d H:i:s') ?? now()->format('Y-m-d H:i:s'),
                 ])->toArray() 
             : null,
         );

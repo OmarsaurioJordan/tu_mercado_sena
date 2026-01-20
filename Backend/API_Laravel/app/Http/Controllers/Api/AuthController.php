@@ -103,7 +103,7 @@ class AuthController
             $result = $this->authService->completarRegistro($datosEncriptados, $dto->clave, $cuenta_id, $dispositivo);
     
             return response()->json([
-                'success' => $result['success'],
+                'success' => true,
                 'message' => 'Usuario registrado correctamente',
                 'user' => $result['data']['user'],
                 'token' => $result['data']['token'],

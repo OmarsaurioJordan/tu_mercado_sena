@@ -157,6 +157,8 @@ return [
         App\Providers\Auth\ServicesProviders::class,
         App\Providers\Usuario\RepositoriesProviders::class,
         App\Providers\Usuario\ServicesProviders::class,
+        App\Providers\Producto\RepositoriesProviders::class,
+        App\Providers\Producto\ServicesProviders::class,
     ],
 
     
