@@ -8,8 +8,6 @@ use App\DTOs\Usuario\Bloqueados\InputDto;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use App\Contracts\Usuario\Repositories\IBloqueadoRepository;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 
 class BloqueadoService implements IBloqueadoService
