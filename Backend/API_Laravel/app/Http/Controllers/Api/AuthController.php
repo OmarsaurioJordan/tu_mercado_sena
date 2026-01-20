@@ -118,7 +118,7 @@ class AuthController
             return response()->json([
                 'success' => false,
                 'message' => 'Error al registrar el usuario',
-            ], 500);
+            ], 401);
         }
     }
 
