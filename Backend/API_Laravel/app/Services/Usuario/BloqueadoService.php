@@ -26,27 +26,37 @@ class BloqueadoService implements IBloqueadoService
      */
     public function solicitarBloqueadosPorUsuario(int $bloqueador_id): array
     {
-        # Log de seguimiento
-        Log::info('Obteniendo lista de usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
+        try{
+            # Log de seguimiento
+            Log::info('Obteniendo lista de usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
+    
+            # Llamar al repositorio para obtener los resultados desde la base de datos
+            $bloqueados = $this->bloqueadoRepository->obtenerBloqueadosPorUsuario($bloqueador_id);
+    
+            # Validar si la colección esta vacía
+            if ($bloqueados->isEmpty()) {
+                Log::info('El usuario no tiene usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
+                return [
+                    'true' => true,
+                    'message' => 'No tienes usuarios bloqueados.',
+                    'data' => []
+                ];
+            }
 
-        # Llamar al repositorio para obtener los resultados desde la base de datos
-        $bloqueados = $this->bloqueadoRepository->obtenerBloqueadosPorUsuario($bloqueador_id);
-
-        # Validar si la colección esta vacía
-        if ($bloqueados->isEmpty()) {
-            Log::info('El usuario no tiene usuarios bloqueados', ['bloqueadorId' => $bloqueador_id]);
             return [
-                'true' => true,
-                'message' => 'No tienes usuarios bloqueados.',
-                'data' => []
+                'success' => true,
+                'message' => 'Usuarios bloqueados',
+                'data' => OutputDto::fromModelCollection($bloqueados)
             ];
-        }
 
-        return [
-            'success' => true,
-            'message' => 'Usuarios bloqueados',
-            'data' => OutputDto::fromModelCollection($bloqueados)
-        ];
+        }catch (\Exception $e) {
+            Log::error('Error al obtener usuarios bloqueados', [
+                'bloqueadorId' => $bloqueador_id,
+                'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+            ]);
+            throw $e;
+        }
     }
 
     public function ejecutarBloqueo(InputDto $dto): array
@@ -57,7 +67,10 @@ class BloqueadoService implements IBloqueadoService
             // Verificar que el usuario no esté ya bloqueado
             $estaBloqueado = $this->bloqueadoRepository->estaBloqueado($dto->bloqueador_id, $dto->bloqueado_id);
             if ($estaBloqueado) {
-                throw new \Exception('El usuario ya está bloqueado.');
+                return [
+                    'success' => false,
+                    'message' => 'El usuario ya está bloqueado.'
+                ];
             }
             
             # Realizar una transacción para el bloqueo y así evitar inconsistencias
@@ -97,7 +110,10 @@ class BloqueadoService implements IBloqueadoService
             // Lógica para desbloquear al usuario
             $estaBloqueado = $this->bloqueadoRepository->estaBloqueado($dto->bloqueador_id, $dto->bloqueado_id);
             if (!$estaBloqueado) {
-                throw new \Exception('El usuario no está bloqueado.');
+                return [
+                    'success' => false,
+                    'message' => 'El usuario no está bloqueado.'
+                ];
             }
 
             return DB::transaction(function () use ($dto) {
@@ -121,6 +137,7 @@ class BloqueadoService implements IBloqueadoService
                 'bloqueador_id' => $dto->bloqueador_id,
                 'bloqueado_id' => $dto->bloqueado_id,
                 'error' => $e->getMessage(),
+                'archivo' => $e->getFile(),
             ]);
             throw $e;
         }
