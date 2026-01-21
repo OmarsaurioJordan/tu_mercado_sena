@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,61 +29,67 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Throwable $e, $request) {
-                if ($request->is('api/*')) {
+            if ($request->is('api/*')) {
 
-                    // 1. Si la excepción sabe cómo renderizarse a sí misma, la delegamos.
-                    if (method_exists($e, 'render')) {
-                        /** @var mixed $e */                        
-                        return $e->render($request);
-                    }
-
-                    // 2. Manejo especial para errores de validación.
-                    if ($e instanceof \Illuminate\Validation\ValidationException) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'Error de validación.',
-                            'errors' => $e->errors(), // Esto devuelve los campos fallidos
-                        ], 422);
-                    }
-
-                    // 3. Responder con JSON según el tipo de excepción.
-                    if ($e instanceof NotFoundHttpException) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'Recurso no encontrado.',
-                        ], 404);
-                    }
-                    
-                    // 4. Mapear otras excepciones a códigos HTTP.
-                    $code = match(true) {
-                        $e instanceof AuthorizationException => 403,
-                        $e instanceof ModelNotFoundException => 404,
-                        $e instanceof ValidationException => 422,
-                        $e instanceof JWTException => 401,
-                        $e instanceof BusinessException => $e->getCode(),
-                        default => 500,
-                    };
-
-                    // 5. Loguear errores de servidor (5xx).
-                    if ($code >= 500) {
-                        Log::error('Error de servidor en la aplicación', [
-                            'message' => $e->getMessage(),
-                            'file' => $e->getFile(),
-                            'line' => $e->getLine(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-                    }
-
-                    // 6. Respuesta genérica para otras excepciones.
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => ($code < 500 || config('app.debug')) 
-                             ? $e->getMessage() 
-                             : 'Ocurrió un error inesperado en el servidor.',
-                    ], $code);
+                // 1. Delegar si la excepción tiene su propio método render (como BusinessException)
+                if (method_exists($e, 'render')) {
+                    /** @var mixed $e */
+                    return $e->render($request);
                 }
-            });
-    })
-    ->create();
+
+                // 2. Errores de Validación (FormRequests)
+                if ($e instanceof ValidationException) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'Los datos proporcionados no son válidos.',
+                        'errors'  => $e->errors(),
+                    ], 422);
+                }
+
+                // 3. Personalización detallada de mensajes de JWT
+                // Esto ayuda mucho al Frontend para saber si redirigir al Login o refrescar
+                $message = $e->getMessage();
+                $code = 500;
+
+                if ($e instanceof TokenExpiredException) {
+                    $message = 'El token ha expirado. Por favor, refresca tu sesión.';
+                    $code = 401;
+                } elseif ($e instanceof TokenInvalidException) {
+                    $message = 'El token proporcionado es inválido.';
+                    $code = 401;
+                } elseif ($e instanceof JWTException) {
+                    $message = 'Error de autenticación: ' . ($e->getMessage() ?: 'Token no proporcionado.');
+                    $code = 401;
+                } 
+                // 4. Mapeo de otras excepciones comunes
+                else {
+                    $code = match(true) {
+                        $e instanceof ModelNotFoundException,
+                        $e instanceof NotFoundHttpException => 404,
+                        $e instanceof \Illuminate\Auth\Access\AuthorizationException => 403,
+                        default => ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException ? $e->getStatusCode() : 500),
+                    };
+                    
+                    $message = ($code < 500 || config('app.debug')) 
+                                ? $e->getMessage() 
+                                : 'Ocurrió un error inesperado en el servidor.';
+                }
+
+                // 5. Logging para errores críticos (>= 500)
+                if ($code >= 500) {
+                    Log::error('API Error Critico', [
+                        'class' => get_class($e),
+                        'message' => $e->getMessage(),
+                        'url' => $request->fullUrl(),
+                    ]);
+                }
+
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => $message,
+                ], $code);
+            }
+        });
+    })->create();
 
 return $app;
