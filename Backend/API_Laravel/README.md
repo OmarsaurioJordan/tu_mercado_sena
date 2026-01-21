@@ -592,9 +592,218 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados/{bloqueado_id}**
 }
 ```
 
+**Modulo productos**
 
 
+**1️⃣ Listar productos**
 
+Método: *GET*
+
+Ruta: **http://127.0.0.1:8000/api/productos**
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "nombre": "Laptop HP",
+      "descripcion": "Laptop con 16GB de RAM",
+      "precio": 2500000,
+      "disponibles": 5
+    }
+  ]
+}
+```
+
+**2️⃣ Buscar productos**
+
+Método: *GET*
+
+Ruta: **http://127.0.0.1:8000/api/productos/buscar**
+
+Ejemplo de uso: ***http://127.0.0.1:8000/api/productos/buscar/?q=laptop**
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "data": [
+    {
+      "id": 2,
+      "nombre": "Laptop Lenovo",
+      "precio": 2100000
+    }
+  ]
+}
+
+```
+**3️⃣ Obtener producto por ID**
+
+Método: *GET*
+
+Ruta: **http://127.0.0.1:8000/api/productos/{id}**
+
+Ejemplo de uso: ***http://127.0.0.1:8000/api/productos/buscar/?q=laptop**
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nombre": "Monitor LG",
+    "descripcion": "Monitor 24 pulgadas",
+    "precio": 800000,
+    "disponibles": 3
+  }
+}
+```
+
+**4️⃣ Obtener productos de un vendedor**
+
+Método: *GET*
+
+Ruta: **http://127.0.0.1:8000/api/productos/vendedor/{vendedorId}**
+
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "data": [
+    {
+      "id": 3,
+      "nombre": "Teclado Mecánico",
+      "precio": 180000
+    }
+  ]
+}
+```
+
+**5️⃣ Crear producto**
+
+Método: *POST*
+
+Ruta: **http://127.0.0.1:8000/api/productos**
+
+**Ejemplo de uso: **
+
+```JSON
+{
+  "nombre": "Mouse Gamer",
+  "descripcion": "Mouse RGB con 7 botones",
+  "subcategoria_id": 4,
+  "integridad_id": 1,
+  "precio": 120000,
+  "disponibles": 10
+}
+```
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "message": "Producto creado correctamente"
+}
+
+```
+
+**6️⃣ Actualizar producto**
+
+Método: *PUT o PATCH*
+
+Ruta: **http://127.0.0.1:8000/api/productos/{id}**
+
+**Ejemplo de uso: **
+
+```JSON
+{
+  "precio": 100000,
+  "disponibles": 8
+}
+
+```
+**⚠️Nota:** Se pueden eviar uno o varios campos, solo se actualizarán los enviados.
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "message": "Producto actualizado correctamente"
+}
+
+```
+
+**7️⃣ Eliminar producto**
+
+Método: **DELETE**
+
+Ruta: **http://127.0.0.1:8000/api/productos/{id}**
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "message": "Producto eliminado correctamente"
+}
+
+```
+
+**8️⃣ Cambiar estado del producto**
+
+Método: *PATCH*
+
+Ruta: **http://127.0.0.1:8000/api/productos/{id}/estado**
+
+**Ejemplo de uso: **
+
+```JSON
+{
+  "estado_id": 2
+}
+
+```
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "message": "Estado del producto actualizado"
+}
+
+```
+
+**9️⃣ Obtener mis productos**
+
+Método: **GET**
+
+Ruta: **http://127.0.0.1:8000/api/mis-productos**
+
+**Respuesta**
+
+```JSON
+{
+  "success": true,
+  "data": [
+    {
+      "id": 5,
+      "nombre": "Audífonos Bluetooth",
+      "precio": 150000
+    }
+  ]
+}
+
+```
 
 Código	Significado
 200	Operación exitosa
