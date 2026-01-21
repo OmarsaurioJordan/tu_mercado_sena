@@ -17,10 +17,7 @@ use App\Http\Requests\Auth\RecuperarPasswordCorreoRequest;
 use App\Http\Requests\Auth\RecuperarPasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\Translation\CatalogueMetadataAwareInterface;
 use Tymon\JWTAuth\JWTGuard;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Controlador de autenticación
@@ -64,25 +61,16 @@ class AuthController
      */
     public function iniciarRegistro(RegisterRequest $request): JsonResponse
     {
-        try {
-            $dto = RegisterDTO::fromRequest($request->validated());
+        $dto = RegisterDTO::fromRequest($request->validated());
 
-            $result = $this->authService->iniciarRegistro($dto);
+        // El "camino feliz" es lo único que importa aquí
+        $result = $this->authService->iniciarRegistro($dto);
 
-            return response()->json([
-                'success' => $result['success'],
-                'message' => $result['message'],
-                'cuenta_id' => $result['cuenta_id'],
-                'expira_en' => $result['expira_en'],
-                'datosEncriptados' => $result['datosEncriptados']
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al iniciar el proceso de registro',
-            ], 500);
-        }
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Se envió el código de verificación a tu correo.',
+            'data'    => $result
+        ], 200);
     }
 
     /**
@@ -95,30 +83,23 @@ class AuthController
      */
     public function register(CodigoVerificacionRequest $request): JsonResponse
     {
-        try {
-            $datosEncriptados = $request->validated()['datosEncriptados'];
-            $cuenta_id = $request->validated()['cuenta_id'];
-            $dispositivo = $request->validated()['device_name'];
-            $dto = VerifyCode::fromArray($request->validated());
-    
-            $result = $this->authService->completarRegistro($datosEncriptados, $dto->clave, $cuenta_id, $dispositivo);
+        $validados = $request->validated();
+        $dto = VerifyCode::fromArray($validados);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Usuario registrado correctamente',
-                'user' => $result['data']['user'],
-                'token' => $result['data']['token'],
-                'token_type' => $result['data']['token_type'],
-                'expires_in' => $result['data']['expires_in'],
-            ], 201);
+        $result = $this->authService->completarRegistro(
+            $validados['datosEncriptados'], 
+            $dto->clave, 
+            $validados['cuenta_id'], 
+            $validados['device_name']
+        );
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al registrar el usuario',
-            ], 401);
-        }
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Usuario registrado correctamente',
+            'data'    => $result
+        ], 201);
     }
+    
 
     /**
      * Iniciar sesión
@@ -130,35 +111,23 @@ class AuthController
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        try {
-            // Crear el DTO desde los datos validades
-            $dto = LoginDTO::fromRequest($request->validated());
+        // El DTO se encarga de la estructura
+        $dto = LoginDTO::fromRequest($request->validated());
 
-            // Llamar al servicio para autenticar los datos
-            // Si las credenciales son incorrectas, lanzar un ValidationException
-            $result = $this->authService->login($dto);
+        // El servicio se encarga de la lógica y las excepciones
+        $result = $this->authService->login($dto);
 
-            // Retornar JSON
-            return response()->json([
-                'success' => $result['success'],
-                'message' => 'Inicio de sesión exitoso',
-                'data' => [
-                    'user' => $result['user'],
-                    'token' => $result['token'],
-                    'token_type' => 'bearer',
-                    'expires_in' => $result['expires_in']
-                ]
-            ], 200);
-        } catch (ValidationException $e){
-            throw $e;
-
-        } catch (\Exception $e){
-            // Error inesperado
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al iniciar sesión',
-            ], 500);
-        }
+        // El controlador solo se encarga de la respuesta exitosa
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Inicio de sesión exitoso',
+            'data' => [
+                'user'       => $result['user'],
+                'token'      => $result['token'],
+                'token_type' => 'bearer',
+                'expires_in' => $result['expires_in']
+            ]
+        ], 200);
     }
 
     /**
@@ -181,28 +150,17 @@ class AuthController
      */
     public function logout(Request $request): JsonResponse
     {
-        try {
-            // Verificar si el usaurio quiere cerrar sesión en todos los dispositivos
-            $allDevices = $request->input('all_devices', false);
+        $allDevices = $request->boolean('all_devices');
 
-            // Llamar al servicio para invalidar el tokens
-            $this->authService->logout($allDevices);
+        // Ejecutamos la lógica (si falla algo, el Handler Global responde por nosotros)
+        $this->authService->logout($allDevices);
 
-            // Retornar confirmación
-            $message = $allDevices 
-                ? 'Sesión cerrada en todos los dispositivos'
-                : 'Sesión cerrada exitosamente';
-            
-            return response()->json([
-                'message' => $message,
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al cerrar sesión',
-            ], 500);
-        }
+        return response()->json([
+            'status'  => 'success',
+            'message' => $allDevices 
+                ? 'Sesión cerrada en todos los dispositivos.' 
+                : 'Sesión cerrada exitosamente.',
+        ], 200);
     }
 
     /**
@@ -215,19 +173,14 @@ class AuthController
      */
     public function iniciarProcesoPassword(RecuperarPasswordCorreoRequest $request): JsonResponse
     {
-        try{
-            $dto = CorreoDto::fromRequest($request->validated());
-    
-            $result = $this->authService->inicioNuevaPassword($dto);
-    
-            return response()->json($result, 200);
+        $dto = CorreoDto::fromRequest($request->validated());
+        $resultado = $this->authService->inicioNuevaPassword($dto);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al iniciar el proceso de recuperación de contraseña',
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Código de recuperación enviado al correo.',
+            'data' => $resultado
+        ], 200);
     }
 
     /**
@@ -240,20 +193,15 @@ class AuthController
      */
     public function validarClavePassword(RecuperarPasswordClaveRequest $request): JsonResponse
     {
-        try {
-            $cuenta_id = $request->validated('cuenta_id');
-            $dto = ClaveDto::fromRequest($request->validated());
-    
-            $result = $this->authService->validarClaveRecuperacion($cuenta_id, $dto);
-    
-            return response()->json($result, 200);
+        $cuenta_id = $request->validated('cuenta_id');
+        $dto = ClaveDto::fromRequest($request->validated());
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al validar la clave de recuperación',
-            ], 500);
-        }
+        $this->authService->validarClaveRecuperacion($cuenta_id, $dto);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Clave de recuperación validada correctamente.'
+        ], 200);
     }
 
     /**
@@ -264,17 +212,17 @@ class AuthController
      * @param RecuperarPasswordRequest $request
      * @return JsonResponse
      */
-    public function reestablecerPassword(RecuperarPasswordRequest $request): JsonResponse {
+    public function reestablecerPassword(RecuperarPasswordRequest $request): JsonResponse 
+    {
         $cuenta_id = $request->validated('cuenta_id');
         $dto = NuevaContrasenaDto::fromRequest($request->validated());
 
-        $result = $this->authService->nuevaPassword($cuenta_id, $dto);
+        $this->authService->nuevaPassword($cuenta_id, $dto);
 
-        if(!$result['success']) {
-            return response()->json($result['message'], 500);
-        }
-
-        return response()->json($result, 201);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Contraseña restablecida correctamente.'
+        ], 200);
     }
 
     /**
@@ -305,26 +253,13 @@ class AuthController
      */
     public function refresh(): JsonResponse
     {
-        try {
-            // Llamar al servicio para refrescar el token
-            // Internamente usa JWTAuth::refresh()
-            $result = $this->authService->refresh();
+        $result = $this->authService->refresh();
 
-            return response()->json([
-                'message' => 'Token refrescado exitosamente',
-                'data' => [
-                    'token' => $result['token'], // Nuevo token JWT
-                    'token_type' => $result['token_type'], // "bearer"
-                    'expires_in' => $result['expires_in'], // segundos
-                ]
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al refrescar token'
-            ], 401); // 401 Unauthorized
-        }
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Token refrescado exitosamente',
+            'data'    => $result
+        ], 200);
     }
 
     /**

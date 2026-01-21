@@ -20,7 +20,7 @@ interface IRegistroService
      * @param string $clave
      * @return array{success: bool, message: string, data: array|null}
      */
-    public function verificarClave(string $correoExistente, string $clave): array;
+    public function verificarClave(string $correoExistente, string $clave): bool;
 
     /**
      * Terminar el proceso de registro priorizando las transacciones para que no haya datos volando

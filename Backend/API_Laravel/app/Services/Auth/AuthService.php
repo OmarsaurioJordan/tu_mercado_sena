@@ -7,8 +7,6 @@ use App\DTOs\Auth\Registro\RegisterDTO;
 use App\DTOs\Auth\LoginDTO;
 use App\Models\Usuario;
 use App\Contracts\Auth\Repositories\ICuentaRepository;
-
-;
 use App\Contracts\Auth\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -70,27 +68,14 @@ class AuthService implements IAuthService
      */
     public function iniciarRegistro(RegisterDTO $dto): array
     {
-        try{
-            $correoUsuario = $dto->email;
-            $passwordUsuario = $dto->password;
-            $inicioProceso =  $this->registroService->iniciarRegistro($correoUsuario, $passwordUsuario);
-    
-            $datosEncriptados = encrypt($dto->toArray());
-            
-            return [
-                'cuenta_id' => $inicioProceso['data']['cuenta_id'],
-                'expira_en' => $inicioProceso['data']['expira_en'],
-                'datosEncriptados' => $datosEncriptados,
-            ];
+        // Llamada directa: si falla, la excepción sube sola
+        $inicioProceso = $this->registroService->iniciarRegistro($dto->email, $dto->password);
 
-        } catch (Exception $e) {
-            Log::error('Error al iniciar el proceso de registro', [
-                'error' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
-            ]);
-            throw $e;
-        }
+        return [
+            'cuenta_id'        => $inicioProceso['cuenta_id'],
+            'expira_en'        => $inicioProceso['expira_en'],
+            'datosEncriptados' => encrypt($dto->toArray()),
+        ];
     }
 
     /**
@@ -99,33 +84,12 @@ class AuthService implements IAuthService
      * @param string $clave - Código que le llega al usuario a su correo
      * @param int $cuenta_id - ID de la cuenta que recibe el usuario en la respuesta JSON anterior
      * @param string $dispositivo - Dispositivo de donde ingreso el usuario
-     * @return array{status: bool, data: array{user:Usuario, token: string, token_type: string, expires_in: int}}
+     * @return array{user:Usuario, token: string, token_type: string, expires_in: int}
      */
-    public function completarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array
-    {
-        try {
-            $registroTerminado = $this->registroService->terminarRegistro($datosEncriptados, $clave, $cuenta_id, $dispositivo);
-
-            if (!$registroTerminado) {
-                Log::error('Error en el Registro del usuario', [
-                    'cuenta_id' => $cuenta_id,
-                    'dispositivo' => $dispositivo,
-                    'Archivo' => 'RegistroService.php'
-                ]);
-                throw new BusinessException('Error al registrar usuario', 401);
-            }
-
-           return $registroTerminado;
-            
-        } catch (Exception $e) {
-            Log::error('Error al completar el proceso de registro', [
-                'error' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
-            ]);
-            throw $e;
+        public function completarRegistro(string $datos, string $clave, int $id, string $dev): array
+        {
+            return $this->registroService->terminarRegistro($datos, $clave, $id, $dev);
         }
-    }
 
     /**
      * Inicio de sesión
@@ -146,91 +110,55 @@ class AuthService implements IAuthService
      */
     public function login(LoginDTO $dto): array
     {
-        try{
-            Log::info('Inicio del proceso Login', [
-                'email' => $dto->email
-            ]);
+        // 1. Buscar cuenta y validar credenciales
+        $cuenta = $this->cuentaRepository->findByCorreo($dto->email);
 
-            $cuentaRegistrada = $this->cuentaRepository->findByCorreo($dto->email);
-
-            if(!$cuentaRegistrada) {
-                Log::warning('Correo no encontrado en la base de datos', [
-                    'correo' => $dto->email
-                ]);
-
-                throw new ValidationException('Correo o contraseña incorrectos', 401);
-            }
-    
-            // Válidar si la contraseña es correcta
-            // Hash::check() compara la contraseña en texto plano con el hash almacenado
-            // Si no coincide, lanzamos excepción con el mismo mensaje genérico
-            if (!Hash::check($dto->password, $cuentaRegistrada->password)) {
-                Log::warning('Contraseña Incorrecta', [
-                    'password' => null
-                ]);
-
-                throw new ValidationException('Correo o contraseña incorrectos', 401);
-            }
-            
-            $user = $this->userRepository->findByIdCuenta($cuentaRegistrada->id);
-            // Válidar que el usuario este activo
-            // estado_id: 1 = activo, 2 = invisible, 3 = eliminado
-            if ($user->estado_id === 3) {
-                throw new ValidationException('Tu cuenta ha sido eliminada. Contacta al soporte para más información.', 403);
-            }
-    
-            // Si el un usuario prosumer intenta entrar a desktop (Unico del admin y master)
-            // Lanzar una excepción
-            if ($user->rol_id === 1 && $dto->device_name === 'desktop'){
-                throw new ValidationException('Acceso denegado desde escritorio para usuarios prosumer.', 403);
-            }
-            
-            // Crear un nuevo token
-            $token = $this->jwt->fromUser($cuentaRegistrada);
-            $this->jwt->setToken($token); 
-            $payload = $this->jwt->getPayload();
-            $jti = $payload->get('jti');
-            $expiresIn = $this->jwt->factory()->getTTL() * 60;
-            
-            return DB::transaction(function () use ($cuentaRegistrada, $dto, $jti, $user, $token, $expiresIn) {
-
-                DB::table('tokens_de_sesion')
-                    ->where('cuenta_id', $cuentaRegistrada->id)
-                    ->where('dispositivo', $dto->device_name)
-                    ->delete();
-
-                DB::table('tokens_de_sesion')->insert([
-                    'cuenta_id'   => $cuentaRegistrada->id,
-                    'dispositivo' => $dto->device_name,
-                    'jti'         => $jti,
-                    'ultimo_uso'  => Carbon::now()
-                ]);
-
-                DB::table('usuarios')
-                    ->where('id', $cuentaRegistrada->id)
-                    ->update([
-                        'fecha_reciente' => Carbon::now()
-                    ]);
-
-                // 3. Return anidado (resultado final del servicio)
-                return [
-                    'success' => true,
-                    'user' => $user,
-                    'token' => $token,
-                    'token_type' => 'bearer',
-                    'expires_in' => $expiresIn,
-                ];
-            });
-
-        } catch (Exception $e) {
-            Log::error('Error al loguearse', [
-                'error' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
-            ]);
-
-            throw $e;
+        if (!$cuenta || !Hash::check($dto->password, $cuenta->password)) {
+            // Usamos BusinessException para que el Handler la capture con el código 401
+            throw new BusinessException('Correo o contraseña incorrectos.', 401);
         }
+
+        // 2. Obtener perfil de usuario y validar estados/roles
+        $user = $this->userRepository->findByIdCuenta($cuenta->id);
+
+        if ($user->estado_id === 3) {
+            throw new BusinessException('Tu cuenta ha sido eliminada. Contacta al soporte.', 403);
+        }
+
+        if ($user->rol_id === 1 && $dto->device_name === 'desktop') {
+            throw new BusinessException('Acceso denegado desde escritorio para este rol.', 403);
+        }
+
+        // 3. Generar JWT y persistir sesión en una sola transacción
+        return DB::transaction(function () use ($cuenta, $user, $dto) {
+            
+            $token = $this->jwt->fromUser($cuenta);
+            $payload = $this->jwt->setToken($token)->getPayload();
+            
+            // Limpiar tokens anteriores en el mismo dispositivo e insertar el nuevo
+            DB::table('tokens_de_sesion')
+                ->where('cuenta_id', $cuenta->id)
+                ->where('dispositivo', $dto->device_name)
+                ->delete();
+
+            DB::table('tokens_de_sesion')->insert([
+                'cuenta_id'   => $cuenta->id,
+                'dispositivo' => $dto->device_name,
+                'jti'         => $payload->get('jti'),
+                'ultimo_uso'  => now()
+            ]);
+
+            // Actualizar fecha de actividad reciente
+            DB::table('usuarios')
+                ->where('id', $cuenta->id)
+                ->update(['fecha_reciente' => Carbon::now()]);
+
+            return [
+                'user'       => $user,
+                'token'      => $token,
+                'expires_in' => $this->jwt->factory()->getTTL() * 60
+            ];
+        });
     }
 
     /**
@@ -241,63 +169,12 @@ class AuthService implements IAuthService
      */
     public function inicioNuevaPassword(CorreoDto $dto): array
     {
-        try {
-            $inicioProceso = $this->nuevaPasswordService->iniciarProceso($dto->email);
-    
-            if (!$inicioProceso['success']) {
-                throw ValidationException::withMessages([
-                    'error' => [$inicioProceso['message']]
-                ]);
-            }
-    
-            return [
-                'message' => $inicioProceso['message'],
-                'cuenta_id' => $inicioProceso['cuenta_id'],
-                'expira_en' => $inicioProceso['expira_en']
-            ];
-
-        } catch (Exception $e) {
-            Log::error('Error al iniciar el proceso de recuperación de contraseña', [
-                'error' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
-            ]);
-            throw $e;
-        }
+       return $this->nuevaPasswordService->iniciarProceso($dto->email);
     }
 
-    /**
-     * Validar el código de recuperación del usuario
-     * @param int $id_cuenta - Id del correo para válidar que la clave de la BD corresponda a la ingresada por el usuario
-     * @param ClaveDto $dto - Clave que ingresa el usuario
-     * @return array{success: bool, message:string, id_usuario: int, clave_verificada: bool}
-     */
-    public function validarClaveRecuperacion(int $cuenta_id, ClaveDto $dto): array
+    public function validarClaveRecuperacion(int $cuenta_id, ClaveDto $dto): bool
     {
-        try {
-            $validarClave = $this->nuevaPasswordService->verificarClaveContrasena($cuenta_id, $dto->clave);
-    
-            if(!$validarClave['success']) {
-                throw ValidationException::withMessages([
-                    'error' => [$validarClave['message']]
-                ]);
-            }
-    
-            return [
-                'success' => $validarClave['success'],
-                'message' => $validarClave['message'],
-                'cuenta_id' => $validarClave['cuenta_id'],
-                'clave_verificada' => $validarClave['clave_verificada']
-            ];
-
-        } catch (Exception $e) {
-            Log::error('Error al validar la clave de recuperación', [
-                'error' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
-            ]);
-            throw $e;
-        }
+        return $this->nuevaPasswordService->verificarClaveContrasena($cuenta_id, $dto->clave);
     }
 
     /**
@@ -305,23 +182,11 @@ class AuthService implements IAuthService
      * 
      * @param int $cuenta_id - Id de la cuenta a cambiar la contraseña
      * @param NuevaContrasenaDto $dto - Nueva contraseña del usuario 
-     * @return array{success: bool, message:string}
+     * @return bool
      */
-    public function nuevaPassword(int $cuenta_id, NuevaContrasenaDto $dto): array 
+    public function nuevaPassword(int $cuenta_id, NuevaContrasenaDto $dto): bool 
     {
-        try {
-            $resultado = $this->nuevaPasswordService->actualizarPassword($cuenta_id, $dto->password);
-    
-            return $resultado;
-
-        } catch (Exception $e) {
-            Log::error('Error al actualizar la nueva contraseña', [
-                'error' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
-            ]);
-            throw $e;
-        }
+        return $this->nuevaPasswordService->actualizarPassword($cuenta_id, $dto->password);
     }
 
     /**
@@ -336,66 +201,25 @@ class AuthService implements IAuthService
      * @param bool $allDevices - true, cierra sesión en todos los dispositivos
      * @return bool - true si se cerro correctamente
      */
-    public function logout(bool $allDevice = false): array
+    public function logout(bool $allDevices = false): void
     {
-        try{
-            $token = $this->jwt->getToken();
+        // 1. Obtener datos del token actual
+        // Si el token es inválido, getPayload() lanzará una excepción que el Handler capturará.
+        $payload = $this->jwt->getPayload();
+        $jti = $payload->get('jti');
+        $cuentaId = $payload->get('sub');
 
-            if (!$token) {
-                return [
-                    'status' => false,
-                    'message' => 'No hay token activo'
-                ];
-            }
+        // 2. Limpieza de base de datos
+        DB::transaction(fn() => 
+            DB::table('tokens_de_sesion')
+                ->where('cuenta_id', $cuentaId)
+                ->when(!$allDevices, fn($query) => $query->where('jti', $jti))
+                ->delete()
+        );
 
-            try {
-                $this->jwt->setToken($token); 
-                $payload = $this->jwt->getPayload();
-                $jti = $payload->get('jti');
-                $cuenta_id = $payload->get('sub');
-            
-            } catch (Exception $e) {
-                // Logs para debbugin
-                Log::warning('Token Inválido o expirado',[
-                    'archivo' => $e->getFile(),
-                    'linea' => $e->getLine()
-                ]);
-
-                return [
-                    'status' => false,
-                    'message' => 'Token Inválido o expirado'
-                ];
-            }
-
-            DB::beginTransaction();
-
-            if ($allDevice) {
-                $revokedCount = DB::table('tokens_de_sesion')
-                    ->where('cuenta_id', $cuenta_id)
-                    ->delete();
-            } else {
-                $revokedCount = DB::table('tokens_de_sesion')
-                    ->where('jti', $jti)
-                    ->delete();
-            }
-
-            DB::commit();
-
-            $this->jwt->invalidate($token);
-            return [
-                'status' => true,
-                'message' => 'Sesión(es) cerrada(s) exitosamente',
-                'revoked_count' => $revokedCount
-            ];
-
-        } catch (Exception $e) {
-            Log::error('Error capturado', [
-                'file' => $e->getFile(),
-            ]);
-            throw $e;
-        }
+        // 3. Invalidar el token en la lista negra (Blacklist) de JWT
+        $this->jwt->invalidate($this->jwt->getToken());
     }
-
     /**
      * Refrescar token JWT
      * 
@@ -425,45 +249,29 @@ class AuthService implements IAuthService
      */
     public function refresh(): array
     {
-        try {
-            // Refresca el token actual
-            $newToken = $this->jwt->refresh();
+        // 1. Refresca el token actual (si está vencido dentro del periodo de gracia, JWTAuth lo maneja)
+        $newToken = $this->jwt->refresh();
 
-            // Setear el nuevo token para poder leer su payload
-            $this->jwt->setToken($newToken);
-            $payload = $this->jwt->getPayload();
+        // 2. Extraer datos del nuevo token
+        $payload = $this->jwt->setToken($newToken)->getPayload();
 
-            // Datos importantes del nuevo token
-            $jti = $payload->get('jti');
-            $cuentaId = $payload->get('sub'); // ID de la cuenta
-            $expiresIn = $this->jwt->factory()->getTTL() * 60;
-
-            // Actualizar token en BD
+        // 3. Persistencia atómica
+        DB::transaction(fn() => 
             DB::table('tokens_de_sesion')
-                ->where('cuenta_id', $cuentaId)
+                ->where('cuenta_id', $payload->get('sub'))
                 ->update([
-                    'jti' => $jti,
-                    'ultimo_uso' => Carbon::now(),
-                ]);
+                    'jti' => $payload->get('jti'),
+                    'ultimo_uso' => now(),
+                ])
+        );
 
-            return [
-                'token' => $newToken,
-                'token_type' => 'bearer',
-                'expires_in' => $expiresIn,
-            ];
-
-        } catch (JWTException $e) {
-            Log::error('Error al refrescar el token', [
-                'error' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
-            ]);
-            throw $e;
-        }
+        return [
+            'token'      => $newToken,
+            'token_type' => 'bearer',
+            'expires_in' => $this->jwt->factory()->getTTL() * 60,
+        ];
     }
 
-    
-    
     /**
      * Obtener información del usuario autenticado
      * 
