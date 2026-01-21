@@ -22,6 +22,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Contracts\Auth\Services\IRegistroService;
+use App\Exceptions\BusinessException;
 
 /**
  * AuthService - Servicio de autenticación
@@ -74,18 +75,9 @@ class AuthService implements IAuthService
             $passwordUsuario = $dto->password;
             $inicioProceso =  $this->registroService->iniciarRegistro($correoUsuario, $passwordUsuario);
     
-            if (!$inicioProceso['success']) {
-                throw ValidationException::withMessages([
-                    'inicio_registro' => [$inicioProceso['message']]
-                    
-                ]);
-            }
-    
             $datosEncriptados = encrypt($dto->toArray());
             
             return [
-                'success' => $inicioProceso['success'],
-                'message' => $inicioProceso['message'],
                 'cuenta_id' => $inicioProceso['data']['cuenta_id'],
                 'expira_en' => $inicioProceso['data']['expira_en'],
                 'datosEncriptados' => $datosEncriptados,
@@ -114,13 +106,13 @@ class AuthService implements IAuthService
         try {
             $registroTerminado = $this->registroService->terminarRegistro($datosEncriptados, $clave, $cuenta_id, $dispositivo);
 
-            if ($registroTerminado['status'] !== 'success') {
+            if (!$registroTerminado) {
                 Log::error('Error en el Registro del usuario', [
                     'cuenta_id' => $cuenta_id,
                     'dispositivo' => $dispositivo,
                     'Archivo' => 'RegistroService.php'
                 ]);
-                throw new Exception('Error al registrar usuario', 401);
+                throw new BusinessException('Error al registrar usuario', 401);
             }
 
            return $registroTerminado;
@@ -166,9 +158,7 @@ class AuthService implements IAuthService
                     'correo' => $dto->email
                 ]);
 
-                throw ValidationException::withMessages([
-                    'login' => ['Correo o contraseña incorrectos']
-                ]);
+                throw new ValidationException('Correo o contraseña incorrectos', 401);
             }
     
             // Válidar si la contraseña es correcta
@@ -179,26 +169,20 @@ class AuthService implements IAuthService
                     'password' => null
                 ]);
 
-                throw ValidationException::withMessages([
-                    'login' => ['Correo o contraseña incorrectos']
-                ]);
+                throw new ValidationException('Correo o contraseña incorrectos', 401);
             }
             
             $user = $this->userRepository->findByIdCuenta($cuentaRegistrada->id);
             // Válidar que el usuario este activo
             // estado_id: 1 = activo, 2 = invisible, 3 = eliminado
             if ($user->estado_id === 3) {
-                throw ValidationException::withMessages([
-                    'login' => ['Esta cuenta ha sido desactivada']
-                ]);
+                throw new ValidationException('Tu cuenta ha sido eliminada. Contacta al soporte para más información.', 403);
             }
     
             // Si el un usuario prosumer intenta entrar a desktop (Unico del admin y master)
             // Lanzar una excepción
             if ($user->rol_id === 1 && $dto->device_name === 'desktop'){
-                throw ValidationException::withMessages([
-                    'login' => ['No cuentas con el rol para acceder']
-                ]);
+                throw new ValidationException('Acceso denegado desde escritorio para usuarios prosumer.', 403);
             }
             
             // Crear un nuevo token

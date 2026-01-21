@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\JWTGuard;
+use App\Exceptions\BusinessException;
 
 
 
@@ -56,10 +57,8 @@ class RegistroService implements IRegistroService
                     'correo' => $email
                 ]);
                 DB::rollBack();
-                return [
-                    'success' => false,
-                    'message' => 'Ya se envió un código. Revisa tu correo.'
-                ];
+
+                throw new BusinessException('Ya existe un código de verificación vigente para este correo.', 409);
             }
 
             // Si existe pero expirado → actualizar clave
@@ -90,11 +89,7 @@ class RegistroService implements IRegistroService
                     'correo' => $email
                 ]);
                 DB::rollBack();
-                return [
-                    'success' => false,
-                    'message' => 'No se pudo enviar el código. Intenta más tarde.',
-                    'data' => null
-                ];
+                throw new BusinessException('No se pudo enviar el correo de verificación. Intenta nuevamente más tarde.', 500);
             }
 
             Log::info('Inicio de registro realizado correctamente',[
@@ -104,8 +99,6 @@ class RegistroService implements IRegistroService
             DB::commit();
 
             return [
-                'success' => true,
-                'message' => 'Código enviado correctamente',
                 'data' => [
                     'cuenta_id' => $cuentaRegistrada->id,
                     'expira_en' => $cuentaRegistrada->fecha_clave->addMinutes(10)->toDateTimeString(),
@@ -146,26 +139,16 @@ class RegistroService implements IRegistroService
 
             // Verificar si la clave ha expirado
             if ($correoExistente->hasExpired()) {
-                return [
-                    'success' => false,
-                    'message' => 'La clave ha expirado. Solicita una nueva clave',
-                    'data' => null,
-                ];
+                throw new BusinessException('El código ha expirado. Por favor, solicita uno nuevo.', 410);
             }
 
             // Verificar que la clave coincida
             if (!$correoExistente->isValidClave($clave)) {
-                return [
-                    'success' => false,
-                    'message' => 'La clave es incorrecta, intenta nuevamente',
-                    'data' => null
-                ];
+                throw new BusinessException('El código de verificación es incorrecto.', 400);
             }
 
             // Clave verificada correctamente
             return [
-                'success' => true,
-                'message' => 'Código verificado correctamente',
                 'data' => [
                     'correo' => $correoExistente,
                     'clave_verificada' => true
@@ -175,7 +158,8 @@ class RegistroService implements IRegistroService
         } catch (\Exception $e) {
             Log::error('Error al verificar clave', [
                 'correo' => $correoExistente ?? null,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
             ]);
 
             throw $e;
@@ -199,13 +183,13 @@ class RegistroService implements IRegistroService
             $cuenta = $this->cuentaRepository->findById($cuenta_id);
     
             if ($this->userRepository->exists($cuenta_id)) {
-                throw new ValidationException("El correo ya fue registrado");
+                throw new ValidationException("El correo ya fue registrado", 422);
             }
     
             $registro = $this->verificarClave($dto->email, $clave);
-    
-            if (!$registro['success']) {
-                throw new ValidationException($registro['message']);
+
+            if (!$registro['data']['clave_verificada'] !== true) {
+                throw new ValidationException("Error al verificar la clave", 422);
             }
 
             // Iniciar transacción
@@ -255,13 +239,10 @@ class RegistroService implements IRegistroService
             DB::commit();
 
             return [
-                'status' => 'success',
-                'data' => [
                     'user' => $usuario,
                     'token' => $token,
                     'token_type' => 'bearer',
                     'expires_in' => $expiresIn
-                ]
             ];
 
         } catch (\Exception $e) {
