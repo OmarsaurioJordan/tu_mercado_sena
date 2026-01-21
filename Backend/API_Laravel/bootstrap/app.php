@@ -33,8 +33,25 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         /** @var mixed $e */                        
                         return $e->render($request);
                     }
+
+                    // 2. Manejo especial para errores de validación.
+                    if ($e instanceof \Illuminate\Validation\ValidationException) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Error de validación.',
+                            'errors' => $e->errors(), // Esto devuelve los campos fallidos
+                        ], 422);
+                    }
+
+                    // 3. Responder con JSON según el tipo de excepción.
+                    if ($e instanceof NotFoundHttpException) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Recurso no encontrado.',
+                        ], 404);
+                    }
                     
-                    // 2. Determinar el código de estado HTTP basado en el tipo de excepción.
+                    // 4. Mapear otras excepciones a códigos HTTP.
                     $code = match(true) {
                         $e instanceof AuthorizationException => 403,
                         $e instanceof ModelNotFoundException => 404,
@@ -44,7 +61,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         default => 500,
                     };
 
-                    // 3. Loguear errores de servidor (5xx).
+                    // 5. Loguear errores de servidor (5xx).
                     if ($code >= 500) {
                         Log::error('Error de servidor en la aplicación', [
                             'message' => $e->getMessage(),
@@ -54,20 +71,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         ]);
                     }
 
-                    // 4. Responder con JSON según el tipo de excepción.
-                    if ($e instanceof NotFoundHttpException) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'Recurso no encontrado.',
-                        ], 404);
-                    }
-
-                    // 5. Respuesta genérica para otras excepciones.
+                    // 6. Respuesta genérica para otras excepciones.
                     return response()->json([
                         'status' => 'error',
-                        'message' => ($code < 500) 
-                                        ? $e->getMessage() 
-                                        : 'Ocurrió un error inesperado en el servidor.',
+                        'message' => ($code < 500 || config('app.debug')) 
+                             ? $e->getMessage() 
+                             : 'Ocurrió un error inesperado en el servidor.',
                     ], $code);
                 }
             });
