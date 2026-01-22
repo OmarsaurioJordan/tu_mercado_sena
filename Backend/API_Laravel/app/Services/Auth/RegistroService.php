@@ -155,6 +155,7 @@ class RegistroService implements IRegistroService
             return [
                 'user'       => $usuario,
                 'token'      => $token,
+                'token_type' => 'bearer',
                 'expires_in' => $this->jwt->factory()->getTTL() * 60
             ];
         });
