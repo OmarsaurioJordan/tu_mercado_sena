@@ -9,13 +9,10 @@ use App\DTOs\Auth\Registro\RegisterDTO;
 use App\Models\Cuenta;
 use App\Models\Usuario;
 use Carbon\Carbon;
-use Dotenv\Exception\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\JWTGuard;
-
-
+use App\Exceptions\BusinessException;
 
 class RegistroService implements IRegistroService
 {
@@ -43,86 +40,33 @@ class RegistroService implements IRegistroService
      */
     public function iniciarRegistro(string $email, string $password): array
     {
-        DB::beginTransaction();
-    
-        $cuentaRegistrada = null;
-        try {
-            Log::info('Iniciando proceso de registro en el servicio',[
-                'correo' => $email
-            ]);
-            // Si el correo tiene un registro vigente, NO crees uno nuevo
+        return DB::transaction(function () use ($email, $password) {
+            // 1. Regla de Negocio
             if ($this->cuentaRepository->isCuentaRegistrada($email)) {
-                Log::warning('Usuario ya cuenta con un código de registro', [
-                    'correo' => $email
-                ]);
-                DB::rollBack();
-                return [
-                    'success' => false,
-                    'message' => 'Ya se envió un código. Revisa tu correo.'
-                ];
+                throw new BusinessException('Ya existe un código de verificación vigente para este correo.', 409);
             }
 
-            // Si existe pero expirado → actualizar clave
-            $cuentaRegistrada = $this->cuentaRepository->findByCorreo($email);
-
+            $cuenta = $this->cuentaRepository->findByCorreo($email);
             $clave = Cuenta::generarClave();
 
-            if ($cuentaRegistrada) {
-                // actualizar y renovar fecha
-                $cuentaRegistrada = $this->cuentaRepository->actualizarClave($cuentaRegistrada, $clave);
-            } else {
-                // crear nuevo registro 
-                $cuentaRegistrada = $this->cuentaRepository->createOrUpdate($email, $clave, $password);
-            }
+            $cuenta = $cuenta 
+                ? $this->cuentaRepository->actualizarClave($cuenta, $clave)
+                : $this->cuentaRepository->createOrUpdate($email, $clave, $password);
 
-            if (!$cuentaRegistrada) {
-                // Esto puede ocurrir si el createOrUpdate falla en crear el registro.
-                Log::error('Fallo crítico: El repositorio no devolvió la Cuenta.', ['correo' => $email]);
-                // Lanzar una excepción de fallo de registro
+            if (!$cuenta) {
                 throw new \Exception('Fallo al crear o actualizar el registro de la cuenta.');
             }
 
-            // Enviar correo
-            $emailEnviado = $this->correoService->enviarCodigoVerificacion($cuentaRegistrada->email,$clave);
-
-            if (!$emailEnviado) {
-                Log::error('Erro en el servicio de registro',[
-                    'correo' => $email
-                ]);
-                DB::rollBack();
-                return [
-                    'success' => false,
-                    'message' => 'No se pudo enviar el código. Intenta más tarde.',
-                    'data' => null
-                ];
+            // 2. Acción externa
+            if (!$this->correoService->enviarCodigoVerificacion($cuenta->email, $clave)) {
+                throw new BusinessException('No se pudo enviar el correo de verificación.', 500);
             }
 
-            Log::info('Inicio de registro realizado correctamente',[
-                'correo' => $cuentaRegistrada->email
-            ]);
-
-            DB::commit();
-
             return [
-                'success' => true,
-                'message' => 'Código enviado correctamente',
-                'data' => [
-                    'cuenta_id' => $cuentaRegistrada->id,
-                    'expira_en' => $cuentaRegistrada->fecha_clave->addMinutes(10)->toDateTimeString(),
-                ]
+                'cuenta_id' => $cuenta->id,
+                'expira_en' => $cuenta->fecha_clave->addMinutes(10)->toDateTimeString(),
             ];
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Error iniciarRegistro', [
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'cuenta_id' => $cuentaRegistrada->id ?? 'N/A'
-            ]);
-
-            throw $e;
-        }    
+        });
     }
 
     /**
@@ -134,52 +78,27 @@ class RegistroService implements IRegistroService
      * @param string $clave - Código que llegara desde el front-end
      * @return array ['success' => bool, 'message' => string]
      */
-    public function verificarClave(string $correoExistente, string $clave): array
+    public function verificarClave(string $correoExistente, string $clave): bool
     {
-        try {
-            // Buscar el correo en la base de datos
-            $correoExistente = $this->cuentaRepository->findByCorreo($correoExistente);
+        // Buscar el correo en la base de datos
+        $correoExistente = $this->cuentaRepository->findByCorreo($correoExistente);
 
-            if (!$correoExistente) {
-                throw new ModelNotFoundException("El registro de verificación para el correo {$correoExistente} no fue encontrado.");
-            }
-
-            // Verificar si la clave ha expirado
-            if ($correoExistente->hasExpired()) {
-                return [
-                    'success' => false,
-                    'message' => 'La clave ha expirado. Solicita una nueva clave',
-                    'data' => null,
-                ];
-            }
-
-            // Verificar que la clave coincida
-            if (!$correoExistente->isValidClave($clave)) {
-                return [
-                    'success' => false,
-                    'message' => 'La clave es incorrecta, intenta nuevamente',
-                    'data' => null
-                ];
-            }
-
-            // Clave verificada correctamente
-            return [
-                'success' => true,
-                'message' => 'Código verificado correctamente',
-                'data' => [
-                    'correo' => $correoExistente,
-                    'clave_verificada' => true
-                ]
-            ];
-
-        } catch (\Exception $e) {
-            Log::error('Error al verificar clave', [
-                'correo' => $correoExistente ?? null,
-                'error' => $e->getMessage()
-            ]);
-
-            throw $e;
+        if (!$correoExistente) {
+            throw new ModelNotFoundException("El registro de verificación para el correo {$correoExistente} no fue encontrado.", 404);
         }
+
+        // Verificar si la clave ha expirado
+        if ($correoExistente->hasExpired()) {
+            throw new BusinessException('El código ha expirado. Por favor, solicita uno nuevo.', 410);
+        }
+
+        // Verificar que la clave coincida
+        if (!$correoExistente->isValidClave($clave)) {
+            throw new BusinessException('El código de verificación es incorrecto.', 400);
+        }
+
+        // Clave verificada correctamente
+        return true;
     }
 
     /**
@@ -193,80 +112,52 @@ class RegistroService implements IRegistroService
 
     public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array
     {
-        try {
-            $data = decrypt($datosEncriptados);
-            $dto = RegisterDTO::fromArray($data);
-            $cuenta = $this->cuentaRepository->findById($cuenta_id);
-    
-            if ($this->userRepository->exists($cuenta_id)) {
-                throw new ValidationException("El correo ya fue registrado");
-            }
-    
-            $registro = $this->verificarClave($dto->email, $clave);
-    
-            if (!$registro['success']) {
-                throw new ValidationException($registro['message']);
-            }
+        // 1. Preparación de datos
+        $data = decrypt($datosEncriptados);
+        $dto = RegisterDTO::fromArray($data);
+        $cuenta = $this->cuentaRepository->findById($cuenta_id);
 
-            // Iniciar transacción
-            DB::beginTransaction();
+        if ($this->userRepository->exists($cuenta_id)) {
+            throw new BusinessException("El correo ya fue registrado", 422);
+        }
+    
 
+        // 2. Ejecución atómica
+        return DB::transaction(function () use ($dto, $clave, $cuenta, $dispositivo) {
+            
+            // Verificamos clave (si falla, lanza excepción y corta el flujo)
+            $this->verificarClave($dto->email, $clave);
+
+            // Crear usuario
             $usuario = $this->userRepository->create([
                 'cuenta_id' => $cuenta->id,
                 'nickname' => $dto->nickname,
                 'imagen' => $dto->imagen,
-                'descripcion' => $dto->descripcion,
-                'link' => $dto->link,
                 'rol_id' => $dto->rol_id,
-                'estado_id' => $dto->estado_id
+                'estado_id' => $dto->estado_id,
+                'descripcion' => $dto->descripcion,
+                'link' => $dto->link
+                
             ]);
 
-            if (!$usuario) {
-                Log::error('Error Registro Service: terminarRegistro');
-                if (DB::transactionLevel() > 0) {
-                    DB::rollBack();
-                }
-                throw new \Exception('Error al crear usuario');
-            }
-
+            // Generar JWT
             $token = $this->jwt->fromUser($cuenta);
-            $this->jwt->setToken($token);
-            $payload = $this->jwt->getPayload();
-            $jti = $payload->get('jti');
-            $expiresIn = $this->jwt->factory()->getTTL() * 60;
-
-            $registroToken = DB::table('tokens_de_sesion')->insert([
-                'cuenta_id' => $cuenta->id,
+            $payload = $this->jwt->setToken($token)->getPayload();
+            
+            // Registrar sesión
+            DB::table('tokens_de_sesion')->insert([
+                'cuenta_id'   => $cuenta->id,
                 'dispositivo' => $dispositivo,
-                'jti' => $jti,
-                'ultimo_uso' => Carbon::now()
+                'jti'         => $payload->get('jti'),
+                'ultimo_uso'  => Carbon::now()
             ]);
-
-            if (!$registroToken) {
-                Log::error('Error al registrar el token de inicio de sesión en la tabla');
-
-                if (DB::transactionLevel() > 0) {
-                    DB::rollBack();
-                    throw new \Tymon\JWTAuth\Exceptions\JWTException("Error al registrar token de registro");
-                }
-            }
-
-            // Si todo fue exitoso envia los datos a la BD
-            DB::commit();
 
             return [
-                'status' => 'success',
-                'data' => [
-                    'user' => $usuario,
-                    'token' => $token,
-                    'token_type' => 'bearer',
-                    'expires_in' => $expiresIn
-                ]
+                'user'       => $usuario,
+                'token'      => $token,
+                'expires_in' => $this->jwt->factory()->getTTL() * 60
             ];
-
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        });
     }
 }
  

@@ -7,7 +7,6 @@ use App\DTOs\Auth\recuperarContrasena\ClaveDto;
 use App\DTOs\Auth\recuperarContrasena\CorreoDto;
 use App\DTOs\Auth\recuperarContrasena\NuevaContrasenaDto;
 use App\DTOs\Auth\Registro\RegisterDTO;
-use App\Models\TokensDeSesion;
 use App\Models\Usuario;
 
 interface IAuthService
@@ -28,11 +27,11 @@ interface IAuthService
 
     public function inicioNuevaPassword(CorreoDto $dto): array;
 
-    public function validarClaveRecuperacion(int $id_cuenta, ClaveDto $dto): array;
+    public function validarClaveRecuperacion(int $cuenta_id, ClaveDto $dto): bool;
 
-    public function nuevaPassword(int $id_cuenta, NuevaContrasenaDto $dto): array;
+    public function nuevaPassword(int $id_cuenta, NuevaContrasenaDto $dto): bool;
 
-    public function logout(bool $all_device = false): array;
+    public function logout(bool $all_device = false): void;
 
     public function refresh(): array;
 

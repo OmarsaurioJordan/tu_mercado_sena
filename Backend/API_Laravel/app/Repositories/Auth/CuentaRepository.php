@@ -7,16 +7,11 @@ use App\Models\Usuario;
 use App\Models\Cuenta;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
-use illuminate\Support\Facades\Log;
 
 class CuentaRepository implements ICuentaRepository
 {
     public function createOrUpdate(string $email, string $clave, string $password): Cuenta
     {
-        Log::info('Iniciando proceso de creación de la cuenta en el CuentaRepository', [
-            ['email' => $email]
-        ]);
-
         return Cuenta::updateOrCreate(
             ['email' => $email],
             [
