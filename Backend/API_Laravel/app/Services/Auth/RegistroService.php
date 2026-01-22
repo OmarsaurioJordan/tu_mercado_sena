@@ -130,10 +130,14 @@ class RegistroService implements IRegistroService
 
             // Crear usuario
             $usuario = $this->userRepository->create([
-                'cuenta_id'   => $cuenta->id,
-                'nickname'    => $dto->nickname,
-                'rol_id'      => $dto->rol_id,
-                'estado_id'   => $dto->estado_id,
+                'cuenta_id' => $cuenta->id,
+                'nickname' => $dto->nickname,
+                'imagen' => $dto->imagen,
+                'rol_id' => $dto->rol_id,
+                'estado_id' => $dto->estado_id,
+                'descripcion' => $dto->descripcion,
+                'link' => $dto->link
+                
             ]);
 
             // Generar JWT

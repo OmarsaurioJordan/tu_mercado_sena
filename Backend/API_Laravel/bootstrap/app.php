@@ -46,6 +46,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     ], 422);
                 }
 
+                if ($e instanceof NotFoundHttpException) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'El recurso solicitado no fue encontrado.',
+                    ], $e->getStatusCode());
+                }
+
                 // 3. Personalización detallada de mensajes de JWT
                 // Esto ayuda mucho al Frontend para saber si redirigir al Login o refrescar
                 $message = $e->getMessage();
@@ -70,9 +77,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         default => ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException ? $e->getStatusCode() : 500),
                     };
                     
-                    $message = ($code < 500 || config('app.debug')) 
-                                ? $e->getMessage() 
-                                : 'Ocurrió un error inesperado en el servidor.';
+                    $message = 'Ocurrió un error inesperado en el servidor.';
                 }
 
                 // 5. Logging para errores críticos (>= 500)
@@ -81,6 +86,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         'class' => get_class($e),
                         'message' => $e->getMessage(),
                         'url' => $request->fullUrl(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                        'trace' => $e->getTraceAsString(),
                     ]);
                 }
 

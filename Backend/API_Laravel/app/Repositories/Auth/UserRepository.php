@@ -44,7 +44,7 @@ class UserRepository implements UserRepositoryInterface
         // Hash::make hashea la contraseña usando bcrypt
         // Asignar el rol del usuario a normal por defecto
         // 1 = Prosumer, 2 = Administrador, 3 = Master
-// 2. Asignar rol por defecto (Si no viene)
+        // 2. Asignar rol por defecto (Si no viene)
         if (!isset($data['rol_id']) || $data['rol_id'] === null) {
             $data['rol_id'] = 1; // Prosumer
         }
