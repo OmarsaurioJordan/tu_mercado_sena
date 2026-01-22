@@ -4,7 +4,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Log;
-use App\Exceptions\BusinessException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
@@ -12,6 +11,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 
 $app = Application::configure(basePath: dirname(__DIR__))
@@ -51,6 +51,20 @@ $app = Application::configure(basePath: dirname(__DIR__))
                         'status'  => 'error',
                         'message' => 'El recurso solicitado no fue encontrado.',
                     ], $e->getStatusCode());
+                }
+
+                if ($e instanceof AuthorizationException) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'No tienes permisos para realizar esta acción.',
+                    ], 403);
+                }
+
+                if ($e instanceof MethodNotAllowedHttpException) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'El método HTTP no está permitido para esta ruta.',
+                    ], 405);
                 }
 
                 // 3. Personalización detallada de mensajes de JWT
