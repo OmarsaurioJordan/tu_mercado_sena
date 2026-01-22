@@ -64,4 +64,9 @@ class Usuario extends Model
     {
         return $this->hasMany(Bloqueado::class, 'bloqueado_id', 'id');
     }
+
+    public function chat()
+    {
+        return $this->hasMany(Chat::class, 'comprador_id', 'id');
+    }
 }

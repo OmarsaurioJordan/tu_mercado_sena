@@ -76,4 +76,8 @@ class Producto extends Model
     {
         return $this->hasMany(Foto::class, 'producto_id');
     }
+
+    public function chats(){
+        return $this->hasMany(Chat::class, 'producto_id');
+    }
 }
