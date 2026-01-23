@@ -13,7 +13,6 @@ readonly class OutputDto implements Arrayable
     public function __construct(
         public int $id,
         public int $bloqueador_id,
-        public int $bloqueado_id,
         public array $usuario_bloqueado,
     )
     {}
@@ -27,7 +26,6 @@ readonly class OutputDto implements Arrayable
         return [
             'id' => $this->id,
             'bloqueador_id' => $this->bloqueador_id,
-            'bloqueado_id' => $this->bloqueado_id,
             'usuario_bloqueado' => $this->usuario_bloqueado
         ];
     }
@@ -43,12 +41,14 @@ readonly class OutputDto implements Arrayable
         return new self(
             id: $bloqueado->id,
             bloqueador_id: $bloqueado->bloqueador_id,
-            bloqueado_id: $bloqueado->bloqueado_id,
-            usuario_bloqueado: [
+            usuario_bloqueado: $bloqueado->relationLoaded('bloqueado') && $bloqueado->bloqueado
+            ? [
                 'id' => $bloqueado->bloqueado?->id,
                 'nickname' => $bloqueado->bloqueado?->nickname,
                 'imagen' => $bloqueado->bloqueado?->imagen
-            ],
+
+            ]
+            : null
         );
     }
 
