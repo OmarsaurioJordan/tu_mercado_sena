@@ -54,9 +54,8 @@ readonly class OutputDto implements Arrayable
                     'id' => $chat->producto->vendedor?->id,
                     'nickname' => $chat->producto->vendedor?->nickname,
                     'imagen' => $chat->producto->vendedor?->imagen
-                ]: null,
-            ]:
-            null,
+                ] : null,
+            ] : null,
             estado_id: $chat->estado->id,
             visto_comprador: $chat->visto_comprador,
             visto_vendedor: $chat->visto_vendedor,
