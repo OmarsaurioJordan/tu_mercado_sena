@@ -9,7 +9,6 @@ class BloquearUsuarioRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // IMPORTANTE: Cambiar a true para permitir la petición
         return Auth::check(); 
     }
 
@@ -51,7 +50,7 @@ class BloquearUsuarioRequest extends FormRequest
             'bloqueado_id.exists' => 'El usuario especificado no existe.',
 
             'bloqueador_id.exists' => 'El usuario bloqueador no existe.',
-            'bloqueador_id.required' => 'El ID del usuario bloqueador es obligatorio.',
+            'bloqueador_id.required' => 'El usuario bloqueador es obligatorio.',
         ];
     }
 }
