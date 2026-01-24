@@ -45,11 +45,11 @@ class Producto extends Model
         return $query->where('vendedor_id', $vendedorId);
     }
     /**
-     * Scope: productos activos
+     * Scope: productos visibles (excluye invisibles estado=2 y eliminados estado=3)
      */
     public function scopeActivos($query)
     {
-        return $query->where('estado_id', 1);
+        return $query->whereNotIn('estado_id', [2, 3]);
     }
 
     public function subcategoria()

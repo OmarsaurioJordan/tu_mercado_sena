@@ -71,7 +71,7 @@ interface IProductoRepository
     public function perteneceAVendedor(int $productoId, int $vendedorId): bool;
 
     /**
-     * Actualiza la fecha de actualización del producto
+     * Actualiza la fecha de actualización de un producto
      * @param int $id
      * @return bool
      */

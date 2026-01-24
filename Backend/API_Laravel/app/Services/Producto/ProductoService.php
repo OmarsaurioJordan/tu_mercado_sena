@@ -258,12 +258,11 @@ class ProductoService implements IProductoService
                 // Eliminar las imágenes del storage
                 $this->eliminarImagenesProducto($productoId);
 
-                // Cambiar estado a eliminado
-                $resultado = $this->productoRepository->eliminar($productoId);
+                // Eliminar el producto de la BD 
+                $producto = \App\Models\Producto::findOrFail($productoId);
+                $producto->delete();
 
-                if (!$resultado) {
-                    throw new \Exception('Error al eliminar el producto.');
-                }
+                Log::info('Producto eliminado', ['producto_id' => $productoId]);
 
                 return [
                     'success' => true,
