@@ -13,7 +13,7 @@ interface IBloqueadoService
      * @param InputDto $dto
      * @return array
      */
-    public function ejecutarBloqueo(InputDto $dto): array;
+    public function ejecutarBloqueo(InputDto $dto): OutputDto;
 
     /**
      * Realiza el desbloqueo de un usuario y retorna un array con el resultado.

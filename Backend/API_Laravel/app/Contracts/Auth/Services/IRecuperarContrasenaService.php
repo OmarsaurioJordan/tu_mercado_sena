@@ -6,7 +6,7 @@ interface IRecuperarContrasenaService
 {
     public function iniciarProceso(string $correo): array;
 
-    public function verificarClaveContrasena(int $id_cuenta, string $clave): array;
+    public function verificarClaveContrasena(int $id_cuenta, string $clave): bool;
 
-    public function actualizarPassword(int $cuenta_id, string $nueva_password):array;
+    public function actualizarPassword(int $cuenta_id, string $nueva_password):bool;
 }

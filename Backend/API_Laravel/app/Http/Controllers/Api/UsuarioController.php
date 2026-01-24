@@ -25,70 +25,46 @@ class UsuarioController
 
         $perfil = $this->usuarioService->update($id, $dto);
 
-        if (!$perfil) {
-            response()->json([
-                'status' => "Error",
-                'message' => 'No se pudo completar la acción'
-            ], 401);
-        }
-
-        return response()->json($perfil);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Perfil actualizado correctamente.',
+            'data' => $perfil
+        ], 200);
     }
 
     // == MODULO DE BLOQUEO DE USUARIOS == //
 
     public function bloquearUsuario(BloquearUsuarioRequest $request)
     {
-        try{
-            $dto = BloqueadoInputDto::fromRequest($request->validated());
+        $dto = BloqueadoInputDto::fromRequest($request->validated());
     
-            $resultado = $this->bloqueadoService->ejecutarBloqueo($dto);
+        $resultado = $this->bloqueadoService->ejecutarBloqueo($dto);
     
-            return response()->json($resultado, 201);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Usuario bloqueado correctamente.',
+            'data' => $resultado
+        ], 201);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => "Error",
-                'message' => 'Error al bloquear el usuario. Intentalo más tarde',
-            ], 422);
-        }
     }
 
     public function desbloquearUsuario(BloquearUsuarioRequest $request)
     {
-        try { 
-            $dto = BloqueadoInputDto::fromRequest($request->validated());
-    
-            $resultado = $this->bloqueadoService->ejecutarDesbloqueo($dto);
-            
-            return response()->json($resultado, 200);
+        $dto = BloqueadoInputDto::fromRequest($request->validated());
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => "Error",
-                'message' => 'Error al desbloquear el usuario. Intentalo más tarde',
-            ], 422);
-        }
+        $resultado = $this->bloqueadoService->ejecutarDesbloqueo($dto);
+        
+        return response()->json($resultado, 200);
     }
 
     public function obtenerBloqueadosPorUsuario()
     {
-        try {
-            $bloqueados = $this->bloqueadoService->solicitarBloqueadosPorUsuario(Auth::id());
+        $bloqueados = $this->bloqueadoService->solicitarBloqueadosPorUsuario(Auth::id());
 
-            return response()->json($bloqueados);
-
-        } catch (AuthorizationException $e) {
-            return response()->json([
-                'status' => "Error",
-                'message' => 'No tienes permiso para realizar esta acción.',
-            ], 403);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => "Error",
-                'message' => 'Error al obtener la lista de usuarios bloqueados. Intentalo más tarde',
-            ], 422);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => empty($bloqueados) ? 'No hay usuarios bloqueados.' : 'Usuarios bloqueados',
+            'data' => $bloqueados
+        ], 200);
     }
 }
