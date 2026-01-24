@@ -48,10 +48,12 @@ class ChatDetailsRequest extends FormRequest
     public function messages()
     {
         return [
+            // Mensajes para el campo "comprador_id"
             'comprador_id.required' => 'El usuario autenticado es requerido',
             'comprador_id.integer' => 'Tipo de dato no válido',
             'comprador_id' => 'Usuario no existe',
 
+            // Mensajes para el campo "producto_id"
             'producto_id.required' => 'El producto es requerido',
             'producto_id.integer' => 'Tipo de dato no válido',
             'producto_id.exists' => 'Producto no encontrado' 
