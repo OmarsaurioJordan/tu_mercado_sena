@@ -11,7 +11,7 @@ class Producto extends Model
     public $timestamps = true;
     
     const CREATE_AT = 'fecha_registro';
-    const UPDATED_AT = 'fecha_actualiza';
+    const UPDATED_AT = null;
     
     protected $fillable = [
         'nombre',

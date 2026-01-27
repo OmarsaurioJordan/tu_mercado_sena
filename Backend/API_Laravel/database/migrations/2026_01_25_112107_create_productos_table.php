@@ -22,7 +22,7 @@ return new class extends Migration
             $table->float('precio');
             $table->smallInteger('disponibles', false, true);
             $table->timestamp('fecha_registro')->useCurrent();
-            $table->timestamp('fecha_actualiza')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('fecha_actualiza');
         });
     }
 
