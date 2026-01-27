@@ -17,7 +17,8 @@ class ProductoRepository implements IProductoRepository
     {
         // El estado por defecto es 1 (activo)
         $data['estado_id'] = $data['estado_id'] ?? 1;
-        $data['fecha_actualiza'] = now();
+        
+        unset($data['fecha_actualiza']); // remover si viene en el array
         
         return Producto::create($data);
     }
@@ -127,7 +128,6 @@ class ProductoRepository implements IProductoRepository
     {
         return Producto::where('id', $id)->update([
             'estado_id' => $estadoId,
-            'fecha_actualiza' => now()
         ]) > 0;
     }
 

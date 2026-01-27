@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Producto extends Model
 {
     protected $table = 'productos';
-    public $timestamps = false; 
+    public $timestamps = true; 
+
+    const CREATED_AT = 'fecha_registro';
+    const UPDATED_AT = null;
     
     protected $fillable = [
         'nombre',
