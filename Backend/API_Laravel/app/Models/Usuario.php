@@ -64,4 +64,65 @@ class Usuario extends Model
     {
         return $this->hasMany(Bloqueado::class, 'bloqueado_id', 'id');
     }
+
+    public function favoritos()
+    {
+        // Método del ORM que facilita las relaciones M-N
+        return $this->belongsToMany(
+            Usuario::class, // Modelo destino al que nos conectamos
+            'favoritos', // Nombre de la tabla pivote(Tabla intermedia entre 2 tablas)
+            'votante_id', // FK en la Pivote que apunta a este modelo
+            'votado_id' // FK en la Pivote que apunta al modelo destino
+        );
+    }
+
+    public function seguidores()
+    {
+        return $this->belongsToMany(
+            Usuario::class,
+            'favoritos',
+            'votado_id',
+            'vatante_id'
+        );
+    }
+
+    public function productosVistos()
+    {
+        return $this->belongsToMany(
+            Producto::class,
+            'vistos',
+            'usuario_id',
+            'producto_id'
+        );
+    }
+
+    public function papelera()
+    {
+        return $this->hasMany(Papelera::class, 'usuario_id');
+    }
+
+    public function notificaciones()
+    {
+        return $this->hasMany(Notificacion::class, 'usuario_id');
+    }
+
+    public function denunciasRealizadas()
+    {
+        return $this->belongsToMany(
+            Usuario::class,
+            'denuncias',
+            'denunciante_id',
+            'usuario_id'
+        )->using(Denuncia::class)->withPivot('producto_id', 'chat_id', 'motivo_id', 'estado_id');
+    }
+
+    public function denunciasRecibidas()
+    {
+        return $this->belongsToMany(
+            Usuario::class,
+            'denuncias',
+            'usuario_id',
+            'denunciante_id'
+        )->using(Denuncia::class)->withPivot('producto_id', 'chat_id', 'motivo_id', 'estado_id');
+    }
 }

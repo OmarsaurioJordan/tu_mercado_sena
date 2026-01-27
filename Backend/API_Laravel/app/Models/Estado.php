@@ -11,6 +11,16 @@ class Estado extends Model
     
     public function usuario()
     {
-        return $this->hasMany(Usuario::class);
+        return $this->hasMany(Usuario::class, 'estado_id');
+    }
+
+    public function pqrs()
+    {
+        return $this->hasMany(Pqrs::class, 'estado_id');
+    }
+
+    public function denuncias()
+    {
+        return $this->hasMany(Denuncia::class, 'estado_id');
     }
 }
