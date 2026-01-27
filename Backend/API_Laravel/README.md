@@ -66,6 +66,15 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
+**Configuración para que Laravel no requiera de una tabla sesiones y/o cache en la BD en el archivo .env**
+```ENV
+SESSION_DRIVER=file
+```
+
+```ENV
+CACHE_STORE=file
+```
+
 Configuración del servicio de mails (Configurar solo si se va comprobar que el correo se envio de manera exitosa a tu correo institucional):
 ```ENV
 MAIL_MAILER=smtp
@@ -78,7 +87,7 @@ MAIL_FROM_ADDRESS={Tu Correo de gmail u otro servicio}
 MAIL_FROM_NAME="Mercado Sena"
 ```
 
-Configuración de JW
+Configuración de JWT
 ```ENV
 AUTH_GUARD=api
 JWT_TTL=1440          # 24 horas en minutos
