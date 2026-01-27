@@ -106,6 +106,10 @@ JWT_BLACKLIST_ENABLED=true
 
 2️⃣ Hacer las migraciones de las tablas usando este comando en la terminal teniendo la base de datos ya creada: 
 
+👁️ **OJO**
+
+El siguiente comando borra todos los registros que tengas en la base de datos que configuraste, si la base de datos tiene registros en las tablas hacer copia de seguridad
+
 ```CMD
 php artisan migrate:refresh
 ```
