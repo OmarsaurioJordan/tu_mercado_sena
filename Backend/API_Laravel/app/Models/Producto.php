@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Producto extends Model
 {
     protected $table = 'productos';
-    public $timestamps = false; 
+    
+    public $timestamps = true;
+    
+    const CREATE_AT = 'fecha_registro';
+    const UPDATED_AT = 'fecha_actualiza';
     
     protected $fillable = [
         'nombre',
@@ -75,5 +79,20 @@ class Producto extends Model
     public function fotos()
     {
         return $this->hasMany(Foto::class, 'producto_id');
+    }
+
+    public function vistoPorUsuarios()
+    {
+        return $this->belongsToMany(
+            Usuario::class,
+            'vistos',
+            'producto_id',
+            'usuario_id'
+        );
+    }
+
+    public function denuncias()
+    {
+        return $this->hasMany(Denuncia::class, 'producto_id');
     }
 }
