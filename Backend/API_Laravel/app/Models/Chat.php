@@ -55,8 +55,14 @@ class Chat extends Model
     }
 
     // Relación 1-M
-    public function mensaje()
+    public function mensajes()
     {
         return $this->hasMany(Mensaje::class, 'chat_id');
+    }
+
+    // Relación para identificar el ultimo mensaje de un chat
+    public function ultimoMensaje()
+    {
+        return $this->hasOne(Mensaje::class, 'chat_id')->latestOfMany();
     }
 }

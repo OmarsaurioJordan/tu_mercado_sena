@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DTOs\Mensaje;
+namespace App\Services\Chat;
 
-class OutputDto
+class ChatService
 {
     /**
      * Create a new class instance.

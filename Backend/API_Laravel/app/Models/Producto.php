@@ -80,4 +80,9 @@ class Producto extends Model
     public function chats(){
         return $this->hasMany(Chat::class, 'producto_id');
     }
+
+    public function fotoPrincipal()
+    {
+        return $this->hasOne(Foto::class, 'producto_id')->latestOfMany();
+    }
 }

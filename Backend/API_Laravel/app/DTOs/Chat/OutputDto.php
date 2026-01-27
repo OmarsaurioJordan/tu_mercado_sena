@@ -3,6 +3,7 @@
 namespace App\DTOs\Chat;
 use Illuminate\Contracts\Support\Arrayable;
 use App\Models\Chat;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
 
 readonly class OutputDto implements Arrayable
@@ -10,7 +11,8 @@ readonly class OutputDto implements Arrayable
     public function __construct(
         public int $id,
         public array $usuario,
-        public array $mensaje
+        public string $ultimoMensajeTexto,
+        public Carbon $fechaUltimoMensaje
     )
     {}
 
@@ -19,7 +21,8 @@ readonly class OutputDto implements Arrayable
         return [
             'id' => $this->id,
             'usuario' => $this->usuario,
-            'mensaje' => $this->mensaje
+            'ultimoMensajeTexto' => $this->ultimoMensajeTexto,
+            'fechaUltimoMensaje' => $this->fechaUltimoMensaje
         ];
     }
 
@@ -33,14 +36,8 @@ readonly class OutputDto implements Arrayable
                 'nombre' => $chat->producto?->nombre,
                 'imagen' => $chat->producto?->imagen
             ] : null,
-            mensaje: $chat->relationLoaded("mensaje") && $chat->mensaje
-            ? [
-                $chat->mensaje?->id,
-                $chat->mensaje?->es_comprador,
-                $chat->mensaje?->mensaje,
-                $chat->mensaje?->imagen,
-                $chat->mensaje?->fecha_registro
-            ] : null
+            ultimoMensajeTexto: $chat->ultimoMensaje?->mensaje ?? 'Sin mensajes aún',
+            fechaUltimoMensaje: $chat->ultimoMensaje?->fecha_registro
         );
     }
 
