@@ -37,9 +37,9 @@ class ChatRepository implements IChatRepository
         return $chat;
     }
 
-    public function findModel(string $columna, mixed $valor): ?Chat
+    public function findModel(array $criterios): ?Chat
     {
-        return Chat::where($columna, $valor)
+        return Chat::where($criterios)
             ->with([
                 'comprador: id, nombre, imagen',
                 'producto: id, nombre, precio',
@@ -70,5 +70,18 @@ class ChatRepository implements IChatRepository
         }
 
         return $chat->delete();
+    }
+
+    public function findDetails(int $chatId): ?Chat
+    {
+        return Chat::with([
+            'estado',
+            'comprador:id,nombre,imagen',
+            'producto.vendedor:id,nickname,imagen',
+            'producto.fotos:id,producto_id,imagen', // Necesario para la foto del producto
+            'mensajes' => function ($query) {
+                $query->orderBy('created_at', 'asc'); // O 'fecha_registro' si usas nombres personalizados
+            }
+        ])->find($chatId);
     }
 }

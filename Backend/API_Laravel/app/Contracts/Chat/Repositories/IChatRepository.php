@@ -16,11 +16,10 @@ interface IChatRepository
 
   /**
    *Función para buscar un registro por una columna y un valor 
-   * @param string $columna - Nombre de la columna de la tabla
-   * @param mixed $valor - Valor a buscar en la tabla
+   * @param array $criterios - Los criterios de busqueda organizados en clave-valor
    * @return Chat|null
    */
-  public function findModel(string $columna, mixed $valor): ?Chat;
+  public function findModel(array $criterios): ?Chat;
 
   /**
    * Función para obtener la lista de chats que tiene un usuario
@@ -35,4 +34,11 @@ interface IChatRepository
    * @return bool
    */
   public function delete(int $id): bool;
+
+  /**
+   * Función para obtener los detalles del chat
+   * @param int $chat_id - Id del chat
+   * @return Chat|null
+   */
+  public function findDetails(int $chat_id): ?Chat;
 }

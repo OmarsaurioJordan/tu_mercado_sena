@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return Auth::check();
@@ -19,6 +16,7 @@ class ChatRequest extends FormRequest
     {
         $this->merge([
             'comprador_id' => Auth::id(),
+            'producto_id' => $this->route('id')
         ]);
     }
 
@@ -30,10 +28,16 @@ class ChatRequest extends FormRequest
                 'integer',
                 'exists:usuarios,id',
                 function ($attribute, $value, $fail){
-                    if ($value !== Auth::id()){
-                        $fail('No tienes permisos para hacer esta acción');
+                    if ($value !== Auth::id()) {
+                        $fail('No tienes permiso para esta acción');
                     }
                 }
+            ],
+
+            'producto_id' => [
+                'required',
+                'integer',
+                'exists:productos,id'
             ]
         ];
     }
@@ -41,9 +45,15 @@ class ChatRequest extends FormRequest
     public function messages()
     {
         return [
+            // Mensajes para el campo "comprador_id"
             'comprador_id.required' => 'El usuario autenticado es requerido',
             'comprador_id.integer' => 'Tipo de dato no válido',
-            'comprador_id' => 'Usuario no existe'
+            'comprador_id' => 'Usuario no existe',
+
+            // Mensajes para el campo "producto_id"
+            'producto_id.required' => 'El producto es requerido',
+            'producto_id.integer' => 'Tipo de dato no válido',
+            'producto_id.exists' => 'Producto no encontrado' 
         ];
     }
 }

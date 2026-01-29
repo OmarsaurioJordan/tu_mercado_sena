@@ -34,7 +34,7 @@ readonly class OutputDto implements Arrayable
             ? [
                 'id' => $chat->producto?->id,
                 'nombre' => $chat->producto?->nombre,
-                'imagen' => $chat->producto?->imagen
+                'imagen' => $chat->producto?->fotos->first()->imagen
             ] : null,
             ultimoMensajeTexto: $chat->ultimoMensaje?->mensaje ?? 'Sin mensajes aún',
             fechaUltimoMensaje: $chat->ultimoMensaje?->fecha_registro

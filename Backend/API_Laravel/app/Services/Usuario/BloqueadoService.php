@@ -25,12 +25,8 @@ class BloqueadoService implements IBloqueadoService
      */
     public function solicitarBloqueadosPorUsuario(int $bloqueadorId): array
     {
-        // 1. Obtención de datos
-        // Si el repositorio falla (ej: DB caída), la QueryException burbujea al Handler.
         $bloqueados = $this->bloqueadoRepository->obtenerBloqueadosPorUsuario($bloqueadorId);
 
-        // 2. Transformación y Retorno
-        // Pasamos la colección al DTO. Si está vacía, el DTO se encargará de devolver [].
         return OutputDto::fromModelCollection($bloqueados);
     }
     
