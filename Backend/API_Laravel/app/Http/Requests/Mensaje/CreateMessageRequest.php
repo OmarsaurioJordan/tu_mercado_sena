@@ -15,6 +15,13 @@ class CreateMessageRequest extends FormRequest
         return $chat->comprador_id === $usuario_id || $chat->producto->usuario_id === $usuario_id;
     }
 
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'chat_id' => $this->route('id')
+        ]);
+    }
+
 
     public function rules(): array
     {

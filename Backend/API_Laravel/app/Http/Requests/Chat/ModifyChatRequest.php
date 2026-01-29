@@ -18,6 +18,14 @@ class ModifyChatRequest extends FormRequest
         return $chat->comprador_id === $usuarioId || $chat->producto->usuario_id === $usuarioId;
     }
 
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'chat_id' => $this->route('id')
+        ]);
+    }
+
+
     public function rules(): array
     {
         return [
