@@ -29,6 +29,7 @@ class DeleteMessageRequest extends FormRequest
     {
         return [
             //
+            
         ];
     }
 }
