@@ -5,7 +5,7 @@ namespace App\Http\Requests\Chat;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class ChatRequest extends FormRequest
+class CreateChatRequest extends FormRequest
 {
     public function authorize(): bool
     {
