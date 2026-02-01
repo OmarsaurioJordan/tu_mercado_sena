@@ -39,26 +39,32 @@ readonly class OutputDetailsDto implements Arrayable
         ];
     }
 
-    public static function fromModel(Chat $chat): self
+    public static function fromModel(Chat $chat, bool $bloqueo_mutuo): self
     {
         return new self(
             id: $chat->id,
             comprador_id: $chat->comprador_id,
-            producto: $chat->relationLoaded('producto') && $chat->producto
-                ? [
-                    'id' => $chat->producto->id,
-                    'nombre' => $chat->producto->nombre,
-                    // Lógica para obtener la primera foto disponible
-                    'imagen' => $chat->producto->relationLoaded('fotos') 
-                                ? $chat->producto->fotos->first()?->imagen 
-                                : null,
-                    'vendedor' => $chat->producto->relationLoaded('vendedor') && $chat->producto->vendedor
-                        ? [
-                            'id' => $chat->producto->vendedor->id,
-                            'nickname' => $chat->producto->vendedor->nickname,
-                            'imagen' => $chat->producto->vendedor->imagen
-                        ] : null,
-                ] : [],
+            producto: $bloqueo_mutuo === false 
+               ? ($chat->relationLoaded('producto') && $chat->producto
+                    ? [
+                        'id' => $chat->producto->id,
+                        'nombre' => $chat->producto->nombre,
+                        // Lógica para obtener la primera foto disponible
+                        'imagen' => $chat->producto->relationLoaded('fotos') 
+                                    ? $chat->producto->fotos->first()?->imagen 
+                                    : null,
+                        'vendedor' => $chat->producto->relationLoaded('vendedor') && $chat->producto->vendedor
+                            ? [
+                                'id' => $chat->producto->vendedor->id,
+                                'nickname' => $chat->producto->vendedor->nickname,
+                                'imagen' => $chat->producto->vendedor->imagen
+                            ] : null,
+                    ] : [])
+                : ($chat->producto->relationLoaded('vendedor') && $chat->producto->vendedor
+                    ? [
+                        'id' => $chat->producto->vendedor->id,
+                        'nickname' => $chat->producto->vendedor->nickname,
+                    ] : []),
             estado_id: $chat->estado_id,
             visto_comprador: (bool) $chat->visto_comprador,
             visto_vendedor: (bool) $chat->visto_vendedor,
@@ -72,9 +78,9 @@ readonly class OutputDetailsDto implements Arrayable
                     'fecha' => $m->fecha_registro ? $m->fecha_registro->toDateTimeString() : null,
                 ])->toArray()
                 : [],
-            cantidad: $chat->cantidad,
-            calificacion: $chat->calificacion,
-            comentario: $chat->comentario,
+            cantidad: $chat->cantidad ?? null,
+            calificacion: $chat->calificacion ?? null,
+            comentario: $chat->comentario ?? null,
             fecha_venta: $chat->fecha_venta ? Carbon::parse($chat->fecha_venta) : null,
         );
     }

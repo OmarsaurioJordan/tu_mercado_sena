@@ -3,7 +3,7 @@
 namespace App\Repositories\Usuario;
 
 use App\Contracts\Usuario\Repositories\IBloqueadoRepository;
-use App\Models\Bloqueado;
+use App\Models\Usuario;
 use Illuminate\Database\Eloquent\Collection;
 
 
@@ -16,33 +16,37 @@ class BloqueadoRepository implements IBloqueadoRepository
      * Función para bloquear un usuario que retorna el modelo creado
      * @param int $bloqueadorId
      * @param int $bloqueadoId
-     * @return Bloqueado
+     * @return Usuario
      */
-    public function bloquearUsuario(int $bloqueadorId, int $bloqueadoId): Bloqueado
+    public function bloquearUsuario(int $bloqueadorId, int $bloqueadoId): Usuario
     {
-        return Bloqueado::firstOrCreate([
-            'bloqueador_id' => $bloqueadorId,
-            'bloqueado_id' => $bloqueadoId
-        ]);
+        $usuario = Usuario::find($bloqueadorId);
+        
+        return $usuario->usuariosQueHeBloqueado()->attach($bloqueadoId);
     }
 
     /**
      * Función para desbloquear un usuario que retorna el modelo eliminado
      * @param int $bloqueadorId
      * @param int $bloqueadoId
-     * @return Bloqueado|null El modelo eliminado o null si no se encontró
+     * @return Usuario|null El modelo eliminado o null si no se encontró
      */
-    public function desbloquearUsuario(int $bloqueadorId, int $bloqueadoId): Bloqueado
+    public function desbloquearUsuario(int $bloqueadorId, int $bloqueadoId): Usuario
     {
-        $registro = Bloqueado::where('bloqueador_id', $bloqueadorId)
-            ->where('bloqueado_id', $bloqueadoId)
-            ->first();
         
-        if ($registro) {
-            $registro->delete();
-        }
+        $usuario = Usuario::find($bloqueadorId);
 
-        return $registro;
+        return $usuario->usuariosQueHeBloqueado()->detach($bloqueadoId);
+
+        // $registro = Bloqueado::where('bloqueador_id', $bloqueadorId)
+        //     ->where('bloqueado_id', $bloqueadoId)
+        //     ->first();
+        
+        // if ($registro) {
+        //     $registro->delete();
+        // }
+
+        // return $registro;
     }
 
     /**
@@ -52,10 +56,12 @@ class BloqueadoRepository implements IBloqueadoRepository
      * @return bool
      */
     public function estaBloqueado(int $bloqueadorId, int $bloqueadoId): bool
-    {
-        return Bloqueado::where('bloqueador_id', $bloqueadorId)
-            ->where('bloqueado_id', $bloqueadoId)
-            ->exists();
+    {   
+        $usuario = Usuario::find($bloqueadorId);
+        return $usuario->usuariosQueHeBloqueado()->where('bloqueado_id', $bloqueadoId)->exists();
+        // return Bloqueado::where('bloqueador_id', $bloqueadorId)
+        //     ->where('bloqueado_id', $bloqueadoId)
+        //     ->exists();
     }
 
     /**
@@ -66,7 +72,7 @@ class BloqueadoRepository implements IBloqueadoRepository
     public function obtenerBloqueadosPorUsuario(int $bloqueadorId): Collection
     {
         # Función with para cargar la relación 'bloqueado' y no tener el problema de N+1 queries
-        return Bloqueado::with('bloqueado')
+        return Usuario::with('usuariosQueHeBloqueado')
             ->where('bloqueador_id', $bloqueadorId)
             ->get();
     }

@@ -12,19 +12,11 @@ class ModifyChatRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $chat = $this->route('id'); 
+        $chat = $this->route('chat'); 
         $usuarioId = Auth::id();
 
         return $chat->comprador_id === $usuarioId || $chat->producto->usuario_id === $usuarioId;
     }
-
-    public function prepareForValidation()
-    {
-        $this->merge([
-            'chat_id' => $this->route('id')
-        ]);
-    }
-
 
     public function rules(): array
     {

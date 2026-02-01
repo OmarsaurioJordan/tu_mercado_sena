@@ -24,10 +24,11 @@ interface IChatService
 
     /**
      * Función para mostrar los detalles de un chat
-     * @param int $chat_id
+     * @param int $chat_id - Id del chat
+     * @param int $usuario_id - Id del usuario autenticado
      * @return OutputDetailsDto
      */
-    public function mostrarChat(int $chat_id): OutputDetailsDto;
+    public function mostrarChat(int $chat_id, int $usuario_id): OutputDetailsDto;
     
     /**
      * Función para borrar el chat por su id

@@ -41,4 +41,21 @@ interface IChatRepository
    * @return Chat|null
    */
   public function findDetails(int $chat_id): ?Chat;
+
+  /**
+   * Obtener si uno usuarios ha bloqueado al otro usuario
+   * @param Chat $chat - Objeto del modelo chat
+   * @return bool - True si uno de los 2 ha bloqueado al otro usuario False si no
+  */
+  public function verificarBloqueoMutuo(Chat $chat): bool;
+
+  /**
+   * Método que retorna un mapa con los IDs bloqueados por el usuario y viceversa
+   * @param Collection $chats - Conjunto de registros 
+   * @param int $usuario_id - Id del usuario autenticado
+   * @return array
+   */
+  public function obtenerMapaDeBloqueos(Collection $chats, int $usuario_id): array;
 }
+
+
