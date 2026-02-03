@@ -35,7 +35,7 @@ use Tymon\JWTAuth\JWTGuard;
  * - 422 Unprocessable Entity: Validación falló
  * - 500 Internal Server Error: Error del servidor
  */
-class AuthController
+class AuthController extends Controller
 {
     /**
      * Constructor con intección de dependencias

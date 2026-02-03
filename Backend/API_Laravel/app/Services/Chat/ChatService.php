@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Contracts\Chat\Services\IChatService;
 use App\Exceptions\BusinessException;
 Use App\DTOs\Chat\InputDto;
+Use App\DTOs\Chat\UpdateInputDto;
 use App\DTOs\Chat\OutputDto;
 use App\DTOs\Chat\OutputDetailsDto;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -30,11 +31,19 @@ class ChatService implements IChatService
 
     public function iniciarChat(InputDto $dto): OutputDetailsDto
     {
+        // Verificar si ya existe un chat entre el comprador y el producto
+        // Si es asi no crear uno nuevo, retornar el existente
         if ($this->repository->findModel(['comprador_id' => $dto->comprador_id,'producto_id' => $dto->producto_id]
         )) {
-            throw new BusinessException('Ya tienes el chat activo', 422);
+           $chatExistente = $this->repository->findModel([
+                'comprador_id' => $dto->comprador_id,
+                'producto_id' => $dto->producto_id
+            ]);
+    
+            $bloqueo_mutuo = $this->repository->verificarBloqueoMutuo($chatExistente);
+    
+            return OutputDetailsDto::fromModel($chatExistente, $bloqueo_mutuo);
         }
-
 
         $chat = DB::transaction(fn() => 
             $this->repository->create($dto->toArray())
@@ -71,12 +80,25 @@ class ChatService implements IChatService
         return OutputDetailsDto::fromModel($chat, $bloqueo_mutuo);
     }
 
-    public function eliminarChat(int $chat_id): void
+    public function eliminarChat(int $chat_id, int $usuario_id): void
     {
-        $eliminado = $this->repository->delete($chat_id);
+       $chat_borrado = $this->repository->delete($chat_id, $usuario_id);
 
-        if (!$eliminado) {
-            throw new \Exception("No se pudo eliminar el chat.");
+       if (!$chat_borrado) {
+           throw new BusinessException('No se pudo eliminar el chat, intentalo nuevamente', 500);
+       }
+    }
+
+    public function actualizarChatComprador(int $chat_id, UpdateInputDto $dto): OutputDetailsDto
+    {
+        $chat_actualizado = $this->repository->update($chat_id, $dto->toArray());
+    
+        if (!$chat_actualizado) {
+            throw new BusinessException('No se pudo actualizar el chat.');
         }
+    
+        $bloqueo_mutuo = $this->repository->verificarBloqueoMutuo($chat_actualizado);
+
+        return OutputDetailsDto::fromModel($chat_actualizado, $bloqueo_mutuo);
     }
 }

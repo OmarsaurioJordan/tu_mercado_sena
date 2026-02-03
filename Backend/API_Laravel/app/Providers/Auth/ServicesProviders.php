@@ -2,6 +2,9 @@
 
 namespace App\Providers\Auth;
 
+
+use App\Models\Chat;
+use App\Policies\ChatPolicy;
 use App\Contracts\Auth\Services\IAuthService;
 use App\Contracts\Auth\Services\IRecuperarContrasenaService;
 use App\Contracts\Auth\Services\IRegistroService;
@@ -23,6 +26,10 @@ class ServicesProviders extends ServiceProvider
 
         $this->app->bind(IRegistroService::class, RegistroService::class);
     }
+
+    protected $policies = [
+        Chat::class => ChatPolicy::class,
+    ];
 
     /**
      * Bootstrap services.

@@ -23,7 +23,7 @@ class InputDto implements Arrayable
         ];
     }
 
-    public function fromRequest(array $data): self
+    public static function fromRequest(array $data): self
     {
         return new self(
             comprador_id: Auth::id(),

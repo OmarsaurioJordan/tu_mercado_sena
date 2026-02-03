@@ -30,10 +30,11 @@ interface IChatRepository
 
   /**
    * Función para borrar un chat por su id
-   * @param int $id - Id del chat que se eliminara de la base de datos
-   * @return bool
+   * @param int $id - Id del chat que se marcara como borrado por uno de los 2 usuarios
+   * @param int $usuario_id - Id del usuario que realiza la acción
+   * @return bool - True si se eliminó correctamente, false si no
    */
-  public function delete(int $id): bool;
+  public function delete(int $id, int $usuario_id): bool;
 
   /**
    * Función para obtener los detalles del chat
@@ -56,6 +57,14 @@ interface IChatRepository
    * @return array
    */
   public function obtenerMapaDeBloqueos(Collection $chats, int $usuario_id): array;
+
+  /**
+   * Función para actualizar un chat en la base de datos unicamente para el comprador
+   * @param int $id - Id del chat a actualizar
+   * @param array $data - Datos a actualizar
+   * @return Chat $chat
+   */
+  public function update(int $id, array $data): Chat;
 }
 
 

@@ -108,15 +108,37 @@ class ChatRepository implements IChatRepository
         ->get();
     }
 
-    public function delete(int $id): bool
+    public function delete(int $id, int $usuario_id): bool
     {
-        $chat = Chat::find($id);
+        $chat = Chat::findorFail($id);
 
-        if (!$chat) {
-            return false;
+        // Definir los IDs de tus estados (ajustar según tu tabla 'estados')
+        $ID_ELIMINADO_COMPRADOR = 4; 
+        $ID_ELIMINADO_VENDEDOR = 5;
+        $ID_ELIMINADO_POR_AMBOS = 6;
+
+        // Verificar quién está eliminando el chat y actualizar el estado en consecuencia
+        $esVendedor = ($chat->producto->vendedor_id === $usuario_id);
+        $esComprador = ($chat->comprador_id === $usuario_id);
+
+        // Lógica para el comprador
+        if ($esComprador) {
+            $nuevoEstado = ($chat->estado_id === $ID_ELIMINADO_VENDEDOR)
+                ? $ID_ELIMINADO_POR_AMBOS
+                : $ID_ELIMINADO_COMPRADOR;
+            
+            return $chat->update(['estado_id' => $nuevoEstado]);
         }
 
-        return $chat->delete();
+        if ($esVendedor) {
+            $nuevoEstado = ($chat->estado_id === $ID_ELIMINADO_COMPRADOR)
+                ? $ID_ELIMINADO_POR_AMBOS
+                : $ID_ELIMINADO_VENDEDOR;
+            
+            return $chat->update(['estado_id' => $nuevoEstado]);
+        }
+
+        return false;
     }
 
     public function findDetails(int $chatId): ?Chat
@@ -130,5 +152,13 @@ class ChatRepository implements IChatRepository
                 $query->orderBy('created_at', 'asc'); // O 'fecha_registro' si usas nombres personalizados
             }
         ])->find($chatId);
+    }
+
+    public function update(int $id, array $data): Chat
+    {
+        $chat = Chat::findOrFail($id);
+        $chat->update($data);
+
+        return $chat;
     }
 }

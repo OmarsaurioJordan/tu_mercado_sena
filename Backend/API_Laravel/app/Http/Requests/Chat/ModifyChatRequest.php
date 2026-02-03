@@ -13,9 +13,9 @@ class ModifyChatRequest extends FormRequest
     public function authorize(): bool
     {
         $chat = $this->route('chat'); 
-        $usuarioId = Auth::id();
+        $usuarioId = Auth::user()->usuario->id;
 
-        return $chat->comprador_id === $usuarioId || $chat->producto->usuario_id === $usuarioId;
+        return $chat->comprador_id === $usuarioId;
     }
 
     public function rules(): array

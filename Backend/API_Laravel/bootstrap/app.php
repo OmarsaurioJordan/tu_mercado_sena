@@ -56,7 +56,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 if ($e instanceof AuthorizationException) {
                     return response()->json([
                         'status'  => 'error',
-                        'message' => 'No tienes permisos para realizar esta acción.',
+                        'message' => 'No Autorizado.',
                     ], 403);
                 }
 

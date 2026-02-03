@@ -3,6 +3,7 @@
 namespace App\Contracts\Chat\Services;
 
 use App\DTOs\Chat\InputDto;
+use App\DTOs\Chat\UpdateInputDto;
 use App\DTOs\Chat\OutputDetailsDto;
 
 interface IChatService
@@ -33,7 +34,16 @@ interface IChatService
     /**
      * Función para borrar el chat por su id
      * @param int $chat_id - Id del chat
+     * @param int $usuario_id - Id del usuario autenticado
      * @return void
      */
-    public function eliminarChat(int $chat_id): void;
+    public function eliminarChat(int $chat_id, int $usuario_id): void;
+
+    /**
+     * Función para que el comprador actualice el estado del chat
+     * @param int $chat_id - Id del chat
+     * @param UpdateInputDto $dto - Datos para actualizar el chat
+     * @return OutputDetailsDto
+     */
+    public function actualizarChatComprador(int $chat_id, UpdateInputDto $dto): OutputDetailsDto;
 }

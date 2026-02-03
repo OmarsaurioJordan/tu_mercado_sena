@@ -15,7 +15,7 @@ class CreateChatRequest extends FormRequest
     protected function prepareForValidation()
     {
         $this->merge([
-            'comprador_id' => Auth::id(),
+            'comprador_id' => Auth::user()->usuario->id,
             'producto_id' => $this->route('producto')
         ]);
     }
