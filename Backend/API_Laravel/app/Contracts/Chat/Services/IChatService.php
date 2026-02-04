@@ -37,7 +37,7 @@ interface IChatService
      * @param int $usuario_id - Id del usuario autenticado
      * @return void
      */
-    public function eliminarChat(int $chat_id, int $usuario_id): void;
+    public function eliminarChat(int $chat_id, int $usuario_id): mixed;
 
     /**
      * Función para que el comprador actualice el estado del chat

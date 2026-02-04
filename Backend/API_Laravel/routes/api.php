@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\ProductoController; 
+use App\Http\Controllers\Api\ChatController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -171,6 +172,12 @@ Route::middleware('jwtVerify')->group(function (){
      * GET /api/mis-productos
      */
     Route::get('/mis-productos', [ProductoController::class, 'misProductos']);
+
+    Route::resource('chats', ChatController::class)->only([
+        'index', 'show', 'update', 'destroy'
+    ]);
+
+    Route::post('chats', [ChatController::class, 'store'])->middleware('CheckChatBlock');
 
 });
 

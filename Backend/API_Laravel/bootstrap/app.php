@@ -12,6 +12,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use App\Http\Middleware\CheckChatBlock;
 
 
 $app = Application::configure(basePath: dirname(__DIR__))
@@ -25,6 +26,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
         $middleware->alias([
             'jwtVerify' => \App\Http\Middleware\ValidateJWTToken::class,
+            'CheckChatBlock' => \App\Http\Middleware\CheckChatBlock::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
