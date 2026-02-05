@@ -41,7 +41,7 @@ readonly class OutputDetailsDto implements Arrayable
         ];
     }
 
-    public static function fromModel(Chat $chat, bool $bloqueo_mutuo, $mensajesPaginados = null): self
+    public static function fromModel(Chat $chat, bool $bloqueo_mutuo = false, $mensajesPaginados = null): self
     {
         return new self(
             id: $chat->id,
