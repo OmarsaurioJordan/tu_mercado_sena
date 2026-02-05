@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Contracts\Mensaje\Services\IMensajeService;
+use App\DTOs\Chat\OutputDetailsDto;
 use App\Http\Controllers\Api\Controller;
 use App\Http\Requests\Mensaje\StoreMessageRequest;
 use App\Models\Mensaje;
 use App\DTOs\Mensaje\InputDto;
+use App\Models\Chat;
 
 class MensajeController extends Controller
 {
@@ -14,17 +16,19 @@ class MensajeController extends Controller
         protected IMensajeService $mensajeService
     ){}
 
-    public function store(StoreMessageRequest $request)
+    public function store(Chat $chat,StoreMessageRequest $request)
     {
         // Crear el dto que guardara la información proveniente del front-end
         $dto = InputDto::fromRequest($request->validated());
 
-        $mensaje = $this->mensajeService->crearMensaje($dto);
+        $mensaje = $chat->mensajes()->create($dto->toArray());
+
+        $chat = $chat->with(['producto', 'producto.fotos', 'producto.vendedor'])->first();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Mensaje creado correctamente',
-            'data' => $mensaje
+            'chat_detalle' => OutputDetailsDto::fromModel($chat, false, null)->toArray(),
+            'nuevo_mensaje' => $mensaje
         ], 201);
     }
 

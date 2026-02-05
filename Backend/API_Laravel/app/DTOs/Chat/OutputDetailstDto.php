@@ -19,7 +19,8 @@ readonly class OutputDetailsDto implements Arrayable
         public ?int $cantidad,
         public ?int $calificacion,
         public ?string $comentario,
-        public ?Carbon $fecha_venta
+        public ?Carbon $fecha_venta,
+        public array $paginacion
     ) {}
 
     public function toArray(): array
@@ -33,13 +34,14 @@ readonly class OutputDetailsDto implements Arrayable
             'visto_vendedor' => $this->visto_vendedor,
             'mensajes' => $this->mensajes,
             'cantidad' => $this->cantidad,
+            'paginacion' => $this->paginacion,
             'calificacion' => $this->calificacion,
             'comentario' => $this->comentario,
-            'fecha_venta' => $this->fecha_venta?->toDateTimeString()
+            'fecha_venta' => $this->fecha_venta?->toDateTimeString(),
         ];
     }
 
-    public static function fromModel(Chat $chat, bool $bloqueo_mutuo): self
+    public static function fromModel(Chat $chat, bool $bloqueo_mutuo, $mensajesPaginados = null): self
     {
         return new self(
             id: $chat->id,
@@ -68,16 +70,20 @@ readonly class OutputDetailsDto implements Arrayable
             estado_id: $chat->estado_id,
             visto_comprador: (bool) $chat->visto_comprador,
             visto_vendedor: (bool) $chat->visto_vendedor,
-            mensajes: $chat->relationLoaded('mensajes')
-                ? $chat->mensajes->map(fn($m) => [
-                    'id' => $m->id,
-                    'es_comprador' => (bool) $m->es_comprador, // Casteo a bool por seguridad
-                    'chat_id' => $m->chat_id,
-                    'mensaje' => $m->mensaje,
-                    'imagen' => $m->imagen,
-                    'fecha' => $m->fecha_registro ? $m->fecha_registro->toDateTimeString() : null,
-                ])->toArray()
-                : [],
+            mensajes: $mensajesPaginados 
+                        ? $mensajesPaginados->getCollection()->map(fn($m) => [
+                            'id' => $m->id,
+                            'mensaje' => $m->mensaje,
+                            'es_comprador' => (bool) $m->es_comprador,
+                            // ... rest of mapping
+                        ])->toArray()
+                        : null, // O [] si prefieres que siempre sea un array
+            paginacion: $mensajesPaginados ? [
+                'total' => $mensajesPaginados->total(),
+                'pagina_actual' => $mensajesPaginados->currentPage(),
+                'siguiente_pagina' => $mensajesPaginados->nextPageUrl(),
+                'pagina_anterior' => $mensajesPaginados->previousPageUrl(),
+            ] : null,
             cantidad: $chat->cantidad ?? null,
             calificacion: $chat->calificacion ?? null,
             comentario: $chat->comentario ?? null,

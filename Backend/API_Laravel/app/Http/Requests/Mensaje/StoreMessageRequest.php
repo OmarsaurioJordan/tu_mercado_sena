@@ -41,10 +41,6 @@ class StoreMessageRequest extends FormRequest
                 'string',
                 'max:80'
             ],
-            'chat_id' => [
-                'required',
-                'exists:chats,id'
-            ]
         ];
     }
 

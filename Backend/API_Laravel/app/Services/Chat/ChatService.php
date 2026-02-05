@@ -41,7 +41,7 @@ class ChatService implements IChatService
             ]);
     
             $bloqueo_mutuo = $this->repository->verificarBloqueoMutuo($chatExistente);
-    
+
             return OutputDetailsDto::fromModel($chatExistente, $bloqueo_mutuo);
         }
 
@@ -77,8 +77,12 @@ class ChatService implements IChatService
 
         $bloqueo_mutuo = $this->repository->verificarBloqueoMutuo($chat);
 
+        
+        $mensajesPaginados = $chat->mensajes()
+            ->orderByDesc('fecha_registro') 
+            ->paginate(20);
 
-        return OutputDetailsDto::fromModel($chat, $bloqueo_mutuo);
+        return OutputDetailsDto::fromModel($chat, $bloqueo_mutuo, $mensajesPaginados);
     }
 
     public function eliminarChat(int $chat_id, int $usuario_id): mixed
