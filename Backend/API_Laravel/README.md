@@ -606,6 +606,13 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados/{bloqueado_id}**
 ```
 
 **Modulo productos**
+**Importante para la parte de las fotos, aún esta en prueba**
+
+
+Se debe de ejecutar el siguiente comando para crear un enlace simbiotico de las imagenes. Esto es necesario para que la carpeta publica pueda acceder a los archivos subidos.
+```CMD
+php artisan storage:link
+```
 
 
 **1️⃣ Listar productos**
