@@ -7,6 +7,7 @@ use App\Contracts\Chat\Services\IChatService;
 use App\DTOs\Chat\InputDto;
 use App\DTOs\Chat\UpdateInputDto;
 use App\Models\Chat;
+use App\Models\Producto;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Chat\CreateChatRequest;
 use App\Http\Requests\Chat\ModifyChatRequest;
@@ -20,6 +21,7 @@ class ChatController extends Controller
 
     public function index()
     {
+        $this->authorize('viewAny', Chat::class);
         // Mostrar la lista de los chats
         $usuario_id = Auth::user()->usuario->id; 
 
@@ -30,7 +32,9 @@ class ChatController extends Controller
     }
 
     public function show(Chat $chat)
-    {
+    {   
+        $chat->load('producto');
+
         // Validar que solo el comprador o el vendedor puedan ver los detalles del chat
         $this->authorize('view', $chat);
 
@@ -43,9 +47,18 @@ class ChatController extends Controller
         ], 200);
     }
 
-    public function store(CreateChatRequest $request)
+    public function store(Producto $producto, CreateChatRequest $request)
     {
-        $dto = InputDto::fromRequest($request->validated());
+
+        $usuario_id = Auth::user()->usuario->id;
+        $producto_id = $producto->id;
+        $estado_id = 1; // Asignar el estado "activo" por defecto
+
+        $dto = InputDto::fromRequest([
+            'comprador_id' => $usuario_id,
+            'producto_id' => $producto_id,
+            'estado_id' => $estado_id
+        ]);
 
         $chat = $this->chatService->iniciarChat($dto);
 

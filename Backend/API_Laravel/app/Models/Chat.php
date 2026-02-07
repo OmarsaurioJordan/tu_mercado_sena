@@ -12,6 +12,8 @@ class Chat extends Model
 {
     protected $table = 'chats';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'comprador_id',
         'producto_id',

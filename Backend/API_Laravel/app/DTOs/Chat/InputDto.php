@@ -27,7 +27,7 @@ class InputDto implements Arrayable
     {
         return new self(
             comprador_id: Auth::id(),
-            producto_id: $data['producto_id'],
+            producto_id: $data['producto_id'] ?? null,
             estado_id: $data['estado_id']
         );
     }

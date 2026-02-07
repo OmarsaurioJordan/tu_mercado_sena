@@ -25,6 +25,9 @@ return new class extends Migration
             ['nombre' => 'activo', 'descripcion' => 'Usuario activo en el sistema'],
             ['nombre' => 'invisible', 'descripcion' => 'Usuario invisible en el sistema'],
             ['nombre' => 'eliminado', 'descripcion' => 'Usuario eliminado en el sistema'],
+            ['nombre' => 'eliminado_comprador', 'descripcion' => 'Chat eliminado por comprador'],
+            ['nombre' => 'eliminado_vendedor', 'descripcion' => 'Chat eliminado por vendedor'],
+            ['nombre' => 'eliminado_por_ambos', 'descripcion' => 'Chat eliminado por ambos participantes'],
         ]);
     }
 

@@ -13,7 +13,6 @@ class ChatRepository implements IChatRepository
     public function verificarBloqueoMutuo(Chat $chat): bool
     {
         $comprador = $chat->comprador;
-
         $vendedor = $chat->producto->vendedor;
 
         // Verificar si el comprador tiene bloqueado al vendedor
@@ -67,13 +66,17 @@ class ChatRepository implements IChatRepository
         // Obtener los datos de las tablas relacionadas
         $chat->load([
             'comprador' => function ($query) {
-                $query->select('id', 'nombre', 'imagen');
+                $query->select('id', 'nickname', 'imagen');
             },
             'producto' => function ($query) {
                 $query->select('id', 'nombre', 'precio');
             },
             'producto.fotoPrincipal' => function ($query) {
-                $query->select('id', 'producto_id', 'imagen')->first();
+                $query->select(
+                    'fotos.id',
+                    'fotos.producto_id',
+                    'fotos.imagen'
+                );
             },
             'estado' => function ($query) {
                 $query->select('id', 'nombre');
@@ -87,10 +90,10 @@ class ChatRepository implements IChatRepository
     {
         return Chat::where($criterios)
             ->with([
-                'comprador: id, nombre, imagen',
-                'producto: id, nombre, precio',
-                'producto.fotos: id, producto_id, imagen',
-                'estado: id, nombre'
+                'comprador:id,nombre,imagen',
+                'producto:id,nombre,precio',
+                'producto.fotos:id,producto_id,imagen',
+                'estado:id,nombre'
             ])
             ->first();
     }
@@ -98,14 +101,22 @@ class ChatRepository implements IChatRepository
     public function listarChats(int $usuario_id): Collection
     {
         return Chat::with([
-                'producto: id, nombre, precio, vendedor_id',
-                'producto.vendedor: id, nickname, imagen',
-                'producto.fotos: id, producto_id, imagen',
-                'estado: id, nombre',
+                'producto:id,nombre,precio,vendedor_id',
+                'producto.vendedor:id,nickname,imagen',
+                'producto.fotos:id,producto_id,imagen',
+                'estado:id,nombre',
                 'ultimoMensaje'
-        ])
-        ->where('comprador_id', $usuario_id)
-        ->get();
+            ])
+            ->where(function ($query) use ($usuario_id) {
+                $query->where('comprador_id', $usuario_id)
+                    ->orWhereHas('producto', function ($q) use ($usuario_id) {
+                        $q->where('vendedor_id', $usuario_id);
+                    });
+            })
+            ->whereHas('estado', function ($query) {
+                $query->whereNotIn('id', [4, 5, 6]);
+            })
+            ->get();
     }
 
     public function delete(int $id, int $usuario_id): bool
@@ -145,11 +156,11 @@ class ChatRepository implements IChatRepository
     {
         return Chat::with([
             'estado',
-            'comprador:id,nombre,imagen',
+            'comprador:id,nickname,imagen',
             'producto.vendedor:id,nickname,imagen',
             'producto.fotos:id,producto_id,imagen', // Necesario para la foto del producto
             'mensajes' => function ($query) {
-                $query->orderBy('created_at', 'asc'); // O 'fecha_registro' si usas nombres personalizados
+                $query->orderBy('fecha_registro', 'asc'); // O 'fecha_registro' si usas nombres personalizados
             }
         ])->find($chatId);
     }

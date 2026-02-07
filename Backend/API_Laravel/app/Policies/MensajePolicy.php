@@ -13,16 +13,18 @@ class MensajePolicy
      */
     public function delete(Cuenta $cuenta, Mensaje $mensaje): bool
     {
-        $usuario = $cuenta->usuario;
+        $usuarioId = $cuenta->usuario->id;
         $chat = $mensaje->chat;
 
-        $esDelChat = $chat->comprador_id === $usuario->id || $chat->producto->usuario_id === $usuario->id;
+        // Si esto falla, es porque no cargaste 'chat.producto' en el controlador
+        $vendedorId = $chat->producto->vendedor->id;
+        $compradorId = $chat->comprador->id;
 
-        $esCreador = $chat->es_comprador
-            ? $chat->comprador_id === $usuario->id
-            : $chat->producto->usuario_id === $usuario->id;
-            
-        return $esDelChat && $esCreador;
+        // Lógica basada en tu base de datos (tinyint es_comprador)
+        $esAutor = $mensaje->es_comprador 
+                ? $compradorId == $usuarioId 
+                : $vendedorId == $usuarioId;
+
+        return $esAutor;
     }
-
 }

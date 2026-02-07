@@ -28,17 +28,11 @@ class CreateChatRequest extends FormRequest
                 'integer',
                 'exists:usuarios,id',
                 function ($attribute, $value, $fail){
-                    if ($value !== Auth::id()) {
+                    if ($value !== Auth::user()->usuario->id) {
                         $fail('No tienes permiso para esta acción');
                     }
                 }
             ],
-
-            'producto_id' => [
-                'required',
-                'integer',
-                'exists:productos,id'
-            ]
         ];
     }
 
@@ -49,11 +43,6 @@ class CreateChatRequest extends FormRequest
             'comprador_id.required' => 'El usuario autenticado es requerido',
             'comprador_id.integer' => 'Tipo de dato no válido',
             'comprador_id' => 'Usuario no existe',
-
-            // Mensajes para el campo "producto_id"
-            'producto_id.required' => 'El producto es requerido',
-            'producto_id.integer' => 'Tipo de dato no válido',
-            'producto_id.exists' => 'Producto no encontrado' 
         ];
     }
 }

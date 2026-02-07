@@ -17,7 +17,12 @@ class MensajeService implements IMensajeService
     public function crearMensaje(InputDto $dto): Mensaje
     {
         return DB::transaction(function () use ($dto) {
+
+            
+
             $mensaje = $this->mensajeRepository->create($dto->toArray());
+
+            $mensaje->load('chat.producto.vendedor', 'chat.comprador');
 
             if (!$mensaje) {
                 throw new \Exception("No se pudo crear el mensaje, Intente nuevamente.");

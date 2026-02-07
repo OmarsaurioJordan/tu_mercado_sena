@@ -4,10 +4,19 @@ namespace App\Policies;
 
 use App\Models\Chat;
 use App\Models\Cuenta;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Access\Response;
 
 class ChatPolicy
 {
+    public function viewAny(Cuenta $cuenta): bool
+    {
+        // Cualquier usuario autenticado puede ver la lista de chats
+        $usuario_id = $cuenta->usuario->id;
+
+        return $usuario_id === Auth::user()->usuario->id;
+    }
+    
     /**
      * Determinar quien puede ver los detalles de un chat
      * @param Chat $chat
@@ -15,17 +24,13 @@ class ChatPolicy
      * @return bool
      */
     public function view(Cuenta $cuenta, Chat $chat): bool
-    {   
-        // Obtener el usuario asociado a la cuenta
+    {
         $usuario = $cuenta->usuario;
 
-        // Verificar si el usuario es el comprador
         $esComprador = $usuario->id === $chat->comprador_id;
-        
-        // Verificar si el usuario es el vendedor
-        $esVendedor = $usuario->id === $chat->producto->usuario_id;
 
-        // Permitir el acceso si es comprador o vendedor
+        $esVendedor = $usuario->id === $chat->producto->vendedor_id;
+
         return $esComprador || $esVendedor;
     }
 

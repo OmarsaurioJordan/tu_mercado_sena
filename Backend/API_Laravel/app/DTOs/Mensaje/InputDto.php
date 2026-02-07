@@ -10,17 +10,17 @@ class InputDto implements Arrayable
         public ?string $mensaje,
         public ?string $imagen,
         public int $chat_id,
-        public bool $es_comprador
+        public ?bool $es_comprador
     )
     {}
 
     public function toArray(): array
     {
         return [
-            'mensaje' => $this->mensaje,
-            'imagen' => $this->imagen,
+            'mensaje' => (string) $this->mensaje ?? "",
+            'imagen' => $this->imagen ?? "",
             'chat_id' => $this->chat_id,
-            'es_comprador' => $this->es_comprador
+            'es_comprador' => (bool) $this->es_comprador
         ];
     }
 
@@ -30,7 +30,7 @@ class InputDto implements Arrayable
             mensaje: $data['mensaje'] ?? null,
             imagen: $data['imagen'] ?? null,
             chat_id: $data['chat_id'],
-            es_comprador: $data['es_comprador'] ?? false
+            es_comprador: $data['es_comprador'] ?? null
         );
     }
 }

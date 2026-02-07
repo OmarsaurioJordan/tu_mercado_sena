@@ -9,6 +9,7 @@ use App\Http\Requests\Mensaje\StoreMessageRequest;
 use App\Models\Mensaje;
 use App\DTOs\Mensaje\InputDto;
 use App\Models\Chat;
+use Illuminate\Support\Facades\Auth;
 
 class MensajeController extends Controller
 {
@@ -16,28 +17,47 @@ class MensajeController extends Controller
         protected IMensajeService $mensajeService
     ){}
 
-    public function store(Chat $chat,StoreMessageRequest $request)
+    public function store(Chat $chat, StoreMessageRequest $request)
     {
-        // Crear el dto que guardara la información proveniente del front-end
-        $dto = InputDto::fromRequest($request->validated());
+        $dto = InputDto::fromRequest(
+            array_merge(
+                $request->validated(),
+                [
+                    'chat_id' => $chat->id,
+                    'es_comprador' => $chat->comprador_id === Auth::user()->usuario->id
+                ]
+            )
+        );
 
         $mensaje = $chat->mensajes()->create($dto->toArray());
 
-        $chat = $chat->with(['producto', 'producto.fotos', 'producto.vendedor'])->first();
+        $chat->load(['producto', 'producto.fotos', 'producto.vendedor']);
 
+        $mensajesPaginados = $chat
+            ->mensajes()
+            ->orderBy('fecha_registro', 'desc')
+            ->paginate(20);
+
+        
         return response()->json([
             'status' => 'success',
-            'chat_detalle' => OutputDetailsDto::fromModel($chat, false, null)->toArray(),
+            'chat_detalle' => OutputDetailsDto::fromModel($chat, false, $mensajesPaginados)->toArray(),
             'nuevo_mensaje' => $mensaje
         ], 201);
     }
 
-    public function destroy(Mensaje $mensaje)
-    {
+    public function destroy(Chat $chat, Mensaje $mensaje)
+    {   
+        if ($mensaje->chat_id !== $chat->id) {
+                abort(403, 'El mensaje no pertenece al chat especificado.'); 
+        }
+
+        $mensaje->load('chat.producto');
+
         // Validar que solo los usuarios del chat y el creador del mensaje puedan eliminarlo
         $this->authorize('delete', $mensaje);
 
-        $this->mensajeService->delete($mensaje->id);
+        $mensaje->delete($mensaje->id);
 
         return response()->json([
             'status' => 'success',

@@ -15,12 +15,12 @@ readonly class OutputDetailsDto implements Arrayable
         public int $estado_id,
         public bool $visto_comprador,
         public bool $visto_vendedor,
-        public array $mensajes,
+        public ?array $mensajes,
         public ?int $cantidad,
         public ?int $calificacion,
         public ?string $comentario,
         public ?Carbon $fecha_venta,
-        public array $paginacion
+        public ?array $paginacion
     ) {}
 
     public function toArray(): array
@@ -60,12 +60,13 @@ readonly class OutputDetailsDto implements Arrayable
                                 'id' => $chat->producto->vendedor->id,
                                 'nickname' => $chat->producto->vendedor->nickname,
                                 'imagen' => $chat->producto->vendedor->imagen
-                            ] : null,
+                            ] : [],
                     ] : [])
                 : ($chat->producto->relationLoaded('vendedor') && $chat->producto->vendedor
                     ? [
                         'id' => $chat->producto->vendedor->id,
                         'nickname' => $chat->producto->vendedor->nickname,
+                        'imagen' => ($bloqueo_mutuo === true ? null : $chat->producto->vendedor->imagen)
                     ] : []),
             estado_id: $chat->estado_id,
             visto_comprador: (bool) $chat->visto_comprador,
@@ -75,15 +76,16 @@ readonly class OutputDetailsDto implements Arrayable
                             'id' => $m->id,
                             'mensaje' => $m->mensaje,
                             'es_comprador' => (bool) $m->es_comprador,
-                            // ... rest of mapping
+                            'imagen' => $m->imagen,
+                            'fecha_registro' => $m->fecha_registro->toDateTimeString(),
                         ])->toArray()
-                        : null, // O [] si prefieres que siempre sea un array
+                        : [], // O [] si prefieres que siempre sea un array
             paginacion: $mensajesPaginados ? [
                 'total' => $mensajesPaginados->total(),
                 'pagina_actual' => $mensajesPaginados->currentPage(),
                 'siguiente_pagina' => $mensajesPaginados->nextPageUrl(),
                 'pagina_anterior' => $mensajesPaginados->previousPageUrl(),
-            ] : null,
+            ] : [],
             cantidad: $chat->cantidad ?? null,
             calificacion: $chat->calificacion ?? null,
             comentario: $chat->comentario ?? null,

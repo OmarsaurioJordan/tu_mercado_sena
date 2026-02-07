@@ -10,40 +10,56 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckChatBlock
 {
-    /**
-     * Verificar si existe un bloqueo entre los participantes del chat
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // Obtener la ruta desde el parámetro de la ruta
         $chat = $request->route('chat');
 
-        // Si el chat no es un objeto(es un ID), lo buscamos
         if (!$chat instanceof Chat) {
-            $chat = Chat::with(['producto.vendedor', 'comprador'])->findOrFail($chat);
+            $chat = Chat::with(['producto.vendedor', 'comprador'])
+                ->findOrFail($chat);
         }
 
-        // Id de la cuenta que es la misma del usuario
         $usuarioAutenticado = Auth::user()->usuario;
 
-        // Identificar al otro usuario en el chat
-        $vendedor = $chat->producto->vendedor;
         $comprador = $chat->comprador;
+        $vendedor = $chat->producto->vendedor;
 
-        $otroUsuario = ($usuarioAutenticado->id === $comprador->id) ? $vendedor : $comprador;
+        // 1️⃣ Validar que el usuario pertenezca al chat
+        if (
+            $usuarioAutenticado->id !== $comprador->id &&
+            $usuarioAutenticado->id !== $vendedor->id
+        ) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tienes permiso para interactuar con este chat',
+                'code' => 'CHAT_FORBIDDEN'
+            ], 403);
+        }
 
-        // Verificar el bloqueo mutuo usando la relacion belongsToMany
-        $existeBloqueo = $usuarioAutenticado->usuariosQueHeBloqueado()->where('bloqueado_id', $otroUsuario->id)->exists()
-                      || $otroUsuario->usuariosQueheBloqueado()->where('bloqueado_id', $usuarioAutenticado->id);
+        // 2️⃣ Identificar al otro usuario
+        $otroUsuario = $usuarioAutenticado->id === $comprador->id
+            ? $vendedor
+            : $comprador;
+
+        // 3️⃣ Verificar bloqueo mutuo
+        $existeBloqueo =
+            $usuarioAutenticado->usuariosQueHeBloqueado()
+                ->where('bloqueado_id', $otroUsuario->id)
+                ->exists()
+            ||
+            $otroUsuario->usuariosQueHeBloqueado()
+                ->where('bloqueado_id', $usuarioAutenticado->id)
+                ->exists();
 
         if ($existeBloqueo) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No puedes realizar esta operación debido a las configuraciones de privacidad de los usuarios involucrados.',
-                'code' => 'USER_RESTRICTION'
+                'message' => 'No puedes enviar mensajes porque uno de los usuarios ha bloqueado al otro.',
+                'code' => 'USER_BLOCKED'
             ], 403);
         }
-        
+
         return $next($request);
     }
 }
+

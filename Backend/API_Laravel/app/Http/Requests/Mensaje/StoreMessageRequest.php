@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Mensaje;
 
 use App\Models\Chat;
+use App\Models\Usuario;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,13 +15,14 @@ class StoreMessageRequest extends FormRequest
     public function authorize(): bool
     {
         // Validar si el usuario pertenece al chat
-        $chat = Chat::with('producto')->find($this->chat_id);
+        $chat = $this->route('chat');
 
         if (!$chat) return false;
 
         $usuario_id = Auth::user()->usuario->id;
-        
-        return $usuario_id === $chat->comprador_id || $usuario_id === $chat->producto->vendedor->id;
+
+        return $usuario_id === $chat->comprador_id
+            || $usuario_id === $chat->producto->vendedor->id;    
     }
 
     /**
@@ -41,16 +43,10 @@ class StoreMessageRequest extends FormRequest
                 'string',
                 'max:80'
             ],
+
+            'es_comprador' => [
+                'boolean'
+            ]
         ];
-    }
-
-    protected function passedValidation():void
-    {
-        $chat = Chat::find($this->chat->id);
-        $usuario_id = Auth::user()->usuario->id;
-
-        $this->merge([
-            'es_comprador' => ($usuario_id === $chat->comprador_id)
-        ]);
     }
 }

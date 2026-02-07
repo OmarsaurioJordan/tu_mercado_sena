@@ -13,18 +13,15 @@ class MensajeObserver
     {
         $chat = $mensaje->chat;
 
-        if ($mensaje->es_comprador) {
-            // Si escribio el comprador: él ya lo vio, el vendedor no
+        if ($mensaje->es_comprador === true) {
             $chat->update([
                 'visto_comprador' => true,
-                'visto_vendedor' => false
+                'visto_vendedor' => false,
             ]);
-
         } else {
-            // Si escribió el vendedor: él ya lo vio, el comprador no
             $chat->update([
                 'visto_vendedor' => true,
-                'visto_comprador' => false
+                'visto_comprador' => false,
             ]);
         }
     }

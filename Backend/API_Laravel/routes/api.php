@@ -185,12 +185,12 @@ Route::middleware('jwtVerify')->group(function (){
     // RUTA: api/chats
     // Crea un nuevo chat entre el usuario autenticado y otro usuario (vendedor)
     // El middleware "CheckChatBlock" verifica si el usuario autenticado ha bloqueado al otro usuario o viceversa
-    Route::post('chats', [ChatController::class, 'store'])->middleware('CheckChatBlock');
+    Route::post('productos/{producto}/chats', [ChatController::class, 'store']);//->middleware('CheckChatBlock');
     
     //RUTA: api/chats/{chat}/mensajes
     Route::post('chats/{chat}/mensajes', [MensajeController::class, 'store'])->middleware('CheckChatBlock');
     // RUTA: api/mensajes/{mensaje}
-    Route::delete('mensajes/{mensaje}', [MensajeController::class, 'destroy'])->middleware('can:delete,mensaje');
+    Route::delete('chats/{chat}/mensajes/{mensaje}', [MensajeController::class, 'destroy']);
 });
 
 

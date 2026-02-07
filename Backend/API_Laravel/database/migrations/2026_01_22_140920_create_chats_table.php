@@ -18,8 +18,8 @@ return new class extends Migration
             $table->foreignId('estado_id')->constrained('estados')->onDelete('cascade');
             $table->boolean('visto_comprador')->default(false);
             $table->boolean('visto_vendedor')->default(false);
-            $table->float('precio');
-            $table->smallInteger('cantidad');
+            $table->float('precio')->nullable();
+            $table->smallInteger('cantidad')->default(1);
             $table->tinyInteger('calificacion')->nullable();
             $table->text('comentario')->nullable();
             $table->dateTime('fecha_venta')->nullable();

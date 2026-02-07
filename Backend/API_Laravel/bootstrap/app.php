@@ -12,8 +12,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use App\Http\Middleware\CheckChatBlock;
-
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -55,10 +54,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     ], $e->getStatusCode());
                 }
 
-                if ($e instanceof AuthorizationException) {
+                if ($e instanceof AuthorizationException || $e instanceof AccessDeniedHttpException) {
                     return response()->json([
                         'status'  => 'error',
-                        'message' => 'No Autorizado.',
+                        'message' => 'Acceso denegado: No tienes permisos para realizar esta acción.',
                     ], 403);
                 }
 
@@ -89,7 +88,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     $code = match(true) {
                         $e instanceof ModelNotFoundException,
                         $e instanceof NotFoundHttpException => 404,
-                        $e instanceof \Illuminate\Auth\Access\AuthorizationException => 403,
                         default => ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException ? $e->getStatusCode() : 500),
                     };
                     

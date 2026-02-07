@@ -11,14 +11,18 @@ class Mensaje extends Model
     
     public $timestamps = true;
 
-    const CREATE_AT = 'fecha_registro';
-    const UPDATE_AT = null;
+    const CREATED_AT = 'fecha_registro';
+    const UPDATED_AT = null;
     
     protected $fillable = [
         'es_comprador',
         'chat_id',
-        'mensajes',
+        'mensaje',
         'imagen'
+    ];
+
+    protected $casts = [
+        'es_comprador' => 'boolean',
     ];
 
     // Relación 1-1

@@ -64,15 +64,6 @@ class Usuario extends Model
         );
     }
 
-    public function usuariosQueMeHanBloqueado()
-    {
-        return $this->belongsToMany(
-            Usuario::class,
-            'bloqueados',
-            'bloqueado_id',
-            'bloqueador_id'
-        );
-    }
     public function productos()
     {
         return $this->hasMany(Producto::class, 'vendedor_id');

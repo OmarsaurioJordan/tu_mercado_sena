@@ -39,14 +39,25 @@ class ChatService implements IChatService
                 'comprador_id' => $dto->comprador_id,
                 'producto_id' => $dto->producto_id
             ]);
+
+            $mensajesPaginados = $chatExistente
+                ->mensajes()
+                ->orderBy('fecha_registro', 'desc')
+                ->paginate(20);
+
+            $chatExistente->load('producto.vendedor', 'comprador');
+
     
             $bloqueo_mutuo = $this->repository->verificarBloqueoMutuo($chatExistente);
 
-            return OutputDetailsDto::fromModel($chatExistente, $bloqueo_mutuo);
+            return OutputDetailsDto::fromModel($chatExistente, $bloqueo_mutuo, $mensajesPaginados);
         }
 
         return DB::transaction(function () use ($dto){
             $chat = $this->repository->create($dto->toArray());
+
+            $chat->load('producto.vendedor', 'comprador');
+
 
             if (!$chat) {
                 throw new BusinessException('No se pudo crear el chat, intentalo nuevamente', 500);
@@ -57,12 +68,14 @@ class ChatService implements IChatService
     
             return OutputDetailsDto::fromModel($chat, $bloqueo_mutuo);
         });
-
     }
 
     public function mostrarChat(int $chat_id, int $usuario_id): OutputDetailsDto
     {
         $chat = $this->repository->findDetails($chat_id);
+
+        $chat->load('producto.vendedor', 'comprador');
+
 
         if (!$chat) {
             throw new ModelNotFoundException('El chat solicitado no existe');
@@ -79,7 +92,7 @@ class ChatService implements IChatService
 
         
         $mensajesPaginados = $chat->mensajes()
-            ->orderByDesc('fecha_registro') 
+            ->orderByDesc('fecha_registro', 'desc') 
             ->paginate(20);
 
         return OutputDetailsDto::fromModel($chat, $bloqueo_mutuo, $mensajesPaginados);
@@ -100,7 +113,9 @@ class ChatService implements IChatService
     {
         return DB::transaction(function () use ($chat_id, $dto) {
             $chat_actualizado = $this->repository->update($chat_id, $dto->toArray());
-    
+            
+            $chat_actualizado->load('producto.vendedor', 'comprador');
+            
             if (!$chat_actualizado) {
                 throw new BusinessException('No se pudo actualizar el chat.');
             }

@@ -12,7 +12,9 @@ readonly class OutputDto implements Arrayable
         public int $id,
         public array $usuario,
         public string $ultimoMensajeTexto,
-        public Carbon $fechaUltimoMensaje
+        public bool $visto_comprador,
+        public bool $visto_vendedor,
+        public ?string $fechaUltimoMensaje
     )
     {}
 
@@ -21,44 +23,51 @@ readonly class OutputDto implements Arrayable
         return [
             'id' => $this->id,
             'usuario' => $this->usuario,
+            'visto_comprador' => $this->visto_comprador,
+            'visto_vendedor' => $this->visto_vendedor,
             'ultimoMensajeTexto' => $this->ultimoMensajeTexto,
             'fechaUltimoMensaje' => $this->fechaUltimoMensaje
         ];
     }
 
-    public function fromModel(Chat $chat, bool $bloqueo_mutuo): self
+    public static function fromModel(Chat $chat, int $usuario_id, bool $bloqueo_mutuo): self
     {
+        $esComprador = $chat->comprador_id === $usuario_id;
+
+        $otroUsuario = $esComprador
+            ? $chat->producto->vendedor
+            : $chat->comprador;
+
         return new self(
             id: $chat->id,
-            usuario: $bloqueo_mutuo === false ? 
-                ($chat->producto->relationLoaded("vendedor") && $chat->producto->vendedor
+            usuario: $otroUsuario
                 ? [
-                    'id' => $chat->producto->vendedor?->id,
-                    'nickname' => $chat->producto->vendedor?->nickname,
-                    'imagen' => $chat->producto->vendedor?->imagen
-                ] : null)
-                : ($chat->producto->relationLoaded("vendedor") && $chat->producto->vendedor
-                    ? [
-                        'id' => $chat->producto->vendedor?->id,
-                        'nickname' => $chat->producto->vendedor?->nickname
-                    ] : null) ,
+                    'id' => $otroUsuario->id,
+                    'nickname' => $otroUsuario->nickname,
+                    'imagen' => $bloqueo_mutuo ? null : $otroUsuario->imagen
+                ]
+                : [],
+            visto_comprador: $chat->visto_comprador,
+            visto_vendedor: $chat->visto_vendedor,
             ultimoMensajeTexto: $chat->ultimoMensaje?->mensaje ?? 'Sin mensajes aún',
             fechaUltimoMensaje: $chat->ultimoMensaje?->fecha_registro
         );
     }
 
-    public static function fromModelCollection(ModelCollection $chats, int $usuario_id, array $mapaBloqueos): array
-    {
+    public static function fromModelCollection(
+        ModelCollection $chats,
+        int $usuario_id,
+        array $mapaBloqueos
+    ): array {
         return $chats->map(function ($chat) use ($usuario_id, $mapaBloqueos) {
-                // Determinamos quién es el otro
-                $otroId = ($chat->comprador_id === $usuario_id) 
-                    ? $chat->producto->vendedor_id 
-                    : $chat->comprador_id;
 
-                // Si el ID del otro está en el mapa de bloqueos, bloqueo_mutuo es true
-                $estaBloqueado = in_array($otroId, $mapaBloqueos);
+            $otroId = ($chat->comprador_id === $usuario_id)
+                ? $chat->producto->vendedor_id
+                : $chat->comprador_id;
 
-                return self::fromModel($chat, $estaBloqueado)->toArray();
-            })->all();    
+            $bloqueoMutuo = in_array($otroId, $mapaBloqueos);
+
+            return self::fromModel($chat, $usuario_id, $bloqueoMutuo)->toArray();
+        })->all();
     }
 }
