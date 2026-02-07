@@ -135,7 +135,7 @@ Route::middleware('jwtVerify')->group(function (){
          *   - integridad_id
          *   - precio
          *   - disponibles
-         *   - imagenes[] (opcional, máx 5)
+         *   - imagenes[] (opcional, máx 5) FALTA COMPROBAR IMÁGENES DESDE POSTMAN 
          */
         Route::post('/', [ProductoController::class, 'store']);
         

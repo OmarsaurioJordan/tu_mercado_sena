@@ -55,6 +55,13 @@ class Producto extends Model
         return $query->whereNotIn('estado_id', [2, 3]);
     }
 
+    /**
+     * Scope: excluir productos de un vendedor específico (no aparecer en el general)
+     */
+    public function scopeExcluirVendedor($query, int $vendedorId)
+    {
+        return $query->where('vendedor_id', '<>', $vendedorId);
+    }
     public function subcategoria()
     {
         return $this->belongsTo(Subcategoria::class, 'subcategoria_id');

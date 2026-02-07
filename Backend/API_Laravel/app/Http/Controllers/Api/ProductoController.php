@@ -59,7 +59,7 @@ class ProductoController extends Controller
     public function store(CrearProductoRequest $request): JsonResponse
 {
     try {
-        // 👇 AGREGA ESTOS LOGS
+        // Probar qué datos llegan en el request y si se detectan las imágenes correctamente
         Log::info('=== DEBUG INICIO ===');
         Log::info('Request completo', [
             'all' => $request->all(),
