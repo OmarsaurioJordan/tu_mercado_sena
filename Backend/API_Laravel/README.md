@@ -66,6 +66,15 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
+**Configuración para que Laravel no requiera de una tabla sesiones y/o cache en la BD en el archivo .env**
+```ENV
+SESSION_DRIVER=file
+```
+
+```ENV
+CACHE_STORE=file
+```
+
 Configuración del servicio de mails (Configurar solo si se va comprobar que el correo se envio de manera exitosa a tu correo institucional):
 ```ENV
 MAIL_MAILER=smtp
@@ -78,7 +87,7 @@ MAIL_FROM_ADDRESS={Tu Correo de gmail u otro servicio}
 MAIL_FROM_NAME="Mercado Sena"
 ```
 
-Configuración de JW
+Configuración de JWT
 ```ENV
 AUTH_GUARD=api
 JWT_TTL=1440          # 24 horas en minutos
@@ -96,6 +105,10 @@ JWT_BLACKLIST_ENABLED=true
 
 
 2️⃣ Hacer las migraciones de las tablas usando este comando en la terminal teniendo la base de datos ya creada: 
+
+👁️ **OJO**
+
+El siguiente comando borra todos los registros que tengas en la base de datos que configuraste, si la base de datos tiene registros en las tablas hacer copia de seguridad
 
 ```CMD
 php artisan migrate:refresh
@@ -593,6 +606,13 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados/{bloqueado_id}**
 ```
 
 **Modulo productos**
+**Importante para la parte de las fotos, aún esta en prueba**
+
+
+Se debe de ejecutar el siguiente comando para crear un enlace simbiotico de las imagenes. Esto es necesario para que la carpeta publica pueda acceder a los archivos subidos.
+```CMD
+php artisan storage:link
+```
 
 
 **1️⃣ Listar productos**
