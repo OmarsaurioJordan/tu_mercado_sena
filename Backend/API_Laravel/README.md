@@ -120,7 +120,7 @@ php artisan migrate:refresh
 1️⃣ Registro de usuario
 
 Método: POST
-Ruta: http://localhost:8000/api/auth/inicio-registro
+Ruta: http://localhost:8000/api/auth/iniciar-registro
 
 Restricciones:
 
@@ -831,3 +831,4 @@ Código	Significado
 401	Token inválido / no autenticado
 422	Error de validación
 500	Error interno del servidor
+La parte de fotos sigue en prueba (Con exactitud puede que funcione) Mirar LOGS, falta probar con postman
