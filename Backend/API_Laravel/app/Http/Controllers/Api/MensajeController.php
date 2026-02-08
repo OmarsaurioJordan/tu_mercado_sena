@@ -19,45 +19,26 @@ class MensajeController extends Controller
 
     public function store(Chat $chat, StoreMessageRequest $request)
     {
-        $dto = InputDto::fromRequest(
-            array_merge(
-                $request->validated(),
-                [
-                    'chat_id' => $chat->id,
-                    'es_comprador' => $chat->comprador_id === Auth::user()->usuario->id
-                ]
-            )
-        );
+        $dto = InputDto::fromRequest($request->validated());
 
-        $mensaje = $chat->mensajes()->create($dto->toArray());
+        $resultado = $this->mensajeService->crearMensaje($dto, $chat);
 
-        $chat->load(['producto', 'producto.fotos', 'producto.vendedor']);
-
-        $mensajesPaginados = $chat
-            ->mensajes()
-            ->orderBy('fecha_registro', 'desc')
-            ->paginate(20);
-
-        
         return response()->json([
             'status' => 'success',
-            'chat_detalle' => OutputDetailsDto::fromModel($chat, false, $mensajesPaginados)->toArray(),
-            'nuevo_mensaje' => $mensaje
+            'chat_detalle' => OutputDetailsDto::fromModel(
+                $resultado['chat_detalle'], 
+                false, 
+                $resultado['mensajes_paginados']
+            )->toArray(),
+            'nuevo_mensaje' => $resultado['mensaje']
         ], 201);
     }
 
     public function destroy(Chat $chat, Mensaje $mensaje)
     {   
-        if ($mensaje->chat_id !== $chat->id) {
-                abort(403, 'El mensaje no pertenece al chat especificado.'); 
-        }
-
-        $mensaje->load('chat.producto');
-
-        // Validar que solo los usuarios del chat y el creador del mensaje puedan eliminarlo
         $this->authorize('delete', $mensaje);
 
-        $mensaje->delete($mensaje->id);
+        $this->mensajeService->delete($chat, $mensaje);
 
         return response()->json([
             'status' => 'success',

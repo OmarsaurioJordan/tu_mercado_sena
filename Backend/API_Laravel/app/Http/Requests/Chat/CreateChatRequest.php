@@ -33,6 +33,28 @@ class CreateChatRequest extends FormRequest
                     }
                 }
             ],
+
+            'producto_id' => [
+                'required',
+                'integer',
+                'exists:productos,id'
+            ],
+
+            'visto_comprador' => [
+                'nullable',
+                'boolean',
+            ],
+
+            'visto_vendedor' => [
+                'nullable',
+                'boolean',
+            ],
+
+            'estado_id' => [
+                'nullable',
+                'integer',
+                'exists:estados,id'
+            ]
         ];
     }
 

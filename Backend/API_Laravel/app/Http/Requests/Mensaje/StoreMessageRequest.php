@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests\Mensaje;
 
-use App\Models\Chat;
-use App\Models\Usuario;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,6 +23,16 @@ class StoreMessageRequest extends FormRequest
             || $usuario_id === $chat->producto->vendedor->id;    
     }
 
+    protected function prepareForValidation()
+    {
+        $chat = $this->route('chat');
+
+        $this->merge([
+            'chat_id' => $chat->id,
+            'es_comprador' => $chat->comprador_id === Auth::user()->usuario->id
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -33,6 +41,11 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'chat_id' => [
+                'required',
+                'integer',
+                'exists:chats,id'
+            ],
             'mensaje' => [
                 'required_without:imagen',
                 'string',
@@ -43,8 +56,8 @@ class StoreMessageRequest extends FormRequest
                 'string',
                 'max:80'
             ],
-
             'es_comprador' => [
+                'nullable',
                 'boolean'
             ]
         ];
