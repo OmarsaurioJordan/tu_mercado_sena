@@ -17,7 +17,8 @@ class ProductoRepository implements IProductoRepository
     {
         // El estado por defecto es 1 (activo)
         $data['estado_id'] = $data['estado_id'] ?? 1;
-        $data['fecha_actualiza'] = now();
+        
+        unset($data['fecha_actualiza']); // remover si viene en el array
         
         return Producto::create($data);
     }
@@ -93,6 +94,11 @@ class ProductoRepository implements IProductoRepository
             $query->porVendedor($filtros['vendedor_id']);
         }
 
+        // Excluir mis propios productos en el listado general si no se filtra por vendedor
+        if (Auth::check() && !isset($filtros['vendedor_id'])) {
+            $query->where('vendedor_id', '<>', Auth::id());
+        }
+
         // Ordenamiento
         $orderBy = $filtros['order_by'] ?? 'fecha_registro';
         $orderDirection = $filtros['order_direction'] ?? 'desc';
@@ -127,7 +133,6 @@ class ProductoRepository implements IProductoRepository
     {
         return Producto::where('id', $id)->update([
             'estado_id' => $estadoId,
-            'fecha_actualiza' => now()
         ]) > 0;
     }
 
@@ -173,6 +178,11 @@ class ProductoRepository implements IProductoRepository
         // Aplicar filtro de bloqueados
         if (Auth::check()) {
             $query = $this->aplicarFiltroBloqueados($query);
+        }
+
+        // Excluir mis propios productos en la búsqueda general
+        if (Auth::check()) {
+            $query->where('vendedor_id', '<>', Auth::id());
         }
 
         return $query->orderBy('fecha_registro', 'desc')->paginate($perPage);
