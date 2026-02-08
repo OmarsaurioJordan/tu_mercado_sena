@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Producto extends Model
 {
@@ -85,5 +86,20 @@ class Producto extends Model
     public function fotos()
     {
         return $this->hasMany(Foto::class, 'producto_id');
+    }
+
+    public function vistosPorUsuarios()
+    {
+        return $this->belongsToMany(
+            Usuario::class,
+            'vistos',
+            'producto_id',
+            'usuario_id'
+        );
+    }
+
+    public function denuncias()
+    {
+        return $this->hasMany(Denuncia::class, 'producto_id');
     }
 }
