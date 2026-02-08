@@ -9,5 +9,5 @@ interface IMensajeService
 {
     public function crearMensaje(InputDto $dto, Chat $chat): Array;
 
-    public function delete(Chat $chat, Mensaje $mensaje): bool;
+    public function delete(Mensaje $mensaje): bool;
 }

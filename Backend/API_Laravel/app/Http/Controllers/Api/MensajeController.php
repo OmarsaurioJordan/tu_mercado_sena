@@ -34,11 +34,11 @@ class MensajeController extends Controller
         ], 201);
     }
 
-    public function destroy(Chat $chat, Mensaje $mensaje)
+    public function destroy(Mensaje $mensaje)
     {   
         $this->authorize('delete', $mensaje);
 
-        $this->mensajeService->delete($chat, $mensaje);
+        $this->mensajeService->delete($mensaje);
 
         return response()->json([
             'status' => 'success',

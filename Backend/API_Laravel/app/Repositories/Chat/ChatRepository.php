@@ -108,13 +108,16 @@ class ChatRepository implements IChatRepository
                 'ultimoMensaje'
             ])
             ->where(function ($query) use ($usuario_id) {
+                // Chats donde el usuario es comprador
                 $query->where('comprador_id', $usuario_id)
-                    ->orWhereHas('producto', function ($q) use ($usuario_id) {
-                        $q->where('vendedor_id', $usuario_id);
+                    ->whereNotIn('estado_id', [4, 6]) // comprador eliminó o ambos eliminaron → oculto
+                    // Chats donde el usuario es vendedor
+                    ->orWhere(function($q) use ($usuario_id) {
+                        $q->whereHas('producto', function ($prod) use ($usuario_id) {
+                            $prod->where('vendedor_id', $usuario_id);
+                        })
+                        ->whereNotIn('estado_id', [5, 6]); // vendedor eliminó o ambos eliminaron → oculto
                     });
-            })
-            ->whereHas('estado', function ($query) {
-                $query->whereNotIn('id', [4, 5, 6]);
             })
             ->get();
     }

@@ -25,6 +25,10 @@ class MensajeService implements IMensajeService
                 throw new \Exception("No se pudo crear el mensaje, Intente nuevamente.");
             }
 
+            if ($chat->estado_id === 4 || $chat->estado_id === 5) {
+                $chat->update(['estado_id' => 1]);
+            }
+
             $chat->load(['producto', 'producto.fotos', 'producto.vendedor']);
 
             $mensajesPaginados = $chat
@@ -41,12 +45,12 @@ class MensajeService implements IMensajeService
                     'visto_comprador' => true,
                     'visto_vendedor' => false,
                 ]);
-                } else {
-                    $chat->update([
-                        'visto_vendedor' => true,
-                        'visto_comprador' => false,
-                    ]);
-                }
+            } else {
+                $chat->update([
+                    'visto_vendedor' => true,
+                    'visto_comprador' => false,
+                ]);
+            }
 
             return [
                 'success' => true,
@@ -57,14 +61,16 @@ class MensajeService implements IMensajeService
         });
     }
 
-    public function delete(Chat $chat, Mensaje $mensaje): bool
+    public function delete(Mensaje $mensaje): bool
     {
+        $chat = $mensaje->chat;
+
         // Validar que el mensaje pertenezca al chat especificado
         if ($mensaje->chat_id !== $chat->id) {
             throw new \Exception("El mensaje no pertenece al chat especificado.");
         }
 
-        return DB::transaction(function () use ( $mensaje) {
+        return DB::transaction(function () use ($mensaje) {
            $mensajeBorrado = $this->mensajeRepository->delete($mensaje->id);
 
             if (!$mensajeBorrado) {
