@@ -6,15 +6,15 @@ require_once("../config.php");
 $cond = "";
 $vars = [];
 
-$nombre = isset($_GET["nombre"]) ? $_GET["nombre"] : "";
-if ($nombre != "") {
-    $cond .= " AND u.nombre LIKE ?";
-    $vars[] = "%$nombre%";
+$nickname = isset($_GET["nickname"]) ? $_GET["nickname"] : "";
+if ($nickname != "") {
+    $cond .= " AND u.nickname LIKE ?";
+    $vars[] = "%$nickname%";
 }
 
 $rol_id = isset($_GET["rol_id"]) ? $_GET["rol_id"] : "0";
 if ($rol_id != "0") {
-    $cond .= ($rol_id == "1") ? " AND u.rol_id = 3" : " AND u.rol_id = 2";
+    $cond .= " AND u.rol_id = $rol_id";
 }
 
 $estado_id = isset($_GET["estado_id"]) ? $_GET["estado_id"] : "0";
@@ -72,11 +72,11 @@ if ($registro_hasta != "") {
     $vars[] = $registro_hasta;
 }
 
-$correo = isset($_GET["correo"]) ? $_GET["correo"] : "";
-if ($correo != "") {
-    # no lleva concatenacion porque correo sobreescribe a las otras condiciones
-    $cond = " AND c.correo = ?";
-    $vars = [$correo];
+$email = isset($_GET["email"]) ? $_GET["email"] : "";
+if ($email != "") {
+    # no lleva concatenacion porque email sobreescribe a las otras condiciones
+    $cond = " AND c.email = ?";
+    $vars = [$email];
 }
 
 $limite = isset($_GET["limite"]) ? $_GET["limite"] : "";
@@ -96,10 +96,11 @@ if ($cursor_id != "") {
 }
 array_unshift($vars, $cursor_fecha);
 
-$sql = "SELECT u.id AS id, c.correo AS correo, u.rol_id AS rol_id, u.nombre AS nombre, u.avatar AS avatar, u.descripcion AS descripcion, u.link AS link, u.estado_id AS estado_id, u.fecha_registro AS fecha_registro, u.fecha_actualiza AS fecha_actualiza, u.fecha_reciente AS fecha_reciente
-FROM usuarios u LEFT JOIN correos c ON u.correo_id = c.id
-WHERE (u.fecha_registro < ? OR $curs) AND u.rol_id != 1 $cond 
-ORDER BY u.fecha_registro DESC, u.id DESC $lim";
+$sql = "SELECT u.id AS id, c.email AS email, u.rol_id AS rol_id, u.nickname AS nickname, u.imagen AS imagen, u.descripcion AS descripcion, u.link AS link, u.estado_id AS estado_id, u.fecha_registro AS fecha_registro, u.fecha_actualiza AS fecha_actualiza, u.fecha_reciente AS fecha_reciente
+    FROM usuarios u
+    LEFT JOIN cuentas c ON u.cuenta_id = c.id
+    WHERE (u.fecha_registro < ? OR $curs) AND u.rol_id != 3 $cond 
+    ORDER BY u.fecha_registro DESC, u.id DESC $lim";
 
 $stmt = $conn->prepare($sql);
 if (count($vars) > 0) {

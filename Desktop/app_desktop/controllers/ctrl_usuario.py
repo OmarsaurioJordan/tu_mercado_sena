@@ -95,8 +95,8 @@ class CtrlUsuario:
             return DEFAULT_INFO
         return descripcion
 
-    def admin_login(self, correo="", password=""):
-        params = {"correo": correo, "password": password}
+    def admin_login(self, email="", password=""):
+        params = {"email": email, "password": password}
         response = requests.get(API_BASE_URL + "usuarios/admin_login.php", params=params)
         if response.status_code == 200:
             data = response.json()
@@ -114,8 +114,8 @@ class CtrlUsuario:
             }
         return {"token": "", "error": ""}
 
-    def admin_pin(self, correo="", pin=""):
-        params = {"correo": correo, "pin": pin}
+    def admin_pin(self, email="", pin=""):
+        params = {"email": email, "pin": pin}
         response = requests.get(API_BASE_URL + "usuarios/admin_pin.php", params=params)
         data = response.json()
         if response.status_code == 200:

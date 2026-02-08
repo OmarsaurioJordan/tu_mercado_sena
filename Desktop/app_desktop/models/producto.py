@@ -1,7 +1,7 @@
 class Producto:
-    def __init__(self, id, nombre, con_imagen, categoria, subcategoria, integridad, vendedor_id, estado_id, descripcion, precio, disponibles, fecha_registro, fecha_actualiza):
+    def __init__(self, id, nickname, con_imagen, categoria, subcategoria, integridad, vendedor_id, estado_id, descripcion, precio, disponibles, fecha_registro, fecha_actualiza):
         self.id = id
-        self.nombre = nombre
+        self.nickname = nickname
         self.con_imagen = con_imagen
         self.categoria = categoria
         self.subcategoria = subcategoria
@@ -18,7 +18,7 @@ class Producto:
     def from_json(data):
         return Producto(
             id=data.get('id'),
-            nombre=data.get('nombre'),
+            nickname=data.get('nickname'),
             con_imagen=data.get('con_imagen'),
             categoria=data.get('categoria'),
             subcategoria=data.get('subcategoria'),
