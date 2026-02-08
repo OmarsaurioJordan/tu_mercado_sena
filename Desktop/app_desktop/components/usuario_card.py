@@ -23,34 +23,34 @@ class UsuarioCard(QFrame):
         self.setFrameShadow(QFrame.Shadow.Raised)
         self.setMaximumWidth(500)
 
-        self.avatar = QLabel()
-        self.avatar.setScaledContents(True)
-        self.avatar.setFixedSize(48, 48)
+        self.imagen = QLabel()
+        self.imagen.setScaledContents(True)
+        self.imagen.setFixedSize(48, 48)
         self.set_image(QPixmap("assets/sprites/avatar.png"))
         usuario.img_signal.ok_image.connect(self.set_image)
 
-        nombre = QLabel(usuario.nombre)
-        nombre.setWordWrap(True)
-        font = nombre.font()
+        nickname = QLabel(usuario.nickname)
+        nickname.setWordWrap(True)
+        font = nickname.font()
         font.setBold(True)
-        nombre.setFont(font)
-        nombre.setAlignment(
+        nickname.setFont(font)
+        nickname.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
 
-        correo = QLabel(usuario.correo.split("@")[0])
-        correo.setWordWrap(True)
-        correo.setStyleSheet("color: #777777;")
-        correo.setAlignment(
+        email = QLabel(usuario.email.split("@")[0])
+        email.setWordWrap(True)
+        email.setStyleSheet("color: #777777;")
+        email.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
 
-        layNombreCorreo = QVBoxLayout()
-        layNombreCorreo.addWidget(nombre)
-        layNombreCorreo.addWidget(correo)
+        layNicknameEmail = QVBoxLayout()
+        layNicknameEmail.addWidget(nickname)
+        layNicknameEmail.addWidget(email)
 
-        if usuario.rol_id != 3:
-            rol = QLabel("M" if usuario.rol_id == 1 else "A")
+        if usuario.rol_id != 1:
+            rol = QLabel("M" if usuario.rol_id == 3 else "A")
             font = rol.font()
             font.setPointSize(8)
             rol.setFont(font)
@@ -60,9 +60,9 @@ class UsuarioCard(QFrame):
             layRol.addWidget(QLabel())
 
         layHorizontal = QHBoxLayout()
-        layHorizontal.addLayout(layNombreCorreo)
-        layHorizontal.addWidget(self.avatar)
-        if usuario.rol_id != 3:
+        layHorizontal.addLayout(layNicknameEmail)
+        layHorizontal.addWidget(self.imagen)
+        if usuario.rol_id != 1:
             layHorizontal.addLayout(layRol)
         self.setLayout(layHorizontal)
 
@@ -89,4 +89,4 @@ class UsuarioCard(QFrame):
         super().mousePressEvent(event)
 
     def set_image(self, image):
-        self.avatar.setPixmap(image)
+        self.imagen.setPixmap(image)

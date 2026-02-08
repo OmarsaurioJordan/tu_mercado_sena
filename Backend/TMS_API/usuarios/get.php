@@ -10,9 +10,10 @@ if (!isset($_GET["id"])) {
 }
 $id = $_GET["id"];
 
-$sql = "SELECT u.id AS id, c.correo AS correo, u.rol_id AS rol_id, u.nombre AS nombre, u.avatar AS avatar, u.descripcion AS descripcion, u.link AS link, u.estado_id AS estado_id, u.fecha_registro AS fecha_registro, u.fecha_actualiza AS fecha_actualiza, u.fecha_reciente AS fecha_reciente
-FROM usuarios u LEFT JOIN correos c ON u.correo_id = c.id
-WHERE u.id = ?";
+$sql = "SELECT u.id AS id, c.email AS email, u.rol_id AS rol_id, u.nickname AS nickname, u.imagen AS imagen, u.descripcion AS descripcion, u.link AS link, u.estado_id AS estado_id, u.fecha_registro AS fecha_registro, u.fecha_actualiza AS fecha_actualiza, u.fecha_reciente AS fecha_reciente
+    FROM usuarios u
+    LEFT JOIN cuentas c ON u.cuenta_id = c.id
+    WHERE u.id = ?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);

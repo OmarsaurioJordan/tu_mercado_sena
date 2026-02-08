@@ -3,18 +3,22 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 require_once("../config.php");
 
-if (!isset($_GET["correo"]) || !isset($_GET["password"])) {
+if (!isset($_GET["email"]) || !isset($_GET["password"])) {
     http_response_code(400);
     echo json_encode(["error" => "Faltan credenciales"]);
     exit;
 }
-$correo = $_GET["correo"];
+$email = $_GET["email"];
 $password = $_GET["password"];
 
-$sql = "SELECT u.id AS id, r.nombre AS rol, u.password AS pass FROM usuarios u LEFT JOIN correos c ON c.id = u.correo_id LEFT JOIN roles r ON r.id = u.rol_id WHERE c.correo = ?";
+$sql = "SELECT u.id AS id, u.cuenta_id AS cuenta_id, r.nombre AS rol, c.password AS pass
+    FROM usuarios u
+    LEFT JOIN cuentas c ON c.id = u.cuenta_id
+    LEFT JOIN roles r ON r.id = u.rol_id
+    WHERE c.email = ?";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $correo);
+$stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 $info = $result->fetch_assoc();
@@ -47,17 +51,33 @@ $stmt->execute();
 if ($stmt->errno === 0) {
 
     $token = bin2hex(random_bytes(32));
+    $cuenta_id = $info['cuenta_id'];
 
-    $sql = "UPDATE usuarios SET token_admin = ? WHERE id = ?";
+    $sql = "SELECT id FROM tokens_de_sesion
+        WHERE cuenta_id = ? AND dispositivo = 'desktop'";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("si", $token, $admin_id);
+    $stmt->bind_param("i", $cuenta_id);
     $stmt->execute();
-    if ($stmt->errno === 0) {
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $sql = "UPDATE tokens_de_sesion SET jti = ?, ultimo_uso = NOW()
+            WHERE cuenta_id = ? AND dispositivo = 'desktop'";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("si", $token, $cuenta_id);
+    }
+    else {
+        $sql = "INSERT INTO tokens_de_sesion (cuenta_id, dispositivo, jti, ultimo_uso)
+            VALUES (?, 'desktop', ?, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("is", $cuenta_id, $token);
+    }
+    if ($stmt->execute()) {
         echo json_encode(["token" => $token, "id" => $admin_id]);
         exit;
     }
 }
 
 http_response_code(500);
-die(json_encode(["error" => "Error ejecución DB"]));
+echo json_encode(["error" => "Error ejecución DB"]);
 ?>

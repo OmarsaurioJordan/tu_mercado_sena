@@ -36,9 +36,9 @@ class WindowManager(QMainWindow):
         self.stack.addWidget(login)
         self.change_tool("login")
 
-    def set_tools(self, token="", correo="", id=0):
+    def set_tools(self, token="", email="", id=0):
         ses = Session()
-        ses.set_login(token, correo, id)
+        ses.set_login(token, email, id)
         self.views = {
             "menu": MenuWindow(),
             "tools": ToolsWindow(),

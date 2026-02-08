@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-12-2025 a las 00:29:07
+-- Tiempo de generación: 08-02-2026 a las 05:55:48
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `tu_mercado_sena`
+-- Base de datos: `api_tms`
 --
 
 -- --------------------------------------------------------
@@ -26,24 +26,24 @@ SET time_zone = "+00:00";
 --
 -- Estructura de tabla para la tabla `auditorias`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `auditorias`;
 CREATE TABLE `auditorias` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `administrador_id` int(10) UNSIGNED NOT NULL COMMENT 'quién hizo la acción',
-  `suceso_id` int(10) UNSIGNED NOT NULL COMMENT 'cuál es la naturaleza de la acción',
-  `descripcion` varchar(512) NOT NULL COMMENT 'detalla qué fué lo que sucedió, dando id de tablas implicadas',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `administrador_id` bigint(20) UNSIGNED NOT NULL,
+  `suceso_id` bigint(20) UNSIGNED NOT NULL,
+  `descripcion` varchar(512) NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `auditorias`:
---   `suceso_id`
---       `sucesos` -> `id`
 --   `administrador_id`
 --       `usuarios` -> `id`
+--   `suceso_id`
+--       `sucesos` -> `id`
 --
 
 -- --------------------------------------------------------
@@ -51,15 +51,15 @@ CREATE TABLE `auditorias` (
 --
 -- Estructura de tabla para la tabla `bloqueados`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `bloqueados`;
 CREATE TABLE `bloqueados` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `bloqueador_id` int(10) UNSIGNED NOT NULL COMMENT 'quien bloqueo al bloqueado',
-  `bloqueado_id` int(10) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `bloqueador_id` bigint(20) UNSIGNED NOT NULL,
+  `bloqueado_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `bloqueados`:
@@ -74,14 +74,15 @@ CREATE TABLE `bloqueados` (
 --
 -- Estructura de tabla para la tabla `categorias`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `categorias`;
 CREATE TABLE `categorias` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `nombre` varchar(32) NOT NULL COMMENT 'por ejemplo, electrodomesticos, mobiliario, comida, ropa, etc'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nombre` varchar(32) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `categorias`:
@@ -112,32 +113,32 @@ INSERT INTO `categorias` (`id`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `chats`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `chats`;
 CREATE TABLE `chats` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `comprador_id` int(10) UNSIGNED NOT NULL COMMENT 'el usuario que inicia la conversación',
-  `producto_id` int(10) UNSIGNED NOT NULL COMMENT 'los chats se inician mediante un producto en venta, aqui estaria ese producto',
-  `estado_id` int(10) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'el estado dice si el chat esta eliminado, finalizado, activo, etc',
-  `visto_comprador` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'true indica que el último mensaje del vendedor ya fué visto por el comprador',
-  `visto_vendedor` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'true indica que el último mensaje del comprador ya fué visto por el vendedor',
-  `precio` float DEFAULT NULL COMMENT 'el precio total final acordado, puede diferir del precio del producto, esto lo pone el vendedor',
-  `cantidad` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'la cantidad de ítems transaccionados, esto lo pone el vendedor',
-  `calificacion` tinyint(3) UNSIGNED DEFAULT NULL COMMENT '1 a 5 puesta por el comprador y se puede modificar luego',
-  `comentario` varchar(255) DEFAULT NULL COMMENT 'escrito por el comprador y se puede modificar luego',
-  `fecha_venta` timestamp NULL DEFAULT NULL COMMENT 'cuándo se hizo la transacción'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `comprador_id` bigint(20) UNSIGNED NOT NULL,
+  `producto_id` bigint(20) UNSIGNED NOT NULL,
+  `estado_id` bigint(20) UNSIGNED NOT NULL,
+  `visto_comprador` tinyint(1) NOT NULL DEFAULT 1,
+  `visto_vendedor` tinyint(1) NOT NULL DEFAULT 0,
+  `precio` double NOT NULL,
+  `cantidad` smallint(5) UNSIGNED NOT NULL,
+  `calificacion` tinyint(3) UNSIGNED DEFAULT NULL,
+  `comentario` varchar(512) DEFAULT NULL,
+  `fecha_venta` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `chats`:
+--   `comprador_id`
+--       `usuarios` -> `id`
 --   `estado_id`
 --       `estados` -> `id`
 --   `producto_id`
 --       `productos` -> `id`
---   `comprador_id`
---       `usuarios` -> `id`
 --
 
 -- --------------------------------------------------------
@@ -145,24 +146,22 @@ CREATE TABLE `chats` (
 --
 -- Estructura de tabla para la tabla `cuentas`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 08-02-2026 a las 03:45:03
+-- Última actualización: 08-02-2026 a las 03:49:49
 --
 
 DROP TABLE IF EXISTS `cuentas`;
 CREATE TABLE `cuentas` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `email` varchar(64) NOT NULL COMMENT 'correo institucional, debe ser unico',
-  `password` varchar(127) NOT NULL DEFAULT '' COMMENT 'debe guardarse como un hash',
-  `clave` varchar(32) NOT NULL DEFAULT '' COMMENT 'una combinación aleatoria que será enviada al correo, con un solo uso limitado por tiempo',
-  `notifica_correo` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'en true significa que desea recibir correos cuando alguien se pone en contacto',
-  `notifica_push` tinyint(3) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'en true significa que quiere recibir notificaciones emergentes en celular o computadora cuando algo sucede',
-  `uso_datos` tinyint(3) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'en false reduce el consumo de datos de la aplicacion evitando cargar imagenes',
-  `pin` varchar(4) NOT NULL DEFAULT '' COMMENT 'para bloqueo de interfaces sin logout',
-  `token_web` varchar(32) NOT NULL DEFAULT '' COMMENT 'para un acceso a web',
-  `token_movil` varchar(32) NOT NULL DEFAULT '' COMMENT 'para un acceso a móvil',
-  `token_admin` varchar(32) NOT NULL DEFAULT '' COMMENT 'para un acceso a desktop',
-  `fecha_clave` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'guarda el momento en que se envio una solicitud al mail, para poder esperar y no enviarlas muy seguido'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(127) NOT NULL,
+  `clave` varchar(32) NOT NULL,
+  `notifica_correo` tinyint(1) NOT NULL DEFAULT 0,
+  `notifica_push` tinyint(1) NOT NULL DEFAULT 1,
+  `uso_datos` tinyint(1) NOT NULL DEFAULT 0,
+  `pin` varchar(4) DEFAULT '',
+  `fecha_clave` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `cuentas`:
@@ -173,20 +172,20 @@ CREATE TABLE `cuentas` (
 --
 -- Estructura de tabla para la tabla `denuncias`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:02
 --
 
 DROP TABLE IF EXISTS `denuncias`;
 CREATE TABLE `denuncias` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `denunciante_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'quién fué el usuario que creó la denuncia',
-  `producto_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'si fué creada a partir de un producto',
-  `usuario_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'si fué creada a partir de un usuario',
-  `chat_id` int(10) UNSIGNED DEFAULT NULL COMMENT 'si fué creada a partir de un chat / mensaje de comprador',
-  `motivo_id` int(10) UNSIGNED NOT NULL COMMENT 'indica qué naturaleza tiene la denuncia',
-  `estado_id` int(10) UNSIGNED NOT NULL COMMENT 'indica si ya se ha procesado la denuncia',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `denunciante_id` bigint(20) UNSIGNED NOT NULL,
+  `producto_id` bigint(20) UNSIGNED NOT NULL,
+  `usuario_id` bigint(20) UNSIGNED NOT NULL,
+  `chat_id` bigint(20) UNSIGNED NOT NULL,
+  `motivo_id` bigint(20) UNSIGNED NOT NULL,
+  `estado_id` bigint(20) UNSIGNED NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `denuncias`:
@@ -209,15 +208,16 @@ CREATE TABLE `denuncias` (
 --
 -- Estructura de tabla para la tabla `estados`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 08-02-2026 a las 04:21:06
 --
 
 DROP TABLE IF EXISTS `estados`;
 CREATE TABLE `estados` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
-  `descripcion` varchar(128) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `descripcion` varchar(128) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `estados`:
@@ -228,16 +228,16 @@ CREATE TABLE `estados` (
 --
 
 INSERT INTO `estados` (`id`, `nombre`, `descripcion`) VALUES
-(1, 'activo', 'cuando funciona con completa normalidad'),
-(2, 'invisible', 'cuando un producto es sacado temporalmente del mercado o un usuario quiere ocultarse temporalmente'),
-(3, 'eliminado', 'ya no puede ser alcanzado por los usuarios nunca más'),
-(4, 'bloqueado', 'se ha aplicado una censura a usuario o producto por parte del sistema'),
+(1, 'activo', 'usuario, producto o etc activos'),
+(2, 'invisible', 'usuario, producto o etc que se ha ocultado por su propietario'),
+(3, 'eliminado', 'usuario, producto o etc eliminado'),
+(4, 'bloqueado', 'usuario baneado momentáneamente'),
 (5, 'vendido', 'aplicado a un chat cuando se hizo la transacción'),
 (6, 'esperando', 'la transacción del chat espera el visto bueno del comprador'),
 (7, 'devolviendo', 'el historial abre una solicitud de devolución, a espera de respuesta del vendedor'),
 (8, 'devuelto', 'el chat finalizó con una transacción que fué cancelada'),
 (9, 'censurado', 'el estado del chat era vendido, pero la administración baneó la calificación y comentario'),
-(10, 'denunciado', 'cuando un usuario o producto ha sido denunciado repetidas veces, mientras se revisa el caso, no será listado públicamente, pero '),
+(10, 'denunciado', 'cuando un usuario o producto ha sido denunciado repetidas veces, mientras se revisa el caso, no será listado públicamente'),
 (11, 'resuelto', 'para decir que una PQRS o denuncia ya fué tratada');
 
 -- --------------------------------------------------------
@@ -245,15 +245,15 @@ INSERT INTO `estados` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `favoritos`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `favoritos`;
 CREATE TABLE `favoritos` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `votante_id` int(10) UNSIGNED NOT NULL COMMENT 'el votante dijo que el votado era su favorito',
-  `votado_id` int(10) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `votante_id` bigint(20) UNSIGNED NOT NULL,
+  `votado_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `favoritos`:
@@ -268,16 +268,17 @@ CREATE TABLE `favoritos` (
 --
 -- Estructura de tabla para la tabla `fotos`
 --
--- Creación: 10-12-2025 a las 23:28:28
+-- Creación: 07-02-2026 a las 18:36:02
+-- Última actualización: 08-02-2026 a las 03:50:59
 --
 
 DROP TABLE IF EXISTS `fotos`;
 CREATE TABLE `fotos` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `producto_id` int(10) UNSIGNED NOT NULL COMMENT 'a que producto pertenecene las fotos',
-  `imagen` varchar(80) NOT NULL COMMENT 'nombre del archivo con extension, para buscarlo en almacenamiento',
-  `actualiza` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'cuando se cambio la foto'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `producto_id` bigint(20) UNSIGNED NOT NULL,
+  `imagen` varchar(80) NOT NULL,
+  `actualiza` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `fotos`:
@@ -290,15 +291,16 @@ CREATE TABLE `fotos` (
 --
 -- Estructura de tabla para la tabla `integridad`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `integridad`;
 CREATE TABLE `integridad` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `nombre` varchar(32) NOT NULL COMMENT 'ejemplo, nuevo, de segunda pero bueno, en mal estado (digamos que vende un PC malo para sacarle componentes)',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nombre` varchar(32) NOT NULL,
   `descripcion` varchar(128) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `integridad`:
@@ -319,17 +321,18 @@ INSERT INTO `integridad` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `login_ip`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 08-02-2026 a las 03:37:34
 --
 
 DROP TABLE IF EXISTS `login_ip`;
 CREATE TABLE `login_ip` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'qué admin ingrsó al sistema',
-  `ip_direccion` varchar(45) NOT NULL COMMENT 'para almacenar direcciónes IP incluso IPv6',
-  `informacion` varchar(128) NOT NULL DEFAULT '' COMMENT 'por ejemplo: para datos de localización IP',
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'cuándo sucedió el ingreso'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `usuario_id` bigint(20) UNSIGNED NOT NULL,
+  `ip_direccion` varchar(45) NOT NULL,
+  `informacion` varchar(128) NOT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `login_ip`:
@@ -342,19 +345,18 @@ CREATE TABLE `login_ip` (
 --
 -- Estructura de tabla para la tabla `mensajes`
 --
--- Creación: 10-12-2025 a las 22:05:15
--- Última actualización: 10-12-2025 a las 23:27:18
+-- Creación: 07-02-2026 a las 18:36:02
 --
 
 DROP TABLE IF EXISTS `mensajes`;
 CREATE TABLE `mensajes` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `es_comprador` tinyint(3) UNSIGNED NOT NULL COMMENT 'el chat tiene usuario A y B, acá es 1 si lo escribió A o 0 si B',
-  `chat_id` int(10) UNSIGNED NOT NULL COMMENT 'a que chat va, ahi estara el receptor',
-  `mensaje` varchar(512) NOT NULL DEFAULT '' COMMENT 'el texto como tal',
-  `imagen` varchar(80) NOT NULL DEFAULT '''''' COMMENT 'nombre del archivo de imagen con extension, en el almacenamiento',
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'automaticamente se establece cuando se creo el mensaje'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `es_comprador` tinyint(1) NOT NULL DEFAULT 1,
+  `chat_id` bigint(20) UNSIGNED NOT NULL,
+  `mensaje` varchar(512) NOT NULL,
+  `imagen` varchar(255) DEFAULT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `mensajes`:
@@ -367,15 +369,16 @@ CREATE TABLE `mensajes` (
 --
 -- Estructura de tabla para la tabla `motivos`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `motivos`;
 CREATE TABLE `motivos` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
   `descripcion` varchar(128) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `motivos`:
@@ -418,18 +421,18 @@ INSERT INTO `motivos` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `notificaciones`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `notificaciones`;
 CREATE TABLE `notificaciones` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'quién recibirá la notificación',
-  `motivo_id` int(10) UNSIGNED NOT NULL COMMENT 'naturaleza de la notificación',
-  `mensaje` varchar(255) NOT NULL COMMENT 'cuerpo de la notificación',
-  `visto` tinyint(3) UNSIGNED NOT NULL COMMENT 'true si ya fué abierta por el usuario',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `usuario_id` bigint(20) UNSIGNED NOT NULL,
+  `motivo_id` bigint(20) UNSIGNED NOT NULL,
+  `mensaje` varchar(255) NOT NULL,
+  `visto` tinyint(1) NOT NULL DEFAULT 0,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `notificaciones`:
@@ -444,17 +447,17 @@ CREATE TABLE `notificaciones` (
 --
 -- Estructura de tabla para la tabla `papelera`
 --
--- Creación: 10-12-2025 a las 22:03:53
+-- Creación: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `papelera`;
 CREATE TABLE `papelera` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'quién es responsable de esta edición',
-  `mensaje` varchar(512) NOT NULL DEFAULT '' COMMENT 'texto que fué editado sea en perfil o producto o calificación de producto, cualquier parte donde se pueda editar',
-  `imagen` varchar(80) NOT NULL DEFAULT '' COMMENT 'nombre del archivo de imagen con extension, en el almacenamiento',
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'cuándo se hizo el registro, la edición'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `usuario_id` bigint(20) UNSIGNED NOT NULL,
+  `mensaje` varchar(512) NOT NULL,
+  `imagen` varchar(80) NOT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `papelera`:
@@ -467,18 +470,18 @@ CREATE TABLE `papelera` (
 --
 -- Estructura de tabla para la tabla `pqrs`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `pqrs`;
 CREATE TABLE `pqrs` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'quién hizo la PQRS',
-  `mensaje` varchar(512) NOT NULL COMMENT 'mensaje del cuerpo',
-  `motivo_id` int(10) UNSIGNED NOT NULL COMMENT 'para saber si es P, Q, R, S',
-  `estado_id` int(10) UNSIGNED NOT NULL COMMENT 'para saber si ya se proceso la PQRS',
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `usuario_id` bigint(20) UNSIGNED NOT NULL,
+  `mensaje` varchar(512) NOT NULL,
+  `motivo_id` bigint(20) UNSIGNED NOT NULL,
+  `estado_id` bigint(20) UNSIGNED NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `pqrs`:
@@ -495,33 +498,33 @@ CREATE TABLE `pqrs` (
 --
 -- Estructura de tabla para la tabla `productos`
 --
--- Creación: 10-12-2025 a las 23:24:46
--- Última actualización: 10-12-2025 a las 23:24:46
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 08-02-2026 a las 03:50:59
 --
 
 DROP TABLE IF EXISTS `productos`;
 CREATE TABLE `productos` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(64) NOT NULL,
-  `subcategoria_id` int(10) UNSIGNED NOT NULL COMMENT 'la subcategoria incluye a la categoria, por ejemplo, electrodomesticos, mobiliario, alimento, etc',
-  `integridad_id` int(10) UNSIGNED NOT NULL COMMENT 'para saber si el producto es nuevo, de segunda pero en buen estado o si es un producto con fallas',
-  `vendedor_id` int(10) UNSIGNED NOT NULL COMMENT 'apunta al id de usuario que es su creador',
-  `estado_id` int(10) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'l estado define si esta visible, eliminado, bloqueado',
-  `descripcion` varchar(512) NOT NULL COMMENT 'texto amplio describiendo las caracteristicas del producto',
-  `precio` float NOT NULL COMMENT 'cuanto cuesta en COP',
-  `disponibles` smallint(5) UNSIGNED NOT NULL COMMENT 'cuandos articulos hay disponibles',
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'esto solo se coloca automaticamente al crear el registro, y se deja asi',
-  `fecha_actualiza` timestamp NOT NULL DEFAULT '2000-01-01 05:00:00' COMMENT 'esto se actualiza cuando hay edicion por parte del propietario, es para evitar actualizaciones muy seguidas, opcionalmente'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `subcategoria_id` bigint(20) UNSIGNED NOT NULL,
+  `integridad_id` bigint(20) UNSIGNED NOT NULL,
+  `vendedor_id` bigint(20) UNSIGNED NOT NULL,
+  `estado_id` bigint(20) UNSIGNED NOT NULL,
+  `descripcion` varchar(512) NOT NULL,
+  `precio` double NOT NULL,
+  `disponibles` smallint(5) UNSIGNED NOT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_actualiza` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `productos`:
 --   `estado_id`
 --       `estados` -> `id`
---   `subcategoria_id`
---       `subcategorias` -> `id`
 --   `integridad_id`
 --       `integridad` -> `id`
+--   `subcategoria_id`
+--       `subcategorias` -> `id`
 --   `vendedor_id`
 --       `usuarios` -> `id`
 --
@@ -531,14 +534,15 @@ CREATE TABLE `productos` (
 --
 -- Estructura de tabla para la tabla `roles`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `roles`:
@@ -549,24 +553,25 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `nombre`) VALUES
-(1, 'master'),
 (2, 'administrador'),
-(3, 'prosumer');
+(3, 'master'),
+(1, 'prosumer');
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `subcategorias`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `subcategorias`;
 CREATE TABLE `subcategorias` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `nombre` varchar(32) NOT NULL COMMENT 'por ejemplo, para la categoria ropa tenemos: calzado, pantalon, camisa, sombrero, etc',
-  `categoria_id` int(10) UNSIGNED NOT NULL COMMENT 'a que categoria pertenece la subcategoria'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `nombre` varchar(32) NOT NULL,
+  `categoria_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `subcategorias`:
@@ -726,15 +731,16 @@ INSERT INTO `subcategorias` (`id`, `nombre`, `categoria_id`) VALUES
 --
 -- Estructura de tabla para la tabla `sucesos`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `sucesos`;
 CREATE TABLE `sucesos` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
   `descripcion` varchar(128) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `sucesos`:
@@ -760,25 +766,52 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `tokens_de_sesion`
+--
+-- Creación: 07-02-2026 a las 23:33:20
+-- Última actualización: 08-02-2026 a las 03:37:34
+--
+
+DROP TABLE IF EXISTS `tokens_de_sesion`;
+CREATE TABLE `tokens_de_sesion` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `cuenta_id` bigint(20) UNSIGNED NOT NULL,
+  `dispositivo` enum('web','movil','desktop') NOT NULL,
+  `jti` varchar(255) NOT NULL,
+  `ultimo_uso` timestamp NULL DEFAULT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_actualiza` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- RELACIONES PARA LA TABLA `tokens_de_sesion`:
+--   `cuenta_id`
+--       `cuentas` -> `id`
+--
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 10-12-2025 a las 23:26:22
+-- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 08-02-2026 a las 04:41:27
 --
 
 DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `cuenta_id` int(10) UNSIGNED NOT NULL,
-  `nickname` varchar(32) NOT NULL COMMENT 'el nickname del usuario, pueden repetirse',
-  `imagen` varchar(80) NOT NULL COMMENT 'nombre del archivo de imagen con extension, en el almacenamiento',
-  `descripcion` varchar(512) NOT NULL DEFAULT '''''' COMMENT 'para que el usuario diga algo sobre si mismo en su perfil',
-  `link` varchar(128) NOT NULL DEFAULT '''''' COMMENT 'si el usuario quiere compartir redes sociales o algo asi',
-  `rol_id` int(10) UNSIGNED NOT NULL DEFAULT 3 COMMENT 'administra los permisos de acceso al sistema',
-  `estado_id` int(10) UNSIGNED NOT NULL DEFAULT 1 COMMENT 'esto dice si el usuario esta pendiente de aprobacion, bloqueado del sistema, eliminado, etc',
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'esto no se cambia, solo se pone automaticamente cuando el usuario se registra',
-  `fecha_actualiza` timestamp NOT NULL DEFAULT '2000-01-01 05:00:00' COMMENT 'se actualizara cada que el usuario edita su perfil, para dar una ventana de tiempo entre ediciones',
-  `fecha_reciente` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'utilizado para saber si el usuario ha estado activo recientemente'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `cuenta_id` bigint(20) UNSIGNED NOT NULL,
+  `nickname` varchar(32) NOT NULL,
+  `imagen` varchar(80) NOT NULL,
+  `descripcion` varchar(512) NOT NULL,
+  `link` varchar(128) DEFAULT NULL,
+  `rol_id` bigint(20) UNSIGNED NOT NULL,
+  `estado_id` bigint(20) UNSIGNED NOT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_actualiza` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `fecha_reciente` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `usuarios`:
@@ -795,15 +828,15 @@ CREATE TABLE `usuarios` (
 --
 -- Estructura de tabla para la tabla `vistos`
 --
--- Creación: 10-12-2025 a las 21:55:57
+-- Creación: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `vistos`;
 CREATE TABLE `vistos` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `usuario_id` int(10) UNSIGNED NOT NULL COMMENT 'quien observo el producto',
-  `producto_id` int(10) UNSIGNED NOT NULL COMMENT 'que producto fue observado'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `usuario_id` bigint(20) UNSIGNED NOT NULL,
+  `producto_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- RELACIONES PARA LA TABLA `vistos`:
@@ -822,16 +855,16 @@ CREATE TABLE `vistos` (
 --
 ALTER TABLE `auditorias`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `auditoria_usuario` (`administrador_id`),
-  ADD KEY `auditoria_suceso` (`suceso_id`);
+  ADD KEY `auditorias_administrador_id_foreign` (`administrador_id`),
+  ADD KEY `auditorias_suceso_id_foreign` (`suceso_id`);
 
 --
 -- Indices de la tabla `bloqueados`
 --
 ALTER TABLE `bloqueados`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `usuario_bloqueado` (`bloqueado_id`),
-  ADD KEY `usuario_bloqueador` (`bloqueador_id`);
+  ADD KEY `bloqueados_bloqueador_id_foreign` (`bloqueador_id`),
+  ADD KEY `bloqueados_bloqueado_id_foreign` (`bloqueado_id`);
 
 --
 -- Indices de la tabla `categorias`
@@ -844,50 +877,50 @@ ALTER TABLE `categorias`
 --
 ALTER TABLE `chats`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `chat_usuario_a` (`comprador_id`),
-  ADD KEY `chat_producto` (`producto_id`),
-  ADD KEY `chat_estado` (`estado_id`);
+  ADD KEY `chats_comprador_id_foreign` (`comprador_id`),
+  ADD KEY `chats_producto_id_foreign` (`producto_id`),
+  ADD KEY `chats_estado_id_foreign` (`estado_id`);
 
 --
 -- Indices de la tabla `cuentas`
 --
 ALTER TABLE `cuentas`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `cuentas_email_unique` (`email`);
 
 --
 -- Indices de la tabla `denuncias`
 --
 ALTER TABLE `denuncias`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `denuncia_chat` (`chat_id`),
-  ADD KEY `denuncia_usuario` (`usuario_id`),
-  ADD KEY `denuncia_producto` (`producto_id`),
-  ADD KEY `denuncia_estado` (`estado_id`),
-  ADD KEY `denuncia_motivo` (`motivo_id`),
-  ADD KEY `denuncia_denunciante` (`denunciante_id`);
+  ADD KEY `denuncias_denunciante_id_foreign` (`denunciante_id`),
+  ADD KEY `denuncias_producto_id_foreign` (`producto_id`),
+  ADD KEY `denuncias_usuario_id_foreign` (`usuario_id`),
+  ADD KEY `denuncias_chat_id_foreign` (`chat_id`),
+  ADD KEY `denuncias_motivo_id_foreign` (`motivo_id`),
+  ADD KEY `denuncias_estado_id_foreign` (`estado_id`);
 
 --
 -- Indices de la tabla `estados`
 --
 ALTER TABLE `estados`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `estados_nombre_unique` (`nombre`);
 
 --
 -- Indices de la tabla `favoritos`
 --
 ALTER TABLE `favoritos`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `usuario_votante` (`votante_id`),
-  ADD KEY `usuario_votado` (`votado_id`) USING BTREE;
+  ADD KEY `favoritos_votante_id_foreign` (`votante_id`),
+  ADD KEY `favoritos_votado_id_foreign` (`votado_id`);
 
 --
 -- Indices de la tabla `fotos`
 --
 ALTER TABLE `fotos`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `filename` (`imagen`),
-  ADD KEY `foto_producto` (`producto_id`);
+  ADD KEY `fotos_producto_id_foreign` (`producto_id`);
 
 --
 -- Indices de la tabla `integridad`
@@ -900,14 +933,14 @@ ALTER TABLE `integridad`
 --
 ALTER TABLE `login_ip`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `login_usuario` (`usuario_id`);
+  ADD KEY `login_ip_usuario_id_foreign` (`usuario_id`);
 
 --
 -- Indices de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `mensaje_chat` (`chat_id`);
+  ADD KEY `mensajes_chat_id_foreign` (`chat_id`);
 
 --
 -- Indices de la tabla `motivos`
@@ -920,47 +953,48 @@ ALTER TABLE `motivos`
 --
 ALTER TABLE `notificaciones`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `notifi_motivo` (`motivo_id`),
-  ADD KEY `notifi_usuario` (`usuario_id`);
+  ADD KEY `notificaciones_usuario_id_foreign` (`usuario_id`),
+  ADD KEY `notificaciones_motivo_id_foreign` (`motivo_id`);
 
 --
 -- Indices de la tabla `papelera`
 --
 ALTER TABLE `papelera`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `papelera_usuario` (`usuario_id`);
+  ADD KEY `papelera_usuario_id_foreign` (`usuario_id`);
 
 --
 -- Indices de la tabla `pqrs`
 --
 ALTER TABLE `pqrs`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `pqrs_estado` (`estado_id`),
-  ADD KEY `pqrs_motivo` (`motivo_id`),
-  ADD KEY `pqrs_usuario` (`usuario_id`);
+  ADD KEY `pqrs_usuario_id_foreign` (`usuario_id`),
+  ADD KEY `pqrs_motivo_id_foreign` (`motivo_id`),
+  ADD KEY `pqrs_estado_id_foreign` (`estado_id`);
 
 --
 -- Indices de la tabla `productos`
 --
 ALTER TABLE `productos`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `producto_usuario` (`vendedor_id`),
-  ADD KEY `producto_subcategoria` (`subcategoria_id`),
-  ADD KEY `producto_uso` (`integridad_id`),
-  ADD KEY `producto_estado` (`estado_id`);
+  ADD KEY `productos_subcategoria_id_foreign` (`subcategoria_id`),
+  ADD KEY `productos_integridad_id_foreign` (`integridad_id`),
+  ADD KEY `productos_vendedor_id_foreign` (`vendedor_id`),
+  ADD KEY `productos_estado_id_foreign` (`estado_id`);
 
 --
 -- Indices de la tabla `roles`
 --
 ALTER TABLE `roles`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `roles_nombre_unique` (`nombre`);
 
 --
 -- Indices de la tabla `subcategorias`
 --
 ALTER TABLE `subcategorias`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `subcategoria_categoria` (`categoria_id`);
+  ADD KEY `subcategorias_categoria_id_foreign` (`categoria_id`);
 
 --
 -- Indices de la tabla `sucesos`
@@ -969,22 +1003,30 @@ ALTER TABLE `sucesos`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `tokens_de_sesion`
+--
+ALTER TABLE `tokens_de_sesion`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `tokens_de_sesion_cuenta_id_dispositivo_unique` (`cuenta_id`,`dispositivo`),
+  ADD UNIQUE KEY `tokens_de_sesion_jti_unique` (`jti`);
+
+--
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nickname` (`nickname`),
-  ADD KEY `usuario_estado` (`estado_id`),
-  ADD KEY `usuario_rol` (`rol_id`),
-  ADD KEY `usuario_cuenta` (`cuenta_id`);
+  ADD UNIQUE KEY `usuarios_cuenta_id_unique` (`cuenta_id`),
+  ADD UNIQUE KEY `usuarios_nickname_unique` (`nickname`),
+  ADD KEY `usuarios_rol_id_foreign` (`rol_id`),
+  ADD KEY `usuarios_estado_id_foreign` (`estado_id`);
 
 --
 -- Indices de la tabla `vistos`
 --
 ALTER TABLE `vistos`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `visto_producto` (`producto_id`),
-  ADD KEY `visto_usuario` (`usuario_id`);
+  ADD KEY `vistos_usuario_id_foreign` (`usuario_id`),
+  ADD KEY `vistos_producto_id_foreign` (`producto_id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -994,133 +1036,139 @@ ALTER TABLE `vistos`
 -- AUTO_INCREMENT de la tabla `auditorias`
 --
 ALTER TABLE `auditorias`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `bloqueados`
 --
 ALTER TABLE `bloqueados`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `chats`
 --
 ALTER TABLE `chats`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `cuentas`
 --
 ALTER TABLE `cuentas`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `denuncias`
 --
 ALTER TABLE `denuncias`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `estados`
 --
 ALTER TABLE `estados`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `favoritos`
 --
 ALTER TABLE `favoritos`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `fotos`
 --
 ALTER TABLE `fotos`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `integridad`
 --
 ALTER TABLE `integridad`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `login_ip`
 --
 ALTER TABLE `login_ip`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `motivos`
 --
 ALTER TABLE `motivos`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `notificaciones`
 --
 ALTER TABLE `notificaciones`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `papelera`
 --
 ALTER TABLE `papelera`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `pqrs`
 --
 ALTER TABLE `pqrs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `subcategorias`
 --
 ALTER TABLE `subcategorias`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
 
 --
 -- AUTO_INCREMENT de la tabla `sucesos`
 --
 ALTER TABLE `sucesos`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de la tabla `tokens_de_sesion`
+--
+ALTER TABLE `tokens_de_sesion`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `vistos`
 --
 ALTER TABLE `vistos`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -1130,110 +1178,116 @@ ALTER TABLE `vistos`
 -- Filtros para la tabla `auditorias`
 --
 ALTER TABLE `auditorias`
-  ADD CONSTRAINT `auditoria_suceso` FOREIGN KEY (`suceso_id`) REFERENCES `sucesos` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `auditoria_usuario` FOREIGN KEY (`administrador_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `auditorias_administrador_id_foreign` FOREIGN KEY (`administrador_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `auditorias_suceso_id_foreign` FOREIGN KEY (`suceso_id`) REFERENCES `sucesos` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `bloqueados`
 --
 ALTER TABLE `bloqueados`
-  ADD CONSTRAINT `usuario_bloqueado` FOREIGN KEY (`bloqueado_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_bloqueador` FOREIGN KEY (`bloqueador_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `bloqueados_bloqueado_id_foreign` FOREIGN KEY (`bloqueado_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bloqueados_bloqueador_id_foreign` FOREIGN KEY (`bloqueador_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `chats`
 --
 ALTER TABLE `chats`
-  ADD CONSTRAINT `chat_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `chat_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `chat_usuario_a` FOREIGN KEY (`comprador_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `chats_comprador_id_foreign` FOREIGN KEY (`comprador_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `chats_estado_id_foreign` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `chats_producto_id_foreign` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `denuncias`
 --
 ALTER TABLE `denuncias`
-  ADD CONSTRAINT `denuncia_chat` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `denuncia_denunciante` FOREIGN KEY (`denunciante_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `denuncia_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `denuncia_motivo` FOREIGN KEY (`motivo_id`) REFERENCES `motivos` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `denuncia_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `denuncia_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `denuncias_chat_id_foreign` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `denuncias_denunciante_id_foreign` FOREIGN KEY (`denunciante_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `denuncias_estado_id_foreign` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `denuncias_motivo_id_foreign` FOREIGN KEY (`motivo_id`) REFERENCES `motivos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `denuncias_producto_id_foreign` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `denuncias_usuario_id_foreign` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `favoritos`
 --
 ALTER TABLE `favoritos`
-  ADD CONSTRAINT `usuario_votado` FOREIGN KEY (`votado_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_votante` FOREIGN KEY (`votante_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `favoritos_votado_id_foreign` FOREIGN KEY (`votado_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `favoritos_votante_id_foreign` FOREIGN KEY (`votante_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `fotos`
 --
 ALTER TABLE `fotos`
-  ADD CONSTRAINT `foto_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `fotos_producto_id_foreign` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `login_ip`
 --
 ALTER TABLE `login_ip`
-  ADD CONSTRAINT `login_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `login_ip_usuario_id_foreign` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `mensajes`
 --
 ALTER TABLE `mensajes`
-  ADD CONSTRAINT `mensaje_chat` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `mensajes_chat_id_foreign` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `notificaciones`
 --
 ALTER TABLE `notificaciones`
-  ADD CONSTRAINT `notifi_motivo` FOREIGN KEY (`motivo_id`) REFERENCES `motivos` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `notifi_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `notificaciones_motivo_id_foreign` FOREIGN KEY (`motivo_id`) REFERENCES `motivos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notificaciones_usuario_id_foreign` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `papelera`
 --
 ALTER TABLE `papelera`
-  ADD CONSTRAINT `papelera_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `papelera_usuario_id_foreign` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `pqrs`
 --
 ALTER TABLE `pqrs`
-  ADD CONSTRAINT `pqrs_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `pqrs_motivo` FOREIGN KEY (`motivo_id`) REFERENCES `motivos` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `pqrs_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `pqrs_estado_id_foreign` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `pqrs_motivo_id_foreign` FOREIGN KEY (`motivo_id`) REFERENCES `motivos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `pqrs_usuario_id_foreign` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `productos`
 --
 ALTER TABLE `productos`
-  ADD CONSTRAINT `producto_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `producto_subcategoria` FOREIGN KEY (`subcategoria_id`) REFERENCES `subcategorias` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `producto_uso` FOREIGN KEY (`integridad_id`) REFERENCES `integridad` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `producto_usuario` FOREIGN KEY (`vendedor_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `productos_estado_id_foreign` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `productos_integridad_id_foreign` FOREIGN KEY (`integridad_id`) REFERENCES `integridad` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `productos_subcategoria_id_foreign` FOREIGN KEY (`subcategoria_id`) REFERENCES `subcategorias` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `productos_vendedor_id_foreign` FOREIGN KEY (`vendedor_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `subcategorias`
 --
 ALTER TABLE `subcategorias`
-  ADD CONSTRAINT `subcategoria_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `subcategorias_categoria_id_foreign` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `tokens_de_sesion`
+--
+ALTER TABLE `tokens_de_sesion`
+  ADD CONSTRAINT `tokens_de_sesion_cuenta_id_foreign` FOREIGN KEY (`cuenta_id`) REFERENCES `cuentas` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  ADD CONSTRAINT `usuario_cuenta` FOREIGN KEY (`cuenta_id`) REFERENCES `cuentas` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_estado` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuario_rol` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `usuarios_cuenta_id_foreign` FOREIGN KEY (`cuenta_id`) REFERENCES `cuentas` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `usuarios_estado_id_foreign` FOREIGN KEY (`estado_id`) REFERENCES `estados` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `usuarios_rol_id_foreign` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `vistos`
 --
 ALTER TABLE `vistos`
-  ADD CONSTRAINT `visto_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `visto_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `vistos_producto_id_foreign` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `vistos_usuario_id_foreign` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

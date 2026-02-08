@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
-from core.app_config import DOMINIO_CORREO
+from core.app_config import DOMINIO_EMAIL
 from components.selector import Selector
 from components.boton import Boton
 from components.txt_edit import TxtEdit
@@ -13,28 +13,28 @@ class UsuarioBody(QWidget):
         super().__init__()
         self.id = -1
 
-        self.avatar = QLabel()
+        self.imagen = QLabel()
         image = QPixmap("assets/sprites/avatar.png")
-        self.avatar.setPixmap(image)
-        self.avatar.setScaledContents(True)
-        self.avatar.setFixedSize(128, 128)
-        self.avatar.setAlignment(
+        self.imagen.setPixmap(image)
+        self.imagen.setScaledContents(True)
+        self.imagen.setFixedSize(128, 128)
+        self.imagen.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.nombre = QLabel("*** ??? ***")
-        self.nombre.setWordWrap(True)
-        font = self.nombre.font()
+        self.nickname = QLabel("*** ??? ***")
+        self.nickname.setWordWrap(True)
+        font = self.nickname.font()
         font.setBold(True)
         font.setPointSize(20)
-        self.nombre.setFont(font)
-        self.nombre.setAlignment(
+        self.nickname.setFont(font)
+        self.nickname.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.correo = QLabel("*** correo ***")
-        self.correo.setWordWrap(True)
-        self.correo.setAlignment(
+        self.email = QLabel("*** email ***")
+        self.email.setWordWrap(True)
+        self.email.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
@@ -74,10 +74,10 @@ class UsuarioBody(QWidget):
 
         groupRecuperacion = QGroupBox("Recuperación")
         layRecup = QVBoxLayout()
-        self.correo_recup = QLineEdit()
-        self.correo_recup.setAlignment(Qt.AlignCenter)
-        self.correo_recup.setPlaceholderText("correo_usuario" + DOMINIO_CORREO)
-        layRecup.addWidget(self.correo_recup)
+        self.email_recup = QLineEdit()
+        self.email_recup.setAlignment(Qt.AlignCenter)
+        self.email_recup.setPlaceholderText("email_usuario" + DOMINIO_EMAIL)
+        layRecup.addWidget(self.email_recup)
         layRecup.addSpacing(10)
         self.btnRecup = Boton("Recuperar clave")
         layRecup.addWidget(self.btnRecup)
@@ -87,7 +87,7 @@ class UsuarioBody(QWidget):
         layMsj = QVBoxLayout()
         self.mensaje = QTextEdit()
         self.mensaje.setAlignment(Qt.AlignJustify)
-        self.mensaje.setPlaceholderText("escribe un texto que será enviado al correo del usuario, se agregarán automáticamente cabecera y pie de página con saludo e información del administrador remitente")
+        self.mensaje.setPlaceholderText("escribe un texto que será enviado al email del usuario, se agregarán automáticamente cabecera y pie de página con saludo e información del administrador remitente")
         layMsj.addWidget(self.mensaje)
         layMsj.addSpacing(10)
         self.btnMensaje = Boton("Enviar Mensaje")
@@ -96,11 +96,11 @@ class UsuarioBody(QWidget):
 
         layVertical = QVBoxLayout()
         layVertical.addSpacing(10)
-        layVertical.addWidget(self.avatar, alignment=Qt.AlignCenter)
+        layVertical.addWidget(self.imagen, alignment=Qt.AlignCenter)
         layVertical.addSpacing(10)
-        layVertical.addWidget(self.nombre)
+        layVertical.addWidget(self.nickname)
         layVertical.addSpacing(10)
-        layVertical.addWidget(self.correo)
+        layVertical.addWidget(self.email)
         layVertical.addSpacing(10)
         layVertical.addLayout(laySelectores)
         layVertical.addSpacing(10)
@@ -126,8 +126,8 @@ class UsuarioBody(QWidget):
 
     def actualiza(self, usuario):
         self.id = usuario.id
-        self.correo.setText(usuario.correo)
-        self.nombre.setText(usuario.nombre)
+        self.email.setText(usuario.email)
+        self.nickname.setText(usuario.nickname)
         if usuario.descripcion == "":
             self.descripcion.setText("*** descripción vacía ***")
         else:
@@ -139,8 +139,11 @@ class UsuarioBody(QWidget):
         self.registro.setText("Registro\n" + usuario.fecha_registro.replace(" ", "\n"))
         self.edicion.setText("Edición\n" + usuario.fecha_actualiza.replace(" ", "\n"))
         self.actividad.setText("Actividad\n" + usuario.fecha_reciente.replace(" ", "\n"))
-        self.sel_rol.set_index(0 if usuario.rol_id == 3 else 1)
+        self.sel_rol.set_index(0 if usuario.rol_id == 1 else 1)
         self.sel_estado.set_index(usuario.estado_id - 1)
         self.sel_rol.set_ente_id(usuario.id)
         self.sel_estado.set_ente_id(usuario.id)
-        # cargar imagen
+        self.set_image(usuario.img_pix)
+
+    def set_image(self, image):
+        self.imagen.setPixmap(image)
