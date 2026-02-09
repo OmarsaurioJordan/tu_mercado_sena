@@ -9,7 +9,8 @@ use App\Http\Requests\Mensaje\StoreMessageRequest;
 use App\Models\Mensaje;
 use App\DTOs\Mensaje\InputDto;
 use App\Models\Chat;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class MensajeController extends Controller
 {

@@ -126,6 +126,8 @@ class ChatRepository implements IChatRepository
     {
         $chat = Chat::findorFail($id);
 
+        $mensajes = $chat->mensajes;
+
         // Definir los IDs de tus estados (ajustar según tu tabla 'estados')
         $ID_ELIMINADO_COMPRADOR = 4; 
         $ID_ELIMINADO_VENDEDOR = 5;

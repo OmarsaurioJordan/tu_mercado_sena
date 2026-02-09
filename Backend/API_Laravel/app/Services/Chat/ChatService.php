@@ -35,6 +35,7 @@ class ChatService implements IChatService
         // Si es asi no crear uno nuevo, retornar el existente
         if ($this->repository->findModel(['comprador_id' => $dto->comprador_id,'producto_id' => $dto->producto_id]
         )) {
+
            $chatExistente = $this->repository->findModel([
                 'comprador_id' => $dto->comprador_id,
                 'producto_id' => $dto->producto_id
@@ -76,9 +77,22 @@ class ChatService implements IChatService
 
         $chat->load('producto.vendedor', 'comprador');
 
-
+        // Validar que el chat exista
         if (!$chat) {
             throw new ModelNotFoundException('El chat solicitado no existe');
+        }
+
+        // Validar que cuando el chat fue borrado por el usuario, este no pueda acceder a el, para ambos casos
+        if ($usuario_id === $chat->comprador_id && $chat->estado_id === 4) {
+            throw new BusinessException('El chat está cerrado, no puedes enviar mensajes', 403);
+        }
+        
+        if ($usuario_id === $chat->producto->vendedor_id && $chat->estado_id === 5) {
+            throw new BusinessException('El chat está cerrado, no puedes enviar mensajes', 403);
+        }
+
+        if ($chat->estado_id === 6) {
+            throw new BusinessException('El chat está cerrado, no puedes enviar mensajes', 403);
         }
 
         if ($usuario_id === $chat->comprador_id) {

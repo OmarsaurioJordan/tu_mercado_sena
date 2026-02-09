@@ -8,6 +8,10 @@ use App\DTOs\Mensaje\InputDto;
 use App\Models\Chat;
 use App\Models\Mensaje;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 
 
 class MensajeService implements IMensajeService
@@ -18,28 +22,53 @@ class MensajeService implements IMensajeService
     public function crearMensaje(InputDto $dto, Chat $chat): array
     {
         return DB::transaction(function () use ($dto, $chat) {
-            
-            $mensaje = $this->mensajeRepository->create($dto->toArray());
+            $data = $dto->toArray();    
 
+            $file = request()->file('imagen');
+
+            Log::info('Datos del mensaje a crear:', $data);
+
+            if ($file instanceof UploadedFile) {
+                $image = Image::read($file->getPathname())
+                    ->resize(512, 512)
+                    ->toWebp(90);
+
+                $nombre = uniqid() . '.webp';
+                $ruta = "mensajes/{$chat->id}/{$nombre}";
+
+                Storage::disk('public')->put($ruta, $image->toString());
+
+                $data['imagen'] = $ruta;
+            }
+
+            // Crear el mensaje utilizando el repositorio
+            $mensaje = $this->mensajeRepository->create($data);
+
+            // Validar que el mensaje se haya creado correctamente
             if (!$mensaje) {
                 throw new \Exception("No se pudo crear el mensaje, Intente nuevamente.");
             }
 
+            // Reactivar el chat si uno de los participantes lo había borrado
             if ($chat->estado_id === 4 || $chat->estado_id === 5) {
                 $chat->update(['estado_id' => 1]);
             }
 
+            // Cargar las relaciones necesarias para el detalle del chat
             $chat->load(['producto', 'producto.fotos', 'producto.vendedor']);
 
+            // Obtener los mensajes paginados del chat
             $mensajesPaginados = $chat
                 ->mensajes()
                 ->orderBy('fecha_registro', 'desc')
                 ->paginate(20);
 
+            // Validar que se hayan cargado los mensajes paginados correctamente
             if (!$mensajesPaginados) {
                 throw new \Exception("No se pudieron cargar los mensajes, Intente nuevamente.");
             }
 
+            // Actualizar el estado de visto del chat según el remitente del mensaje
             if ($mensaje->es_comprador) {
                 $chat->update([
                     'visto_comprador' => true,

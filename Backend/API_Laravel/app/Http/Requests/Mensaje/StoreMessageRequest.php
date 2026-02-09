@@ -53,13 +53,30 @@ class StoreMessageRequest extends FormRequest
             ],
             'imagen' => [
                 'required_without:mensaje',
-                'string',
-                'max:80'
+                'file',
+                'max: 5120', // 5MB
+                'mimes:jpg,jpeg,png,webp'
             ],
             'es_comprador' => [
                 'nullable',
                 'boolean'
             ]
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'chat_id.required' => 'El campo chat_id es obligatorio.',
+            'chat_id.integer' => 'El campo chat_id debe ser un número entero.',
+            'chat_id.exists' => 'El chat especificado no existe.',
+            'mensaje.required_without' => 'Debe proporcionar un mensaje o una imagen.',
+            'mensaje.string' => 'El mensaje debe ser una cadena de texto.',
+            'mensaje.max' => 'El mensaje no debe exceder los 512 caracteres.',
+            'imagen.required_without' => 'Debe proporcionar un mensaje o una imagen.',
+            'imagen.file' => 'El campo imagen debe ser un archivo válido.',
+            'imagen.max' => 'La imagen no debe exceder los 5MB.',
+            'imagen.mimes' => 'La imagen debe ser un archivo de tipo: jpg, jpeg, png, webp.',
         ];
     }
 }
