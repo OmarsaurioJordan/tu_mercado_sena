@@ -3,3 +3,7 @@ __pycache__
 build/
 *.exe
 *.rar
+/vendor
+.env
+.vscode
+Backend/PoblarDB/.vscode
