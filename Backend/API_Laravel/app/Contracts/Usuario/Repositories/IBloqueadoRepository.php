@@ -2,27 +2,27 @@
 
 namespace App\Contracts\Usuario\Repositories;
 
-use App\Models\Bloqueado;
+use App\Models\Usuario;
 use Illuminate\Database\Eloquent\Collection;
 
 
 interface IBloqueadoRepository
 {
     /**
-     * Función para bloquear un usuario que retorna el modelo creado
+     * Función para bloquear un usuario que retorna su modelo
      * @param int $bloqueadorId
      * @param int $bloqueadoId
-     * @return Bloqueado
+     * @return Usuario
      */
-    public function bloquearUsuario(int $bloqueadorId, int $bloqueadoId): Bloqueado;
+    public function bloquearUsuario(int $bloqueadorId, int $bloqueadoId): Usuario;
 
     /**
      * Función para desbloquear un usuario que retorna el modelo eliminado
      * @param int $bloqueadorId
      * @param int $bloqueadoId
-     * @return Bloqueado|null El modelo eliminado o null si no se encontró
+     * @return Usuario|null El modelo eliminado o null si no se encontró
      */
-    public function desbloquearUsuario(int $bloqueadorId, int $bloqueadoId): Bloqueado;
+    public function desbloquearUsuario(int $bloqueadorId, int $bloqueadoId): Usuario;
 
     /**
      * Función de apoyo para verificar si un usuario ha bloqueado a otro

@@ -3,16 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Chat;
 
 class Mensaje extends Model
 {
-    protected $table = 'mensajes';
-
+    public $table = 'mensajes';
+    
     public $timestamps = true;
 
     const CREATED_AT = 'fecha_registro';
-    const UPDATE_AT = null;
-
+    const UPDATED_AT = null;
+    
     protected $fillable = [
         'es_comprador',
         'chat_id',
@@ -20,6 +21,11 @@ class Mensaje extends Model
         'imagen'
     ];
 
+    protected $casts = [
+        'es_comprador' => 'boolean',
+    ];
+
+    // Relación 1-1
     public function chat()
     {
         return $this->belongsTo(Chat::class, 'chat_id');

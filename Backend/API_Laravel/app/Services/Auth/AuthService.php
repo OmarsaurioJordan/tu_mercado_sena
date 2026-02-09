@@ -21,6 +21,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Contracts\Auth\Services\IRegistroService;
 use App\Exceptions\BusinessException;
+use Illuminate\Http\UploadedFile;
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+
 
 /**
  * AuthService - Servicio de autenticación
@@ -68,13 +72,32 @@ class AuthService implements IAuthService
      */
     public function iniciarRegistro(RegisterDTO $dto): array
     {
+
         // Llamada directa: si falla, la excepción sube sola
         $inicioProceso = $this->registroService->iniciarRegistro($dto->email, $dto->password);
 
+        $cuenta_id = $inicioProceso['cuenta_id'];
+        // Obtener la imagen y pasarlo en los datos encriptados
+        $file = request()->file('imagen');
+
+        $ruta = null;
+        
+        if ($file instanceof UploadedFile) {
+            $image = Image::read($file->getPathname())
+                ->resize(512, 512)
+                ->toWebp(90);
+
+            $nombre = uniqid() . '.webp';
+            $ruta = "tmp/registro/{$cuenta_id}/{$nombre}";
+
+            Storage::disk('public')->put($ruta, $image->toString());             
+        }
+                
+
         return [
-            'cuenta_id'        => $inicioProceso['cuenta_id'],
+            'cuenta_id'        => $cuenta_id,
             'expira_en'        => $inicioProceso['expira_en'],
-            'datosEncriptados' => encrypt($dto->toArray()),
+            'datosEncriptados' => encrypt($dto->toArray($ruta)),
         ];
     }
 

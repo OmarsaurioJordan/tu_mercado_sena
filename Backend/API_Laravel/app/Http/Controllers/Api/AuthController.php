@@ -35,7 +35,7 @@ use Tymon\JWTAuth\JWTGuard;
  * - 422 Unprocessable Entity: Validación falló
  * - 500 Internal Server Error: Error del servidor
  */
-class AuthController
+class AuthController extends Controller
 {
     /**
      * Constructor con intección de dependencias
@@ -61,7 +61,7 @@ class AuthController
      */
     public function iniciarRegistro(RegisterRequest $request): JsonResponse
     {
-        $dto = RegisterDTO::fromRequest($request->validated());
+        $dto = RegisterDTO::fromRequest($request);
 
         // El "camino feliz" es lo único que importa aquí
         $result = $this->authService->iniciarRegistro($dto);
