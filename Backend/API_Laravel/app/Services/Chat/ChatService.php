@@ -83,15 +83,15 @@ class ChatService implements IChatService
         }
 
         // Validar que cuando el chat fue borrado por el usuario, este no pueda acceder a el, para ambos casos
-        if ($usuario_id === $chat->comprador_id && $chat->estado_id === 4) {
+        if ($usuario_id === $chat->comprador_id && $chat->estado_id === 12) {
             throw new BusinessException('El chat está cerrado, no puedes enviar mensajes', 403);
         }
         
-        if ($usuario_id === $chat->producto->vendedor_id && $chat->estado_id === 5) {
+        if ($usuario_id === $chat->producto->vendedor_id && $chat->estado_id === 11) {
             throw new BusinessException('El chat está cerrado, no puedes enviar mensajes', 403);
         }
 
-        if ($chat->estado_id === 6) {
+        if ($chat->estado_id === 13) {
             throw new BusinessException('El chat está cerrado, no puedes enviar mensajes', 403);
         }
 

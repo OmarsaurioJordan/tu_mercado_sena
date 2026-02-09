@@ -110,13 +110,13 @@ class ChatRepository implements IChatRepository
             ->where(function ($query) use ($usuario_id) {
                 // Chats donde el usuario es comprador
                 $query->where('comprador_id', $usuario_id)
-                    ->whereNotIn('estado_id', [4, 6]) // comprador eliminó o ambos eliminaron → oculto
+                    ->whereNotIn('estado_id', [12, 13]) // comprador eliminó o ambos eliminaron → oculto
                     // Chats donde el usuario es vendedor
                     ->orWhere(function($q) use ($usuario_id) {
                         $q->whereHas('producto', function ($prod) use ($usuario_id) {
                             $prod->where('vendedor_id', $usuario_id);
                         })
-                        ->whereNotIn('estado_id', [5, 6]); // vendedor eliminó o ambos eliminaron → oculto
+                        ->whereNotIn('estado_id', [11, 13]); // vendedor eliminó o ambos eliminaron → oculto
                     });
             })
             ->get();
@@ -129,9 +129,9 @@ class ChatRepository implements IChatRepository
         $mensajes = $chat->mensajes;
 
         // Definir los IDs de tus estados (ajustar según tu tabla 'estados')
-        $ID_ELIMINADO_COMPRADOR = 4; 
-        $ID_ELIMINADO_VENDEDOR = 5;
-        $ID_ELIMINADO_POR_AMBOS = 6;
+        $ID_ELIMINADO_COMPRADOR = 12; 
+        $ID_ELIMINADO_VENDEDOR = 11;
+        $ID_ELIMINADO_POR_AMBOS = 13;
 
         // Verificar quién está eliminando el chat y actualizar el estado en consecuencia
         $esVendedor = ($chat->producto->vendedor_id === $usuario_id);
