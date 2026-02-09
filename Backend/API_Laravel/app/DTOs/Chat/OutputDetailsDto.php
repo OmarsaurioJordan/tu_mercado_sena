@@ -77,11 +77,11 @@ readonly class OutputDetailsDto implements Arrayable
                             'mensaje' => $m->mensaje,
                             'es_comprador' => (bool) $m->es_comprador,
                             'imagen' => $m->imagen
-                                ? asset('storage/' . $m->imagen)
+                                ? asset('storage/' . ltrim($m->imagen, '/'))
                                 : null,                            
                             'fecha_registro' => $m->fecha_registro->toDateTimeString(),
                         ])->toArray()
-                        : [], // O [] si prefieres que siempre sea un array
+                        : [],
             paginacion: $mensajesPaginados ? [
                 'total' => $mensajesPaginados->total(),
                 'pagina_actual' => $mensajesPaginados->currentPage(),

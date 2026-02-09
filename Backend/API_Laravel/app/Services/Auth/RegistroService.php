@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\JWTGuard;
 use App\Exceptions\BusinessException;
+use Illuminate\Http\UploadedFile;
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 
 class RegistroService implements IRegistroService
 {
@@ -110,40 +113,62 @@ class RegistroService implements IRegistroService
      * @return array{status: bool, data: array{user:Usuario, token: string, token_type: string, expires_in: int}}
      */
 
-    public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array
-    {
+    public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array {
         // 1. Preparación de datos
-        $data = decrypt($datosEncriptados);
-        $dto = RegisterDTO::fromArray($data);
+        $datos = decrypt($datosEncriptados);
+        $dto = RegisterDTO::fromArray($datos);
+
         $cuenta = $this->cuentaRepository->findById($cuenta_id);
+
+        if (!$cuenta) {
+            throw new BusinessException('Cuenta no encontrada', 404);
+        }
 
         if ($this->userRepository->exists($cuenta_id)) {
             throw new BusinessException("El correo ya fue registrado", 422);
         }
-    
 
-        // 2. Ejecución atómica
-        return DB::transaction(function () use ($dto, $clave, $cuenta, $dispositivo) {
-            
-            // Verificamos clave (si falla, lanza excepción y corta el flujo)
+        $rutaImagen = null;
+
+        if (!empty($dto->ruta_imagen)) {
+
+            $origen = $dto->ruta_imagen;
+            $destino = "usuarios/{$cuenta->id}/" . basename($origen);
+
+            if (Storage::disk('public')->exists($origen)) {
+                Storage::disk('public')->move($origen, $destino);
+                $rutaImagen = $destino;
+            }
+        }
+
+        if (!$rutaImagen) {
+            throw new BusinessException('La imagen es obligatoria', 422);
+        }
+
+        // 3. Datos finales para persistencia
+        $data = $dto->toArray($rutaImagen);
+
+        // 4. Ejecución atómica
+        return DB::transaction(function () use ($data, $dto, $clave, $cuenta, $dispositivo) {
+
+            // Verificar clave
             $this->verificarClave($dto->email, $clave);
 
             // Crear usuario
             $usuario = $this->userRepository->create([
                 'cuenta_id' => $cuenta->id,
                 'nickname' => $dto->nickname,
-                'imagen' => $dto->imagen,
+                'imagen' => $data['ruta_imagen'], // 👈 string|null
                 'rol_id' => $dto->rol_id,
                 'estado_id' => $dto->estado_id,
                 'descripcion' => $dto->descripcion,
                 'link' => $dto->link
-                
             ]);
 
             // Generar JWT
             $token = $this->jwt->fromUser($cuenta);
             $payload = $this->jwt->setToken($token)->getPayload();
-            
+
             // Registrar sesión
             DB::table('tokens_de_sesion')->insert([
                 'cuenta_id'   => $cuenta->id,

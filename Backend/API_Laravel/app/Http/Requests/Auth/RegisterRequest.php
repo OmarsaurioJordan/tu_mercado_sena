@@ -42,8 +42,9 @@ class RegisterRequest extends FormRequest
 
             'imagen' => [
                 'required',
-                'string',
-                'max:80'
+                'file',
+                'max: 5120', // 5MB
+                'mimes:jpg,jpeg,png,webp'
             ],
 
             'rol_id' => [
@@ -96,6 +97,11 @@ class RegisterRequest extends FormRequest
             'nombre.max' => 'El nombre no puede exceder los 24 caracteres.',
             'descripcion.max' => 'La descripción no puede exceder los 300 caracteres.',
             'link.regex' => 'El link debe ser una red social válida (YouTube, Instagram, Facebook, Twitter, LinkedIn).',
+            
+            'imagen.required' => 'Debes adjuntar una imagen',
+            'imagen.file' => 'El campo imagen debe ser un archivo válido.',
+            'imagen.max' => 'La imagen no debe exceder los 5MB.',
+            'imagen.mimes' => 'La imagen debe ser un archivo de tipo: jpg, jpeg, png, webp.',
         ];
     }
 }
