@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
@@ -11,18 +11,20 @@ from components.txt_edit import TxtEdit
 class UsuarioBody(QWidget):
     def __init__(self):
         super().__init__()
-        self.id = -1
+        self.id = 0
+
+        ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+        ctrlUsuario.usuario_signal.hubo_cambio.connect(self.actualizar)
 
         self.imagen = QLabel()
-        image = QPixmap("assets/sprites/avatar.png")
-        self.imagen.setPixmap(image)
+        self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
         self.imagen.setScaledContents(True)
         self.imagen.setFixedSize(128, 128)
         self.imagen.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.nickname = QLabel("*** ??? ***")
+        self.nickname = QLabel("")
         self.nickname.setWordWrap(True)
         font = self.nickname.font()
         font.setBold(True)
@@ -32,7 +34,7 @@ class UsuarioBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.email = QLabel("*** email ***")
+        self.email = QLabel("")
         self.email.setWordWrap(True)
         self.email.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -49,14 +51,14 @@ class UsuarioBody(QWidget):
         ], "estado...", "Estado", 0, "usuario_estado")
         laySelectores.addWidget(self.sel_estado)
 
-        self.link = QLabel("*** link ***")
+        self.link = QLabel("")
         self.link.setWordWrap(True)
         self.link.setStyleSheet("color: #777777;")
         self.link.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.descripcion = QLabel("*** descripción vacía ***")
+        self.descripcion = QLabel("")
         self.descripcion.setWordWrap(True)
         self.descripcion.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -115,6 +117,7 @@ class UsuarioBody(QWidget):
         layVertical.addWidget(groupMensaje)
         layVertical.addStretch()
         self.setLayout(layVertical)
+        self.resetData()
     
     def labelFechas(self, texto=""):
         label = QLabel(texto)
@@ -124,7 +127,25 @@ class UsuarioBody(QWidget):
         )
         return label
 
-    def actualiza(self, usuario):
+    def resetData(self):
+        self.id = 0
+        self.email.setText("*** email ***")
+        self.nickname.setText("*** ??? ***")
+        self.descripcion.setText("*** descripción vacía ***")
+        self.link.setText("*** link ***")
+        self.registro.setText("Registro")
+        self.edicion.setText("Edición")
+        self.actividad.setText("Actividad")
+        self.sel_rol.set_index(0)
+        self.sel_estado.set_index(0)
+        self.sel_rol.set_ente_id(0)
+        self.sel_estado.set_ente_id(0)
+        self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
+
+    def setData(self, usuario):
+        if usuario == None:
+            self.resetData()
+            return
         self.id = usuario.id
         self.email.setText(usuario.email)
         self.nickname.setText(usuario.nickname)
@@ -143,7 +164,9 @@ class UsuarioBody(QWidget):
         self.sel_estado.set_index(usuario.estado_id - 1)
         self.sel_rol.set_ente_id(usuario.id)
         self.sel_estado.set_ente_id(usuario.id)
-        self.set_image(usuario.img_pix)
+        self.imagen.setPixmap(usuario.img_pix)
 
-    def set_image(self, image):
-        self.imagen.setPixmap(image)
+    def actualizar(self, id=0):
+        if id == self.id:
+            ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+            self.setData(ctrlUsuario.get_usuario(id))

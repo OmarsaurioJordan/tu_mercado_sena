@@ -31,19 +31,20 @@ class ToolsWidget(QWidget):
         tabsB.addTab(Scroll(), "Historial")
 
         tabsFind = QTabWidget()
-        # comienza a instanciar las diferentes pestannas de filtros mas listas
+        # estructura de la busqueda de usuarios
         usuarioFilter = Usuariofilter()
         usuarioBusqueda = UsuarioBusqueda()
         tabsFind.addTab(Buscador(usuarioFilter, usuarioBusqueda), "Usuarios")
+        usuarioFilter.clicAplicar.connect(
+            lambda filtros: self.buscarUsuarios(filtros, usuarioBusqueda, usuarioBody)
+        )
         usuarioBusqueda.scroll_at_end.connect(
-            lambda: self.rebuscarUsuarios(usuarioBusqueda)
+            lambda: self.rebuscarUsuarios()
         )
         usuarioBusqueda.card_clic.connect(
             lambda user_id: self.buscarUsuario(user_id, usuarioBody)
         )
-        usuarioFilter.clicAplicar.connect(
-            lambda filtros: self.buscarUsuarios(filtros, usuarioBusqueda)
-        )
+        # estructura de la busqueda de productos
         tabsFind.addTab(Buscador(), "Productos")
         tabsFind.addTab(Buscador(), "PQRSs")
         tabsFind.addTab(Buscador(), "Denuncias")
@@ -61,16 +62,14 @@ class ToolsWidget(QWidget):
         layFondoTres.setStretch(2, 3)
         self.setLayout(layFondoTres)
 
-    def buscarUsuarios(self, filtros, widgetResultado):
-        self.ctrlUsuario.limpiar()
-        usuarios = self.ctrlUsuario.get_usuarios(filtros=filtros)
+    def buscarUsuarios(self, filtros, widgetResultado, widgetReset):
         widgetResultado.eliminar_usuarios()
-        widgetResultado.cargar_usuarios(usuarios)
+        widgetReset.resetData()
+        usuarios = self.ctrlUsuario.do_busqueda(filtros=filtros)
     
-    def rebuscarUsuarios(self, widgetResultado):
-        usuarios = self.ctrlUsuario.get_usuarios(rebusqueda=True)
-        widgetResultado.cargar_usuarios(usuarios)
+    def rebuscarUsuarios(self):
+        usuarios = self.ctrlUsuario.do_busqueda(rebusqueda=True)
 
     def buscarUsuario(self, user_id, widgetResultado):
         usuario = self.ctrlUsuario.get_usuario(user_id)
-        widgetResultado.actualiza(usuario)
+        widgetResultado.setData(usuario)

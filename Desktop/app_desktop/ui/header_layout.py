@@ -19,7 +19,10 @@ class HeaderLayout(QVBoxLayout):
         if admin_id == 0:
             admin = self.usuario_debug()
         else:
-            admin = ctrlUsuario.get_usuario(admin_id)
+            admin = ctrlUsuario.get_usuario(admin_id, True)
+            if admin == None:
+                admin_id = 0
+                admin = self.usuario_debug()
 
         image = QPixmap("assets/sprites/logo.png")
         logo = QLabel()
@@ -69,7 +72,7 @@ class HeaderLayout(QVBoxLayout):
             self.addWidget(widget)
 
     def usuario_debug(self):
-        return Usuario(0, "email_administrativo@sena.edu.co", 1, "Usuario Administrador", 0, "", "", 1, "", "", "")
+        return Usuario(0, "email_administrativo@sena.edu.co", 3, "Usuario Administrador", 0, "", "", 1, "", "", "")
 
     def cambiaPagina(self, pagina=""):
         manager = QApplication.instance().property("manager")

@@ -1,17 +1,24 @@
 import requests
+from PySide6.QtCore import Signal, QObject
 from core.app_config import (
     API_LIMIT_ITEMS, DEFAULT_INFO, API_BASE_URL
 )
 from models.usuario import Usuario
+from core.session import Session
+
+class CtrlUsuarioSignal(QObject):
+    hubo_cambio = Signal(int)
 
 class CtrlUsuario:
 
     def __init__(self):
+        self.usuario_signal = CtrlUsuarioSignal()
         self.limpiar()
     
-    def limpiar(self):
+    def limpiar(self, solo_busqueda=False):
+        if not solo_busqueda:
+            self.usuarios = []
         self.usuarios_busqueda = []
-        self.usuarios = []
         self.cursor_busqueda = {
             "cursor_fecha": "",
             "cursor_id": "",
@@ -20,12 +27,15 @@ class CtrlUsuario:
             "filtros": {}
         }
 
+    # llamadas a la API para informacion de usuarios
+
     def api_usuario(self, id=0):
         params = {"id": id}
         response = requests.get(API_BASE_URL + "usuarios/get.php", params=params)
         if response.status_code == 200:
-            usr = Usuario.from_json(response.json())
+            usr = self.new_usuario(response.json())
             self.add_usuarios([usr], False)
+            self.usuario_signal.hubo_cambio.emit(usr.id)
             return usr
         return None
 
@@ -42,11 +52,13 @@ class CtrlUsuario:
             if response.status_code == 200:
                 data = response.json()
                 for item in data:
-                    usuarios.append(Usuario.from_json(item))
+                    usr = self.new_usuario(item)
+                    usuarios.append(usr)
                 if len(usuarios) > 0:
                     self.cursor_busqueda["cursor_fecha"] = usuarios[-1].fecha_registro
                     self.cursor_busqueda["cursor_id"] = usuarios[-1].id
                     self.add_usuarios(usuarios, True)
+                    self.usuario_signal.hubo_cambio.emit(0)
                 else:
                     self.cursor_busqueda["finalizo"] = True
             return usuarios
@@ -54,46 +66,52 @@ class CtrlUsuario:
             self.cursor_busqueda["running"] = False
         return []
 
+    def do_busqueda(self, filtros={}, rebusqueda=False):
+        if rebusqueda:
+            filtros = self.cursor_busqueda["filtros"]
+        else:
+            self.limpiar(True)
+            self.cursor_busqueda["filtros"] = filtros
+        self.api_usuarios(filtros)
+
+    # administracion de agregacion de usuarios
+
     def add_usuarios(self, usuarios=[], from_busqueda=True):
         for usr in usuarios:
-            self.set_in_list(self.usuarios, usr, True)
+            self.set_in_list(self.usuarios, usr)
             if from_busqueda:
-                self.set_in_list(self.usuarios_busqueda, usr, False)
+                self.set_in_list(self.usuarios_busqueda, usr)
 
-    def get_usuario(self, id=0):
+    def set_in_list(self, lista=[], value=None):
+        for i in range(len(lista)):
+            if lista[i].id == value.id:
+                lista[i] = value
+                return
+        lista.append(value)
+
+    # obtencion de informacion de usuarios
+
+    def get_usuario(self, id=0, forzado=False):
         for usr in self.usuarios:
             if usr.id == id:
                 return usr
         for usr in self.usuarios_busqueda:
             if usr.id == id:
                 return usr
-        return self.api_usuario(id)
+        if forzado:
+            return self.api_usuario(id)
+        return None
     
-    def get_usuarios(self, filtros={}, rebusqueda=False):
-        if rebusqueda:
-            filtros = self.cursor_busqueda["filtros"]
-        else:
-            self.cursor_busqueda["filtros"] = filtros
-        self.api_usuarios(filtros)
+    def get_busqueda(self):
         return self.usuarios_busqueda
 
-    def set_in_list(self, lista=[], value=None, reemplazar=True):
-        for i in range(len(lista)):
-            if lista[i].id == value.id:
-                if reemplazar:
-                    lista[i] = value
-                return True
-        lista.append(value)
-        return False
+    # llamadas a la API para administrador
 
     def get_master_info(self):
-        descripcion = ""
         response = requests.get(API_BASE_URL + "usuarios/master_info.php")
         if response.status_code == 200:
-            descripcion = response.json().get('descripcion')
-        if descripcion == "":
-            return DEFAULT_INFO
-        return descripcion
+            return response.json().get('descripcion')
+        return DEFAULT_INFO
 
     def admin_login(self, email="", password=""):
         params = {"email": email, "password": password}
@@ -112,26 +130,56 @@ class CtrlUsuario:
                 "id": 0,
                 "error": data.get('error')
             }
-        return {"token": "", "error": ""}
+        return {"token": "", "id": 0, "error": ""}
 
     def admin_pin(self, email="", pin=""):
-        params = {"email": email, "pin": pin}
+        ses = Session()
+        admindata = ses.get_login()
+        params = {"email": email, "pin": pin,
+            "admin_email": admindata["email"], "admin_token": admindata["token"]
+        }
         response = requests.get(API_BASE_URL + "usuarios/admin_pin.php", params=params)
         data = response.json()
         if response.status_code == 200:
             return int(data.get('Ok')) # 0 o 1
         return 2 # error
 
+    # llamadas a la API para modificar usuarios
+    
     def set_rol(self, id=0, rol_id=0):
-        params = {"id": id, "rol": rol_id}
+        ses = Session()
+        admindata = ses.get_login()
+        params = {"id": id, "rol": rol_id,
+            "admin_email": admindata["email"], "admin_token": admindata["token"]
+        }
         response = requests.get(API_BASE_URL + "usuarios/set_rol.php", params=params)
         if response.status_code == 200:
-            return response.json()["Ok"] == "1"
+            res = response.json()["Ok"] == "1"
+            if res:
+                self.api_usuario(id)
+            return res
         return False
     
     def set_estado(self, id=0, estado_id=0):
-        params = {"id": id, "estado": estado_id}
+        ses = Session()
+        admindata = ses.get_login()
+        params = {"id": id, "estado": estado_id,
+            "admin_email": admindata["email"], "admin_token": admindata["token"]
+        }
         response = requests.get(API_BASE_URL + "usuarios/set_estado.php", params=params)
         if response.status_code == 200:
-            return response.json()["Ok"] == "1"
+            res = response.json()["Ok"] == "1"
+            if res:
+                self.api_usuario(id)
+            return res
         return False
+
+    # metodos de apoyo
+
+    def set_image(self, id=0):
+        self.usuario_signal.hubo_cambio.emit(id)
+    
+    def new_usuario(self, data_json):
+        usr = Usuario.from_json(data_json)
+        usr.img_signal.ok_image.connect(self.set_image)
+        return usr

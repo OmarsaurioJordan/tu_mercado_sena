@@ -3,6 +3,8 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 require_once("../config.php");
 
+validation();
+
 if (!isset($_GET["email"]) || !isset($_GET["pin"])) {
     http_response_code(400);
     echo json_encode(["error" => "Faltan credenciales"]);

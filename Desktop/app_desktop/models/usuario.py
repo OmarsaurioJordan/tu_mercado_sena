@@ -4,9 +4,10 @@ from services.load_image import ImageWorker
 from core.app_config import IMAGE_USER_LINK
 
 class UsuarioSignal(QObject):
-    ok_image = Signal(QPixmap)
+    ok_image = Signal(int)
 
 class Usuario:
+    
     def __init__(self, id, email, rol_id, nickname, imagen, descripcion, link, estado_id, fecha_registro, fecha_actualiza, fecha_reciente):
         self.id = id
         self.email = email
@@ -51,4 +52,4 @@ class Usuario:
 
     def set_image(self, image):
         self.img_pix = image
-        self.img_signal.ok_image.emit(image)
+        self.img_signal.ok_image.emit(self.id)
