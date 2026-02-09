@@ -120,6 +120,25 @@ El siguiente comando borra todos los registros que tengas en la base de datos qu
 php artisan migrate:refresh
 ```
 
+**Configurar e instalar Framework intervention Image para subir imagenes**
+
+1️⃣ En el cmd poner el siguiente comando para instalarlo
+```CMD
+composer require intervention/image-laravel
+```
+
+2️⃣ Configurar la extensión para que laravel la pueda usar
+```CMD
+php artisan vendor:publish --provider="Intervention\Image\Laravel\ServiceProvider"
+```
+
+3️⃣ En la configuración de php.ini (Desde Xammp, activar apache, config, php.ini) decomentar la siguiente linea:
+
+Comentada
+**;extension=gd**
+
+Descomentada
+**extension=gd**
 
 🔓 RUTAS PÚBLICAS
 
