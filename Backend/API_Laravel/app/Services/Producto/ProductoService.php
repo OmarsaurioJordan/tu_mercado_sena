@@ -326,16 +326,16 @@ class ProductoService implements IProductoService
             // Generar nombre único para la imagen
             $nombreArchivo = Str::uuid() . '.webp';
 
-            // Guardar imagen directamente en storage
-            $ruta = storage_path('app/public/productos/' . $nombreArchivo);
-
             // Procesar la imagen con Intervention Image
-            Image::read($imagen->getRealPath())
+            $imageContent = Image::read($imagen->getRealPath())
                 // Redimensionar manteniendo aspect ratio
                 // Máximo 1024x1024
                 ->scale(width: 1024, height: 1024)
                 ->toWebp(quality: 85)
-                ->save($ruta);
+                ->toString();
+
+            // Guardar imagen en storage - Laravel crea las carpetas automáticamente
+            Storage::disk('public')->put('productos/' . $nombreArchivo, $imageContent);
 
             // Guardar en base de datos
             Foto::create([

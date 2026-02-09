@@ -61,7 +61,7 @@ class ProductoController extends Controller
     try {
         $dto = InputDto::fromRequest($request->validated());
         
-        // 👇 SIMPLE: Solo buscar 'imagenes'
+        //Solo buscar 'imagenes'
         $imagenes = null;
         
         if ($request->hasFile('imagenes')) {
