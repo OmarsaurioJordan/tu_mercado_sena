@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Services\Producto;
-
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Str;
 use App\Contracts\Producto\Services\IProductoService;
 use App\Contracts\Producto\Repositories\IProductoRepository;
 use App\DTOs\Producto\InputDto;
@@ -211,7 +212,7 @@ class ProductoService implements IProductoService
     {
         Log::info('Cambiando estado de producto', [
             'producto_id' => $productoId,
-            'estado_id' => $estadoId
+             'estado_id' => $estadoId
         ]);
 
         try {
@@ -319,50 +320,30 @@ class ProductoService implements IProductoService
      * Procesa y guarda las imágenes del producto
      */
     protected function procesarImagenes(int $productoId, array $imagenes): void
-{
-    Log::info('=== PROCESANDO IMAGENES ===', [
-        'producto_id' => $productoId,
-        'cantidad_imagenes' => count($imagenes)
-    ]);
+    {
+        foreach ($imagenes as $imagen) {
 
-    foreach ($imagenes as $index => $imagen) {
-        try {
-            Log::info("Procesando imagen {$index}", [
-                'original_name' => $imagen->getClientOriginalName(),
-                'extension' => $imagen->getClientOriginalExtension(),
-                'size' => $imagen->getSize(),
-                'mime' => $imagen->getMimeType()
-            ]);
+            // Generar nombre único para la imagen
+            $nombreArchivo = Str::uuid() . '.webp';
 
-            // Generar nombre único
-            $nombreArchivo = uniqid('producto_') . '.' . $imagen->getClientOriginalExtension();
-            
-            Log::info("Guardando imagen como: {$nombreArchivo}");
-            
-            // Guardar en storage/app/public/productos
-            $ruta = $imagen->storeAs('productos', $nombreArchivo, 'public');
-            
-            Log::info("Imagen guardada en storage", ['ruta' => $ruta]);
+            // Guardar imagen directamente en storage
+            $ruta = storage_path('app/public/productos/' . $nombreArchivo);
 
-            // Crear registro en BD
-            $foto = Foto::create([
+            // Procesar la imagen con Intervention Image
+            Image::read($imagen->getRealPath())
+                // Redimensionar manteniendo aspect ratio
+                // Máximo 1024x1024
+                ->scale(width: 1024, height: 1024)
+                ->toWebp(quality: 85)
+                ->save($ruta);
+
+            // Guardar en base de datos
+            Foto::create([
                 'producto_id' => $productoId,
                 'imagen' => $nombreArchivo,
             ]);
-            
-            Log::info("Registro creado en BD", ['foto_id' => $foto->id]);
-
-        } catch (\Exception $e) {
-            Log::error("Error procesando imagen {$index}", [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw $e;
         }
     }
-    
-    Log::info('OK');
-}
 
     /**
      * Elimina las imágenes de un producto del storage

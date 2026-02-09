@@ -22,7 +22,7 @@ class CrearProductoRequest extends FormRequest
             'precio' => ['required', 'numeric', 'min:0', 'max:999999999'],
             'disponibles' => ['required', 'integer', 'min:0', 'max:32767'],
             'imagenes' => ['nullable', 'array', 'max:5'],
-            'imagenes.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'imagenes.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ];
     }
 
@@ -52,9 +52,9 @@ class CrearProductoRequest extends FormRequest
             'disponibles.max' => 'La cantidad excede el límite permitido.',
             
             'imagenes.max' => 'Puedes subir máximo 5 imágenes.',
-            'imagenes.*.image' => 'Todos los archivos deben ser imágenes válidas.',
+            'imagenes.*.image' => 'Todos los archivos deben ser imágenes.',
             'imagenes.*.mimes' => 'Las imágenes deben ser de tipo: jpeg, png, jpg o webp.',
-            'imagenes.*.max' => 'Cada imagen no puede superar los 2MB.',
+            'imagenes.*.max' => 'Cada imagen no puede superar los 5MB.',
         ];
     }
 }
