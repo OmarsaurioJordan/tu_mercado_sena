@@ -1,3 +1,4 @@
+from datetime import datetime, time, timezone
 from PySide6.QtWidgets import (
     QWidget, QDateEdit, QLabel, QHBoxLayout
 )
@@ -21,3 +22,13 @@ class DateEdit(QWidget):
     
     def get_value(self):
         return self.dateedit.date().toString("yyyy-MM-dd")
+    
+    def get_value_utc(self):
+        qdate = self.dateedit.date()
+        now = datetime.now().time()
+        local_dt = datetime(
+            qdate.year(), qdate.month(), qdate.day(),
+            now.hour, now.minute, now.second, now.microsecond
+        ).astimezone()
+        utc_dt = local_dt.astimezone(timezone.utc)
+        return utc_dt.strftime('%Y-%m-%d')

@@ -11,7 +11,7 @@ if (!isset($_GET["id"]) || !isset($_GET["rol"])) {
 $id = $_GET["id"];
 $rol = $_GET["rol"];
 
-$sql = "UPDATE usuarios SET rol_id=? WHERE id=?";
+$sql = "UPDATE usuarios SET rol_id = ? WHERE id = ?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $rol, $id);

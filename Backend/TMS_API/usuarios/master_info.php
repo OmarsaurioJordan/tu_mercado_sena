@@ -3,7 +3,10 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 require_once("../config.php");
 
-$sql = "SELECT u.descripcion AS descripcion FROM usuarios u LEFT JOIN roles r ON r.id = u.rol_id WHERE r.nombre = 'master' LIMIT 1";
+$sql = "SELECT u.descripcion AS descripcion
+    FROM usuarios u
+    LEFT JOIN roles r ON r.id = u.rol_id
+    WHERE r.nombre = 'master' LIMIT 1";
 
 $stmt = $conn->prepare($sql);
 $stmt->execute();

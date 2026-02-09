@@ -46,16 +46,16 @@ class LockWindow(QWidget):
 
     def ingresar(self):
         ses = Session()
-        correo = ses.get_login()["correo"]
+        email = ses.get_login()["email"]
         pin = self.textPin.get_value()
         self.textPin.set_value("")
-        if correo == "":
+        if email == "":
             manager = QApplication.instance().property("manager")
             manager.set_login()
         else:
             manager = QApplication.instance().property("controls")
             ctrlUsuario = manager.get_usuarios()
-            result = ctrlUsuario.admin_pin(correo, pin)
+            result = ctrlUsuario.admin_pin(email, pin)
             match result:
                 case 0:
                     Alerta("Alerta", "Credenciales inválidos", 1)
