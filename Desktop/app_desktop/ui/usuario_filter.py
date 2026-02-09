@@ -17,10 +17,10 @@ class Usuariofilter(QWidget):
 
         layVertical = QVBoxLayout()
         layVertical.setSpacing(10)
-        self.txtNombre = TxtEdit("Nombre", "nombre")
-        layVertical.addWidget(self.txtNombre)
-        self.txtCorreo = TxtEdit("Correo", "correo")
-        layVertical.addWidget(self.txtCorreo)
+        self.txtNickname = TxtEdit("Nickname", "nickname")
+        layVertical.addWidget(self.txtNickname)
+        self.txtEmail = TxtEdit("Email", "email")
+        layVertical.addWidget(self.txtEmail)
         self.selRol = Selector(
             ["Todos", "Prosumer", "Admin"],
             "rol...", "Rol", 1
@@ -55,15 +55,15 @@ class Usuariofilter(QWidget):
 
     def obtener_filtros(self):
         filtros = {
-            "nombre": self.txtNombre.get_value(),
-            "correo": self.txtCorreo.get_value(),
+            "nickname": self.txtNickname.get_value(),
+            "email": self.txtEmail.get_value(),
             "rol_id": self.selRol.get_index(),
             "estado_id": self.selEstado.get_index(),
             "dias_activo": self.dias_actividad.get_value(),
             "con_link": self.chkLink.get_bool(),
             "con_descripcion": self.chkTexto.get_bool(),
             "con_productos": self.chkProductos.get_bool(),
-            "registro_desde": self.date_registro_min.get_value(),
-            "registro_hasta": self.date_registro_max.get_value()
+            "registro_desde": self.date_registro_min.get_value_utc(),
+            "registro_hasta": self.date_registro_max.get_value_utc()
         }
         return filtros

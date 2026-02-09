@@ -75,6 +75,12 @@ SESSION_DRIVER=file
 CACHE_STORE=file
 ```
 
+
+**Configuración para incluir el puerto para asegurar que las urls de las imagenes sean accesibles**
+```ENV
+APP_URL=http://127.0.0.1:8000
+```
+
 Configuración del servicio de mails (Configurar solo si se va comprobar que el correo se envio de manera exitosa a tu correo institucional):
 ```ENV
 MAIL_MAILER=smtp
@@ -114,13 +120,32 @@ El siguiente comando borra todos los registros que tengas en la base de datos qu
 php artisan migrate:refresh
 ```
 
+**Configurar e instalar Framework intervention Image para subir imagenes**
+
+1️⃣ En el cmd poner el siguiente comando para instalarlo
+```CMD
+composer require intervention/image-laravel
+```
+
+2️⃣ Configurar la extensión para que laravel la pueda usar
+```CMD
+php artisan vendor:publish --provider="Intervention\Image\Laravel\ServiceProvider"
+```
+
+3️⃣ En la configuración de php.ini (Desde Xammp, activar apache, config, php.ini) decomentar la siguiente linea:
+
+Comentada
+**;extension=gd**
+
+Descomentada
+**extension=gd**
 
 🔓 RUTAS PÚBLICAS
 
 1️⃣ Registro de usuario
 
 Método: POST
-Ruta: http://localhost:8000/api/auth/inicio-registro
+Ruta: http://localhost:8000/api/auth/iniciar-registro
 
 Restricciones:
 
@@ -831,3 +856,4 @@ Código	Significado
 401	Token inválido / no autenticado
 422	Error de validación
 500	Error interno del servidor
+La parte de fotos sigue en prueba (Con exactitud puede que funcione) Mirar LOGS, falta probar con postman

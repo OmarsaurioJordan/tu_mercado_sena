@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 from core.app_config import (
-    DOMINIO_CORREO
+    DOMINIO_EMAIL
 )
 from ui.info_menus import InfoMenus
 from components.txt_edit import TxtEdit
@@ -39,7 +39,7 @@ class LoginWindow(QWidget):
         descripcion.setFont(font)
         descripcion.setAlignment(Qt.AlignCenter)
 
-        self.textCorreo = TxtEdit("Correo Institucional", "correo_administrador" + DOMINIO_CORREO)
+        self.textEmail = TxtEdit("Email Institucional", "email_administrador" + DOMINIO_EMAIL)
         
         self.textPassword = TxtEdit("Contraseña", "******")
         self.textPassword.passwordMode()
@@ -55,7 +55,7 @@ class LoginWindow(QWidget):
         layCentro.addSpacing(5)
         layCentro.addWidget(descripcion)
         layCentro.addSpacing(10)
-        layCentro.addWidget(self.textCorreo)
+        layCentro.addWidget(self.textEmail)
         layCentro.addSpacing(5)
         layCentro.addWidget(self.textPassword)
         layCentro.addSpacing(5)
@@ -71,16 +71,16 @@ class LoginWindow(QWidget):
         self.setLayout(layCentral)
 
     def login(self):
-        correo = self.textCorreo.get_value()
+        email = self.textEmail.get_value()
         password = self.textPassword.get_value()
-        if correo == "" or password == "":
+        if email == "" or password == "":
             Alerta("Alerta", "Ingrese sus credenciales", 1)
         else:
             manager = QApplication.instance().property("controls")
             ctrlUsuario = manager.get_usuarios()
-            result = ctrlUsuario.admin_login(correo, password)
+            result = ctrlUsuario.admin_login(email, password)
             if result["token"] != "":
                 manager = QApplication.instance().property("manager")
-                manager.set_tools(result["token"], correo, result["id"])
+                manager.set_tools(result["token"], email, result["id"])
             elif result["error"] != "":
                 Alerta("Alerta", result["error"], 1)

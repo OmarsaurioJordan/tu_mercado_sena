@@ -13,17 +13,17 @@ class Session:
         self._initialized = True
         # agregar los atributos globales
         self.admin_token = ""
-        self.admin_correo = ""
+        self.admin_email = ""
         self.admin_id = 0
 
-    def set_login(self, token="", correo="", id=0):
+    def set_login(self, token="", email="", id=0):
         self.admin_token = token
-        self.admin_correo = correo
+        self.admin_email = email
         self.admin_id = id
 
     def get_login(self):
         return {
             "token": self.admin_token,
-            "correo": self.admin_correo,
+            "email": self.admin_email,
             "id": self.admin_id
         }
