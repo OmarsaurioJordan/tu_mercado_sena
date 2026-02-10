@@ -16,7 +16,7 @@ class CreateChatRequest extends FormRequest
     {
         $this->merge([
             'comprador_id' => Auth::user()->usuario->id,
-            'producto_id' => $this->route('producto')
+            'producto_id' => (int) $this->route('producto')->id
         ]);
     }
 

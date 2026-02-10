@@ -114,28 +114,38 @@ class RegistroService implements IRegistroService
      */
 
     public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array {
-        // 1. Preparación de datos
+        // Obtener los datos encriptados
         $datos = decrypt($datosEncriptados);
+
+        // Mapear el dto a partir de los datos
         $dto = RegisterDTO::fromArray($datos);
 
+        // Objeto de la cuenta del usuario por su id, enviado en el request
         $cuenta = $this->cuentaRepository->findById($cuenta_id);
 
+        // Validar si la cuenta esta en la base de datos
         if (!$cuenta) {
             throw new BusinessException('Cuenta no encontrada', 404);
         }
 
+        // Si la cuenta ya esta registrado devolver una excepción
         if ($this->userRepository->exists($cuenta_id)) {
             throw new BusinessException("El correo ya fue registrado", 422);
         }
 
+        // Iniciarlizar la variable Ruta
         $rutaImagen = null;
 
+        // Validar que haya llegado la ruta de la imagen del mapeado de los datos
         if (!empty($dto->ruta_imagen)) {
 
+            // Obtener la ruta temporal y moverlo hacia la ruta donde se guardan las imagenes
             $origen = $dto->ruta_imagen;
             $destino = "usuarios/{$cuenta->id}/" . basename($origen);
 
+            // Validar si existe esa ruta que llego de los datos encriptados
             if (Storage::disk('public')->exists($origen)) {
+                // Moverlo hacia la ruta 
                 Storage::disk('public')->move($origen, $destino);
                 $rutaImagen = $destino;
             }
@@ -144,7 +154,7 @@ class RegistroService implements IRegistroService
         if (!$rutaImagen) {
             throw new BusinessException('La imagen es obligatoria', 422);
         }
-
+        
         // 3. Datos finales para persistencia
         $data = $dto->toArray($rutaImagen);
 

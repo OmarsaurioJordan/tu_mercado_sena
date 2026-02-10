@@ -56,8 +56,8 @@ class ChatRepository implements IChatRepository
     public function create(array $datos): Chat
     {
         // Asignar por defecto el estado del chat
-        if (!isset($data['estado_id']) || $data['estado_id'] === null) {
-            $data['estado_id'] = 1;
+        if (!isset($datos['estado_id']) || $datos['estado_id'] === null) {
+            $datos['estado_id'] = 1;
         }
 
         // Crear el registro en la Base de datos
@@ -69,7 +69,7 @@ class ChatRepository implements IChatRepository
                 $query->select('id', 'nickname', 'imagen');
             },
             'producto' => function ($query) {
-                $query->select('id', 'nombre', 'precio');
+                $query->select('id', 'nombre', 'precio', 'vendedor_id');
             },
             'producto.fotoPrincipal' => function ($query) {
                 $query->select(
@@ -90,8 +90,8 @@ class ChatRepository implements IChatRepository
     {
         return Chat::where($criterios)
             ->with([
-                'comprador:id,nombre,imagen',
-                'producto:id,nombre,precio',
+                'comprador:id,nickname,imagen',
+                'producto:id,nombre,precio,vendedor_id',
                 'producto.fotos:id,producto_id,imagen',
                 'estado:id,nombre'
             ])

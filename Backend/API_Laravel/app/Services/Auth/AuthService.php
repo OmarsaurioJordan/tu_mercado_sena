@@ -72,16 +72,16 @@ class AuthService implements IAuthService
      */
     public function iniciarRegistro(RegisterDTO $dto): array
     {
-
-        // Llamada directa: si falla, la excepción sube sola
         $inicioProceso = $this->registroService->iniciarRegistro($dto->email, $dto->password);
 
         $cuenta_id = $inicioProceso['cuenta_id'];
         // Obtener la imagen y pasarlo en los datos encriptados
         $file = request()->file('imagen');
 
+        // Inicializar la ruta
         $ruta = null;
         
+        // Validar si la imagen es instacia de la clase UploadedFile para formatearla y subir solo su ruta
         if ($file instanceof UploadedFile) {
             $image = Image::read($file->getPathname())
                 ->resize(512, 512)
@@ -90,10 +90,11 @@ class AuthService implements IAuthService
             $nombre = uniqid() . '.webp';
             $ruta = "tmp/registro/{$cuenta_id}/{$nombre}";
 
+            // Enviar la imagen a una ruta temporal
             Storage::disk('public')->put($ruta, $image->toString());             
         }
-                
-
+        
+        // Retornar al authService los datos
         return [
             'cuenta_id'        => $cuenta_id,
             'expira_en'        => $inicioProceso['expira_en'],
