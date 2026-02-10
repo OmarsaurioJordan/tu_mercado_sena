@@ -159,6 +159,7 @@ return [
         App\Providers\Usuario\ServicesProviders::class,
         App\Providers\Producto\RepositoriesProviders::class,
         App\Providers\Producto\ServicesProviders::class,
+        App\Providers\Chats\RepositoryServicesProviders::class,
     ],
 
     

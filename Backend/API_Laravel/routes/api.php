@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\ProductoController; 
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\MensajeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -172,6 +174,23 @@ Route::middleware('jwtVerify')->group(function (){
      */
     Route::get('/mis-productos', [ProductoController::class, 'misProductos']);
 
+    // GET Index: Listar todos los chats del usuario autenticado
+    // GET Show: Ver detalles de un chat específico (incluye mensajes)
+    // PATCH: Update: api/chats/{chat} Marcar mensajes como leídos o actualizar información del chat
+    // DELETE Destroy: api/chats/{chats} Eliminar un chat (opcional, dependiendo de la lógica de negocio)
+    Route::resource('chats', ChatController::class)->only([
+        'index', 'show', 'update', 'destroy'
+    ]);
+    
+    // RUTA: api/chats
+    // Crea un nuevo chat entre el usuario autenticado y otro usuario (vendedor)
+    // El middleware "CheckChatBlock" verifica si el usuario autenticado ha bloqueado al otro usuario o viceversa
+    Route::post('productos/{producto}/chats', [ChatController::class, 'store']);//->middleware('CheckChatBlock');
+    
+    //RUTA: api/chats/{chat}/mensajes
+    Route::post('chats/{chat}/mensajes', [MensajeController::class, 'store'])->middleware('CheckChatBlock');
+    // RUTA: api/mensajes/{mensaje}
+    Route::delete('mensajes/{mensaje}', [MensajeController::class, 'destroy']);
 });
 
 

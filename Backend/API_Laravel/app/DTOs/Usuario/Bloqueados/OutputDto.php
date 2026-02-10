@@ -2,7 +2,7 @@
 
 namespace App\DTOs\Usuario\Bloqueados;
 
-use App\Models\Bloqueado;
+use App\Models\Usuario;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
 
@@ -13,7 +13,6 @@ readonly class OutputDto implements Arrayable
     public function __construct(
         public int $id,
         public int $bloqueador_id,
-        public int $bloqueado_id,
         public array $usuario_bloqueado,
     )
     {}
@@ -27,38 +26,38 @@ readonly class OutputDto implements Arrayable
         return [
             'id' => $this->id,
             'bloqueador_id' => $this->bloqueador_id,
-            'bloqueado_id' => $this->bloqueado_id,
             'usuario_bloqueado' => $this->usuario_bloqueado
         ];
     }
 
     /**
      * Crea una instancia de este DTO a partir de un modelo Bloqueado
-     * @param Bloqueado $bloqueado
+     * @param Usuario $usuario
      * @return self
      */
-    public static function fromModel(Bloqueado $bloqueado): self
+    public static function fromModel(Usuario $usuario): self
     {
         #$bloqueado es una instancia de App\Models\Bloqueado con la relacion 'bloqueado' cargada
         return new self(
-            id: $bloqueado->id,
-            bloqueador_id: $bloqueado->bloqueador_id,
-            bloqueado_id: $bloqueado->bloqueado_id,
-            usuario_bloqueado: [
-                'id' => $bloqueado->bloqueado?->id,
-                'nickname' => $bloqueado->bloqueado?->nickname,
-                'imagen' => $bloqueado->bloqueado?->imagen
-            ],
+            id: $usuario->usuarioQueHeBloqueado->id,
+            bloqueador_id: $usuario->usuariosQueHeBloqueado->bloqueador_id,
+            usuario_bloqueado: $usuario->relationLoaded('usuarioQueHeBloqueado') && $usuario->usuariosQueHeBloqueado
+            ? [
+                'id' => $usuario->usuariosQueHeBloqueado?->bloqueado_id,
+                'nickname' => $usuario->usuariosQueHeBloqueado?->nickname,
+                'imagen' => $usuario->usuariosQueHeBloqueado->imagen
+            ]
+            : []
         );
     }
 
     /**
      * Crea un array de este DTO a partir de una colección de modelos Bloqueado
-     * @param ModelCollection<int, Bloqueado> $bloqueados
+     * @param ModelCollection<int, Usuario> $usuarios
      * @return array<int, array<string, mixed>>
      */
-    public static function fromModelCollection(ModelCollection $bloqueados): array
+    public static function fromModelCollection(ModelCollection $usuarios): array
     {
-        return $bloqueados->map(fn (Bloqueado $bloqueado) => self::fromModel($bloqueado)->toArray())->all();
+        return $usuarios->map(fn (Usuario $usuario) => self::fromModel($usuario)->toArray())->all();
     }
 }

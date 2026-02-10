@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('mensajes', function (Blueprint $table) {
             $table->id();
-            $table->boolean('es_comprador')->default(true);
-            $table->foreignId('chat_id')->constrained('chats', 'id')->cascadeOnDelete();
+            $table->boolean('es_comprador')->default(false);
+            $table->foreignId('chat_id')->constrained('chats')->cascadeOnDelete();
             $table->string('mensaje', 512);
-            $table->string('imagen')->nullable();
+            $table->string('imagen', 80)->nullable();
             $table->timestamp('fecha_registro')->useCurrent();
         });
     }

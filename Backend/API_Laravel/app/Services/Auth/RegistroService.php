@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\JWTGuard;
 use App\Exceptions\BusinessException;
+use Illuminate\Http\UploadedFile;
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 
 class RegistroService implements IRegistroService
 {
@@ -110,40 +113,72 @@ class RegistroService implements IRegistroService
      * @return array{status: bool, data: array{user:Usuario, token: string, token_type: string, expires_in: int}}
      */
 
-    public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array
-    {
-        // 1. Preparación de datos
-        $data = decrypt($datosEncriptados);
-        $dto = RegisterDTO::fromArray($data);
+    public function terminarRegistro(string $datosEncriptados, string $clave, int $cuenta_id, string $dispositivo): array {
+        // Obtener los datos encriptados
+        $datos = decrypt($datosEncriptados);
+
+        // Mapear el dto a partir de los datos
+        $dto = RegisterDTO::fromArray($datos);
+
+        // Objeto de la cuenta del usuario por su id, enviado en el request
         $cuenta = $this->cuentaRepository->findById($cuenta_id);
 
+        // Validar si la cuenta esta en la base de datos
+        if (!$cuenta) {
+            throw new BusinessException('Cuenta no encontrada', 404);
+        }
+
+        // Si la cuenta ya esta registrado devolver una excepción
         if ($this->userRepository->exists($cuenta_id)) {
             throw new BusinessException("El correo ya fue registrado", 422);
         }
-    
 
-        // 2. Ejecución atómica
-        return DB::transaction(function () use ($dto, $clave, $cuenta, $dispositivo) {
-            
-            // Verificamos clave (si falla, lanza excepción y corta el flujo)
+        // Iniciarlizar la variable Ruta
+        $rutaImagen = null;
+
+        // Validar que haya llegado la ruta de la imagen del mapeado de los datos
+        if (!empty($dto->ruta_imagen)) {
+
+            // Obtener la ruta temporal y moverlo hacia la ruta donde se guardan las imagenes
+            $origen = $dto->ruta_imagen;
+            $destino = "usuarios/{$cuenta->id}/" . basename($origen);
+
+            // Validar si existe esa ruta que llego de los datos encriptados
+            if (Storage::disk('public')->exists($origen)) {
+                // Moverlo hacia la ruta 
+                Storage::disk('public')->move($origen, $destino);
+                $rutaImagen = $destino;
+            }
+        }
+
+        if (!$rutaImagen) {
+            throw new BusinessException('La imagen es obligatoria', 422);
+        }
+        
+        // 3. Datos finales para persistencia
+        $data = $dto->toArray($rutaImagen);
+
+        // 4. Ejecución atómica
+        return DB::transaction(function () use ($data, $dto, $clave, $cuenta, $dispositivo) {
+
+            // Verificar clave
             $this->verificarClave($dto->email, $clave);
 
             // Crear usuario
             $usuario = $this->userRepository->create([
                 'cuenta_id' => $cuenta->id,
                 'nickname' => $dto->nickname,
-                'imagen' => $dto->imagen,
+                'imagen' => $data['ruta_imagen'], // 👈 string|null
                 'rol_id' => $dto->rol_id,
                 'estado_id' => $dto->estado_id,
                 'descripcion' => $dto->descripcion,
                 'link' => $dto->link
-                
             ]);
 
             // Generar JWT
             $token = $this->jwt->fromUser($cuenta);
             $payload = $this->jwt->setToken($token)->getPayload();
-            
+
             // Registrar sesión
             DB::table('tokens_de_sesion')->insert([
                 'cuenta_id'   => $cuenta->id,

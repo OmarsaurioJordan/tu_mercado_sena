@@ -11,7 +11,7 @@ use App\Contracts\Usuario\Services\IUsuarioService;
 use App\Contracts\Usuario\Services\IBloqueadoService;
 use App\DTOs\Usuario\Bloqueados\InputDto as BloqueadoInputDto;
 
-class UsuarioController
+class UsuarioController extends Controller
 {
     public function __construct(
         private IUsuarioService $usuarioService,

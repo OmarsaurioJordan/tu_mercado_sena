@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Cuenta;
 use App\Models\Rol;
 use App\Models\Estado;
-use App\Models\Bloqueado;
 
 
 class Usuario extends Model
@@ -55,14 +54,24 @@ class Usuario extends Model
         return $this->belongsTo(Estado::class, 'estado_id');
     }
 
-    public function bloqueadores()
+    public function usuariosQueHeBloqueado()
     {
-        return $this->hasMany(Bloqueado::class, 'bloqueador_id', 'id');
+        return $this->belongsToMany(
+            Usuario::class,
+            'bloqueados',
+            'bloqueador_id',
+            'bloqueado_id'
+        );
     }
 
-    public function bloqueados()
+    public function productos()
     {
-        return $this->hasMany(Bloqueado::class, 'bloqueado_id', 'id');
+        return $this->hasMany(Producto::class, 'vendedor_id');
+    }
+
+    public function chat()
+    {
+        return $this->hasMany(Chat::class, 'comprador_id', 'id');
     }
 
     public function favoritos()
