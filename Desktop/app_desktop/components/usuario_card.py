@@ -68,9 +68,10 @@ class UsuarioCard(QFrame):
         self.email.setText(usuario.email.split("@")[0])
         self.estado_color = {
             1: "#e6e5e5", # activo
-            2: "#D2EDF8", # invisible
+            2: "#d2edf8", # invisible
             3: "#999898", # eliminado
-            4: "#f7d9ac" # bloqueado
+            4: "#f7d9ac", # bloqueado
+            10: "#f4f7ac" # denunciado
         }.get(usuario.estado_id, "#f88eef") # error
         self.setPulsado()
 

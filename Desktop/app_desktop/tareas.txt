@@ -1,13 +1,15 @@
 TAREAS:
 ...
+- revisar si quitar imagen desde tms y refrescar usuario, ejemplo al cambiar estado, quita o cambia imagen
 - obtener los productos filtrados:
-  - API productos
-  - controlador productos
-  - interfaz productos
-    - fichas productos
-    - filtro productos
-    - producto detalles
-    - cargar imágenes
+  - API productos (ya)
+  - obtener categorias y subcategorias
+  - modelo con carga img (falta nombre vendedor)
+  - controlador productos (iniciado)
+  - buscador donde están las fichas
+  - fichas productos (ya)
+  - filtro productos (faltan cat subc)
+  - producto body info
 - link de perfil de usuario navegable
 - limpiar cosas de anterior seleccionado en tools
 - limpiar controladores al cerrar sesion

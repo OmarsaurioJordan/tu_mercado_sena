@@ -22,19 +22,18 @@ if ($estado_id != "0") {
     switch ($estado_id) {
         case "1":
         case "2":
-            $cond .= " AND u.estado_id = " . $estado_id;
-            break;
         case "3":
-            $cond .= " AND u.estado_id = " . 4;
-            break;
         case "4":
-            $cond .= " AND u.estado_id = " . 3;
+            $cond .= " AND u.estado_id = " . $estado_id; // act, inv, elim, bloq
             break;
         case "5":
-            $cond .= " AND u.estado_id IN (1, 2)";
+            $cond .= " AND u.estado_id = 10"; // denunciado
             break;
         case "6":
-            $cond .= " AND u.estado_id IN (1, 2, 4)";
+            $cond .= " AND u.estado_id IN (1, 2)"; // act-inv
+            break;
+        case "6":
+            $cond .= " AND u.estado_id IN (4, 10)"; // bloq-denun
             break;
     }
 }

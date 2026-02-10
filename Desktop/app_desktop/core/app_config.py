@@ -14,6 +14,11 @@ DEBUG_NO_LOGIN = True
 DEFAULT_INFO = "Información de contacto:\n***vacío***\n(descripción del master)"
 # link a la web de TMS
 WEB_LINK = "https://omwekiatl.xyz/Prestamo/ensano_chat/"
-# url donde estan alojadas las imagenes
+# url donde estan alojadas las imagenes de usuarios
 IMAGE_USER_LINK = "http://localhost/Prestamo/freddy/Frontend/assets/images/avatars/"
 #IMAGE_USER_LINK = "https://omwekiatl.xyz/Prestamo/ensano_chat/uploads/"
+# url donde estan alojadas las imagenes de productos
+IMAGE_PROD_LINK = "http://localhost/Prestamo/freddy/Frontend/uploads/"
+#IMAGE_PROD_LINK = "https://omwekiatl.xyz/Prestamo/ensano_chat/uploads/"
+# precio maximo de la aplicacion
+PRECIO_MAX = 10000000

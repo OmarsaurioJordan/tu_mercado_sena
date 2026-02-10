@@ -26,17 +26,17 @@ class Usuario:
     @staticmethod
     def from_json(data):
         usr = Usuario(
-            id=int(data.get('id')),
-            email=data.get('email'),
-            rol_id=int(data.get('rol_id')),
-            nickname=data.get('nickname'),
-            imagen=data.get('imagen'),
-            descripcion=data.get('descripcion'),
-            link=data.get('link'),
-            estado_id=int(data.get('estado_id')),
-            fecha_registro=data.get('fecha_registro'),
-            fecha_actualiza=data.get('fecha_actualiza'),
-            fecha_reciente=data.get('fecha_reciente')
+            id = int(data.get('id')),
+            email = data.get('email'),
+            rol_id = int(data.get('rol_id')),
+            nickname = data.get('nickname'),
+            imagen = data.get('imagen'),
+            descripcion = data.get('descripcion'),
+            link = data.get('link'),
+            estado_id = int(data.get('estado_id')),
+            fecha_registro = data.get('fecha_registro'),
+            fecha_actualiza = data.get('fecha_actualiza'),
+            fecha_reciente = data.get('fecha_reciente')
         )
         usr.load_image()
         return usr
@@ -47,8 +47,7 @@ class Usuario:
         url = IMAGE_USER_LINK + self.imagen
         worker = ImageWorker(url, True)
         worker.signals.finished.connect(self.set_image)
-        threadpool = QThreadPool.globalInstance()
-        threadpool.start(worker)
+        QThreadPool.globalInstance().start(worker)
 
     def set_image(self, image):
         self.img_pix = image
