@@ -22,12 +22,16 @@ class MensajeService implements IMensajeService
     public function crearMensaje(InputDto $dto, Chat $chat): array
     {
         return DB::transaction(function () use ($dto, $chat) {
+            // Formatear el Dto a un arreglo puro
             $data = $dto->toArray();    
 
+            // Obtener la imagen del request
             $file = request()->file('imagen');
 
+            // Log de información
             Log::info('Datos del mensaje a crear:', $data);
 
+            // Redimensionar y crear la ruta de la imagen, que se guardara en la base de datos
             if ($file instanceof UploadedFile) {
                 $image = Image::read($file->getPathname())
                     ->resize(512, 512)
@@ -40,7 +44,7 @@ class MensajeService implements IMensajeService
 
                 $data['imagen'] = $ruta;
             }
-
+            
             // Crear el mensaje utilizando el repositorio
             $mensaje = $this->mensajeRepository->create($data);
 
@@ -81,6 +85,7 @@ class MensajeService implements IMensajeService
                 ]);
             }
 
+            // Retornar al controlador
             return [
                 'success' => true,
                 'mensaje' => $mensaje,
