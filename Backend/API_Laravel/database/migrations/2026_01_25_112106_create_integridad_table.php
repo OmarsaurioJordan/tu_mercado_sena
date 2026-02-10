@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('descripcion', 128);
         });
 
-        DB::insert('integridad', [
+        DB::table('integridad')->insert([
             ['nombre' => 'nuevo', 'descripcion' => 'alta calidad, recién hecho o sin desempacar, sin uso'],
             ['nombre' => 'usado', 'descripcion' => 'el producto está en buena calidad pero ya ha sido usado o tiene algún tipo de desgaste'],
             ['nombre' => 'reparado', 'descripcion' => 'el producto puede tener fallas pero aún funciona'],

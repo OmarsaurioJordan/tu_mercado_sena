@@ -31,10 +31,10 @@ return new class extends Migration
             ['nombre' => 'devolviendo', 'descripcion' => 'el historial abre una solicitud de devolución, a espera de respuesta del vendedor'], // 7
             ['nombre' => 'devuelto', 'descripcion' => 'el chat finalizó con una transacción que fué cancelada'],// 8
             ['nombre' => 'censurado', 'descripcion' => 'el estado del chat era vendido, pero la administración baneó la calificación y comentario'], // 9
-            ['nombre' => 'denunciado', 'descripcion' => 'cuando un usuario o producto ha sido denunciado repetidas veces, mientras se revisa el caso, no será listado públicamente, pero '], // 10
+            ['nombre' => 'denunciado', 'descripcion' => 'cuando un usuario o producto ha sido denunciado repetidas veces, mientras, no será listado públicamente, pero '], // 10
             ['nombre' => 'resuelto', 'descripcion' => 'para decir que una PQRS o denuncia ya fué tratada'],
-            ['nombre' => 'chat_eliminado_vendedor', 'descripcion' => 'cuando el vendedor elimina un chat, se le asigna este estado para que no aparezca en su historial, pero el comprador aún puede acceder a él'], // 11
-            ['nombre' => 'chat_eliminado_comprador', 'descripcion' => 'cuando el comprador elimina un chat, se le asigna este estado para que no aparezca en su historial, pero el vendedor aún puede acceder a él'], // 12
+            ['nombre' => 'chat_eliminado_vendedor', 'descripcion' => 'cuando el vendedor elimina un chat, el comprador aún puede acceder a él'], // 11
+            ['nombre' => 'chat_eliminado_comprador', 'descripcion' => 'cuando el comprador elimina un chat,  el vendedor aún puede acceder a él'], // 12
             ['nombre' => 'chat_eliminado_ambos', 'descripcion' => 'cuando ambos eliminan un chat, se le asigna este estado para que no aparezca en el historial de ninguno de los dos'], // 13
         ]);
     }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('descripcion', 128);
         });
 
-        DB::insert('sucesos', [
+        DB::table('sucesos')->insert([
             ['nombre' => 'estado_usuario', 'descripcion' => 'ha cambiado el estado de un usuario, por ejemplo a activo, eliminado, baneado'],
             ['nombre' => 'rol_cambiado', 'descripcion' => 'se ha modificado que un usuario sea o deje de ser administrador'],
             ['nombre' => 'ver_chat', 'descripcion' => 'buscando ilegalidades ha entrado a revisar una conversación'],

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('descripcion', 128);
         });
 
-        DB::insert('motivos', [
+        DB::table('motivos')->insert([
             [
                 'nombre' => 'pqrs_pregunta',
                 'descripcion' => 'mensaje de pregunta'
