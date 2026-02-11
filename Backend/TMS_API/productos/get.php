@@ -10,9 +10,11 @@ if (!isset($_GET["id"])) {
 }
 $id = $_GET["id"];
 
-$sql = "SELECT id, nombre, subcategoria_id, integridad_id, vendedor_id, estado_id, descripcion, precio, disponibles, fecha_registro, fecha_actualiza
-    FROM productos
-    WHERE id = ?";
+$sql = "SELECT p.id AS id, p.nombre AS nombre, p.subcategoria_id AS subcategoria_id, p.integridad_id AS integridad_id, p.vendedor_id AS vendedor_id, p.estado_id AS estado_id, p.descripcion AS descripcion, p.precio AS precio, p.disponibles AS disponibles, p.fecha_registro AS fecha_registro, p.fecha_actualiza AS fecha_actualiza, u.nickname AS vendedor_nickname, s.categoria_id AS categoria_id
+    FROM productos p
+    LEFT JOIN usuarios u ON p.vendedor_id = u.id
+    LEFT JOIN subcategorias s ON p.subcategoria_id = s.id
+    WHERE p.id = ?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);

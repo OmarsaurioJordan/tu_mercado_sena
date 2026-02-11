@@ -8,36 +8,25 @@ $vars = [];
 
 $nombre = isset($_GET["nombre"]) ? $_GET["nombre"] : "";
 if ($nombre != "") {
-    $cond .= " AND nombre LIKE ?";
+    $cond .= " AND p.nombre LIKE ?";
     $vars[] = "%$nombre%";
 }
 
 $subcategoria_id = isset($_GET["subcategoria_id"]) ? $_GET["subcategoria_id"] : "0";
 if ($subcategoria_id != "0") {
-    $cond .= " AND subcategoria_id == ?";
+    $cond .= " AND p.subcategoria_id == ?";
     $vars[] = $subcategoria_id;
 }
 
 $categoria_id = isset($_GET["categoria_id"]) ? $_GET["categoria_id"] : "0";
 if ($categoria_id != "0") {
-    $ssql = "SELECT id FROM subcategorias WHERE categoria_id = ?";
-    $sstmt = $conn->prepare($ssql);
-    $sstmt->bind_param("i", $categoria_id);
-    $sstmt->execute();
-    $sresult = $sstmt->get_result();
-    $cat = "";
-    while ($row = $sresult->fetch_assoc()) {
-        $cat .= $row["id"]. ",";
-    }
-    if ($cat != "") {
-        $cat = substr($cat, 0, -1);
-    }
-    $cond .= " AND subcategoria_id IN (". $cat .")";
+    $cond .= " AND s.categoria_id == ?";
+    $vars[] = $categoria_id;
 }
 
 $integridad_id = isset($_GET["integridad_id"]) ? $_GET["integridad_id"] : "0";
 if ($integridad_id != "0") {
-    $cond .= " AND integridad_id == ?";
+    $cond .= " AND p.integridad_id == ?";
     $vars[] = $integridad_id;
 }
 
@@ -48,46 +37,46 @@ if ($estado_id != "0") {
         case "2":
         case "3":
         case "4":
-            $cond .= " AND estado_id = " . $estado_id; // act, inv, elim, bloq
+            $cond .= " AND p.estado_id = " . $estado_id; // act, inv, elim, bloq
             break;
         case "5":
-            $cond .= " AND estado_id = 10"; // denunciado
+            $cond .= " AND p.estado_id = 10"; // denunciado
             break;
         case "6":
-            $cond .= " AND estado_id IN (1, 2)"; // act-inv
+            $cond .= " AND p.estado_id IN (1, 2)"; // act-inv
             break;
         case "6":
-            $cond .= " AND estado_id IN (4, 10)"; // bloq-denun
+            $cond .= " AND p.estado_id IN (4, 10)"; // bloq-denun
             break;
     }
 }
 
 $precio_min = isset($_GET["precio_min"]) ? $_GET["precio_min"] : 0;
 if ($precio_min != 0) {
-    $cond .= " AND precio >= ?";
+    $cond .= " AND p.precio >= ?";
     $vars[] = $precio_min;
 }
 
 $precio_max = isset($_GET["precio_max"]) ? $_GET["precio_max"] : 0;
 if ($precio_max != 0) {
-    $cond .= " AND precio <= ?";
+    $cond .= " AND p.precio <= ?";
     $vars[] = $precio_max;
 }
 
 $con_descripcion = isset($_GET["con_descripcion"]) ? $_GET["con_descripcion"] : "0";
 if ($con_descripcion != "0") {
-    $cond .= " AND descripcion != ''";
+    $cond .= " AND p.descripcion != ''";
 }
 
 $registro_desde = isset($_GET["registro_desde"]) ? $_GET["registro_desde"] : "";
 if ($registro_desde != "") {
-    $cond .= " AND fecha_registro >= ?";
+    $cond .= " AND p.fecha_registro >= ?";
     $vars[] = $registro_desde;
 }
 
 $registro_hasta = isset($_GET["registro_hasta"]) ? $_GET["registro_hasta"] : "";
 if ($registro_hasta != "") {
-    $cond .= " AND fecha_registro <= ?";
+    $cond .= " AND p.fecha_registro <= ?";
     $vars[] = $registro_hasta;
 }
 
@@ -102,16 +91,18 @@ $cursor_fecha = isset($_GET["cursor_fecha"]) ? $_GET["cursor_fecha"] : date("Y-m
 $cursor_id = isset($_GET["cursor_id"]) ? $_GET["cursor_id"] : "";
 $curs = "1";
 if ($cursor_id != "") {
-    $curs = "(fecha_registro = ? AND id < ?)";
+    $curs = "(p.fecha_registro = ? AND p.id < ?)";
     array_unshift($vars, $cursor_id);
     array_unshift($vars, $cursor_fecha);
 }
 array_unshift($vars, $cursor_fecha);
 
-$sql = "SELECT id, nombre, subcategoria_id, integridad_id, vendedor_id, estado_id, descripcion, precio, disponibles, fecha_registro, fecha_actualiza
-    FROM productos
-    WHERE (fecha_registro < ? OR $curs) $cond 
-    ORDER BY fecha_registro DESC, id DESC $lim";
+$sql = "SELECT p.id AS id, p.nombre AS nombre, p.subcategoria_id AS subcategoria_id, p.integridad_id AS integridad_id, p.vendedor_id AS vendedor_id, p.estado_id AS estado_id, p.descripcion AS descripcion, p.precio AS precio, p.disponibles AS disponibles, p.fecha_registro AS fecha_registro, p.fecha_actualiza AS fecha_actualiza, u.nickname AS vendedor_nickname, s.categoria_id AS categoria_id
+    FROM productos p
+    LEFT JOIN usuarios u ON p.vendedor_id = u.id
+    LEFT JOIN subcategorias s ON p.subcategoria_id = s.id
+    WHERE (p.fecha_registro < ? OR $curs) $cond 
+    ORDER BY p.fecha_registro DESC, p.id DESC $lim";
 
 $stmt = $conn->prepare($sql);
 if (count($vars) > 0) {
