@@ -62,9 +62,9 @@ class ActualizarProductoRequest extends FormRequest
             'disponibles.max' => 'La cantidad excede el límite permitido.',
             
             'imagenes.max' => 'Puedes subir máximo 5 imágenes adicionales.',
-            'imagenes.*.image' => 'Todos los archivos deben ser imágenes válidas.',
+            'imagenes.*.image' => 'Todos los archivos deben ser imágenes.',
             'imagenes.*.mimes' => 'Las imágenes deben ser de tipo: jpeg, png, jpg o webp.',
-            'imagenes.*.max' => 'Cada imagen no puede superar los 2MB.',
+            'imagenes.*.max' => 'Cada imagen no puede superar los 5MB.',
         ];
     }
 }

@@ -87,8 +87,7 @@ class Producto extends Model
     {
         return $this->hasMany(Foto::class, 'producto_id');
     }
-
-    public function vistosPorUsuarios()
+    public function vistoPorUsuarios()
     {
         return $this->belongsToMany(
             Usuario::class,

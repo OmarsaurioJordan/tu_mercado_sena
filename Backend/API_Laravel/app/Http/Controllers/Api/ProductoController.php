@@ -59,24 +59,18 @@ class ProductoController extends Controller
     public function store(CrearProductoRequest $request): JsonResponse
 {
     try {
-        // Probar qué datos llegan en el request y si se detectan las imágenes correctamente
-        Log::info('=== DEBUG INICIO ===');
-        Log::info('Request completo', [
-            'all' => $request->all(),
-            'files' => $request->allFiles()
-        ]);
-        Log::info('Tiene imagenes?', [
-            'hasFile_imagenes' => $request->hasFile('imagenes'),
-            'file_imagenes' => $request->file('imagenes')
-        ]);
-        
         $dto = InputDto::fromRequest($request->validated());
-        $imagenes = $request->hasFile('imagenes') ? $request->file('imagenes') : null;
         
-        Log::info('Imagenes a enviar al service', [
-            'imagenes_is_null' => $imagenes === null,
-            'imagenes_count' => $imagenes ? count($imagenes) : 0
-        ]);
+        //Solo buscar 'imagenes'
+        $imagenes = null;
+        
+        if ($request->hasFile('imagenes')) {
+            $archivos = $request->file('imagenes');
+            
+            // Si es array, usar directamente
+            // Si es un solo archivo, convertir a array
+            $imagenes = is_array($archivos) ? $archivos : [$archivos];
+        }
 
         $resultado = $this->productoService->crearProducto($dto, $imagenes);
 
@@ -90,12 +84,6 @@ class ProductoController extends Controller
         ], 422);
 
     } catch (\Exception $e) {
-        Log::error('Error en store controller', [
-            'mensaje' => $e->getMessage(),
-            'linea' => $e->getLine(),
-            'archivo' => $e->getFile()
-        ]);
-        
         return response()->json([
             'success' => false,
             'message' => 'Error al crear el producto.',
@@ -131,29 +119,36 @@ class ProductoController extends Controller
      * PUT/PATCH /api/productos/{id}
      */
     public function update(ActualizarProductoRequest $request, int $id): JsonResponse
-    {
-        try {
-            $dto = InputDto::fromRequest($request->validated(), $id);
-            $imagenes = $request->hasFile('imagenes') ? $request->file('imagenes') : null;
-
-            $resultado = $this->productoService->actualizarProducto($dto, $imagenes);
-
-            return response()->json($resultado, 200);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de validación.',
-                'errors' => $e->errors()
-            ], 422);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 403);
+{
+    try {
+        $dto = InputDto::fromRequest($request->validated(), $id);
+        
+        // Mismo código
+        $imagenes = null;
+        
+        if ($request->hasFile('imagenes')) {
+            $archivos = $request->file('imagenes');
+            $imagenes = is_array($archivos) ? $archivos : [$archivos];
         }
+
+        $resultado = $this->productoService->actualizarProducto($dto, $imagenes);
+
+        return response()->json($resultado, 200);
+
+    } catch (ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error de validación.',
+            'errors' => $e->errors()
+        ], 422);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 403);
     }
+}
 
     /**
      * Eliminar un producto (eliminación lógica)

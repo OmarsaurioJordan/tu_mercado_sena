@@ -9,8 +9,8 @@ class Foto extends Model
     protected $table = 'fotos';
     public $timestamps = true;
     
-    const CREATE_AT = null;
-    const UPDATE_AT = 'actualiza';
+    const CREATED_AT = null;
+    const UPDATED_AT = 'actualiza';
 
     protected $fillable = [
         'producto_id',
