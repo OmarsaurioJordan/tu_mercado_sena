@@ -31,6 +31,9 @@ class ChatService implements IChatService
 
     public function iniciarChat(InputDto $dto): OutputDetailsDto
     {
+        
+        // Validar para que el vendedor cree un chat asi mismo
+
         // Verificar si ya existe un chat entre el comprador y el producto
         // Si es asi no crear uno nuevo, retornar el existente
         if ($this->repository->findModel(['comprador_id' => $dto->comprador_id,'producto_id' => $dto->producto_id]

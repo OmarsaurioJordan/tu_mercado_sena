@@ -4,6 +4,7 @@ namespace App\Http\Requests\Chat;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Producto;
 
 class CreateChatRequest extends FormRequest
 {
@@ -37,7 +38,14 @@ class CreateChatRequest extends FormRequest
             'producto_id' => [
                 'required',
                 'integer',
-                'exists:productos,id'
+                'exists:productos,id',
+                function ($attribute, $value, $fail) {
+                $producto = Producto::find($value);
+
+                if ($producto && $producto->vendedor_id === Auth::user()->usuario->id) {
+                    $fail('No puedes iniciar un chat con tu propio producto.');
+                    }
+                }
             ],
 
             'visto_comprador' => [
@@ -65,6 +73,7 @@ class CreateChatRequest extends FormRequest
             'comprador_id.required' => 'El usuario autenticado es requerido',
             'comprador_id.integer' => 'Tipo de dato no válido',
             'comprador_id' => 'Usuario no existe',
+            'comprador_id.exists' => 'Usuario no existe',
         ];
     }
 }
