@@ -1074,7 +1074,7 @@ o en un formulario, con el nombre o id **imagen** para mandar una imagen.
 
 **Vista Vendedor**
 
-```
+```Json
 [
   {
     "id": 2,
