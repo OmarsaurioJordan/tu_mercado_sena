@@ -13,7 +13,12 @@ if (!isset($_GET["email"]) || !isset($_GET["pin"])) {
 $email = $_GET["email"];
 $pin = $_GET["pin"];
 
-$sql = "SELECT 1 FROM cuentas WHERE email = ? AND pin=?";
+if ($pin == "") {
+    $sql = "SELECT 1 FROM cuentas WHERE email = ? AND pin IN (?, NULL)";
+}
+else {
+    $sql = "SELECT 1 FROM cuentas WHERE email = ? AND pin = ?";
+}
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $email, $pin);

@@ -31,9 +31,10 @@ class CtrlProducto:
 
     def api_usuario(self, id=0):
         params = {"id": id}
-        response = requests.get(API_BASE_URL + "usuarios/get.php", params=params)
+        response = requests.get(API_BASE_URL + "usuarios", params=params)
         if response.status_code == 200:
-            usr = self.new_usuario(response.json())
+            data = response.json()
+            usr = self.new_usuario(data[0])
             self.add_usuarios([usr], False)
             self.usuario_signal.hubo_cambio.emit(usr.id)
             return usr

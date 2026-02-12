@@ -13,7 +13,13 @@ if (!isset($_GET["id"]) || !isset($_GET["rol"])) {
 $id = $_GET["id"];
 $rol = $_GET["rol"];
 
-$sql = "UPDATE usuarios SET rol_id = ? WHERE id = ?";
+if ($rol == 3) {
+    http_response_code(404);
+    echo json_encode(["error" => "No puede ser master"]);
+    exit;
+}
+
+$sql = "UPDATE usuarios SET rol_id = ? WHERE id = ? AND rol_id != 3";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $rol, $id);

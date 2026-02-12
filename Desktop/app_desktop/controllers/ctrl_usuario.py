@@ -31,9 +31,10 @@ class CtrlUsuario:
 
     def api_usuario(self, id=0):
         params = {"id": id}
-        response = requests.get(API_BASE_URL + "usuarios/get.php", params=params)
+        response = requests.get(API_BASE_URL + "usuarios", params=params)
         if response.status_code == 200:
-            usr = self.new_usuario(response.json())
+            data = response.json()
+            usr = self.new_usuario(data[0])
             self.add_usuarios([usr], False)
             self.usuario_signal.hubo_cambio.emit(usr.id)
             return usr
@@ -108,14 +109,14 @@ class CtrlUsuario:
     # llamadas a la API para administrador
 
     def get_master_info(self):
-        response = requests.get(API_BASE_URL + "usuarios/master_info.php")
+        response = requests.get(API_BASE_URL + "admin/master_info.php")
         if response.status_code == 200:
             return response.json().get('descripcion')
         return DEFAULT_INFO
 
     def admin_login(self, email="", password=""):
         params = {"email": email, "password": password}
-        response = requests.get(API_BASE_URL + "usuarios/admin_login.php", params=params)
+        response = requests.get(API_BASE_URL + "admin/admin_login.php", params=params)
         if response.status_code == 200:
             data = response.json()
             return {
@@ -138,7 +139,7 @@ class CtrlUsuario:
         params = {"email": email, "pin": pin,
             "admin_email": admindata["email"], "admin_token": admindata["token"]
         }
-        response = requests.get(API_BASE_URL + "usuarios/admin_pin.php", params=params)
+        response = requests.get(API_BASE_URL + "admin/admin_pin.php", params=params)
         data = response.json()
         if response.status_code == 200:
             return int(data.get('Ok')) # 0 o 1

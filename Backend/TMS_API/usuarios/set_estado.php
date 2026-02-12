@@ -13,7 +13,7 @@ if (!isset($_GET["id"]) || !isset($_GET["estado"])) {
 $id = $_GET["id"];
 $estado = $_GET["estado"];
 
-$sql = "UPDATE usuarios SET estado_id = ? WHERE id = ?";
+$sql = "UPDATE usuarios SET estado_id = ? WHERE id = ? AND rol_id != 3";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $estado, $id);
