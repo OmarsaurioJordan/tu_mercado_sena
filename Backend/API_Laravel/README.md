@@ -859,6 +859,408 @@ Ruta: **http://127.0.0.1:8000/api/mis-productos**
 
 ```
 
+**Modulo Chats y Mensajes**
+
+1️⃣**Iniciar Chat con vendedor**
+
+**Método**: POST
+
+**Ruta**: http://127.0.0.1:8000/api/productos/{producto_id}/chats
+
+**Restricciones**
+
+
+✖️ Que el vendedor tenga bloqueado al comprador o viceversa.
+
+✖️ Que el vendedor intente crear un chat consigo mismo.
+
+✅ Mostrar la información para la interfaz de detalles del chat.
+
+
+**Salida**
+
+```Json
+{
+"status":"success",
+"message":"Chat iniciado correctamente",
+"data": {
+    "id":2,"comprador_id":3,
+    "producto": {
+        "id":1,
+        "nombre":"Mouse Gamer",
+        "imagen":null,
+        "vendedor": {
+            "id":1,
+            "nickname":"julian1223",
+            "imagen":"usuarios/1/698a9969b97db.webp"
+        }    
+    },
+    "estado_id":1,
+    "visto_comprador":false,
+    "visto_vendedor":false,
+    "mensajes":[],
+    "cantidad":null,
+    "calificacion":null,
+    "comentario":null,
+    "fecha_venta":null,
+    "paginacion":[]
+    }
+}
+```
+
+2️⃣**Enviar mensaje al vendedor**
+
+**Restricciones**
+
+✖️ Que el vendedor tenga bloqueado al comprador o viceversa.
+
+✖️ Que la imagen no pase de 5MB.
+
+
+**Método**: POST
+
+**Ruta**: http://127.0.0.1:8000/api/chats/{chat_id}/mensajes
+
+**Entrada**
+
+
+```Json
+{
+    "mensaje": "Soy el comprador"
+}    
+```
+
+o en un formulario, con el nombre o id **imagen** para mandar una imagen.
+
+
+⚠️ Cuando el comprador envia el mensaje, el **visto_comprador** queda en true, y el **visto_vendedor** queda en false y viceversa. Al momento que el vendedor o comprador vea los detalles del chat (Ruta más abajo) el visto_vendedor o visto_comprador cambia a true.
+
+**Salida comprador**
+
+```Json
+{
+  "status": "success",
+  "chat_detalle": {
+    "id": 2,
+    "comprador_id": 3,
+    "producto": {
+      "id": 1,
+      "nombre": "Mouse Gamer",
+      "imagen": null,
+      "vendedor": {
+        "id": 1,
+        "nickname": "julian1223",
+        "imagen": "usuarios/1/698a9969b97db.webp"
+      }
+    },
+    "estado_id": 1,
+    "visto_comprador": true,
+    "visto_vendedor": false,
+    "mensajes": [
+      {
+        "id": 4,
+        "mensaje": "Soy el comprador",
+        "es_comprador": true,
+        "imagen": null,
+        "fecha_registro": "2026-02-11 21:59:05"
+      }
+    ],
+    "cantidad": 1,
+    "paginacion": {
+      "total": 1,
+      "pagina_actual": 1,
+      "siguiente_pagina": null,
+      "pagina_anterior": null
+    },
+    "calificacion": null,
+    "comentario": null,
+    "fecha_venta": null
+  },
+  "nuevo_mensaje": {
+    "mensaje": "Soy el comprador",
+    "imagen": "",
+    "chat_id": 2,
+    "es_comprador": true,
+    "fecha_registro": "2026-02-12T02:59:05.000000Z",
+    "id": 4
+  }
+}
+```
+
+**Salida vendedor**
+
+
+```Json
+{
+  "status": "success",
+  "chat_detalle": {
+    "id": 2,
+    "comprador_id": 3,
+    "producto": {
+      "id": 1,
+      "nombre": "Mouse Gamer",
+      "imagen": null,
+      "vendedor": {
+        "id": 1,
+        "nickname": "julian1223",
+        "imagen": "usuarios/1/698a9969b97db.webp"
+      }
+    },
+    "estado_id": 1,
+    "visto_comprador": false,
+    "visto_vendedor": true,
+    "mensajes": [
+      {
+        "id": 5,
+        "mensaje": "Soy vendedor",
+        "es_comprador": false,
+        "imagen": null,
+        "fecha_registro": "2026-02-11 22:46:35"
+      },
+      {
+        "id": 4,
+        "mensaje": "Soy el comprador",
+        "es_comprador": true,
+        "imagen": null,
+        "fecha_registro": "2026-02-11 21:59:05"
+      }
+    ],
+    "cantidad": 1,
+    "paginacion": {
+      "total": 2,
+      "pagina_actual": 1,
+      "siguiente_pagina": null,
+      "pagina_anterior": null
+    },
+    "calificacion": null,
+    "comentario": null,
+    "fecha_venta": null
+  },
+  "nuevo_mensaje": {
+    "mensaje": "Soy vendedor",
+    "imagen": "",
+    "chat_id": 2,
+    "es_comprador": false,
+    "fecha_registro": "2026-02-12T03:46:35.000000Z",
+    "id": 5
+  }
+}
+```
+
+3️⃣ **Ver lista de chats activos**
+
+**Método**: GET
+
+**Ruta**: http://127.0.0.1:8000/api/chats
+
+**Salida vista comprador**
+
+```Json
+[
+  {
+    "id": 2,
+    "usuario": {
+      "id": 1,
+      "nickname": "julian1223",
+      "imagen": "usuarios/1/698a9969b97db.webp"
+    },
+    "visto_comprador": true,
+    "visto_vendedor": false,
+    "ultimoMensajeTexto": "Soy el comprador",
+    "fechaUltimoMensaje": "2026-02-11 21:59:05"
+  }
+]
+```
+
+**Vista Vendedor**
+
+```
+[
+  {
+    "id": 2,
+    "usuario": {
+      "id": 3,
+      "nickname": "Marcos228",
+      "imagen": "usuarios/3/698a9f3bd455f.webp"
+    },
+    "visto_comprador": true,
+    "visto_vendedor": false,
+    "ultimoMensajeTexto": "Soy el comprador",
+    "fechaUltimoMensaje": "2026-02-11 21:59:05"
+  }
+]
+```
+
+4️⃣ **Ver detalles de un chat**
+
+**Método**: GET
+
+**Ruta**: http://127.0.0.1:8000/api/chats/{chat_id}
+
+**Salida vista comprador**
+
+```Json
+{
+  "status": "success",
+  "data": {
+    "id": 2,
+    "comprador_id": 3,
+    "producto": {
+      "id": 1,
+      "nombre": "Mouse Gamer",
+      "imagen": null,
+      "vendedor": {
+        "id": 1,
+        "nickname": "julian1223",
+        "imagen": "usuarios/1/698a9969b97db.webp"
+      }
+    },
+    "estado_id": 1,
+    "visto_comprador": true,
+    "visto_vendedor": false,
+    "mensajes": [
+      {
+        "id": 4,
+        "mensaje": "Soy el comprador",
+        "es_comprador": true,
+        "imagen": null,
+        "fecha_registro": "2026-02-11 21:59:05"
+      }
+    ],
+    "cantidad": 1,
+    "calificacion": null,
+    "comentario": null,
+    "fecha_venta": null,
+    "paginacion": {
+      "total": 1,
+      "pagina_actual": 1,
+      "siguiente_pagina": null,
+      "pagina_anterior": null
+    }
+  }
+}
+```
+
+**Vista salida vendedor**
+
+```Json
+{
+  "status": "success",
+  "data": {
+    "id": 2,
+    "comprador_id": 3,
+    "producto": {
+      "id": 1,
+      "nombre": "Mouse Gamer",
+      "imagen": null,
+      "vendedor": {
+        "id": 1,
+        "nickname": "julian1223",
+        "imagen": "usuarios/1/698a9969b97db.webp"
+      }
+    },
+    "estado_id": 1,
+    "visto_comprador": true,
+    "visto_vendedor": true,
+    "mensajes": [
+      {
+        "id": 4,
+        "mensaje": "Soy el comprador",
+        "es_comprador": true,
+        "imagen": null,
+        "fecha_registro": "2026-02-11 21:59:05"
+      }
+    ],
+    "cantidad": 1,
+    "calificacion": null,
+    "comentario": null,
+    "fecha_venta": null,
+    "paginacion": {
+      "total": 1,
+      "pagina_actual": 1,
+      "siguiente_pagina": null,
+      "pagina_anterior": null
+    }
+  }
+}
+```
+
+5️⃣ **Borrar Mensaje**
+
+**Restricciones**
+
+✖️ Solo el autor puede borrar el mensaje
+
+**Método**: DELETE
+
+**Ruta**: http://127.0.0.1:8000/api/mensajes/{mensaje_id}
+
+```Json
+{
+  "status": "success",
+  "message": "Mensaje eliminado correctamente"
+}
+```
+
+**⚠️ Cuando un usuario trata de borrar el mensaje de otro usuario**
+
+```Json
+{
+  "status": "error",
+  "message": "Acceso denegado: No tienes permisos para realizar esta acción."
+}
+```
+
+6️⃣ **Borrar Chat**
+
+**Método**: DELETE
+
+**Ruta**: http://127.0.0.1:8000/api/chats/{chat_id}
+
+⚠️ El chat no se borra, solo cambia de estado, haciendo que no aparezca en la lista de chats activos, siendo invisible para el usuario que lo borro pero visible para la otra parte.
+
+**Comprador borra el chat**
+
+
+```Json
+{
+  "status": "success",
+  "message": "Chat eliminado correctamente"
+}
+```
+
+**Cuando comprador usa la ruta para visualizar la lista de chats activos**
+
+❕Array vacio porque solo tenia un chat activo
+
+
+```Json
+[]
+```
+
+**Cuando vendedor usa la ruta para visualizar la lista de chats activos**
+
+```Json
+[
+  {
+    "id": 2,
+    "usuario": {
+      "id": 3,
+      "nickname": "Marcos228",
+      "imagen": "usuarios/3/698a9f3bd455f.webp"
+    },
+    "visto_comprador": false,
+    "visto_vendedor": true,
+    "ultimoMensajeTexto": "Soy vendedor",
+    "fechaUltimoMensaje": "2026-02-11 22:46:35"
+  }
+]
+```
+
+⚠️ Si una de las partes que no ha borrado el chat, envia un mensaje luego que la otra la borro, vuelve activar el chat para la parte que lo borro.
+
+
+
 Código	Significado
 200	Operación exitosa
 201	Registro completado
