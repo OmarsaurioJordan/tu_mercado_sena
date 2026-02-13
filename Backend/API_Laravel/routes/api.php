@@ -182,8 +182,7 @@ Route::middleware('jwtVerify')->group(function (){
         'index', 'show', 'destroy'
     ]);
 
-    Route::path('chats/{chat}', [ChatController::class, 'update']);
-    
+    Route::patch('chats/{chat}', [ChatController::class, 'update']);
     // RUTA: api/chats
     // Crea un nuevo chat entre el usuario autenticado y otro usuario (vendedor)
     // El middleware "CheckChatBlock" verifica si el usuario autenticado ha bloqueado al otro usuario o viceversa
