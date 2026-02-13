@@ -5,6 +5,7 @@ namespace App\Contracts\Chat\Services;
 use App\DTOs\Chat\InputDto;
 use App\DTOs\Chat\UpdateInputDto;
 use App\DTOs\Chat\OutputDetailsDto;
+use App\Models\Chat;
 
 interface IChatService
 {
@@ -40,10 +41,16 @@ interface IChatService
     public function eliminarChat(int $chat_id, int $usuario_id): mixed;
 
     /**
-     * Función para que el comprador actualice el estado del chat
+     * Función para iniciar la compraventa, este método solo lo puede usar el vendedor
      * @param int $chat_id - Id del chat
      * @param UpdateInputDto $dto - Datos para actualizar el chat
      * @return OutputDetailsDto
      */
-    public function actualizarChatComprador(int $chat_id, UpdateInputDto $dto): OutputDetailsDto;
+    public function iniciarCompraventa(int $chat_id, UpdateInputDto $dto): array;
+
+    /**
+     * Función unica para el comprador, confirma si la compraventa fue realizada,
+     * Si es así cambia el estado del chat a vendido, si no lo cambia a activo
+     */
+    public function terminarCompraventa(Chat $chat, bool $confirmacion): array;
 }

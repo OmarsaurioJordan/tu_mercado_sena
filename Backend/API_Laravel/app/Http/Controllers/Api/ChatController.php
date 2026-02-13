@@ -6,11 +6,15 @@ use App\Http\Controllers\Api\Controller;
 use App\Contracts\Chat\Services\IChatService;
 use App\DTOs\Chat\InputDto;
 use App\DTOs\Chat\UpdateInputDto;
+use App\Http\Requests\Chat\CompraventaRequest;
 use App\Models\Chat;
 use App\Models\Producto;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Chat\CreateChatRequest;
+use App\Http\Requests\Chat\IniciarCompraventa;
 use App\Http\Requests\Chat\ModifyChatRequest;
+use App\Http\Requests\Chat\TerminarCompraventa;
+use Illuminate\Support\Facades\Request;
 
 class ChatController extends Controller
 {
@@ -69,24 +73,28 @@ class ChatController extends Controller
         ], 201);
     }
 
-    public function update(ModifyChatRequest $request, Chat $chat)
-    {   
-        // Validar que solo el comprador pueda modificar el chat
+    public function update(CompraventaRequest $request, Chat $chat)
+    {
         $this->authorize('update', $chat);
 
-        // Crear el DTO a partir de los datos validados de la solicitud
-        $dto = UpdateInputDto::fromRequest($request->validated());
+        $usuarioId = Auth::user()->usuario->id;
+        $esVendedor = $chat->producto->vendedor->id === $usuarioId;
 
-        // Actualizar el chat utilizando el servicio
-        $chat_actualizado = $this->chatService->actualizarChatComprador($chat->id, $dto);
+        if ($esVendedor) {
 
-        // Retornar la respuesta JSON con el chat actualizado
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Chat actualizado correctamente',
-            'data' => $chat_actualizado
-        ], 200);
+            $dto = UpdateInputDto::fromRequest($request->validated());
+
+            $chatActualizado = $this->chatService->iniciarCompraventa($chat->id,$dto);
+
+            return response()->json($chatActualizado, 200);
+        }
+
+        // Si es comprador
+        $resultado = $this->chatService->terminarCompraventa($chat,$request->validated()['confirmacion']);
+
+        return response()->json($resultado, 200);
     }
+
 
     public function destroy(Chat $chat)
     {

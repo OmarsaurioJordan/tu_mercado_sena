@@ -179,8 +179,10 @@ Route::middleware('jwtVerify')->group(function (){
     // PATCH: Update: api/chats/{chat} Marcar mensajes como leídos o actualizar información del chat
     // DELETE Destroy: api/chats/{chats} Eliminar un chat (opcional, dependiendo de la lógica de negocio)
     Route::resource('chats', ChatController::class)->only([
-        'index', 'show', 'update', 'destroy'
+        'index', 'show', 'destroy'
     ]);
+
+    Route::path('chats/{chat}', [ChatController::class, 'update']);
     
     // RUTA: api/chats
     // Crea un nuevo chat entre el usuario autenticado y otro usuario (vendedor)

@@ -33,15 +33,17 @@ class ChatPolicy
 
         return $esComprador || $esVendedor;
     }
-
+    
     public function update(Cuenta $cuenta, Chat $chat): bool
     {
-        // Obtener el usuario asociado a la cuenta
         $usuario = $cuenta->usuario;
 
-        // Verificar si el usuario es el comprador
-        return $usuario->id === $chat->comprador_id;
+        $esVendedor = $usuario->id === $chat->producto->vendedor->id;
+        $esComprador = $usuario->id === $chat->comprador_id;
+
+        return $esVendedor || $esComprador;
     }
+
 
     public function delete(Cuenta $cuenta, Chat $chat): bool
     {

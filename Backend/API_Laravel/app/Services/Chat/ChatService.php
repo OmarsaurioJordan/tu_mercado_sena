@@ -10,10 +10,15 @@ Use App\DTOs\Chat\InputDto;
 Use App\DTOs\Chat\UpdateInputDto;
 use App\DTOs\Chat\OutputDto;
 use App\DTOs\Chat\OutputDetailsDto;
+use App\Models\Chat;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ChatService implements IChatService
 {
+    const ESTADO_ACTIVO = 1;
+    const ESTADO_VENDIDO = 5; 
+    const ESTADO_ESPERANDO = 6;
+
     public function __construct(
         protected IChatRepository $repository
     )
@@ -126,20 +131,50 @@ class ChatService implements IChatService
         });
     }
 
-    public function actualizarChatComprador(int $chat_id, UpdateInputDto $dto): OutputDetailsDto
+    public function iniciarCompraventa(int $chat_id, UpdateInputDto $dto): array
     {
+        if ($dto->estado_id !== self::ESTADO_ACTIVO) {
+            throw new BusinessException('Chat no activo, no puede iniciar el proceso', 403);
+        }
+
         return DB::transaction(function () use ($chat_id, $dto) {
             $chat_actualizado = $this->repository->update($chat_id, $dto->toArray());
             
-            $chat_actualizado->load('producto.vendedor', 'comprador');
-            
             if (!$chat_actualizado) {
-                throw new BusinessException('No se pudo actualizar el chat.');
+                throw new BusinessException('No se pudo actualizar el chat.', 500);
             }
-    
-            $bloqueo_mutuo = $this->repository->verificarBloqueoMutuo($chat_actualizado);
-    
-            return OutputDetailsDto::fromModel($chat_actualizado, $bloqueo_mutuo);
+
+            return [
+                'success' => true, 
+                'message' => 'Proceso iniciado, espera la confirmación del comprador'
+            ];
+        });
+    }
+
+    public function terminarCompraventa(Chat $chat, bool $confirmacion): array
+    {
+        if ($chat->estado_id !== self::ESTADO_ESPERANDO) {
+            throw new BusinessException('El vendedor no ha iniciado el proceso de compraventa', 422);
+        }
+
+        return DB::transaction(function () use ($chat, $confirmacion) {
+            if (!$confirmacion) {
+                $chat->estado_id = self::ESTADO_ACTIVO;
+                $chat->save();
+                
+                return [
+                    'success' => true,
+                    'message' => 'Proceso cancelado'
+                ];
+            }
+
+            $chat->estado_id = self::ESTADO_VENDIDO;
+            $chat->save();
+
+            return [
+                'success' => true,
+                'message' => 'Venta concretada con exito'
+            ];
         });
     }
 }

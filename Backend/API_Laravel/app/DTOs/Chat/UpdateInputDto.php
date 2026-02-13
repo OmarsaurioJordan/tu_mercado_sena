@@ -11,28 +11,32 @@ class UpdateInputDto implements Arrayable
      * Create a new class instance.
      */
     public function __construct(
-        public ?int $precio,
-        public ?int $cantidad,
-        public ?int $calificacion,
-        public ?string $comentario
+        public int $estado_id,
+        public int $precio,
+        public int $cantidad
     )
     {}
 
     public static function fromRequest(array $data): self
     {
         return new self(
-            precio: $data['precio'] ?? null,
-            cantidad: $data['cantidad'] ?? null,
-            calificacion: $data['calificacion'] ?? null,
-            comentario: $data['comentario'] ?? null
+            estado_id: $data['estado_id'],
+            precio: $data['precio'],
+            cantidad: $data['cantidad'],
         );
     }
 
     public function toArray(): array
     {
-        return array_filter(
-            get_object_vars($this),
-            fn ($value) => !is_null($value)
-        );
+        // return array_filter(
+        //     get_object_vars($this),
+        //     fn ($value) => !is_null($value)
+        // );
+
+        return [
+            'estado_id' => $this->estado_id,
+            'precio' => $this->precio,
+            'cantidad' => $this->cantidad
+        ];
     }
 }
