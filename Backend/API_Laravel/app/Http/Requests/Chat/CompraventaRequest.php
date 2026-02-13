@@ -9,43 +9,56 @@ class CompraventaRequest extends FormRequest
 {
     const ESTADO_ESPERANDO = 6;
 
+    protected $chat;
+    protected $usuarioId;
+    protected $esVendedor = false;
+    protected $esComprador = false;
 
     public function authorize(): bool
     {
-        $chat = $this->route('chat'); 
-        $usuarioId = Auth::user()->usuario->id;
-        $vendedor = $chat->producto->vendedor;
-        $comprador = $chat->comprador;
+        $this->chat = $this->route('chat');
+        $this->usuarioId = Auth::user()->usuario->id;
 
-        return $vendedor->id === $usuarioId || $comprador === $usuarioId;
-    }
+        $vendedorId = $this->chat->producto->vendedor->id;
+        $compradorId = $this->chat->comprador_id;
 
-    protected function prepareForValidation()
-    {
-        
+        $this->esVendedor = $vendedorId === $this->usuarioId;
+        $this->esComprador = $compradorId === $this->usuarioId;
+
+        return $this->esVendedor || $this->esComprador;
     }
 
     public function rules(): array
     {
-        return [
-            'estado_id' => [
-                'integer',
-                'required',
-                'exists:estados,id',
-            ],
+        if ($this->esVendedor) {
+            return [
+                'estado_id' => [
+                    'required',
+                    'integer',
+                    'exists:estados,id',
+                ],
+                'cantidad' => [
+                    'required',
+                    'integer',
+                    'min:1',
+                ],
+                'precio' => [
+                    'required',
+                    'integer',
+                ],
+            ];
+        }
 
-            'cantidad' => [
-                'required',
-                'integer',
-                'min:1',
-            ],
+        if ($this->esComprador) {
+            return [
+                'confirmacion' => [
+                    'required',
+                    'boolean',
+                ],
+            ];
+        }
 
-            'precio' => [
-                'required',
-                'integer',
-            ]
-
-        ];
+        return [];
     }
 
     public function messages()
@@ -55,8 +68,11 @@ class CompraventaRequest extends FormRequest
             'cantidad.integer' => 'La cantidad debe ser un número',
             'cantidad.min' => 'La cantidad no puede ser 0',
 
-            'precio' => 'El precio debe ser especificado',
-            ''
+            'precio.required' => 'El precio debe ser especificado',
+            'precio.integer' => 'El precio debe ser un número',
+
+            'confirmacion.required' => 'La confirmación es requerida',
+            'confirmacion.boolean' => 'Formato no válido',
         ];
     }
 }
