@@ -22,10 +22,12 @@ class Usuario:
         self.fecha_reciente = fecha_reciente
         self.img_signal = UsuarioSignal()
         self.img_pix = QPixmap("assets/sprites/avatar.png")
+        self.is_img_load = False
+        self.worker = None
 
     @staticmethod
     def from_json(data):
-        usr = Usuario(
+        return Usuario(
             id = int(data.get('id')),
             email = data.get('email'),
             rol_id = int(data.get('rol_id')),
@@ -38,17 +40,18 @@ class Usuario:
             fecha_actualiza = data.get('fecha_actualiza'),
             fecha_reciente = data.get('fecha_reciente')
         )
-        usr.load_image()
-        return usr
 
     def load_image(self):
-        if self.imagen == "":
+        if not self.imagen:
+            self.worker = ImageWorker("", True)
+            QThreadPool.globalInstance().start(self.worker)
             return
         url = IMAGE_USER_LINK + self.imagen
-        worker = ImageWorker(url, True)
-        worker.signals.finished.connect(self.set_image)
-        QThreadPool.globalInstance().start(worker)
+        self.worker = ImageWorker(url, True)
+        self.worker.signals.finished.connect(self.set_image)
+        QThreadPool.globalInstance().start(self.worker)
 
     def set_image(self, image):
         self.img_pix = image
+        self.is_img_load = True
         self.img_signal.ok_image.emit(self.id)

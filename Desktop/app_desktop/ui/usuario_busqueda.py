@@ -39,17 +39,24 @@ class UsuarioBusqueda(QListWidget):
         self.clear()
 
     def actualizar(self, id=0):
-        if id != 0:
-            return
         ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-        usuarios = ctrlUsuario.get_busqueda()
-        self.agregar_usuarios(usuarios)
+        if id == 0:
+            usuarios = ctrlUsuario.get_busqueda()
+            self.agregar_usuarios(usuarios)
+        else:
+            for i in range(self.count()):
+                item = self.item(i)
+                ficha = self.itemWidget(item)
+                if ficha.id == id:
+                    ficha.setData(ctrlUsuario.get_usuario(id))
+                    break
     
     def agregar_usuarios(self, usuarios):
         ids = self.obtener_ids()
         for usr in usuarios:
             if usr.id in ids:
                 continue
+            ids.add(usr.id)
             ficha = UsuarioCard(usr)
             ficha.card_clic.connect(self._click_event)
             item = QListWidgetItem()

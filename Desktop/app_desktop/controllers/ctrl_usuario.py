@@ -1,7 +1,7 @@
 import requests
 from PySide6.QtCore import Signal, QObject
 from core.app_config import (
-    API_LIMIT_ITEMS, DEFAULT_INFO, API_BASE_URL
+    API_LIMIT_ITEMS, DEFAULT_INFO, API_BASE_URL, TIME_OUT
 )
 from models.usuario import Usuario
 from core.session import Session
@@ -31,7 +31,7 @@ class CtrlUsuario:
 
     def api_usuario(self, id=0):
         params = {"id": id}
-        response = requests.get(API_BASE_URL + "usuarios", params=params)
+        response = requests.get(API_BASE_URL + "usuarios", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             data = response.json()
             usr = self.new_usuario(data[0])
@@ -48,7 +48,7 @@ class CtrlUsuario:
             filtros["limite"] = API_LIMIT_ITEMS
             filtros["cursor_fecha"] = self.cursor_busqueda["cursor_fecha"]
             filtros["cursor_id"] = self.cursor_busqueda["cursor_id"]
-            response = requests.get(API_BASE_URL + "usuarios", params=filtros)
+            response = requests.get(API_BASE_URL + "usuarios", params=filtros, timeout=TIME_OUT)
             usuarios = []
             if response.status_code == 200:
                 data = response.json()
@@ -86,6 +86,10 @@ class CtrlUsuario:
     def set_in_list(self, lista=[], value=None):
         for i in range(len(lista)):
             if lista[i].id == value.id:
+                existing = lista[i]
+                if not value.is_img_load and existing.is_img_load:
+                    value.img_pix = existing.img_pix
+                    value.imagen = existing.imagen
                 lista[i] = value
                 return
         lista.append(value)
@@ -109,14 +113,14 @@ class CtrlUsuario:
     # llamadas a la API para administrador
 
     def get_master_info(self):
-        response = requests.get(API_BASE_URL + "admin/master_info.php")
+        response = requests.get(API_BASE_URL + "admin/master_info.php", timeout=TIME_OUT)
         if response.status_code == 200:
             return response.json().get('descripcion')
         return DEFAULT_INFO
 
     def admin_login(self, email="", password=""):
         params = {"email": email, "password": password}
-        response = requests.get(API_BASE_URL + "admin/admin_login.php", params=params)
+        response = requests.get(API_BASE_URL + "admin/admin_login.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             data = response.json()
             return {
@@ -139,7 +143,7 @@ class CtrlUsuario:
         params = {"email": email, "pin": pin,
             "admin_email": admindata["email"], "admin_token": admindata["token"]
         }
-        response = requests.get(API_BASE_URL + "admin/admin_pin.php", params=params)
+        response = requests.get(API_BASE_URL + "admin/admin_pin.php", params=params, timeout=TIME_OUT)
         data = response.json()
         if response.status_code == 200:
             return int(data.get('Ok')) # 0 o 1
@@ -153,7 +157,7 @@ class CtrlUsuario:
         params = {"id": id, "rol": rol_id,
             "admin_email": admindata["email"], "admin_token": admindata["token"]
         }
-        response = requests.get(API_BASE_URL + "usuarios/set_rol.php", params=params)
+        response = requests.get(API_BASE_URL + "usuarios/set_rol.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             res = response.json()["Ok"] == "1"
             if res:
@@ -167,7 +171,7 @@ class CtrlUsuario:
         params = {"id": id, "estado": estado_id,
             "admin_email": admindata["email"], "admin_token": admindata["token"]
         }
-        response = requests.get(API_BASE_URL + "usuarios/set_estado.php", params=params)
+        response = requests.get(API_BASE_URL + "usuarios/set_estado.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             res = response.json()["Ok"] == "1"
             if res:
@@ -183,4 +187,5 @@ class CtrlUsuario:
     def new_usuario(self, data_json):
         usr = Usuario.from_json(data_json)
         usr.img_signal.ok_image.connect(self.set_image)
+        usr.load_image()
         return usr

@@ -65,10 +65,10 @@ class ToolsWidget(QWidget):
     def buscarUsuarios(self, filtros, widgetResultado, widgetReset):
         widgetResultado.eliminar_usuarios()
         widgetReset.resetData()
-        usuarios = self.ctrlUsuario.do_busqueda(filtros=filtros)
+        self.ctrlUsuario.do_busqueda(filtros=filtros)
     
     def rebuscarUsuarios(self):
-        usuarios = self.ctrlUsuario.do_busqueda(rebusqueda=True)
+        self.ctrlUsuario.do_busqueda(rebusqueda=True)
 
     def buscarUsuario(self, user_id, widgetResultado):
         usuario = self.ctrlUsuario.get_usuario(user_id)

@@ -1,7 +1,7 @@
 import requests
 from PySide6.QtCore import Signal, QObject
 from core.app_config import (
-    API_LIMIT_ITEMS, DEFAULT_INFO, API_BASE_URL
+    API_LIMIT_ITEMS, DEFAULT_INFO, API_BASE_URL, TIME_OUT
 )
 from models.producto import Producto
 from core.session import Session
@@ -31,7 +31,7 @@ class CtrlProducto:
 
     def api_usuario(self, id=0):
         params = {"id": id}
-        response = requests.get(API_BASE_URL + "usuarios", params=params)
+        response = requests.get(API_BASE_URL + "usuarios", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             data = response.json()
             usr = self.new_usuario(data[0])
@@ -48,7 +48,7 @@ class CtrlProducto:
             filtros["limite"] = API_LIMIT_ITEMS
             filtros["cursor_fecha"] = self.cursor_busqueda["cursor_fecha"]
             filtros["cursor_id"] = self.cursor_busqueda["cursor_id"]
-            response = requests.get(API_BASE_URL + "usuarios", params=filtros)
+            response = requests.get(API_BASE_URL + "usuarios", params=filtros, timeout=TIME_OUT)
             usuarios = []
             if response.status_code == 200:
                 data = response.json()
@@ -114,7 +114,7 @@ class CtrlProducto:
         params = {"id": id, "estado": estado_id,
             "admin_email": admindata["email"], "admin_token": admindata["token"]
         }
-        response = requests.get(API_BASE_URL + "productos/set_estado.php", params=params)
+        response = requests.get(API_BASE_URL + "productos/set_estado.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             res = response.json()["Ok"] == "1"
             if res:
@@ -130,4 +130,5 @@ class CtrlProducto:
     def new_usuario(self, data_json):
         usr = Usuario.from_json(data_json)
         usr.img_signal.ok_image.connect(self.set_image)
+        usr.load_image()
         return usr
