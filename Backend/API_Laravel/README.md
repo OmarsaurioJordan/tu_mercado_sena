@@ -1328,7 +1328,7 @@ MÉTODO: **PATCH**
 ```Json
 {
     "success": true,
-    "message" 'Proceso cancelado'
+    "message": "Proceso cancelado"
 }
 ```
 
