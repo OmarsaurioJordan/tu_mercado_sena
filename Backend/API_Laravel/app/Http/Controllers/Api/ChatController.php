@@ -12,8 +12,10 @@ use App\Models\Producto;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Chat\CreateChatRequest;
 use App\Http\Requests\Chat\IniciarCompraventa;
+use App\Http\Requests\Chat\IniciarCompraventaRequest;
 use App\Http\Requests\Chat\ModifyChatRequest;
 use App\Http\Requests\Chat\TerminarCompraventa;
+use App\Http\Requests\Chat\TerminarCompraventaRequest;
 use Illuminate\Support\Facades\Request;
 
 class ChatController extends Controller
@@ -73,26 +75,33 @@ class ChatController extends Controller
         ], 201);
     }
 
-    public function update(CompraventaRequest $request, Chat $chat)
+    public function iniciarCompraVenta(IniciarCompraventaRequest $request, Chat $chat)
     {
         $this->authorize('update', $chat);
 
-        $usuarioId = Auth::user()->usuario->id;
-        $esVendedor = $chat->producto->vendedor->id === $usuarioId;
+        $dto = UpdateInputDto::fromRequest($request->validated());
 
-        if ($esVendedor) {
+        $chatActualizado = $this->chatService->iniciarCompraventa($chat, $dto);
 
-            $dto = UpdateInputDto::fromRequest($request->validated());
-
-            $chatActualizado = $this->chatService->iniciarCompraventa($chat->id,$dto);
-
-            return response()->json($chatActualizado, 200);
-        }
+        return response()->json($chatActualizado, 200);
+    }
 
         // Si es comprador
-        $resultado = $this->chatService->terminarCompraventa($chat,$request->validated()['confirmacion']);
+        // $resultado = $this->chatService->terminarCompraventa($chat,$request->validated()['confirmacion']);
+
+        // return response()->json($resultado, 200);
+    public function terminarCompraVenta(TerminarCompraventaRequest $request, Chat $chat)
+    {
+        $this->authorize('update', $chat);
+
+        $resultado = $this->chatService->terminarCompraventa($chat, $request->validated());
 
         return response()->json($resultado, 200);
+    }
+
+    public function iniciarDevoluciones()
+    {
+        
     }
 
 

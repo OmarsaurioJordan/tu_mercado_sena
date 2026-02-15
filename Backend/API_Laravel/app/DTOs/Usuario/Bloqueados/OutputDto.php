@@ -5,6 +5,7 @@ namespace App\DTOs\Usuario\Bloqueados;
 use App\Models\Usuario;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -35,17 +36,16 @@ readonly class OutputDto implements Arrayable
      * @param Usuario $usuario
      * @return self
      */
-    public static function fromModel(Usuario $usuario): self
+    public static function fromModel(Usuario $bloqueado): self
     {
         #$bloqueado es una instancia de App\Models\Bloqueado con la relacion 'bloqueado' cargada
         return new self(
-            id: $usuario->usuarioQueHeBloqueado->id,
-            bloqueador_id: $usuario->usuariosQueHeBloqueado->bloqueador_id,
-            usuario_bloqueado: $usuario->relationLoaded('usuarioQueHeBloqueado') && $usuario->usuariosQueHeBloqueado
+            id: $bloqueado?->id ?? 0,
+            bloqueador_id: Auth::user()->usuario->id,
+            usuario_bloqueado: $bloqueado
             ? [
-                'id' => $usuario->usuariosQueHeBloqueado?->bloqueado_id,
-                'nickname' => $usuario->usuariosQueHeBloqueado?->nickname,
-                'imagen' => $usuario->usuariosQueHeBloqueado->imagen
+                'id' => $bloqueado->id,
+                'nickname'=> $bloqueado->nickname
             ]
             : []
         );

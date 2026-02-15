@@ -88,9 +88,9 @@ Route::middleware('jwtVerify')->group(function (){
     Route::patch("/editar-perfil/{id}", [UsuarioController::class, 'update']);
 
     // === BLOQUEADOS ===
-    Route::get('bloqueados', [UsuarioController::class, 'obtenerBloqueadosPorUsuario']);
-    Route::post('bloqueados', [UsuarioController::class, 'bloquearUsuario']);
-    Route::delete('bloqueados/{bloqueado_id}', [UsuarioController::class, 'desbloquearUsuario']);
+    Route::get('/bloqueados', [UsuarioController::class, 'obtenerBloqueadosPorUsuario']);
+    Route::post('/bloqueados/{usuario}', [UsuarioController::class, 'bloquearUsuario']);
+    Route::delete('/bloqueados/{usuario}', [UsuarioController::class, 'desbloquearUsuario']);
 
     // ========================================
     // === PRODUCTOS (RUTAS PROTEGIDAS) ===
@@ -182,7 +182,10 @@ Route::middleware('jwtVerify')->group(function (){
         'index', 'show', 'destroy'
     ]);
 
-    Route::patch('chats/{chat}', [ChatController::class, 'update']);
+    // Rutas para concretar una compraventa
+    Route::patch('chats/{chat}/iniciar-compraventas', [ChatController::class, 'iniciarCompraVenta']);
+    Route::patch('chats/{chat}/terminar-compraventas', [ChatController::class, 'terminarCompraVenta']);
+    
     // RUTA: api/chats
     // Crea un nuevo chat entre el usuario autenticado y otro usuario (vendedor)
     // El middleware "CheckChatBlock" verifica si el usuario autenticado ha bloqueado al otro usuario o viceversa

@@ -46,11 +46,19 @@ interface IChatService
      * @param UpdateInputDto $dto - Datos para actualizar el chat
      * @return OutputDetailsDto
      */
-    public function iniciarCompraventa(int $chat_id, UpdateInputDto $dto): array;
+    public function iniciarCompraventa(Chat $chat, UpdateInputDto $dto): array;
 
     /**
      * Función unica para el comprador, confirma si la compraventa fue realizada,
      * Si es así cambia el estado del chat a vendido, si no lo cambia a activo
      */
-    public function terminarCompraventa(Chat $chat, bool $confirmacion): array;
+    public function terminarCompraventa(Chat $chat, array $datos): array;
+
+    /**
+     * Función para el comprador, el inicia el proceso de devolución
+     * @param Chat $chat - Modelo del chat al que se le quiere hacer el proceso de devolución.
+     * @param int $usuarioId - Id del usuario, para validar que sea el comprador en el chat.
+     * @return array - Arreglo con la confirmación de que inicio el proceso.
+     */
+    public function iniciarDevolucion(Chat $chat, int $usuarioId): array;
 }

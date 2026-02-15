@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CompraventaRequest extends FormRequest
 {
-    const ESTADO_ESPERANDO = 6;
-
     protected $chat;
     protected $usuarioId;
     protected $esVendedor = false;

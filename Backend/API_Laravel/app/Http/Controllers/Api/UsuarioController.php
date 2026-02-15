@@ -10,6 +10,7 @@ use App\DTOs\Usuario\EditarPerfil\InputDto as EditarPerfilInputDto;
 use App\Contracts\Usuario\Services\IUsuarioService;
 use App\Contracts\Usuario\Services\IBloqueadoService;
 use App\DTOs\Usuario\Bloqueados\InputDto as BloqueadoInputDto;
+use App\Models\Usuario;
 
 class UsuarioController extends Controller
 {
@@ -34,7 +35,7 @@ class UsuarioController extends Controller
 
     // == MODULO DE BLOQUEO DE USUARIOS == //
 
-    public function bloquearUsuario(BloquearUsuarioRequest $request)
+    public function bloquearUsuario(BloquearUsuarioRequest $request, Usuario $usuario)
     {
         $dto = BloqueadoInputDto::fromRequest($request->validated());
     
@@ -48,7 +49,7 @@ class UsuarioController extends Controller
 
     }
 
-    public function desbloquearUsuario(BloquearUsuarioRequest $request)
+    public function desbloquearUsuario(BloquearUsuarioRequest $request, Usuario $usuario)
     {
         $dto = BloqueadoInputDto::fromRequest($request->validated());
 
@@ -59,7 +60,7 @@ class UsuarioController extends Controller
 
     public function obtenerBloqueadosPorUsuario()
     {
-        $bloqueados = $this->bloqueadoService->solicitarBloqueadosPorUsuario(Auth::id());
+        $bloqueados = $this->bloqueadoService->solicitarBloqueadosPorUsuario(Auth::user()->usuario->id);
 
         return response()->json([
             'status' => 'success',

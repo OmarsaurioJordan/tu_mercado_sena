@@ -24,7 +24,7 @@ readonly class InputDto implements Arrayable
     public static function fromRequest(array $data): self
     {
         return new self(
-            bloqueador_id: Auth::id(),
+            bloqueador_id: Auth::user()->usuario->id,
             bloqueado_id: $data['bloqueado_id']
         );
     }

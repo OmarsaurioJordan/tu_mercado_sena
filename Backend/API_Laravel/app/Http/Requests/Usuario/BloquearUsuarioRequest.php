@@ -16,8 +16,8 @@ class BloquearUsuarioRequest extends FormRequest
     {
         // Inyectamos el ID del usuario autenticado para que pase las reglas
         $this->merge([
-            'bloqueador_id' => Auth::id(),
-            'bloqueado_id'  => $this->route('bloqueado_id') ?? $this->input('bloqueado_id'),
+            'bloqueador_id' => Auth::user()->usuario->id,
+            'bloqueado_id'  => $this->route('usuario')->id
         ]);
     }
 
@@ -35,7 +35,7 @@ class BloquearUsuarioRequest extends FormRequest
                 'integer',
                 'exists:usuarios,id',
                 function ($attribute, $value, $fail) {
-                    if ($value !== Auth::id()) {
+                    if ($value !== Auth::user()->usuario->id) {
                         $fail('El bloqueador debe ser el usuario autenticado.');
                     }
                 },

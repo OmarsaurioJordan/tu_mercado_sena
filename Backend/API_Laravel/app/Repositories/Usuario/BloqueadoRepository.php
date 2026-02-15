@@ -22,7 +22,9 @@ class BloqueadoRepository implements IBloqueadoRepository
     {
         $usuario = Usuario::find($bloqueadorId);
         
-        return $usuario->usuariosQueHeBloqueado()->attach($bloqueadoId);
+        $usuario->usuariosQueHeBloqueado()->syncWithoutDetaching([$bloqueadoId]);
+
+        return $usuario;
     }
 
     /**
@@ -36,8 +38,9 @@ class BloqueadoRepository implements IBloqueadoRepository
         
         $usuario = Usuario::find($bloqueadorId);
 
-        return $usuario->usuariosQueHeBloqueado()->detach($bloqueadoId);
+        $usuario->usuariosQueHeBloqueado()->detach($bloqueadoId);
 
+        return $usuario;
         // $registro = Bloqueado::where('bloqueador_id', $bloqueadorId)
         //     ->where('bloqueado_id', $bloqueadoId)
         //     ->first();
@@ -71,9 +74,9 @@ class BloqueadoRepository implements IBloqueadoRepository
      */
     public function obtenerBloqueadosPorUsuario(int $bloqueadorId): Collection
     {
-        # Función with para cargar la relación 'bloqueado' y no tener el problema de N+1 queries
-        return Usuario::with('usuariosQueHeBloqueado')
-            ->where('bloqueador_id', $bloqueadorId)
-            ->get();
+        $usuario = Usuario::findOrFail($bloqueadorId);
+
+        return $usuario->usuariosQueHeBloqueado()->get();
+
     }
 }

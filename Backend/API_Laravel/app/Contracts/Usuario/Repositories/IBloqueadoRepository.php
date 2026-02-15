@@ -10,8 +10,8 @@ interface IBloqueadoRepository
 {
     /**
      * Función para bloquear un usuario que retorna su modelo
-     * @param int $bloqueadorId
-     * @param int $bloqueadoId
+     * @param int $bloqueadorId $usuario - Id del usuario que bloqueara al otro
+     * @param int $bloqueadoId - Id del usuario que sera bloqueado
      * @return Usuario
      */
     public function bloquearUsuario(int $bloqueadorId, int $bloqueadoId): Usuario;

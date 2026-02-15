@@ -12,12 +12,15 @@ use App\DTOs\Chat\OutputDto;
 use App\DTOs\Chat\OutputDetailsDto;
 use App\Models\Chat;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Carbon\Carbon;
 
 class ChatService implements IChatService
 {
     const ESTADO_ACTIVO = 1;
     const ESTADO_VENDIDO = 5; 
     const ESTADO_ESPERANDO = 6;
+    const ESTADO_DEVOLVIENDO = 7;
+    const ESTADO_DEVUELTO = 8;
 
     public function __construct(
         protected IChatRepository $repository
@@ -131,14 +134,14 @@ class ChatService implements IChatService
         });
     }
 
-    public function iniciarCompraventa(int $chat_id, UpdateInputDto $dto): array
+    public function iniciarCompraventa(Chat $chat, UpdateInputDto $dto): array
     {
-        if ($dto->estado_id !== self::ESTADO_ACTIVO) {
+        if ($chat->estado_id !== self::ESTADO_ACTIVO) {
             throw new BusinessException('Chat no activo, no puede iniciar el proceso', 403);
         }
 
-        return DB::transaction(function () use ($chat_id, $dto) {
-            $chat_actualizado = $this->repository->update($chat_id, $dto->toArray());
+        return DB::transaction(function () use ($chat, $dto) {
+            $chat_actualizado = $this->repository->update($chat->id, $dto->toArray());
             
             if (!$chat_actualizado) {
                 throw new BusinessException('No se pudo actualizar el chat.', 500);
@@ -151,14 +154,15 @@ class ChatService implements IChatService
         });
     }
 
-    public function terminarCompraventa(Chat $chat, bool $confirmacion): array
+    public function terminarCompraventa(Chat $chat, array $datos): array
     {
         if ($chat->estado_id !== self::ESTADO_ESPERANDO) {
             throw new BusinessException('El vendedor no ha iniciado el proceso de compraventa', 422);
         }
 
-        return DB::transaction(function () use ($chat, $confirmacion) {
-            if (!$confirmacion) {
+        return DB::transaction(function () use ($chat, $datos) {
+
+            if (!$datos['confirmacion']) {
                 $chat->estado_id = self::ESTADO_ACTIVO;
                 $chat->save();
                 
@@ -169,6 +173,9 @@ class ChatService implements IChatService
             }
 
             $chat->estado_id = self::ESTADO_VENDIDO;
+            $chat->calificacion = $datos['calificacion'] ?? null;
+            $chat->comentario = $datos['comentario'] ?? null;
+            $chat->fecha_venta = Carbon::now();
             $chat->save();
 
             return [
@@ -177,4 +184,33 @@ class ChatService implements IChatService
             ];
         });
     }
-}
+
+    public function iniciarDevolucion(Chat $chat, int $usuarioId): array
+    {
+        $comprador = $chat->comprador;
+
+        $fecha_venta = Carbon::parse($chat->fecha_venta);
+
+        if ($comprador->id !== $usuarioId) {
+            throw new BusinessException('Este proceso solo la puede hacer el comprador', 422);      
+        }
+
+        if ($chat->estado_id !== self::ESTADO_VENDIDO) {
+            throw new BusinessException('El producto tiene que estar vendido', 422);
+        }
+
+        if ($fecha_venta->lt(Carbon::now()->subDays(30))) {
+            throw new BusinessException('Has superado el plazo máximo', 422);
+        }
+
+        Return DB::transaction(function () use ($chat) {
+            $chat->estado_id = self::ESTADO_DEVOLVIENDO;
+            $chat->save();
+
+            return [
+                'success' => true,
+                'message' => 'Proceso de devolución iniciado, espera la confirmación del vendedor'
+            ];
+        });
+    }
+} 
