@@ -99,9 +99,34 @@ class ChatController extends Controller
         return response()->json($resultado, 200);
     }
 
-    public function iniciarDevoluciones()
+    public function iniciarDevoluciones(Chat $chat)
     {
-        
+        // Policy que solo permite al vendedor y al comprador interactuar con este método
+        $this->authorize('update', $chat);
+
+        // Obtener el id del usuario que hace la petición
+        $usuarioId = Auth::user()->usuario->id;
+
+        // Variable que guarda el array de confirmación que viene del servicio
+        $resultado = $this->chatService->iniciarDevolucion($chat, $usuarioId);
+
+        // Retornar json
+        return response()->json($resultado, 200);
+    }
+
+    public function terminarDevolucion(Chat $chat)
+    {
+        // Policy que solo permite al vendedor y al comprador interactuar con este método
+        $this->authorize('update', $chat);
+
+        // Obtener el id del usuario que hace la petición
+        $usuarioId = Auth::user()->usuario->id;
+
+        // Variable que guarda el array de confirmación que viene del servicio
+        $resultado = $this->chatService->terminarDevolucion($chat, $usuarioId);
+
+        // Retornar json
+        return response()->json($resultado, 200);
     }
 
 

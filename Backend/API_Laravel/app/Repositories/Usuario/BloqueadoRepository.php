@@ -20,11 +20,13 @@ class BloqueadoRepository implements IBloqueadoRepository
      */
     public function bloquearUsuario(int $bloqueadorId, int $bloqueadoId): Usuario
     {
-        $usuario = Usuario::find($bloqueadorId);
-        
-        $usuario->usuariosQueHeBloqueado()->syncWithoutDetaching([$bloqueadoId]);
+        $usuarioBloqueador = Usuario::find($bloqueadorId);
+            
+        // Realiza la acción de bloqueo
+        $usuarioBloqueador->usuariosQueHeBloqueado()->syncWithoutDetaching([$bloqueadoId]);
 
-        return $usuario;
+        // RETORNA el usuario bloqueado, no el bloqueador
+        return Usuario::findOrFail($bloqueadoId);
     }
 
     /**
