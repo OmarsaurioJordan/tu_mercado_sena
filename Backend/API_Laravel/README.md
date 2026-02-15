@@ -587,6 +587,8 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados/{usuario_id}**
 }
 ```
 
+
+
 **2️⃣Ver usuarios bloqueados**
 Método: **GET**
 
@@ -612,8 +614,9 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados**
 }
 ```
 
-**3️⃣Desbloquear usuario**
 
+
+**3️⃣Desbloquear usuario**
 
 Método: **DELETE**
 
