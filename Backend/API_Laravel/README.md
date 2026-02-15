@@ -564,13 +564,13 @@ Método: **POST**
 
 👁️ **usuario_id = Id del usuario que se desea bloquear**
 
-
 Ruta: **http://127.0.0.1:8000/api/bloqueados/{usuario_id}**
-```
 
 **Respuesta**
 
-```JSON
+
+```
+```Json
 {
   "success": true,
   "message": "Usuarios bloqueados",
