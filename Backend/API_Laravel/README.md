@@ -1254,7 +1254,7 @@ o en un formulario, con el nombre o id **imagen** para mandar una imagen.
 
 **1️⃣Iniciar proceso de compraventa**
 
-RUTA: **http://127.0.0.1:8000/api/chats/2/iniciar-compraventas**
+RUTA: **http://127.0.0.1:8000/api/chats/{chat_id}/iniciar-compraventas**
 
 MÉTODO: **PATCH**
 
@@ -1284,7 +1284,7 @@ MÉTODO: **PATCH**
 
 **2️⃣Terminar proceso de compraventa**
 
-RUTA: **http://127.0.0.1:8000/api/chats/2/terminar-compraventas**
+RUTA: **http://127.0.0.1:8000/api/chats/{chat_id}/terminar-compraventas**
 
 MÉTODO: **PATCH**
 
@@ -1328,7 +1328,7 @@ MÉTODO: **PATCH**
 ```Json
 {
     "success": true,
-    'message' => 'Proceso cancelado'
+    "message" 'Proceso cancelado'
 }
 ```
 
