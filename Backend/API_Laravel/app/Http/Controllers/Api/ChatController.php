@@ -99,7 +99,7 @@ class ChatController extends Controller
         return response()->json($resultado, 200);
     }
 
-    public function iniciarDevoluciones(Chat $chat)
+    public function iniciarDevolucion(Chat $chat)
     {
         // Policy que solo permite al vendedor y al comprador interactuar con este método
         $this->authorize('update', $chat);

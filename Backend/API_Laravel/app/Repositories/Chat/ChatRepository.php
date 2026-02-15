@@ -6,6 +6,7 @@ use App\Contracts\Chat\Repositories\IChatRepository;
 use App\Models\Chat;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ChatRepository implements IChatRepository
 {
@@ -174,5 +175,23 @@ class ChatRepository implements IChatRepository
         $chat->update($data);
 
         return $chat;
+    }
+
+
+    public function listarConFiltros(int $usuarioId, array $estados = []): Collection
+    {
+        Log::info('Consultado método: listarConFiltros en el repositorio del chat');
+
+        return Chat::where(function($q) use ($usuarioId) {
+            $q->where('comprador_id', $usuarioId)
+              ->orWhereHas('producto', fn($p) => $p->where('usuario_id', $usuarioId));
+        })
+        ->deEstados($estados)
+        ->with([
+            'producto:id,nombre,precio,vendedor_id',
+            'producto.vendedor:id,nickname,imagen',
+            'producto.fotos:id,producto_id,imagen',
+            'estado:id,nombre',
+        ])->get();
     }
 }
