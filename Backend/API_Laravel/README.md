@@ -1354,7 +1354,7 @@ MÉTODO: **PATCH**
 ```
 
 
-**3️⃣Terminar proceso de devolución**
+**4️⃣Terminar proceso de devolución**
 
 RUTA: **http://127.0.0.1:8000/api/chats/{chat_id}/terminar-devoluciones**
 
