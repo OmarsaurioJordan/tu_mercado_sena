@@ -560,11 +560,12 @@ Respuesta:
 
 **1️⃣Bloquear Usuario**
 
-Método: **Post**
+Método: **POST**
+
+👁️ **usuario_id = Id del usuario que se desea bloquear**
 
 
-
-Ruta: **http://127.0.0.1:8000/api/bloqueados/{usuarioId}**
+Ruta: **http://127.0.0.1:8000/api/bloqueados/{usuario_id}**
 ```
 
 **Respuesta**
@@ -605,9 +606,6 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados**
       "usuario_bloqueado": {
         "id": 1,
         "nickname": "XXXXXXXXX",
-        "imagen": "Imagen.jpg",
-        "descripcion": "XXXXX",
-        "link": null
       }
     }
   ]
