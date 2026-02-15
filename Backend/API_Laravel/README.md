@@ -564,13 +564,12 @@ Método: **POST**
 
 👁️ **usuario_id = Id del usuario que se desea bloquear**
 
-
 Ruta: **http://127.0.0.1:8000/api/bloqueados/{usuario_id}**
-```
 
 **Respuesta**
 
-```JSON
+
+```Json
 {
   "success": true,
   "message": "Usuarios bloqueados",
@@ -588,13 +587,16 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados/{usuario_id}**
 }
 ```
 
+
+
 **2️⃣Ver usuarios bloqueados**
 Método: **GET**
 
 Ruta: **http://127.0.0.1:8000/api/bloqueados**
 
 **Respuesta**
-```
+
+```Json
 {
   "success": true,
   "message": "Usuarios bloqueados",
@@ -612,8 +614,9 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados**
 }
 ```
 
-**3️⃣Desbloquear usuario**
 
+
+**3️⃣Desbloquear usuario**
 
 Método: **DELETE**
 
@@ -1290,7 +1293,7 @@ MÉTODO: **PATCH**
 
 **Restricciones**
 
-✖️ Solo el comprador puede termianr el proceso.
+✖️ Solo el comprador puede terminar el proceso.
 
 ✖️ El chat debe estar en esperando (estado_id = 6).
 
@@ -1331,6 +1334,52 @@ MÉTODO: **PATCH**
     "message": "Proceso cancelado"
 }
 ```
+
+**3️⃣Iniciar proceso de devolución**
+
+RUTA: **http://127.0.0.1:8000/api/chats/{chat_id}/iniciar-devoluciones**
+
+MÉTODO: **PATCH**
+
+**Restricciones**
+
+✖️ Solo el comprador puede iniciar el proceso.
+
+✖️ El estado del chat debe estar en vendido (estado_id = 5).
+
+**Salida Json**
+
+```Json
+{
+    "success": true,
+    "message": "Proceso de devolución iniciado, espera la confirmación del vendedor"
+}
+```
+
+
+**4️⃣Terminar proceso de devolución**
+
+RUTA: **http://127.0.0.1:8000/api/chats/{chat_id}/terminar-devoluciones**
+
+MÉTODO: **PATCH**
+
+**Restricciones**
+
+✖️ Solo el vendedor puede terminar el proceso.
+
+✖️ El estado del chat debe estar en devolviendo (estado_id = 7).
+
+✖️ Si ha pasado más de 3 días desde el inicio de devolución el estado del chat vuelve a vendido
+
+**Salida Json**
+
+```Json
+{
+    "success": true,
+    "message": "Devolución registrada con exito"
+}
+```
+
 
 
 
