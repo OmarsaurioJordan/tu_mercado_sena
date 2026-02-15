@@ -38,16 +38,16 @@ readonly class OutputDto implements Arrayable
      */
     public static function fromModel(Usuario $bloqueado): self
     {
-        #$bloqueado es una instancia de App\Models\Bloqueado con la relacion 'bloqueado' cargada
+        // Obtenemos el ID del bloqueador (quien está logueado)
+        $bloqueadorId = Auth::user()->usuario->id;
+
         return new self(
-            id: $bloqueado?->id ?? 0,
-            bloqueador_id: Auth::user()->usuario->id,
-            usuario_bloqueado: $bloqueado
-            ? [
-                'id' => $bloqueado->id,
-                'nickname'=> $bloqueado->nickname
+            id: $bloqueado->id, // El ID del registro (o del usuario bloqueado)
+            bloqueador_id: $bloqueadorId,
+            usuario_bloqueado: [
+                'id'       => $bloqueado->id,
+                'nickname' => $bloqueado->nickname
             ]
-            : []
         );
     }
 

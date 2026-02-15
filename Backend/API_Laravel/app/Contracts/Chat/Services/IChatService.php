@@ -61,4 +61,12 @@ interface IChatService
      * @return array - Arreglo con la confirmación de que inicio el proceso.
      */
     public function iniciarDevolucion(Chat $chat, int $usuarioId): array;
+
+    /**
+     * Función para el vendedor, el termina el proceso de devolución.
+     * @param Chat $chat - Modelo del chat.
+     * @param int $usuarioId - ID del usuario, para validar que sea el vendedor.
+     * @return array - Arreglo con la confirmación de que se concreto la validación
+     */
+    public function terminarDevolucion(Chat $chat, int $usuarioId);
 }

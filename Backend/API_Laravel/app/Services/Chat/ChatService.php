@@ -156,10 +156,12 @@ class ChatService implements IChatService
 
     public function terminarCompraventa(Chat $chat, array $datos): array
     {
+        // Validar que el estado del chat sea esperando
         if ($chat->estado_id !== self::ESTADO_ESPERANDO) {
             throw new BusinessException('El vendedor no ha iniciado el proceso de compraventa', 422);
         }
 
+        // Iniciar transacción 
         return DB::transaction(function () use ($chat, $datos) {
 
             if (!$datos['confirmacion']) {
@@ -172,11 +174,12 @@ class ChatService implements IChatService
                 ];
             }
 
+            // Actualizar el modelo 
             $chat->estado_id = self::ESTADO_VENDIDO;
             $chat->calificacion = $datos['calificacion'] ?? null;
             $chat->comentario = $datos['comentario'] ?? null;
             $chat->fecha_venta = Carbon::now();
-            $chat->save();
+            $chat->save(); // Guardar en la base de datos
 
             return [
                 'success' => true,
@@ -205,11 +208,49 @@ class ChatService implements IChatService
 
         Return DB::transaction(function () use ($chat) {
             $chat->estado_id = self::ESTADO_DEVOLVIENDO;
+            $chat->fecha_venta = Carbon::now();
             $chat->save();
 
             return [
                 'success' => true,
                 'message' => 'Proceso de devolución iniciado, espera la confirmación del vendedor'
+            ];
+        });
+    }
+
+    public function terminarDevolucion(Chat $chat, int $usuarioId): array
+    {   
+        // Obtener el vendedor a travez de las relaciones
+        $vendedor = $chat->producto->vendedor;
+        
+        // Parsear la fecha de venta de la base de datos para operaciones con fechas
+        $fecha_venta = Carbon::parse($chat->fecha_venta);
+
+        // Validar que el estado del chat sea devolviendo
+        if ($chat->estado_id !== self::ESTADO_DEVOLVIENDO) throw new BusinessException('La devolución no ha sido iniciada por el comprador', 422);
+
+        // Validar que solo el vendedor pueda terminar el proceso de devolución
+        if ($vendedor->id !== $usuarioId) throw new BusinessException('Solo el vendedor puede concretar la devolución', 422);
+
+        // Validar que el vendedor responda en el plazo de 3 días, si no volver al estado "vendido"
+        if ($fecha_venta->lt(Carbon::now()->subDays(3))) {
+            $chat->estado_id = self::ESTADO_VENDIDO;
+            $chat->save();
+
+            return [
+                'success' => false,
+                'Plazo de respuesta superado, devolución cancelada'
+            ];
+        }
+
+        return DB::transaction(function () use ($chat) {
+            $chat->estado_id = self::ESTADO_DEVUELTO;
+            $chat->fecha_venta = Carbon::now();
+            $chat->save();
+
+            return [
+                'success' => true,
+                'message' => 'Devolución registrada con exito'
             ];
         });
     }

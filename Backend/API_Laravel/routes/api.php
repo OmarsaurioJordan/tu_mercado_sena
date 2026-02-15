@@ -185,6 +185,10 @@ Route::middleware('jwtVerify')->group(function (){
     // Rutas para concretar una compraventa
     Route::patch('chats/{chat}/iniciar-compraventas', [ChatController::class, 'iniciarCompraVenta']);
     Route::patch('chats/{chat}/terminar-compraventas', [ChatController::class, 'terminarCompraVenta']);
+
+    // Rutas para devoluciones
+    Route::patch('chats/{chat}/iniciar-devoluciones', [ChatController::class, 'iniciarDevolucion']);
+    Route::patch('chats/{chat}/terminar-devoluciones', [ChatController::class, 'terminarDevolucion']);
     
     // RUTA: api/chats
     // Crea un nuevo chat entre el usuario autenticado y otro usuario (vendedor)

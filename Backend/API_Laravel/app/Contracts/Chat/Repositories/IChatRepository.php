@@ -65,6 +65,9 @@ interface IChatRepository
    * @return Chat $chat
    */
   public function update(int $id, array $data): Chat;
+
+  public function listarConFiltros(int $usuarioId, array $estados = []): Collection;
+
 }
 
 

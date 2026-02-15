@@ -73,4 +73,14 @@ class Chat extends Model
     {
         return $this->hasOne(Mensaje::class, 'chat_id')->latestOfMany();
     }
+
+    /**
+     * Scopes
+     */
+    public function scopeDeEstados($query, array $estados)
+    {
+        return $query->when(!empty($estados), function ($q) use ($estados) {
+            $q->whereIn('estado_id', $estados);
+        });
+    }
 }
