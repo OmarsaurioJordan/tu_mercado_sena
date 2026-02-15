@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cuenta_id')->unique()->constrained('cuentas')->cascadeOnDelete();
             $table->string('nickname', 32)->unique();
-            $table->string('imagen', 80);
+            $table->string('imagen', 80)->nullable();
             $table->string('descripcion', 512);
             $table->string('link', 128)->nullable();
             $table->foreignId('rol_id')->constrained('roles')->cascadeOnDelete();

@@ -42,7 +42,7 @@ class RegisterRequest extends FormRequest
             ],
 
             'imagen' => [
-                'required',
+                'nullable',
                 'file',
                 'max: 5120', // 5MB
                 'mimes:jpg,jpeg,png,webp'
