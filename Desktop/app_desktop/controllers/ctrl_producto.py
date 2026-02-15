@@ -1,7 +1,7 @@
 import requests
 from PySide6.QtCore import Signal, QObject
 from core.app_config import (
-    API_LIMIT_ITEMS, DEFAULT_INFO, API_BASE_URL, TIME_OUT
+    API_LIMIT_ITEMS, API_BASE_URL, TIME_OUT
 )
 from models.producto import Producto
 from core.session import Session
@@ -12,13 +12,13 @@ class CtrlProductoSignal(QObject):
 class CtrlProducto:
 
     def __init__(self):
-        self.usuario_signal = CtrlUsuarioSignal()
+        self.producto_signal = CtrlProductoSignal()
         self.limpiar()
     
     def limpiar(self, solo_busqueda=False):
         if not solo_busqueda:
-            self.usuarios = []
-        self.usuarios_busqueda = []
+            self.productos = []
+        self.productos_busqueda = []
         self.cursor_busqueda = {
             "cursor_fecha": "",
             "cursor_id": "",
@@ -27,20 +27,20 @@ class CtrlProducto:
             "filtros": {}
         }
 
-    # llamadas a la API para informacion de usuarios
+    # llamadas a la API para informacion de productos
 
-    def api_usuario(self, id=0):
+    def api_producto(self, id=0):
         params = {"id": id}
-        response = requests.get(API_BASE_URL + "usuarios", params=params, timeout=TIME_OUT)
+        response = requests.get(API_BASE_URL + "productos", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             data = response.json()
-            usr = self.new_usuario(data[0])
-            self.add_usuarios([usr], False)
-            self.usuario_signal.hubo_cambio.emit(usr.id)
-            return usr
+            prd = self.new_producto(data[0])
+            self.add_productos([prd], False)
+            self.producto_signal.hubo_cambio.emit(prd.id)
+            return prd
         return None
 
-    def api_usuarios(self, filtros={}):
+    def api_productos(self, filtros={}):
         if self.cursor_busqueda["finalizo"] or self.cursor_busqueda["running"]:
             return []
         self.cursor_busqueda["running"] = True
@@ -48,21 +48,21 @@ class CtrlProducto:
             filtros["limite"] = API_LIMIT_ITEMS
             filtros["cursor_fecha"] = self.cursor_busqueda["cursor_fecha"]
             filtros["cursor_id"] = self.cursor_busqueda["cursor_id"]
-            response = requests.get(API_BASE_URL + "usuarios", params=filtros, timeout=TIME_OUT)
-            usuarios = []
+            response = requests.get(API_BASE_URL + "productos", params=filtros, timeout=TIME_OUT)
+            productos = []
             if response.status_code == 200:
                 data = response.json()
                 for item in data:
-                    usr = self.new_usuario(item)
-                    usuarios.append(usr)
-                if len(usuarios) > 0:
-                    self.cursor_busqueda["cursor_fecha"] = usuarios[-1].fecha_registro
-                    self.cursor_busqueda["cursor_id"] = usuarios[-1].id
-                    self.add_usuarios(usuarios, True)
-                    self.usuario_signal.hubo_cambio.emit(0)
+                    prd = self.new_producto(item)
+                    productos.append(prd)
+                if len(productos) > 0:
+                    self.cursor_busqueda["cursor_fecha"] = productos[-1].fecha_registro
+                    self.cursor_busqueda["cursor_id"] = productos[-1].id
+                    self.add_productos(productos, True)
+                    self.producto_signal.hubo_cambio.emit(0)
                 else:
                     self.cursor_busqueda["finalizo"] = True
-            return usuarios
+            return productos
         finally:
             self.cursor_busqueda["running"] = False
         return []
@@ -73,15 +73,15 @@ class CtrlProducto:
         else:
             self.limpiar(True)
             self.cursor_busqueda["filtros"] = filtros
-        self.api_usuarios(filtros)
+        self.api_productos(filtros)
 
-    # administracion de agregacion de usuarios
+    # administracion de agregacion de productos
 
-    def add_usuarios(self, usuarios=[], from_busqueda=True):
-        for usr in usuarios:
-            self.set_in_list(self.usuarios, usr)
+    def add_productos(self, productos=[], from_busqueda=True):
+        for prd in productos:
+            self.set_in_list(self.productos, prd)
             if from_busqueda:
-                self.set_in_list(self.usuarios_busqueda, usr)
+                self.set_in_list(self.productos_busqueda, prd)
 
     def set_in_list(self, lista=[], value=None):
         for i in range(len(lista)):
@@ -90,21 +90,21 @@ class CtrlProducto:
                 return
         lista.append(value)
 
-    # obtencion de informacion de usuarios
+    # obtencion de informacion de productos
 
-    def get_usuario(self, id=0, forzado=False):
-        for usr in self.usuarios:
-            if usr.id == id:
-                return usr
-        for usr in self.usuarios_busqueda:
-            if usr.id == id:
-                return usr
+    def get_producto(self, id=0, forzado=False):
+        for prd in self.productos:
+            if prd.id == id:
+                return prd
+        for prd in self.productos_busqueda:
+            if prd.id == id:
+                return prd
         if forzado:
-            return self.api_usuario(id)
+            return self.api_producto(id)
         return None
     
     def get_busqueda(self):
-        return self.usuarios_busqueda
+        return self.productos_busqueda
 
     # llamadas a la API para modificar productos
     
@@ -125,10 +125,10 @@ class CtrlProducto:
     # metodos de apoyo
 
     def set_image(self, id=0):
-        self.usuario_signal.hubo_cambio.emit(id)
+        self.producto_signal.hubo_cambio.emit(id)
     
-    def new_usuario(self, data_json):
-        usr = Usuario.from_json(data_json)
-        usr.img_signal.ok_image.connect(self.set_image)
-        usr.load_image()
-        return usr
+    def new_producto(self, data_json):
+        prd = Producto.from_json(data_json)
+        prd.img_signal.ok_image.connect(self.set_image)
+        prd.load_images(True)
+        return prd

@@ -13,13 +13,14 @@ class Usuario:
         self.email = email
         self.rol_id = rol_id
         self.nickname = nickname
-        self.imagen = imagen
         self.descripcion = descripcion
         self.link = link
         self.estado_id = estado_id
         self.fecha_registro = fecha_registro
         self.fecha_actualiza = fecha_actualiza
         self.fecha_reciente = fecha_reciente
+        # carga de imagenes
+        self.imagen = imagen
         self.img_signal = UsuarioSignal()
         self.img_pix = QPixmap("assets/sprites/avatar.png")
         self.is_img_load = False

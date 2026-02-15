@@ -13,9 +13,9 @@ if (!isset($_GET["id"]) || !isset($_GET["rol"])) {
 $id = $_GET["id"];
 $rol = $_GET["rol"];
 
-if ($rol == 3) {
+if ($rol != 1 && $rol != 2) {
     http_response_code(404);
-    echo json_encode(["error" => "No puede ser master"]);
+    echo json_encode(["error" => "Rol inválido"]);
     exit;
 }
 

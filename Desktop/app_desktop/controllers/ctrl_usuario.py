@@ -86,10 +86,6 @@ class CtrlUsuario:
     def set_in_list(self, lista=[], value=None):
         for i in range(len(lista)):
             if lista[i].id == value.id:
-                existing = lista[i]
-                if not value.is_img_load and existing.is_img_load:
-                    value.img_pix = existing.img_pix
-                    value.imagen = existing.imagen
                 lista[i] = value
                 return
         lista.append(value)

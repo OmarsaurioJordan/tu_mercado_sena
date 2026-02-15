@@ -13,6 +13,12 @@ if (!isset($_GET["id"]) || !isset($_GET["estado"])) {
 $id = $_GET["id"];
 $estado = $_GET["estado"];
 
+if ($estado > 4 or $estado < 1) {
+    http_response_code(400);
+    echo json_encode(["error" => "estado inválido"]);
+    exit;
+}
+
 $sql = "UPDATE productos SET estado_id = ? WHERE id = ?";
 
 $stmt = $conn->prepare($sql);

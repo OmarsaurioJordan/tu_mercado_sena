@@ -33,20 +33,14 @@ if ($integridad_id != "0") {
 $estado_id = isset($_GET["estado_id"]) ? $_GET["estado_id"] : "0";
 if ($estado_id != "0") {
     switch ($estado_id) {
-        case "1":
-        case "2":
-        case "3":
-        case "4":
-            $cond .= " AND p.estado_id = " . $estado_id; // act, inv, elim, bloq
-            break;
-        case "5":
-            $cond .= " AND p.estado_id = 10"; // denunciado
-            break;
-        case "6":
+        case "100":
             $cond .= " AND p.estado_id IN (1, 2)"; // act-inv
             break;
-        case "6":
+        case "101":
             $cond .= " AND p.estado_id IN (4, 10)"; // bloq-denun
+            break;
+        default:
+            $cond .= " AND p.estado_id = " . $estado_id; // act, inv, elim, bloq
             break;
     }
 }

@@ -16,10 +16,12 @@ class UsuarioBody(QWidget):
         ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
         ctrlUsuario.usuario_signal.hubo_cambio.connect(self.actualizar)
 
+        ctrlData = QApplication.instance().property("controls").get_data()
+
         self.imagen = QLabel()
         self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
         self.imagen.setScaledContents(True)
-        self.imagen.setFixedSize(128, 128)
+        self.imagen.setFixedSize(192, 192)
         self.imagen.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
@@ -41,14 +43,12 @@ class UsuarioBody(QWidget):
         )
 
         laySelectores = QHBoxLayout()
-        self.sel_rol = Selector([
-            "Prosumer", "Admin"
-        ], "rol...", "Rol", 0, "usuario_rol")
+        self.sel_rol = Selector(ctrlData.get_roles_basicos(),
+            "rol...", "Rol", 0, "usuario_rol")
         laySelectores.addWidget(self.sel_rol)
         laySelectores.addSpacing(10)
-        self.sel_estado = Selector([
-            "Activo", "Invisible", "Eliminado", "Bloqueado"
-        ], "estado...", "Estado", 0, "usuario_estado")
+        self.sel_estado = Selector(ctrlData.get_estados_basicos(),
+            "estado...", "Estado", 0, "usuario_estado")
         laySelectores.addWidget(self.sel_estado)
 
         self.link = QLabel("")
@@ -160,8 +160,8 @@ class UsuarioBody(QWidget):
         self.registro.setText("Registro\n" + usuario.fecha_registro.replace(" ", "\n"))
         self.edicion.setText("Edición\n" + usuario.fecha_actualiza.replace(" ", "\n"))
         self.actividad.setText("Actividad\n" + usuario.fecha_reciente.replace(" ", "\n"))
-        self.sel_rol.set_index(0 if usuario.rol_id == 1 else 1)
-        self.sel_estado.set_index(usuario.estado_id - 1)
+        self.sel_rol.set_index_from_data(usuario.rol_id)
+        self.sel_estado.set_index_from_data(usuario.estado_id)
         self.sel_rol.set_ente_id(usuario.id)
         self.sel_estado.set_ente_id(usuario.id)
         self.imagen.setPixmap(usuario.img_pix)

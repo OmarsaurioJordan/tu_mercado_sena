@@ -54,7 +54,7 @@ class ProductoCard(QFrame):
             return
         self.imagen.setPixmap(producto.get_portada())
         self.nombre.setText(producto.nombre)
-        self.vendedor.setText(producto.vendedorNickname())
+        self.vendedor.setText(producto.vendedor_nickname)
         self.estado_color = {
             1: "#e6e5e5", # activo
             2: "#d2edf8", # invisible

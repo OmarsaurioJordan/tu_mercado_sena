@@ -5,8 +5,11 @@ from PySide6.QtCore import Qt
 from components.scroll import Scroll
 from components.buscador import Buscador
 from ui.usuario_body import UsuarioBody
+from ui.producto_body import ProductoBody
 from ui.usuario_filter import Usuariofilter
 from ui.usuario_busqueda import UsuarioBusqueda
+from ui.producto_filter import ProductoFilter
+from ui.producto_busqueda import ProductoBusqueda
 
 class ToolsWidget(QWidget):
 
@@ -15,9 +18,11 @@ class ToolsWidget(QWidget):
 
         manager = QApplication.instance().property("controls")
         self.ctrlUsuario = manager.get_usuarios()
+        self.ctrlProducto = manager.get_productos()
 
         tabsA = QTabWidget()
-        tabsA.addTab(Scroll(), "Producto")
+        productoBody = ProductoBody()
+        tabsA.addTab(Scroll(productoBody), "Producto")
         tabsA.addTab(Scroll(), "PQRS")
         tabsA.addTab(Scroll(), "Denuncia")
         tabsA.addTab(Scroll(), "Chat")
@@ -45,7 +50,19 @@ class ToolsWidget(QWidget):
             lambda user_id: self.buscarUsuario(user_id, usuarioBody)
         )
         # estructura de la busqueda de productos
-        tabsFind.addTab(Buscador(), "Productos")
+        productoFilter = ProductoFilter()
+        productoBusqueda = ProductoBusqueda()
+        tabsFind.addTab(Buscador(productoFilter, productoBusqueda), "Productos")
+        productoFilter.clicAplicar.connect(
+            lambda filtros: self.buscarProductos(filtros, productoBusqueda, productoBody)
+        )
+        productoBusqueda.scroll_at_end.connect(
+            lambda: self.rebuscarProductos()
+        )
+        productoBusqueda.card_clic.connect(
+            lambda prod_id: self.buscarProducto(prod_id, productoBody)
+        )
+        # estructura de la busqueda de PQRS
         tabsFind.addTab(Buscador(), "PQRSs")
         tabsFind.addTab(Buscador(), "Denuncias")
         tabsFind.addTab(Buscador(), "Chats")
@@ -73,3 +90,16 @@ class ToolsWidget(QWidget):
     def buscarUsuario(self, user_id, widgetResultado):
         usuario = self.ctrlUsuario.get_usuario(user_id)
         widgetResultado.setData(usuario)
+    
+    def buscarProductos(self, filtros, widgetResultado, widgetReset):
+        widgetResultado.eliminar_productos()
+        widgetReset.resetData()
+        self.ctrlProducto.do_busqueda(filtros=filtros)
+    
+    def rebuscarProductos(self):
+        self.ctrlProducto.do_busqueda(rebusqueda=True)
+
+    def buscarProducto(self, prod_id, widgetResultado):
+        producto = self.ctrlProducto.get_producto(prod_id)
+        widgetResultado.setData(producto)
+        producto.load_images()

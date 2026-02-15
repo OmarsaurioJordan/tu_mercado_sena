@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout
+    QWidget, QVBoxLayout, QApplication
 )
 from PySide6.QtCore import QDate, Signal
 from components.txt_edit import TxtEdit
@@ -10,7 +10,7 @@ from components.date_edit import DateEdit
 from components.boton import Boton
 from core.app_config import PRECIO_MAX
 
-class Usuariofilter(QWidget):
+class ProductoFilter(QWidget):
     clicAplicar = Signal(dict)
 
     def __init__(self):
@@ -21,17 +21,31 @@ class Usuariofilter(QWidget):
         self.txtNombre = TxtEdit("Nombre", "nombre")
         layVertical.addWidget(self.txtNombre)
 
+        ctrlData = QApplication.instance().property("controls").get_data()
+
+        self.selCategoria = Selector(
+            [["Todas", 0]] + ctrlData.get_to_selector("categorias"),
+            "categ...", "Categoria", 0
+        )
+        self.selCategoria.onCambio.connect(self.cambioCategoria)
+        layVertical.addWidget(self.selCategoria)
+        self.selSubcategoria = Selector(
+            [["Todas", 0]] + ctrlData.get_to_selector("subcategorias"),
+            "subcat...", "Subcategoria", 0
+        )
+        layVertical.addWidget(self.selSubcategoria)
 
         self.selIntegridad = Selector(
-            ["Todas", "Nuevo", "Usado", "Reparado", "Reciclable"],
+            [["Todas", 0]] + ctrlData.get_to_selector("integridad"),
             "integ...", "Integridad", 0
         )
         layVertical.addWidget(self.selIntegridad)
         self.selEstado = Selector(
-            ["Todos", "Activo", "Invisible", "Eliminado", "Bloqueado", "Denunciado", "Act-Inv", "Bloq-Denun"],
+            [["Todos", 0]] + ctrlData.get_estados_basicos() + [["Act-Inv", 100], ["Bloq-Denun", 101]],
             "estado...", "Estado", 1
         )
         layVertical.addWidget(self.selEstado)
+
         self.chkTexto = Checkbox("Con Texto")
         layVertical.addWidget(self.chkTexto)
         self.precio_min = SpinBox("Precio min", 0, PRECIO_MAX, 0)
@@ -56,10 +70,10 @@ class Usuariofilter(QWidget):
     def obtener_filtros(self):
         filtros = {
             "nombre": self.txtNombre.get_value(),
-            "categoria_id": self.selCategoria.get_index(),
-            "subcategoria_id": self.selSubcategoria.get_index(),
-            "integridad_id": self.selIntegridad.get_index(),
-            "estado_id": self.selEstado.get_index(),
+            "categoria_id": self.selCategoria.get_data(),
+            "subcategoria_id": self.selSubcategoria.get_data(),
+            "integridad_id": self.selIntegridad.get_data(),
+            "estado_id": self.selEstado.get_data(),
             "precio_min": self.precio_min.get_value(),
             "precio_max": self.precio_max.get_value(),
             "con_descripcion": self.chkTexto.get_bool(),
@@ -67,3 +81,11 @@ class Usuariofilter(QWidget):
             "registro_hasta": self.date_registro_max.get_value_utc()
         }
         return filtros
+    
+    def cambioCategoria(self):
+        ctrlData = QApplication.instance().property("controls").get_data()
+        ind = self.selCategoria.get_data()
+        if ind == 0:
+            self.selSubcategoria.set_items([["Todas", 0]] + ctrlData.get_to_selector("subcategorias"))
+        else:
+            self.selSubcategoria.set_items([["Todas", 0]] + ctrlData.get_subcategorias_to_selector(ind))
