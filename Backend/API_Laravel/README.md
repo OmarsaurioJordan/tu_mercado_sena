@@ -562,13 +562,9 @@ Respuesta:
 
 Método: **Post**
 
-Ruta: **http://127.0.0.1:8000/api/bloqueados**
 
-```JSON
-{
-  "bloqueador_id": 2,
-  "bloqueado_id": 1
-}
+
+Ruta: **http://127.0.0.1:8000/api/bloqueados/{usuarioId}**
 ```
 
 **Respuesta**
@@ -585,9 +581,6 @@ Ruta: **http://127.0.0.1:8000/api/bloqueados**
       "usuario_bloqueado": {
         "id": 1,
         "nickname": "Nickname",
-        "imagen": "Imagen.jpg",
-        "descripcion": "XXXXXXXXX",
-        "link": null
       }
     }
   ]
@@ -1258,6 +1251,90 @@ o en un formulario, con el nombre o id **imagen** para mandar una imagen.
 ```
 
 ⚠️ Si una de las partes que no ha borrado el chat, envia un mensaje luego que la otra la borro, vuelve activar el chat para la parte que lo borro.
+
+**MODULO DE TRANSFERENCIA 🚧🚧🚧**
+
+**1️⃣Iniciar proceso de compraventa**
+
+RUTA: **http://127.0.0.1:8000/api/chats/2/iniciar-compraventas**
+
+MÉTODO: **PATCH**
+
+**Restricciones**
+
+✖️ Solo el vendedor puede iniciar el proceso.
+
+✖️ El chat debe estar activo.
+
+**Datos a enviar**
+
+```Json
+{
+    "cantidad": 1,
+    "precio": 70000
+}
+```
+
+**Respuesta**
+
+```Json
+{
+    "success": true,
+    "message": "Proceso iniciado, espera la confirmación del comprador"
+}
+```
+
+**2️⃣Terminar proceso de compraventa**
+
+RUTA: **http://127.0.0.1:8000/api/chats/2/terminar-compraventas**
+
+MÉTODO: **PATCH**
+
+**Restricciones**
+
+✖️ Solo el comprador puede termianr el proceso.
+
+✖️ El chat debe estar en esperando (estado_id = 6).
+
+**Si el comprador acepta, el estado del chat cambia a vendido**
+
+**Datos a enviar**
+
+```Json
+{
+    "confirmacion": true,
+    "comentario": "Buenos auriculares",
+    "calificacion": 4
+}
+```
+
+**Respuesta**
+
+```Json
+{
+    "success": true,
+    "message": "Venta concretada con exito"
+}
+```
+
+**Si el comprador rechaza, el estado del chat cambia a activo**
+
+```Json
+{
+    "confirmacion": false,
+}
+```
+
+**Respuesta**
+
+```Json
+{
+    "success": true,
+    'message' => 'Proceso cancelado'
+}
+```
+
+
 
 
 
