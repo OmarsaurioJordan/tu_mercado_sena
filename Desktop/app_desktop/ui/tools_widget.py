@@ -102,4 +102,3 @@ class ToolsWidget(QWidget):
     def buscarProducto(self, prod_id, widgetResultado):
         producto = self.ctrlProducto.get_producto(prod_id)
         widgetResultado.setData(producto)
-        producto.load_images()

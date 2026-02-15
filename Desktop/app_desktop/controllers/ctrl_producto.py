@@ -121,6 +121,15 @@ class CtrlProducto:
                 self.api_producto(id)
             return res
         return False
+    
+    def set_integridad(self, id=0, integridad=0):
+        return False
+    
+    def set_subcategoria(self, id=0, subcategoria=0):
+        return False
+    
+    def set_categoria(self, id=0, categoria=0):
+        return False
 
     # metodos de apoyo
 

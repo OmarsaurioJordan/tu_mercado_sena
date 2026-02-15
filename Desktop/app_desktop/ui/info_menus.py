@@ -36,7 +36,7 @@ class InfoMenus(QWidget):
         layDer.addStretch()
         layDer.addWidget(btnWeb)
 
-        if widget == None:
+        if widget is None:
             widget = QLabel()
 
         layFondo = QHBoxLayout()

@@ -60,7 +60,7 @@ class UsuarioCard(QFrame):
         self.setData(usuario)
 
     def setData(self, usuario):
-        if usuario == None:
+        if usuario is None:
             return
         self.rol.setText("M" if usuario.rol_id == 3 else ("A" if usuario.rol_id == 2 else ""))
         self.imagen.setPixmap(usuario.img_pix)

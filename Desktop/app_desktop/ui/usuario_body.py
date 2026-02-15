@@ -54,6 +54,8 @@ class UsuarioBody(QWidget):
         self.link = QLabel("")
         self.link.setWordWrap(True)
         self.link.setStyleSheet("color: #777777;")
+        self.link.setOpenExternalLinks(True)
+        self.link.setTextFormat(Qt.RichText)
         self.link.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
@@ -143,7 +145,7 @@ class UsuarioBody(QWidget):
         self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
 
     def setData(self, usuario):
-        if usuario == None:
+        if usuario is None:
             self.resetData()
             return
         self.id = usuario.id
@@ -156,7 +158,7 @@ class UsuarioBody(QWidget):
         if usuario.link == "":
             self.link.setText("*** link ***")
         else:
-            self.link.setText(usuario.link)
+            self.link.setText("<a href=" + usuario.link + ">" + usuario.link + "</a>")
         self.registro.setText("Registro\n" + usuario.fecha_registro.replace(" ", "\n"))
         self.edicion.setText("Edición\n" + usuario.fecha_actualiza.replace(" ", "\n"))
         self.actividad.setText("Actividad\n" + usuario.fecha_reciente.replace(" ", "\n"))

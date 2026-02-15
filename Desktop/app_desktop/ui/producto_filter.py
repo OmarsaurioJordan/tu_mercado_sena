@@ -18,7 +18,7 @@ class ProductoFilter(QWidget):
 
         layVertical = QVBoxLayout()
         layVertical.setSpacing(10)
-        self.txtNombre = TxtEdit("Nombre", "nombre")
+        self.txtNombre = TxtEdit("Producto", "nombre")
         layVertical.addWidget(self.txtNombre)
 
         ctrlData = QApplication.instance().property("controls").get_data()
@@ -29,8 +29,9 @@ class ProductoFilter(QWidget):
         )
         self.selCategoria.onCambio.connect(self.cambioCategoria)
         layVertical.addWidget(self.selCategoria)
+        textos = self.limitar_textos(ctrlData.get_to_selector("subcategorias"))
         self.selSubcategoria = Selector(
-            [["Todas", 0]] + ctrlData.get_to_selector("subcategorias"),
+            [["Todas", 0]] + textos,
             "subcat...", "Subcategoria", 0
         )
         layVertical.addWidget(self.selSubcategoria)
@@ -86,6 +87,18 @@ class ProductoFilter(QWidget):
         ctrlData = QApplication.instance().property("controls").get_data()
         ind = self.selCategoria.get_data()
         if ind == 0:
-            self.selSubcategoria.set_items([["Todas", 0]] + ctrlData.get_to_selector("subcategorias"))
+            textos = self.limitar_textos(ctrlData.get_to_selector("subcategorias"))
+            self.selSubcategoria.set_items([["Todas", 0]] + textos)
         else:
-            self.selSubcategoria.set_items([["Todas", 0]] + ctrlData.get_subcategorias_to_selector(ind))
+            textos = self.limitar_textos(ctrlData.get_subcategorias_to_selector(ind))
+            self.selSubcategoria.set_items([["Todas", 0]] + textos)
+
+    def limitar_textos(self, textos, max_len=23):
+        for txt in textos:
+            txt[0] = self.limitar_texto(txt[0], max_len)
+        return textos
+
+    def limitar_texto(self, texto, max_len=23):
+        if len(texto) <= max_len:
+            return texto
+        return texto[:max_len-3] + "..."

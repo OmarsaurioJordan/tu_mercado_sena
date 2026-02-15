@@ -20,7 +20,7 @@ class HeaderLayout(QVBoxLayout):
             admin = self.usuario_debug()
         else:
             admin = ctrlUsuario.get_usuario(admin_id, True)
-            if admin == None:
+            if admin is None:
                 admin_id = 0
                 admin = self.usuario_debug()
 
@@ -66,7 +66,7 @@ class HeaderLayout(QVBoxLayout):
         layHorizontal.addWidget(UsuarioCard(admin))
         self.addWidget(header)
         
-        if widget == None:
+        if widget is None:
             self.addWidget(QLabel())
         else:
             self.addWidget(widget)

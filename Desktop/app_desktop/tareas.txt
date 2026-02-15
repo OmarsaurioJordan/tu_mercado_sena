@@ -1,15 +1,10 @@
 TAREAS:
 ...
+- primer clic en producto ficha con multiples imágenes, no deja resaltada la ficha
 - revisar si quitar imagen desde tms y refrescar usuario, ejemplo al cambiar estado, quita o cambia imagen
-- filtros, limitar talla de subcategoria, recortar textos
 - están fallando algunos filtros de producto, revisar todos
-- imágenes secundarias no se muestran a tiempo en UI, como si no refrescara interfaz, primer clic a ficha con img extra no selecciona bien la ficha
-- cambiar 'nombre' por 'producto' en filtros
-- precio quitar punto decimal
-- colocar funciones set cat subcat integr en controller? aún con pass
 - seleccionar producto muestra usuario asociado
 - seleccionar usuario muestra producto asociado o ninguno
 - al actualizar body si no coinciden con busqueda, desresaltar busqueda
-- link de perfil de usuario navegable
 - limpiar controladores al cerrar sesion
 ...

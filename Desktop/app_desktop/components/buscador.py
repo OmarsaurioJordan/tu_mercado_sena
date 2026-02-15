@@ -10,9 +10,9 @@ class Buscador(QWidget):
         layBusqueda = QHBoxLayout()
         layBusqueda.setSpacing(10)
         layBusqueda.setContentsMargins(0, 0, 0, 0)
-        if widgetFiltro == None:
+        if widgetFiltro is None:
             widgetFiltro = QLabel()
-        if widgetResultado == None:
+        if widgetResultado is None:
             widgetResultado = QLabel()
         layBusqueda.addWidget(widgetFiltro, 1)
         self.scroll = Scroll(widgetResultado)

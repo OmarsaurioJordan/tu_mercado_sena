@@ -8,6 +8,7 @@ from components.selector import Selector
 class ProductoBody(QWidget):
     def __init__(self):
         super().__init__()
+        self.current_product = None
         self.id = 0
 
         ctrlProducto = QApplication.instance().property("controls").get_productos()
@@ -117,7 +118,16 @@ class ProductoBody(QWidget):
         )
         return label
 
+    def changeProducto(self, producto=None):
+        if self.current_product is not None:
+            try:
+                self.current_product.img_signal.ok_image.disconnect(self.on_image_loaded)
+            except Exception:
+                pass
+        self.current_product = producto
+
     def resetData(self):
+        self.changeProducto(None)
         self.id = 0
         self.nombre.setText("*** ??? ***")
         self.descripcion.setText("*** descripción vacía ***")
@@ -137,22 +147,31 @@ class ProductoBody(QWidget):
         self.limpiarImagenes()
 
     def limpiarImagenes(self):
-        while self.imagenes.count() > 0:
+        while self.imagenes.count():
             item = self.imagenes.takeAt(0)
             widget = item.widget()
-            widget.deleteLater()
+            if widget is not None:
+                widget.setParent(None)
+                widget.deleteLater()
+            del item
+        self.imagenes.update()
+        self.update()
 
     def setData(self, producto):
-        if producto == None:
+        if producto is None:
             self.resetData()
             return
+        self.changeProducto(producto)
+        producto.img_signal.ok_image.connect(self.on_image_loaded)
+        producto.load_images()
+
         self.id = producto.id
         self.nombre.setText(producto.nombre)
         if producto.descripcion == "":
             self.descripcion.setText("*** descripción vacía ***")
         else:
             self.descripcion.setText(producto.descripcion)
-        self.precio.setText("Precio\n$ " + str(producto.precio))
+        self.precio.setText("Precio\n$ " + str(int(producto.precio)))
         self.disponibles.setText("Disponibles\n" + str(producto.disponibles))
         self.registro.setText("Registro\n" + producto.fecha_registro.replace(" ", "\n"))
         fecha_actualiza = producto.fecha_actualiza or ""
@@ -168,14 +187,19 @@ class ProductoBody(QWidget):
         self.sel_subcategoria.set_ente_id(producto.id)
         self.sel_integridad.set_ente_id(producto.id)
         self.sel_estado.set_ente_id(producto.id)
-        self.imagen.setPixmap(producto.get_portada())
-        self.limpiarImagenes()
-        imgs = producto.get_no_portada()
-        for img in imgs:
-            self.imagenes.addWidget(self.setImagen(img), alignment=Qt.AlignCenter)
-            self.imagenes.addSpacing(4)
+        self.on_image_loaded(producto.id)
 
     def actualizar(self, id=0):
         if id == self.id:
             ctrlProducto = QApplication.instance().property("controls").get_productos()
             self.setData(ctrlProducto.get_producto(id))
+
+    def on_image_loaded(self, prod_id):
+        if self.current_product and self.current_product.id == prod_id:
+            self.imagen.setPixmap(self.current_product.get_portada().copy())
+            self.imagen.repaint()
+            self.limpiarImagenes()
+            for img in self.current_product.get_no_portada():
+                self.imagenes.addWidget(self.setImagen(img.copy()), alignment=Qt.AlignCenter)
+                self.imagenes.addSpacing(4)
+            self.update()

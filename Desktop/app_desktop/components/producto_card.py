@@ -50,9 +50,10 @@ class ProductoCard(QFrame):
         self.setData(producto)
 
     def setData(self, producto):
-        if producto == None:
+        if producto is None:
             return
-        self.imagen.setPixmap(producto.get_portada())
+        self.imagen.setPixmap(producto.get_portada().copy())
+        self.imagen.repaint()
         self.nombre.setText(producto.nombre)
         self.vendedor.setText(producto.vendedor_nickname)
         self.estado_color = {
