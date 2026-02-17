@@ -3,25 +3,28 @@
 namespace App\DTOs\Usuario\EditarPerfil;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Http\Request;
+
 
 
 class InputDto implements Arrayable
 {
     public function __construct(
-        public ?string $imagen = null,
+        public ?UploadedFile $imagen = null,
         public ?string $nickname = null,
         public ?string $descripcion = null,
         public ?string $link = null
     )
     {}
 
-    public static function fromRequest(array $data): self 
+    public static function fromRequest(Request $request): self 
     {
         return new self(
-            imagen: $data['imagen'] ?? null,
-            nickname: $data['nickname'] ?? null,
-            descripcion: $data['descripcion'] ?? null,
-            link: $data['link'] ?? null
+            imagen: $request->file('imagen') ?? null,
+            nickname: $request->input('nickname') ?? null,
+            descripcion: $request->input('descripcion') ?? null,
+            link: $request->input('link') ?? null
         );
     }
 

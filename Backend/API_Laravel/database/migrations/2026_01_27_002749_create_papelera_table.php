@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('papelera', function (Blueprint $table) {
             $table->id();
             $table->foreignId('usuario_id')->constrained('usuarios', 'id')->cascadeOnDelete();
-            $table->string('mensaje', 512);
-            $table->string('imagen', 80);
+            $table->string('mensaje', 512)->nullable();
+            $table->string('imagen', 80)->nullable();
             $table->timestamp('fecha_registro')->useCurrent();
         });
     }

@@ -26,14 +26,15 @@ class EditarPerfilRequest extends FormRequest
         return [
             'imagen' => [
                 'sometimes',
-                'string',
-                'max:80'
+                'file',
+                'max: 5120', // 5MB
+                'mimes:jpg,jpeg,png,webp'
             ],
             'nickname' => [
                 'sometimes',
                 'string',
                 'max:32',
-                Rule::unique('usuarios', 'nickname')->ignore($this->user()->id)            
+                Rule::unique('usuarios', 'nickname')->ignore($this->user()->usuario->id)            
             ],
             'descripcion' => [
                 'sometimes',
@@ -52,7 +53,9 @@ class EditarPerfilRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'imagen.max' => 'Se exedio el limite de caracteres permitidos',
+            'imagen.file' => 'El campo imagen debe ser un archivo válido.',
+            'imagen.max' => 'La imagen no debe exceder los 5MB.',
+            'imagen.mimes' => 'La imagen debe ser un archivo de tipo: jpg, jpeg, png, webp.',
 
             'nickname.unique' => 'Este nickname ya está registrado por otro usuario.',            
             'nickname.string' => 'Nickname inválido',
