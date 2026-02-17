@@ -59,7 +59,7 @@ class UsuarioService implements IUsuarioService
 
                     $nombre = uniqid() . '.webp';
                     $ruta = "usuario/{$usuario->id}/{$nombre}";
-                    $rutaPapelera = "papelera{$usuario->id}/{$nombre}";
+                    $rutaPapelera = "papelera/{$usuario->id}/{$nombre}";
 
                     // Enviar la imagen a una ruta temporal
                     Storage::disk('public')->put($ruta, $image->toString());             

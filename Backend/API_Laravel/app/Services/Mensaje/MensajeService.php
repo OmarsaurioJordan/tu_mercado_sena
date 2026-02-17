@@ -31,6 +31,7 @@ class MensajeService implements IMensajeService
             // Log de información
             Log::info('Datos del mensaje a crear:', $data);
 
+            $rutaPapelera = null;
             // Redimensionar y crear la ruta de la imagen, que se guardara en la base de datos
             if ($file instanceof UploadedFile) {
                 $image = Image::read($file->getPathname())
@@ -39,8 +40,10 @@ class MensajeService implements IMensajeService
 
                 $nombre = uniqid() . '.webp';
                 $ruta = "mensajes/{$chat->id}/{$nombre}";
+                $rutaPapelera = "papelera/chat/{$chat->id}/{$nombre}";
 
                 Storage::disk('public')->put($ruta, $image->toString());
+                Storage::disk('public')->put($rutaPapelera, $image->toString());
 
                 $data['imagen'] = $ruta;
             }
@@ -74,11 +77,32 @@ class MensajeService implements IMensajeService
 
             // Actualizar el estado de visto del chat según el remitente del mensaje
             if ($mensaje->es_comprador) {
+
+                if (!$file) {
+                    $compradorId = $chat->comprador->id;
+
+                    DB::table('papelera')->insert([
+                        'usuario_id' => $compradorId,
+                        'mensaje' => $data['mensaje'],
+                        'imagen' => $rutaPapelera
+                    ]);
+                }
+
                 $chat->update([
                     'visto_comprador' => true,
                     'visto_vendedor' => false,
                 ]);
             } else {
+                if (!$file) {
+                    $vendedorId = $chat->producto->vendedor->id;
+
+                    DB::table('papelera')->insert([
+                        'usuario_id' => $vendedorId,
+                        'mensaje' => $data['mensaje'],
+                        'imagen' => $rutaPapelera
+                    ]);
+                }
+
                 $chat->update([
                     'visto_vendedor' => true,
                     'visto_comprador' => false,
@@ -108,7 +132,7 @@ class MensajeService implements IMensajeService
            $mensajeBorrado = $this->mensajeRepository->delete($mensaje->id);
 
             if (!$mensajeBorrado) {
-                throw new \Exception("No se pudo eliminar el mensaje, Intente nuevamente.");
+                throw new \Exception("No se pudo eliminar el mensaje, Intente nuevamente.", 500);
             }
 
             return $mensajeBorrado;
