@@ -40,6 +40,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
                 // 2. Errores de Validación (FormRequests)
                 if ($e instanceof ValidationException) {
+                    // Logs para encontrar el error (evita métodos inexistentes)
+                    Log::error('Datos ingresados por el usuario', [
+                        'errors' => $e->errors(),
+                        // Registrar inputs (excluir contraseñas) y archivos del request
+                        'input' => $request->except(['password', 'password_confirmation']),
+                    ]);
+
                     return response()->json([
                         'status'  => 'error',
                         'message' => 'Los datos proporcionados no son válidos.',

@@ -133,8 +133,9 @@ class RegistroService implements IRegistroService
             throw new BusinessException("El correo ya fue registrado", 422);
         }
 
-        // Iniciarlizar la variable Ruta
+        // Iniciarlizar las variable Ruta
         $rutaImagen = null;
+        $rutaPapelera = null;
 
         // Validar que haya llegado la ruta de la imagen del mapeado de los datos
         if (!empty($dto->ruta_imagen)) {
@@ -142,24 +143,29 @@ class RegistroService implements IRegistroService
             // Obtener la ruta temporal y moverlo hacia la ruta donde se guardan las imagenes
             $origen = $dto->ruta_imagen;
             $destino = "usuarios/{$cuenta->id}/" . basename($origen);
+            $rutaPapelera = "papelera/{$cuenta->id}/" . basename($origen);
 
             // Validar si existe esa ruta que llego de los datos encriptados
             if (Storage::disk('public')->exists($origen)) {
+                
+                Storage::disk('public')->copy($origen, $rutaPapelera);
+
                 // Moverlo hacia la ruta 
                 Storage::disk('public')->move($origen, $destino);
                 $rutaImagen = $destino;
+
             }
         }
 
-        if (!$rutaImagen) {
-            throw new BusinessException('La imagen es obligatoria', 422);
-        }
+        // if (!$rutaImagen) {
+        //     throw new BusinessException('La imagen es obligatoria', 422);
+        // }
         
         // 3. Datos finales para persistencia
         $data = $dto->toArray($rutaImagen);
 
         // 4. Ejecución atómica
-        return DB::transaction(function () use ($data, $dto, $clave, $cuenta, $dispositivo) {
+        return DB::transaction(function () use ($data, $dto, $clave, $cuenta, $dispositivo, $rutaPapelera) {
 
             // Verificar clave
             $this->verificarClave($dto->email, $clave);
@@ -185,6 +191,13 @@ class RegistroService implements IRegistroService
                 'dispositivo' => $dispositivo,
                 'jti'         => $payload->get('jti'),
                 'ultimo_uso'  => Carbon::now()
+            ]);
+
+            // Insertar datos en la papelera
+            DB::table('papelera')->insert([
+                'usuario_id' => $usuario->id,
+                'mensaje' => null,
+                'imagen' => $rutaPapelera
             ]);
 
             return [
