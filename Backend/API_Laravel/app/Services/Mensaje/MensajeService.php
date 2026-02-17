@@ -12,6 +12,7 @@ use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 
 class MensajeService implements IMensajeService
@@ -57,7 +58,7 @@ class MensajeService implements IMensajeService
             }
 
             // Reactivar el chat si uno de los participantes lo había borrado
-            if ($chat->estado_id === 4 || $chat->estado_id === 5) {
+            if ($chat->estado_id === 12 || $chat->estado_id === 11) {
                 $chat->update(['estado_id' => 1]);
             }
 
@@ -84,7 +85,8 @@ class MensajeService implements IMensajeService
                     DB::table('papelera')->insert([
                         'usuario_id' => $compradorId,
                         'mensaje' => $data['mensaje'],
-                        'imagen' => $rutaPapelera
+                        'imagen' => $rutaPapelera,
+                        'fecha_registro' => Carbon::now()
                     ]);
                 }
 
@@ -99,7 +101,8 @@ class MensajeService implements IMensajeService
                     DB::table('papelera')->insert([
                         'usuario_id' => $vendedorId,
                         'mensaje' => $data['mensaje'],
-                        'imagen' => $rutaPapelera
+                        'imagen' => $rutaPapelera,
+                        'fecha_registro' => Carbon::now()
                     ]);
                 }
 

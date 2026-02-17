@@ -13,8 +13,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\JWTGuard;
 use App\Exceptions\BusinessException;
-use Illuminate\Http\UploadedFile;
-use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 
 class RegistroService implements IRegistroService
@@ -193,12 +191,15 @@ class RegistroService implements IRegistroService
                 'ultimo_uso'  => Carbon::now()
             ]);
 
-            // Insertar datos en la papelera
-            DB::table('papelera')->insert([
-                'usuario_id' => $usuario->id,
-                'mensaje' => null,
-                'imagen' => $rutaPapelera
-            ]);
+            if(!$data['imagen']) {
+                // Insertar datos en la papelera
+                DB::table('papelera')->insert([
+                    'usuario_id' => $usuario->id,
+                    'mensaje' => null,
+                    'imagen' => $rutaPapelera,
+                    'fecha_registro' => Carbon::now()
+                ]);
+            }
 
             return [
                 'user'       => $usuario,

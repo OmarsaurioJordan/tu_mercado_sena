@@ -6,6 +6,7 @@ use App\Contracts\Usuario\Services\IUsuarioService;
 use App\Contracts\Usuario\Repositories\IUsuarioRepository;
 use App\DTOs\Usuario\EditarPerfil\InputDto;
 use App\Exceptions\BusinessException;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,7 @@ class UsuarioService implements IUsuarioService
         }
 
         DB::transaction(function () use ($usuario, $dto) {
-            if (!empty($dto->imagen)){
+            if ($dto->imagen){
                 // Validar que haya llegado la ruta de la imagen del mapeado de los datos
                 $file = request()->file('imagen');
 
@@ -69,7 +70,8 @@ class UsuarioService implements IUsuarioService
                 DB::table('papelera')->insert([
                     'usuario_id' => $usuario->id,
                     'mensaje' => null,
-                    'imagen' => $rutaPapelera
+                    'imagen' => $rutaPapelera,
+                    'fecha_registro' => Carbon::now()
                 ]);
             }
 
