@@ -1,17 +1,10 @@
 TAREAS:
 ...
-- al modificar estado usuario, recargar modelo
-- imagenes se guardan en modelo, este hace el hilo
-- obtener los productos filtrados:
-  - API productos
-  - controlador productos
-  - interfaz productos
-    - fichas productos
-    - filtro productos
-    - producto detalles
-    - cargar imágenes
-- link de perfil de usuario navegable
-- usar token en todas las llamadas API, seguridad
-- limpiar cosas de anterior seleccionado en tools
+- primer clic en producto ficha con multiples imágenes, no deja resaltada la ficha
+- revisar si quitar imagen desde tms y refrescar usuario, ejemplo al cambiar estado, quita o cambia imagen
+- están fallando algunos filtros de producto, revisar todos
+- seleccionar producto muestra usuario asociado
+- seleccionar usuario muestra producto asociado o ninguno
+- al actualizar body si no coinciden con busqueda, desresaltar busqueda
 - limpiar controladores al cerrar sesion
 ...

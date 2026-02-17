@@ -11,10 +11,9 @@ if (!isset($_GET["email"]) || !isset($_GET["password"])) {
 $email = $_GET["email"];
 $password = $_GET["password"];
 
-$sql = "SELECT u.id AS id, u.cuenta_id AS cuenta_id, r.nombre AS rol, c.password AS pass
+$sql = "SELECT u.id AS id, u.cuenta_id AS cuenta_id, u.rol_id AS rol_id, u.estado_id AS estado_id, c.password AS pass
     FROM usuarios u
     LEFT JOIN cuentas c ON c.id = u.cuenta_id
-    LEFT JOIN roles r ON r.id = u.rol_id
     WHERE c.email = ?";
 
 $stmt = $conn->prepare($sql);
@@ -35,7 +34,13 @@ if (!password_verify($password, $info["pass"])) {
     exit;
 }
 
-if ($info['rol'] != "administrador" && $info['rol'] != "master") {
+if ($info["estado_id"] != 1 && $info["estado_id"] != 2) {
+    http_response_code(404);
+    echo json_encode(["error" => "No es usuario activo"]);
+    exit;
+}
+
+if ($info['rol_id'] != 2 && $info['rol_id'] != 3) {
     http_response_code(404);
     echo json_encode(["error" => "No tiene permisos"]);
     exit;

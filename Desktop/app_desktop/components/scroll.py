@@ -11,7 +11,7 @@ class Scroll(QWidget):
         self.scroll.setWidgetResizable(True)
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        if widget == None:
+        if widget is None:
             self.scroll.setWidget(QLabel())
         else:
             self.scroll.setWidget(widget)

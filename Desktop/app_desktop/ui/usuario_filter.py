@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout
+    QWidget, QVBoxLayout, QApplication
 )
 from PySide6.QtCore import QDate, Signal
 from components.txt_edit import TxtEdit
@@ -15,6 +15,8 @@ class Usuariofilter(QWidget):
     def __init__(self):
         super().__init__()
 
+        ctrlData = QApplication.instance().property("controls").get_data()
+
         layVertical = QVBoxLayout()
         layVertical.setSpacing(10)
         self.txtNickname = TxtEdit("Nickname", "nickname")
@@ -22,13 +24,14 @@ class Usuariofilter(QWidget):
         self.txtEmail = TxtEdit("Email", "email")
         layVertical.addWidget(self.txtEmail)
         self.selRol = Selector(
-            ["Todos", "Prosumer", "Admin"],
+            [["Todos", 0]] + ctrlData.get_roles_basicos(),
             "rol...", "Rol", 1
         )
+        self.selRol.set_index_from_data(1)
         layVertical.addWidget(self.selRol)
         self.selEstado = Selector(
-            ["Todos", "Activo", "Invisible", "Bloqueado", "Eliminado", "Act-Inv", "Act-Inv-Bloq"],
-            "estado...", "Estado", 6
+            [["Todos", 0]] + ctrlData.get_estados_basicos() + [["Act-Inv", 100], ["Bloq-Denun", 101]],
+            "estado...", "Estado", 1
         )
         layVertical.addWidget(self.selEstado)
         self.chkLink = Checkbox("Con Link")
@@ -43,6 +46,7 @@ class Usuariofilter(QWidget):
         layVertical.addWidget(self.date_registro_min)
         self.date_registro_max = DateEdit("Reg. hasta")
         layVertical.addWidget(self.date_registro_max)
+        
         self.btnAplicar = Boton("Aplicar")
         self.btnAplicar.clicked.connect(self.emitir_aplicar)
         layVertical.addWidget(self.btnAplicar)
@@ -57,8 +61,8 @@ class Usuariofilter(QWidget):
         filtros = {
             "nickname": self.txtNickname.get_value(),
             "email": self.txtEmail.get_value(),
-            "rol_id": self.selRol.get_index(),
-            "estado_id": self.selEstado.get_index(),
+            "rol_id": self.selRol.get_data(),
+            "estado_id": self.selEstado.get_data(),
             "dias_activo": self.dias_actividad.get_value(),
             "con_link": self.chkLink.get_bool(),
             "con_descripcion": self.chkTexto.get_bool(),

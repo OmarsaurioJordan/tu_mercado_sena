@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel
+    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
@@ -11,13 +11,8 @@ class UsuarioCard(QFrame):
         super().__init__()
         self.id = usuario.id
 
-        self.estado_color = {
-            1: "#e6e5e5", # activo
-            2: "#D2EDF8", # invisible
-            3: "#999898", # eliminado
-            4: "#f7d9ac" # bloqueado
-        }.get(usuario.estado_id, "#f88eef") # error
-        self.setPulsado()
+        ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+        ctrlUsuario.usuario_signal.hubo_cambio.connect(self.actualizar)
 
         self.setFrameShape(QFrame.Shape.StyledPanel)
         self.setFrameShadow(QFrame.Shadow.Raised)
@@ -26,45 +21,64 @@ class UsuarioCard(QFrame):
         self.imagen = QLabel()
         self.imagen.setScaledContents(True)
         self.imagen.setFixedSize(48, 48)
-        self.set_image(QPixmap("assets/sprites/avatar.png"))
-        usuario.img_signal.ok_image.connect(self.set_image)
+        self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
 
-        nickname = QLabel(usuario.nickname)
-        nickname.setWordWrap(True)
-        font = nickname.font()
+        self.nickname = QLabel("")
+        self.nickname.setWordWrap(True)
+        font = self.nickname.font()
         font.setBold(True)
-        nickname.setFont(font)
-        nickname.setAlignment(
+        self.nickname.setFont(font)
+        self.nickname.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
 
-        email = QLabel(usuario.email.split("@")[0])
-        email.setWordWrap(True)
-        email.setStyleSheet("color: #777777;")
-        email.setAlignment(
+        self.email = QLabel("")
+        self.email.setWordWrap(True)
+        self.email.setStyleSheet("color: #777777;")
+        self.email.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
 
         layNicknameEmail = QVBoxLayout()
-        layNicknameEmail.addWidget(nickname)
-        layNicknameEmail.addWidget(email)
+        layNicknameEmail.addWidget(self.nickname)
+        layNicknameEmail.addWidget(self.email)
 
-        if usuario.rol_id != 1:
-            rol = QLabel("M" if usuario.rol_id == 3 else "A")
-            font = rol.font()
-            font.setPointSize(8)
-            rol.setFont(font)
-            layRol = QVBoxLayout()
-            layRol.addWidget(rol)
-            layRol.addWidget(QLabel())
-            layRol.addWidget(QLabel())
+        self.rol = QLabel("")
+        font = self.rol.font()
+        font.setPointSize(8)
+        self.rol.setFont(font)
+        layRol = QVBoxLayout()
+        layRol.addWidget(self.rol)
+        layRol.addWidget(QLabel())
+        layRol.addWidget(QLabel())
 
         layHorizontal = QHBoxLayout()
         layHorizontal.addLayout(layNicknameEmail)
         layHorizontal.addWidget(self.imagen)
-        if usuario.rol_id != 1:
-            layHorizontal.addLayout(layRol)
+        layHorizontal.addLayout(layRol)
         self.setLayout(layHorizontal)
+        self.setData(usuario)
+
+    def setData(self, usuario):
+        if usuario is None:
+            return
+        self.rol.setText("M" if usuario.rol_id == 3 else ("A" if usuario.rol_id == 2 else ""))
+        self.imagen.setPixmap(usuario.img_pix)
+        self.nickname.setText(usuario.nickname)
+        self.email.setText(usuario.email.split("@")[0])
+        self.estado_color = {
+            1: "#e6e5e5", # activo
+            2: "#d2edf8", # invisible
+            3: "#999898", # eliminado
+            4: "#f7d9ac", # bloqueado
+            10: "#f4f7ac" # denunciado
+        }.get(usuario.estado_id, "#f88eef") # error
+        self.setPulsado()
+
+    def actualizar(self, id=0):
+        if id == self.id:
+            ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+            self.setData(ctrlUsuario.get_usuario(id))
 
     def setPulsado(self, is_pulsado=False):
         if is_pulsado:
@@ -87,6 +101,3 @@ class UsuarioCard(QFrame):
     def mousePressEvent(self, event):
         self.card_clic.emit(self.id)
         super().mousePressEvent(event)
-
-    def set_image(self, image):
-        self.imagen.setPixmap(image)

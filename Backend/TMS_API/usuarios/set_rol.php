@@ -3,6 +3,8 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 require_once("../config.php");
 
+validation();
+
 if (!isset($_GET["id"]) || !isset($_GET["rol"])) {
     http_response_code(400);
     echo json_encode(["error" => "Falta id o rol"]);
@@ -11,7 +13,13 @@ if (!isset($_GET["id"]) || !isset($_GET["rol"])) {
 $id = $_GET["id"];
 $rol = $_GET["rol"];
 
-$sql = "UPDATE usuarios SET rol_id = ? WHERE id = ?";
+if ($rol != 1 && $rol != 2) {
+    http_response_code(404);
+    echo json_encode(["error" => "Rol inválido"]);
+    exit;
+}
+
+$sql = "UPDATE usuarios SET rol_id = ? WHERE id = ? AND rol_id != 3";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $rol, $id);

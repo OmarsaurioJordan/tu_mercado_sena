@@ -20,21 +20,14 @@ if ($rol_id != "0") {
 $estado_id = isset($_GET["estado_id"]) ? $_GET["estado_id"] : "0";
 if ($estado_id != "0") {
     switch ($estado_id) {
-        case "1":
-        case "2":
-            $cond .= " AND u.estado_id = " . $estado_id;
+        case "100":
+            $cond .= " AND u.estado_id IN (1, 2)"; // act-inv
             break;
-        case "3":
-            $cond .= " AND u.estado_id = " . 4;
+        case "101":
+            $cond .= " AND u.estado_id IN (4, 10)"; // bloq-denun
             break;
-        case "4":
-            $cond .= " AND u.estado_id = " . 3;
-            break;
-        case "5":
-            $cond .= " AND u.estado_id IN (1, 2)";
-            break;
-        case "6":
-            $cond .= " AND u.estado_id IN (1, 2, 4)";
+        default:
+            $cond .= " AND u.estado_id = " . $estado_id; // act, inv, elim, bloq
             break;
     }
 }
@@ -72,11 +65,20 @@ if ($registro_hasta != "") {
     $vars[] = $registro_hasta;
 }
 
+$id = isset($_GET["id"]) ? $_GET["id"] : 0;
 $email = isset($_GET["email"]) ? $_GET["email"] : "";
-if ($email != "") {
+if ($id != 0) {
+    # no lleva concatenacion porque id sobreescribe a las otras condiciones
+    $cond = " AND u.id = ?";
+    $vars = [$id];
+}
+else if ($email != "") {
     # no lleva concatenacion porque email sobreescribe a las otras condiciones
-    $cond = " AND c.email = ?";
+    $cond = " AND c.email = ? AND u.rol_id != 3";
     $vars = [$email];
+}
+else {
+    $cond .= " AND u.rol_id != 3";
 }
 
 $limite = isset($_GET["limite"]) ? $_GET["limite"] : "";
@@ -99,7 +101,7 @@ array_unshift($vars, $cursor_fecha);
 $sql = "SELECT u.id AS id, c.email AS email, u.rol_id AS rol_id, u.nickname AS nickname, u.imagen AS imagen, u.descripcion AS descripcion, u.link AS link, u.estado_id AS estado_id, u.fecha_registro AS fecha_registro, u.fecha_actualiza AS fecha_actualiza, u.fecha_reciente AS fecha_reciente
     FROM usuarios u
     LEFT JOIN cuentas c ON u.cuenta_id = c.id
-    WHERE (u.fecha_registro < ? OR $curs) AND u.rol_id != 3 $cond 
+    WHERE (u.fecha_registro < ? OR $curs) $cond 
     ORDER BY u.fecha_registro DESC, u.id DESC $lim";
 
 $stmt = $conn->prepare($sql);

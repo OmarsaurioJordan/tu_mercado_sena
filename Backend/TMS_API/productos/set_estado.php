@@ -19,7 +19,7 @@ if ($estado > 4 or $estado < 1) {
     exit;
 }
 
-$sql = "UPDATE usuarios SET estado_id = ? WHERE id = ? AND rol_id != 3";
+$sql = "UPDATE productos SET estado_id = ? WHERE id = ?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $estado, $id);

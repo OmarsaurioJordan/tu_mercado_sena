@@ -3,6 +3,7 @@ from PySide6.QtCore import QRunnable, Slot, Signal, QObject
 from PySide6.QtGui import QPixmap
 from io import BytesIO
 from services.image_utils import circular_pixmap
+from core.app_config import (TIME_OUT)
 
 class ImageWorkerSignals(QObject):
     finished = Signal(QPixmap)
@@ -17,7 +18,7 @@ class ImageWorker(QRunnable):
     @Slot()
     def run(self):
         try:
-            r = requests.get(self.url)
+            r = requests.get(self.url, timeout=TIME_OUT)
             if not r.ok:
                 raise Exception("HTTP error")
             img = QPixmap()
@@ -29,8 +30,4 @@ class ImageWorker(QRunnable):
             else:
                 self.signals.finished.emit(img)
         except:
-            if self.is_avatar:
-                img = QPixmap("assets/sprites/avatar.png")
-            else:
-                img = QPixmap("assets/sprites/img_null.png")
-            self.signals.finished.emit(img)
+            pass

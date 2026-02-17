@@ -5,8 +5,11 @@ from PySide6.QtCore import Qt
 from components.scroll import Scroll
 from components.buscador import Buscador
 from ui.usuario_body import UsuarioBody
+from ui.producto_body import ProductoBody
 from ui.usuario_filter import Usuariofilter
 from ui.usuario_busqueda import UsuarioBusqueda
+from ui.producto_filter import ProductoFilter
+from ui.producto_busqueda import ProductoBusqueda
 
 class ToolsWidget(QWidget):
 
@@ -15,9 +18,11 @@ class ToolsWidget(QWidget):
 
         manager = QApplication.instance().property("controls")
         self.ctrlUsuario = manager.get_usuarios()
+        self.ctrlProducto = manager.get_productos()
 
         tabsA = QTabWidget()
-        tabsA.addTab(Scroll(), "Producto")
+        productoBody = ProductoBody()
+        tabsA.addTab(Scroll(productoBody), "Producto")
         tabsA.addTab(Scroll(), "PQRS")
         tabsA.addTab(Scroll(), "Denuncia")
         tabsA.addTab(Scroll(), "Chat")
@@ -31,20 +36,33 @@ class ToolsWidget(QWidget):
         tabsB.addTab(Scroll(), "Historial")
 
         tabsFind = QTabWidget()
-        # comienza a instanciar las diferentes pestannas de filtros mas listas
+        # estructura de la busqueda de usuarios
         usuarioFilter = Usuariofilter()
         usuarioBusqueda = UsuarioBusqueda()
         tabsFind.addTab(Buscador(usuarioFilter, usuarioBusqueda), "Usuarios")
+        usuarioFilter.clicAplicar.connect(
+            lambda filtros: self.buscarUsuarios(filtros, usuarioBusqueda, usuarioBody)
+        )
         usuarioBusqueda.scroll_at_end.connect(
-            lambda: self.rebuscarUsuarios(usuarioBusqueda)
+            lambda: self.rebuscarUsuarios()
         )
         usuarioBusqueda.card_clic.connect(
             lambda user_id: self.buscarUsuario(user_id, usuarioBody)
         )
-        usuarioFilter.clicAplicar.connect(
-            lambda filtros: self.buscarUsuarios(filtros, usuarioBusqueda)
+        # estructura de la busqueda de productos
+        productoFilter = ProductoFilter()
+        productoBusqueda = ProductoBusqueda()
+        tabsFind.addTab(Buscador(productoFilter, productoBusqueda), "Productos")
+        productoFilter.clicAplicar.connect(
+            lambda filtros: self.buscarProductos(filtros, productoBusqueda, productoBody)
         )
-        tabsFind.addTab(Buscador(), "Productos")
+        productoBusqueda.scroll_at_end.connect(
+            lambda: self.rebuscarProductos()
+        )
+        productoBusqueda.card_clic.connect(
+            lambda prod_id: self.buscarProducto(prod_id, productoBody)
+        )
+        # estructura de la busqueda de PQRS
         tabsFind.addTab(Buscador(), "PQRSs")
         tabsFind.addTab(Buscador(), "Denuncias")
         tabsFind.addTab(Buscador(), "Chats")
@@ -61,16 +79,26 @@ class ToolsWidget(QWidget):
         layFondoTres.setStretch(2, 3)
         self.setLayout(layFondoTres)
 
-    def buscarUsuarios(self, filtros, widgetResultado):
-        self.ctrlUsuario.limpiar()
-        usuarios = self.ctrlUsuario.get_usuarios(filtros=filtros)
+    def buscarUsuarios(self, filtros, widgetResultado, widgetReset):
         widgetResultado.eliminar_usuarios()
-        widgetResultado.cargar_usuarios(usuarios)
+        widgetReset.resetData()
+        self.ctrlUsuario.do_busqueda(filtros=filtros)
     
-    def rebuscarUsuarios(self, widgetResultado):
-        usuarios = self.ctrlUsuario.get_usuarios(rebusqueda=True)
-        widgetResultado.cargar_usuarios(usuarios)
+    def rebuscarUsuarios(self):
+        self.ctrlUsuario.do_busqueda(rebusqueda=True)
 
     def buscarUsuario(self, user_id, widgetResultado):
         usuario = self.ctrlUsuario.get_usuario(user_id)
-        widgetResultado.actualiza(usuario)
+        widgetResultado.setData(usuario)
+    
+    def buscarProductos(self, filtros, widgetResultado, widgetReset):
+        widgetResultado.eliminar_productos()
+        widgetReset.resetData()
+        self.ctrlProducto.do_busqueda(filtros=filtros)
+    
+    def rebuscarProductos(self):
+        self.ctrlProducto.do_busqueda(rebusqueda=True)
+
+    def buscarProducto(self, prod_id, widgetResultado):
+        producto = self.ctrlProducto.get_producto(prod_id)
+        widgetResultado.setData(producto)

@@ -5,17 +5,17 @@ from PySide6.QtGui import (
     QStandardItemModel, QStandardItem
 )
 from PySide6.QtCore import QSize, Signal
-from components.usuario_card import UsuarioCard
+from components.producto_card import ProductoCard
 
-class UsuarioBusqueda(QListWidget):
+class ProductoBusqueda(QListWidget):
     scroll_at_end = Signal()
     card_clic = Signal(int)
 
     def __init__(self):
         super().__init__()
 
-        ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-        ctrlUsuario.usuario_signal.hubo_cambio.connect(self.actualizar)
+        ctrlProducto = QApplication.instance().property("controls").get_productos()
+        ctrlProducto.producto_signal.hubo_cambio.connect(self.actualizar)
 
         self.setViewMode(QListWidget.IconMode)
         self.setResizeMode(QListWidget.Adjust)
@@ -35,29 +35,29 @@ class UsuarioBusqueda(QListWidget):
 
     # CRUD de fichas
 
-    def eliminar_usuarios(self):
+    def eliminar_productos(self):
         self.clear()
 
     def actualizar(self, id=0):
-        ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+        ctrlProducto = QApplication.instance().property("controls").get_productos()
         if id == 0:
-            usuarios = ctrlUsuario.get_busqueda()
-            self.agregar_usuarios(usuarios)
+            productos = ctrlProducto.get_busqueda()
+            self.agregar_productos(productos)
         else:
             for i in range(self.count()):
                 item = self.item(i)
                 ficha = self.itemWidget(item)
                 if ficha.id == id:
-                    ficha.setData(ctrlUsuario.get_usuario(id))
+                    ficha.setData(ctrlProducto.get_producto(id))
                     break
     
-    def agregar_usuarios(self, usuarios):
+    def agregar_productos(self, productos):
         ids = self.obtener_ids()
-        for usr in usuarios:
-            if usr.id in ids:
+        for prd in productos:
+            if prd.id in ids:
                 continue
-            ids.add(usr.id)
-            ficha = UsuarioCard(usr)
+            ids.add(prd.id)
+            ficha = ProductoCard(prd)
             ficha.card_clic.connect(self._click_event)
             item = QListWidgetItem()
             item.setSizeHint(ficha.sizeHint())
@@ -74,12 +74,12 @@ class UsuarioBusqueda(QListWidget):
     
     # pulsacion de fichas
     
-    def _click_event(self, user_id):
-        self.card_clic.emit(user_id)
-        self.set_sombrear(user_id)
+    def _click_event(self, prod_id):
+        self.card_clic.emit(prod_id)
+        self.set_sombrear(prod_id)
     
-    def set_sombrear(self, user_id=0):
+    def set_sombrear(self, prod_id=0):
         for i in range(self.count()):
             item = self.item(i)
             widget = self.itemWidget(item)
-            widget.setPulsado(widget.id == user_id)
+            widget.setPulsado(widget.id == prod_id)
