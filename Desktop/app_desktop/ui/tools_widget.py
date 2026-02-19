@@ -39,6 +39,7 @@ class ToolsWidget(QWidget):
         # estructura de la busqueda de usuarios
         usuarioFilter = Usuariofilter()
         usuarioBusqueda = UsuarioBusqueda()
+        usuarioBody.cambioData.connect(usuarioBusqueda.set_sombrear)
         tabsFind.addTab(Buscador(usuarioFilter, usuarioBusqueda), "Usuarios")
         usuarioFilter.clicAplicar.connect(
             lambda filtros: self.buscarUsuarios(filtros, usuarioBusqueda, usuarioBody)
@@ -52,6 +53,9 @@ class ToolsWidget(QWidget):
         # estructura de la busqueda de productos
         productoFilter = ProductoFilter()
         productoBusqueda = ProductoBusqueda()
+        productoBody.cambioData.connect(productoBusqueda.set_sombrear)
+        productoBody.cambioData.connect(usuarioBody.set_from_producto)
+        usuarioBody.cambioData.connect(productoBody.set_is_vendedor)
         tabsFind.addTab(Buscador(productoFilter, productoBusqueda), "Productos")
         productoFilter.clicAplicar.connect(
             lambda filtros: self.buscarProductos(filtros, productoBusqueda, productoBody)

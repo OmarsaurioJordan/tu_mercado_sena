@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QStackedWidget
+    QMainWindow, QStackedWidget, QApplication
 )
 from windows.login_window import LoginWindow
 from windows.menu_window import MenuWindow
@@ -56,6 +56,7 @@ class WindowManager(QMainWindow):
         self.stack.setCurrentWidget(self.views[tool_name])
 
     def limpiar_stack(self):
+        QApplication.instance().property("controls").limpiar()
         while self.stack.count() > 0:
             widget = self.stack.widget(0)
             self.stack.removeWidget(widget)

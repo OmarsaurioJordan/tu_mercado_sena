@@ -1,10 +1,9 @@
 TAREAS:
 ...
 - primer clic en producto ficha con multiples imágenes, no deja resaltada la ficha
-- revisar si quitar imagen desde tms y refrescar usuario, ejemplo al cambiar estado, quita o cambia imagen
 - están fallando algunos filtros de producto, revisar todos
-- seleccionar producto muestra usuario asociado
-- seleccionar usuario muestra producto asociado o ninguno
-- al actualizar body si no coinciden con busqueda, desresaltar busqueda
-- limpiar controladores al cerrar sesion
+...
+PRUEBAS:
+...
+- quitar imágen en TMS y ver si al refrescar en Desktop se quita
 ...

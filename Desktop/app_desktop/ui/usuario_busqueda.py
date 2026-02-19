@@ -76,7 +76,6 @@ class UsuarioBusqueda(QListWidget):
     
     def _click_event(self, user_id):
         self.card_clic.emit(user_id)
-        self.set_sombrear(user_id)
     
     def set_sombrear(self, user_id=0):
         for i in range(self.count()):
