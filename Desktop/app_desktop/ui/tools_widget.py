@@ -6,6 +6,8 @@ from components.scroll import Scroll
 from components.buscador import Buscador
 from ui.usuario_body import UsuarioBody
 from ui.producto_body import ProductoBody
+from ui.pqrs_body import PqrsBody
+from ui.denuncia_body import DenunciaBody
 from ui.usuario_filter import Usuariofilter
 from ui.usuario_busqueda import UsuarioBusqueda
 from ui.producto_filter import ProductoFilter
@@ -23,7 +25,8 @@ class ToolsWidget(QWidget):
         tabsA = QTabWidget()
         productoBody = ProductoBody()
         tabsA.addTab(Scroll(productoBody), "Producto")
-        tabsA.addTab(Scroll(), "PQRS")
+        pqrsBody = PqrsBody()
+        tabsA.addTab(Scroll(pqrsBody), "PQRS")
         tabsA.addTab(Scroll(), "Denuncia")
         tabsA.addTab(Scroll(), "Chat")
         tabsA.addTab(Scroll(), "Auditoría")
@@ -39,7 +42,6 @@ class ToolsWidget(QWidget):
         # estructura de la busqueda de usuarios
         usuarioFilter = Usuariofilter()
         usuarioBusqueda = UsuarioBusqueda()
-        usuarioBody.cambioData.connect(usuarioBusqueda.set_sombrear)
         tabsFind.addTab(Buscador(usuarioFilter, usuarioBusqueda), "Usuarios")
         usuarioFilter.clicAplicar.connect(
             lambda filtros: self.buscarUsuarios(filtros, usuarioBusqueda, usuarioBody)
@@ -53,9 +55,6 @@ class ToolsWidget(QWidget):
         # estructura de la busqueda de productos
         productoFilter = ProductoFilter()
         productoBusqueda = ProductoBusqueda()
-        productoBody.cambioData.connect(productoBusqueda.set_sombrear)
-        productoBody.cambioData.connect(usuarioBody.set_from_producto)
-        usuarioBody.cambioData.connect(productoBody.set_is_vendedor)
         tabsFind.addTab(Buscador(productoFilter, productoBusqueda), "Productos")
         productoFilter.clicAplicar.connect(
             lambda filtros: self.buscarProductos(filtros, productoBusqueda, productoBody)
@@ -68,10 +67,27 @@ class ToolsWidget(QWidget):
         )
         # estructura de la busqueda de PQRS
         tabsFind.addTab(Buscador(), "PQRSs")
+        pqrsBody.card_clic.connect(
+            lambda user_id: self.buscarUsuario(user_id, usuarioBody)
+        )
+        # estructura de la busqueda de denuncias
         tabsFind.addTab(Buscador(), "Denuncias")
         tabsFind.addTab(Buscador(), "Chats")
         tabsFind.addTab(Buscador(), "Auditorías")
 
+        # sombreado de fichas seleccionadas
+        usuarioBody.cambioData.connect(usuarioBusqueda.set_sombrear)
+        productoBody.cambioData.connect(productoBusqueda.set_sombrear)
+        pqrsBody.cambioData.connect(pqrsBusqueda.set_sombrear)
+        denunciaBody.cambioData.connect(denunciaBusqueda.set_sombrear)
+
+        # conexiones al hacer cambios
+        productoBody.cambioData.connect(usuarioBody.set_from_producto)
+        usuarioBody.cambioData.connect(productoBody.set_is_vendedor)
+        usuarioBody.cambioData.connect(pqrsBody.set_is_seleccionado)
+        pqrsBody.cambioData.connect(usuarioBody.set_from_pqrs)
+
+        # colocar todo en layout principal
         layFondoTres = QHBoxLayout()
         layFondoTres.setSpacing(10)
         layFondoTres.setContentsMargins(10, 10, 10, 10)

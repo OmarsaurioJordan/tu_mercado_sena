@@ -1,0 +1,104 @@
+from PySide6.QtWidgets import (
+    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
+)
+from PySide6.QtCore import Qt, Signal
+
+class PqrsCard(QFrame):
+    card_clic = Signal(int)
+
+    def __init__(self, pqrs):
+        super().__init__()
+        self.id = pqrs.id
+
+        ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+        ctrlPqrs.pqrs_signal.hubo_cambio.connect(self.actualizar)
+
+        self.setFrameShape(QFrame.Shape.StyledPanel)
+        self.setFrameShadow(QFrame.Shadow.Raised)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed)
+
+        self.dias = QLabel("")
+        self.dias.setStyleSheet("color: #777777;")
+        self.dias.setAlignment(
+            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+        )
+
+        self.nickname = QLabel("")
+        self.nickname.setWordWrap(True)
+        font = self.nickname.font()
+        font.setBold(True)
+        self.nickname.setFont(font)
+        self.nickname.setAlignment(
+            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+        )
+
+        self.motivo = QLabel("")
+        self.motivo.setAlignment(
+            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+        )
+
+        layHeader = QVBoxLayout()
+        layHeader.addWidget(self.nickname)
+        layHeader.addWidget(self.motivo)
+
+        self.mensaje = QLabel("")
+        self.mensaje.setWordWrap(True)
+        self.mensaje.setAlignment(
+            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+        )
+
+        layHorizontal = QHBoxLayout()
+        layHorizontal.addWidget(self.dias)
+        layHorizontal.addLayout(layHeader)
+        layHorizontal.addWidget(self.mensaje)
+        self.setLayout(layHorizontal)
+        self.setData(pqrs)
+
+    def setData(self, pqrs):
+        if pqrs is None:
+            return
+        self.dias.setText(str(pqrs.dias) + " días")
+        self.nickname.setText(pqrs.usuario_name)
+        data = QApplication.instance().property("controls").get_data()
+        motivo = data.get_row("motivos", pqrs.motivo_id)
+        mot_txt = motivo["nombre"].capitalize() if motivo is not None else "???"
+        self.motivo.setText(mot_txt)
+        self.mensaje.setText(self.elide_text(pqrs.mensaje, 120))
+        self.estado_color = {
+            1: "#e6e5e5", # activo
+            11: "#999898", # resuelto
+        }.get(pqrs.estado_id, "#f88eef") # error
+        self.setPulsado()
+
+    def actualizar(self, id=0):
+        if id == self.id:
+            ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+            self.setData(ctrlPqrs.get_pqrs(id))
+
+    def setPulsado(self, is_pulsado=False):
+        if is_pulsado:
+            self.setStyleSheet(f"""
+                ProductoCard {{
+                    background-color: {self.estado_color};
+                    border: 2px solid #696969;
+                    border-radius: 10px;
+                }}
+            """)
+        else:
+            self.setStyleSheet(f"""
+                ProductoCard {{
+                    background-color: {self.estado_color};
+                    border: 1px solid #cccccc;
+                    border-radius: 10px;
+                }}
+            """)
+
+    def mousePressEvent(self, event):
+        self.card_clic.emit(self.id)
+        super().mousePressEvent(event)
+
+    def elide_text(self, text, max_chars=120):
+        if len(text) > max_chars:
+            return text[:max_chars].rstrip() + "..."
+        return text

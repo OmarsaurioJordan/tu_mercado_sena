@@ -73,7 +73,7 @@ if ($cursor_id != "") {
 }
 array_unshift($vars, $cursor_fecha);
 
-$sql = "SELECT p.id AS id, p.usuario_id AS usuario_id, p.mensaje AS mensaje, p.motivo_id AS motivo_id, p.estado_id AS estado_id, p.fecha_registro AS fecha_registro, u.nickname AS nickname, c.email AS email, u.imagen AS imagen, DATEDIFF(NOW(), p.fecha_registro) AS dias
+$sql = "SELECT p.id AS id, p.usuario_id AS usuario_id, p.mensaje AS mensaje, p.motivo_id AS motivo_id, p.estado_id AS estado_id, p.fecha_registro AS fecha_registro, u.nickname AS nickname, c.email AS email, DATEDIFF(NOW(), p.fecha_registro) AS dias
     FROM pqrs p
     LEFT JOIN usuarios u ON p.usuario_id = u.id
     LEFT JOIN cuentas c ON u.cuenta_id = c.id

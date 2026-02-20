@@ -140,6 +140,8 @@ class UsuarioBody(QWidget):
         self.registro.setText("Registro")
         self.edicion.setText("Edición")
         self.actividad.setText("Actividad")
+        self.mensaje.setText("")
+        self.email_recup.setText("")
         self.sel_rol.set_index(0)
         self.sel_estado.set_index(0)
         self.sel_rol.set_ente_id(0)
@@ -184,4 +186,13 @@ class UsuarioBody(QWidget):
             if producto is not None:
                 ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
                 usuario = ctrlUsuario.get_usuario(producto.vendedor_id, True)
+                self.setData(usuario)
+    
+    def set_from_pqrs(self, pqrs_id=0):
+        if pqrs_id != 0:
+            ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+            pqrs = ctrlPqrs.get_pqrs(pqrs_id)
+            if pqrs is not None:
+                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                usuario = ctrlUsuario.get_usuario(pqrs.usuario_id, True)
                 self.setData(usuario)

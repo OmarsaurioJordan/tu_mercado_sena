@@ -1,9 +1,21 @@
 TAREAS:
 ...
 - primer clic en producto ficha con multiples imágenes, no deja resaltada la ficha
+- revisar todo llamado a get_usuario o get_producto si ok bool forzado
 - están fallando algunos filtros de producto, revisar todos
+- al seleccionar ficha, poner pestaña adecuada
+- PQRS + denuncias:
+-   cards (ya)
+-   body (falta denuncias)
+-   filter
+-   busqueda
+-   model (ya)
+-   controller
+-   API (ya)
+-   llamado
 ...
 PRUEBAS:
 ...
 - quitar imágen en TMS y ver si al refrescar en Desktop se quita
 ...
+quedé haciendo DenunciaBody
