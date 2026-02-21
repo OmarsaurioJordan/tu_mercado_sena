@@ -20,11 +20,21 @@ class UsuarioController extends Controller
     ) 
     {}
 
-    public function update(int $id, EditarPerfilRequest $request)
+    public function update(Usuario $usuario, EditarPerfilRequest $request)
     {
-        $dto = EditarPerfilInputDto::fromRequest($request->validated());
+        // dd para debbugin
+        // dd([
+        //     'method' => $request->method(),
+        //     'content_type' => $request->header('Content-Type'),
+        //     'hasFile' => $request->hasFile('imagen'),
+        //     'file' => $request->file('imagen'),
+        //     'allFiles' => $request->allFiles(),
+        // ]);   
+        
+        $dto = EditarPerfilInputDto::fromRequest($request);
 
-        $perfil = $this->usuarioService->update($id, $dto);
+    
+        $perfil = $this->usuarioService->update($usuario->id, $dto);
 
         return response()->json([
             'status' => 'success',

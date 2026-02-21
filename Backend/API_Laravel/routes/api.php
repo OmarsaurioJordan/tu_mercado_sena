@@ -85,7 +85,7 @@ Route::middleware('jwtVerify')->group(function (){
     });
 
     // === EDITAR PERFIL ===
-    Route::patch("/editar-perfil/{id}", [UsuarioController::class, 'update']);
+    Route::patch("/editar-perfil/{usuario}", [UsuarioController::class, 'update']);
 
     // === BLOQUEADOS ===
     Route::get('/bloqueados', [UsuarioController::class, 'obtenerBloqueadosPorUsuario']);

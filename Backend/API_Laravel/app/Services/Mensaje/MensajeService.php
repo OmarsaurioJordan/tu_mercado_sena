@@ -41,7 +41,7 @@ class MensajeService implements IMensajeService
 
                 $nombre = uniqid() . '.webp';
                 $ruta = "mensajes/{$chat->id}/{$nombre}";
-                $rutaPapelera = "papelera/chat/{$chat->id}/{$nombre}";
+                $rutaPapelera = "papelera/chats/{$chat->id}/{$nombre}";
 
                 Storage::disk('public')->put($ruta, $image->toString());
                 Storage::disk('public')->put($rutaPapelera, $image->toString());
@@ -76,15 +76,15 @@ class MensajeService implements IMensajeService
                 throw new \Exception("No se pudieron cargar los mensajes, Intente nuevamente.");
             }
 
-            // Actualizar el estado de visto del chat según el remitente del mensaje
+            // Si el comprador envia una imagen, guardarla en la papelera
             if ($mensaje->es_comprador) {
 
-                if (!$file) {
+                if ($file) {
                     $compradorId = $chat->comprador->id;
 
                     DB::table('papelera')->insert([
                         'usuario_id' => $compradorId,
-                        'mensaje' => $data['mensaje'],
+                        'mensaje' => $data['mensaje'] ?? null,
                         'imagen' => $rutaPapelera,
                         'fecha_registro' => Carbon::now()
                     ]);
@@ -95,12 +95,12 @@ class MensajeService implements IMensajeService
                     'visto_vendedor' => false,
                 ]);
             } else {
-                if (!$file) {
+                if ($file) {
                     $vendedorId = $chat->producto->vendedor->id;
 
                     DB::table('papelera')->insert([
                         'usuario_id' => $vendedorId,
-                        'mensaje' => $data['mensaje'],
+                        'mensaje' => $data['mensaje'] ?? null,
                         'imagen' => $rutaPapelera,
                         'fecha_registro' => Carbon::now()
                     ]);

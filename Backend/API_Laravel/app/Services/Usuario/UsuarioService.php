@@ -6,12 +6,14 @@ use App\Contracts\Usuario\Services\IUsuarioService;
 use App\Contracts\Usuario\Repositories\IUsuarioRepository;
 use App\DTOs\Usuario\EditarPerfil\InputDto;
 use App\Exceptions\BusinessException;
+use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Http\UploadedFile;
 
@@ -25,25 +27,23 @@ class UsuarioService implements IUsuarioService
     ) 
     {}
 
-    public function update(int $id, InputDto $dto)
-    {
+    public function update(int $usuarioId, InputDto $dto): Usuario
+    {   
+        Log::info("Iniciando proceso de edición de perfil");
+
         $authUserId = Auth::user()->usuario->id;
     
-        if ($authUserId !== $id) {
+        if ($authUserId !== $usuarioId) {
             throw new AuthorizationException(
                 'No puedes editar el perfil de otro usuario.'
             );
         }
-    
-        $usuario = $this->usuarioRepository->findById($id);
-    
-        if (!$usuario) {
-            throw new ModelNotFoundException(
-                'Usuario no encontrado'
-            );
+
+        if (empty($dto->toArray())) {
+            throw new BusinessException('No hay datos para actualizar', 422);
         }
 
-        DB::transaction(function () use ($usuario, $dto) {
+        return DB::transaction(function () use ($usuarioId, $dto) {
             if ($dto->imagen){
                 // Validar que haya llegado la ruta de la imagen del mapeado de los datos
                 $file = request()->file('imagen');
@@ -52,6 +52,10 @@ class UsuarioService implements IUsuarioService
                 $ruta = null;
                 $rutaPapelera = null;
 
+                Log::info("Archivo recibido", [
+                    "file" => $file,
+                ]);
+
                 // Validar si la imagen es instacia de la clase UploadedFile para formatearla y subir solo su ruta
                 if ($file instanceof UploadedFile) {
                     $image = Image::read($file->getPathname())
@@ -59,23 +63,28 @@ class UsuarioService implements IUsuarioService
                         ->toWebp(90);
 
                     $nombre = uniqid() . '.webp';
-                    $ruta = "usuario/{$usuario->id}/{$nombre}";
-                    $rutaPapelera = "papelera/{$usuario->id}/{$nombre}";
+                    $ruta = "usuarios/{$usuarioId}/{$nombre}";
+                    $rutaPapelera = "papelera/usuarios/{$usuarioId}/{$nombre}";
 
                     // Enviar la imagen a una ruta temporal
                     Storage::disk('public')->put($ruta, $image->toString());             
                     Storage::disk('public')->put($rutaPapelera, $image->toString());
                 }
 
+                Log::info("Creando el registro en la base de datos", [
+                    "ruta" => $rutaPapelera,
+                    "archivo" => "UsuarioService"
+                ]);
+
                 DB::table('papelera')->insert([
-                    'usuario_id' => $usuario->id,
+                    'usuario_id' => $usuarioId,
                     'mensaje' => null,
                     'imagen' => $rutaPapelera,
                     'fecha_registro' => Carbon::now()
                 ]);
             }
 
-            $usuario_actualizado = $this->usuarioRepository->update($usuario->id, $dto->toArray());
+            $usuario_actualizado = $this->usuarioRepository->update($usuarioId, $dto->toArray());
         
             if (!$usuario_actualizado) {
                 throw new BusinessException('No se pudo actualizar el perfil del usuario.', 500);

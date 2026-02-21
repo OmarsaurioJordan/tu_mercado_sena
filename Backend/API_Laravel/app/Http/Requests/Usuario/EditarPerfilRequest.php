@@ -42,6 +42,7 @@ class EditarPerfilRequest extends FormRequest
                 'max:300'
             ],
             'link' => [
+                'sometimes',
                 'string',
                 'url',
                 'max:128',

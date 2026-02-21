@@ -4,7 +4,7 @@ namespace App\DTOs\Usuario\EditarPerfil;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Http\Request;
+use App\Http\Requests\Usuario\EditarPerfilRequest;
 
 
 
@@ -18,13 +18,15 @@ class InputDto implements Arrayable
     )
     {}
 
-    public static function fromRequest(Request $request): self 
+    public static function fromRequest(EditarPerfilRequest $request): self
     {
+        $data = $request->validated();
+
         return new self(
             imagen: $request->file('imagen') ?? null,
-            nickname: $request->input('nickname') ?? null,
-            descripcion: $request->input('descripcion') ?? null,
-            link: $request->input('link') ?? null
+            nickname: $data['nickname'] ?? null,
+            descripcion: $data['descripcion'] ?? null,
+            link: $data['link'] ?? null
         );
     }
 

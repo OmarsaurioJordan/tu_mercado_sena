@@ -55,7 +55,7 @@ class RegistroService implements IRegistroService
                 : $this->cuentaRepository->createOrUpdate($email, $clave, $password);
 
             if (!$cuenta) {
-                throw new \Exception('Fallo al crear o actualizar el registro de la cuenta.');
+                throw new \Exception('Fallo al crear o actualizar el registro de la cuenta.', 500);
             }
 
             // 2. Acción externa
@@ -141,7 +141,7 @@ class RegistroService implements IRegistroService
             // Obtener la ruta temporal y moverlo hacia la ruta donde se guardan las imagenes
             $origen = $dto->ruta_imagen;
             $destino = "usuarios/{$cuenta->id}/" . basename($origen);
-            $rutaPapelera = "papelera/{$cuenta->id}/" . basename($origen);
+            $rutaPapelera = "papelera/usuarios/{$cuenta->id}/" . basename($origen);
 
             // Validar si existe esa ruta que llego de los datos encriptados
             if (Storage::disk('public')->exists($origen)) {

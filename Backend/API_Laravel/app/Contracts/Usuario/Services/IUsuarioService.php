@@ -7,6 +7,6 @@ use App\DTOs\Usuario\EditarPerfil\InputDto;
 
 interface IUsuarioService
 {
-    public function update(int $id, InputDTO $dto);
+    public function update(int $usuarioId, InputDTO $dto);
 }
 
