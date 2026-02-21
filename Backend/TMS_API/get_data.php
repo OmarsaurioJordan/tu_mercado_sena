@@ -13,10 +13,12 @@ $tabla = $_GET["tabla"];
 $extra = "0 AS extra";
 switch ($tabla) {
     case "sucesos":
-    case "motivos":
     case "estados":
     case "integridad":
         $extra = "descripcion AS extra";
+        break;
+    case "motivos":
+        $extra = "tipo AS extra";
         break;
     case "subcategorias":
         $extra = "categoria_id AS extra";

@@ -76,7 +76,6 @@ class ProductoBusqueda(QListWidget):
     
     def _click_event(self, prod_id):
         self.card_clic.emit(prod_id)
-        self.set_sombrear(prod_id)
     
     def set_sombrear(self, prod_id=0):
         for i in range(self.count()):

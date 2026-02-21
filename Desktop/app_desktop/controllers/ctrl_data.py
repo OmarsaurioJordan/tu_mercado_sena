@@ -18,6 +18,16 @@ class CtrlData:
         self.estados = self.api_data("estados")
         self.categorias = self.api_data("categorias")
 
+    def get_motivos(self, tipo=""):
+        res = []
+        motivos = self.get_data("motivos")
+        if not motivos:
+            return [["???", -1]]
+        for mot in motivos:
+            if mot["extra"] == tipo:
+                res.append([mot["nombre"].capitalize(), mot["id"]])
+        return res
+
     def get_estados_basicos(self):
         res = []
         estados = self.get_data("estados")
@@ -25,6 +35,16 @@ class CtrlData:
             return [["???", -1]]
         for est in estados:
             if est["nombre"] in ["activo", "invisible", "eliminado", "bloqueado", "denunciado"]:
+                res.append([est["nombre"].capitalize(), est["id"]])
+        return res
+    
+    def get_estados_resueltos(self):
+        res = []
+        estados = self.get_data("estados")
+        if not estados:
+            return [["???", -1]]
+        for est in estados:
+            if est["nombre"] in ["activo", "resuelto"]:
                 res.append([est["nombre"].capitalize(), est["id"]])
         return res
     
@@ -46,6 +66,15 @@ class CtrlData:
         for dt in data:
             res.append([dt["nombre"].capitalize(), dt["id"]])
         return res
+
+    def get_row(self, tabla="", id=0):
+        data = self.get_data(tabla)
+        if not data:
+            return None
+        for dt in data:
+            if dt["id"] == id:
+                return dt
+        return None
 
     def get_data(self, tabla=""):
         match tabla:

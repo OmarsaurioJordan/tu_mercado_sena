@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 from core.app_config import DOMINIO_EMAIL
 from components.selector import Selector
@@ -9,6 +9,8 @@ from components.boton import Boton
 from components.txt_edit import TxtEdit
 
 class UsuarioBody(QWidget):
+    cambioData = Signal(int)
+
     def __init__(self):
         super().__init__()
         self.id = 0
@@ -138,11 +140,14 @@ class UsuarioBody(QWidget):
         self.registro.setText("Registro")
         self.edicion.setText("Edición")
         self.actividad.setText("Actividad")
+        self.mensaje.setText("")
+        self.email_recup.setText("")
         self.sel_rol.set_index(0)
         self.sel_estado.set_index(0)
         self.sel_rol.set_ente_id(0)
         self.sel_estado.set_ente_id(0)
         self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
+        self.cambioData.emit(0)
 
     def setData(self, usuario):
         if usuario is None:
@@ -167,8 +172,27 @@ class UsuarioBody(QWidget):
         self.sel_rol.set_ente_id(usuario.id)
         self.sel_estado.set_ente_id(usuario.id)
         self.imagen.setPixmap(usuario.img_pix)
+        self.cambioData.emit(usuario.id)
 
     def actualizar(self, id=0):
         if id == self.id:
             ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
             self.setData(ctrlUsuario.get_usuario(id))
+
+    def set_from_producto(self, producto_id=0):
+        if producto_id != 0:
+            ctrlProducto = QApplication.instance().property("controls").get_productos()
+            producto = ctrlProducto.get_producto(producto_id)
+            if producto is not None:
+                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                usuario = ctrlUsuario.get_usuario(producto.vendedor_id, True)
+                self.setData(usuario)
+    
+    def set_from_pqrs(self, pqrs_id=0):
+        if pqrs_id != 0:
+            ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+            pqrs = ctrlPqrs.get_pqrs(pqrs_id)
+            if pqrs is not None:
+                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                usuario = ctrlUsuario.get_usuario(pqrs.usuario_id, True)
+                self.setData(usuario)

@@ -1,10 +1,21 @@
 TAREAS:
 ...
 - primer clic en producto ficha con multiples imágenes, no deja resaltada la ficha
-- revisar si quitar imagen desde tms y refrescar usuario, ejemplo al cambiar estado, quita o cambia imagen
+- revisar todo llamado a get_usuario o get_producto si ok bool forzado
 - están fallando algunos filtros de producto, revisar todos
-- seleccionar producto muestra usuario asociado
-- seleccionar usuario muestra producto asociado o ninguno
-- al actualizar body si no coinciden con busqueda, desresaltar busqueda
-- limpiar controladores al cerrar sesion
+- al seleccionar ficha, poner pestaña adecuada
+- PQRS + denuncias:
+-   cards (ya)
+-   body (falta denuncias)
+-   filter
+-   busqueda
+-   model (ya)
+-   controller
+-   API (ya)
+-   llamado
 ...
+PRUEBAS:
+...
+- quitar imágen en TMS y ver si al refrescar en Desktop se quita
+...
+quedé haciendo DenunciaBody

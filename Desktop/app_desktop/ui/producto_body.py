@@ -1,11 +1,13 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 from components.selector import Selector
 
 class ProductoBody(QWidget):
+    cambioData = Signal(int)
+
     def __init__(self):
         super().__init__()
         self.current_product = None
@@ -145,6 +147,7 @@ class ProductoBody(QWidget):
         self.sel_estado.set_ente_id(0)
         self.imagen.setPixmap(QPixmap("assets/sprites/img_null.png"))
         self.limpiarImagenes()
+        self.cambioData.emit(0)
 
     def limpiarImagenes(self):
         while self.imagenes.count():
@@ -188,6 +191,7 @@ class ProductoBody(QWidget):
         self.sel_integridad.set_ente_id(producto.id)
         self.sel_estado.set_ente_id(producto.id)
         self.on_image_loaded(producto.id)
+        self.cambioData.emit(producto.id)
 
     def actualizar(self, id=0):
         if id == self.id:
@@ -203,3 +207,8 @@ class ProductoBody(QWidget):
                 self.imagenes.addWidget(self.setImagen(img.copy()), alignment=Qt.AlignCenter)
                 self.imagenes.addSpacing(4)
             self.update()
+
+    def set_is_vendedor(self, vendedor_id=0):
+        if self.current_product is not None:
+            if vendedor_id != self.current_product.vendedor_id:
+                self.resetData()
