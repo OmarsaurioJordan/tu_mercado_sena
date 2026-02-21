@@ -521,14 +521,21 @@ Respuesta:
 
 4️⃣ Editar Perfil usuario
 
-Método: PATCH
+Método: POST
 
-ruta: Ruta: http://localhost:8000/api/editar-perfil/{id}
+ruta: Ruta: http://localhost:8000/api/editar-perfil/{usuarioId}
+
+**usuarioId = Usuario que quiere cambiar sus datos**
+
+**👁️IMPORTANTE**
+
+Enviar petición usando **_method: PATCH** para que se envie los datos correctamente
 
 Ejemplo de uso:
 
 ```JSON
 {
+  "_method": "PATCH",
   "imagen": "Nueva_foto",
   "nickname": "Nuevo Nickname",
   "descripcion": "Nueva_descripcioón",
