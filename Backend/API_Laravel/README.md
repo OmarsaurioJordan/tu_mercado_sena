@@ -1479,9 +1479,9 @@ MÉTODO: **POST**
 }
 ```
 
-**6️⃣Mostrar lista de transferencias**
+**7️⃣Filtrar las transferencias**
 
-RUTA: **http://127.0.0.1:8000/api/transferencias-filtros?estados[]=1&estados[]=5**
+RUTA: **http://127.0.0.1:8000/api/transferencias-filtros?estados[]=1&estados[]=6**
 
 **OJO👁️** Los estados[]=1 o estados[]=6 son solo de ejemplo, mostrando unicamente los chats con estados activos o esperando pero pueden cambiar según las transferencias que marque el usuario. Pueden ser estados[]=7 para mostrar los chats con estado devolviendo
 
