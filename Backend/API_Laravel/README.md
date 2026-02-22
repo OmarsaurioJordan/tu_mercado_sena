@@ -102,6 +102,12 @@ JWT_ALGO=HS256
 JWT_BLACKLIST_ENABLED=true
 ```
 
+Configurar para que el sistema permita correos de gmail en el archivo .env:
+
+```env
+ALLOW_GMAIL=true
+```
+
 **⚠️Importante**
 
 
