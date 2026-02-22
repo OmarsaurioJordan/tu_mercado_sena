@@ -81,7 +81,7 @@ CACHE_STORE=file
 APP_URL=http://127.0.0.1:8000
 ```
 
-Configuración del servicio de mails (Configurar solo si se va comprobar que el correo se envio de manera exitosa a tu correo institucional):
+Configuración del servicio de mails (Configurar solo si se va comprobar que el correo se envio de manera exitosa a tu correo):
 ```ENV
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
@@ -107,6 +107,8 @@ Configurar para que el sistema permita correos de gmail en el archivo .env:
 ```env
 ALLOW_GMAIL=true
 ```
+
+**👁️OJO** Los correos gmail no pueden subir avatares, subir imagenes en los chats
 
 **⚠️Importante**
 
