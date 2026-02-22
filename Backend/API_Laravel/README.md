@@ -1404,33 +1404,33 @@ MÉTODO: **GET**
 **Salida Json**
 
 ```Json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 2,
-      "producto": {
-        "id": 1,
-        "nombre": "Mouse Gamer",
-        "imagen": null
-      },
-      "usuario": {
-        "id": 1,
-        "nickname": "julian1223",
-        "avatar": "usuarios/1/698a9969b97db.webp"
-      },
-      "estado": {
-        "id": 8,
-        "nombre": "devuelto"
-      },
-      "cantidad": 1,
-      "precio": 70000,
-      "calificacion": 4,
-      "comentario": "4",
-      "fecha_venta": "2026-02-15T19:55:53.000000Z"
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "nombre": "activo",
+    "descripcion": "Cuando funciona con completa normalidad"
+  },
+  {
+    "id": 5,
+    "nombre": "vendido",
+    "descripcion": "aplicado a un chat cuando se hizo la transacción"
+  },
+  {
+    "id": 6,
+    "nombre": "esperando",
+    "descripcion": "la transacción del chat espera el visto bueno del comprador"
+  },
+  {
+    "id": 7,
+    "nombre": "devolviendo",
+    "descripcion": "el historial abre una solicitud de devolución, a espera de respuesta del vendedor"
+  },
+  {
+    "id": 8,
+    "nombre": "devuelto",
+    "descripcion": "el chat finalizó con una transacción que fué cancelada"
+  }
+]
 ```
 
 
