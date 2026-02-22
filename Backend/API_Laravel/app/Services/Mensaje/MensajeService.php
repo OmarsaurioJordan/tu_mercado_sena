@@ -2,9 +2,11 @@
 
 namespace App\Services\Mensaje;
 
+use App\Contracts\Auth\Repositories\ICuentaRepository;
 use App\Contracts\Mensaje\Repository\IMensajeRepository;
 use App\Contracts\Mensaje\Services\IMensajeService;
 use App\DTOs\Mensaje\InputDto;
+use App\Exceptions\BusinessException;
 use App\Models\Chat;
 use App\Models\Mensaje;
 use Illuminate\Support\Facades\DB;
@@ -13,18 +15,24 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 
 class MensajeService implements IMensajeService
 {
-    public function __construct(private IMensajeRepository $mensajeRepository)
+    public function __construct(
+        private IMensajeRepository $mensajeRepository,
+        private ICuentaRepository $cuentaRepository
+    )
     {}
 
     public function crearMensaje(InputDto $dto, Chat $chat): array
     {
         return DB::transaction(function () use ($dto, $chat) {
             // Formatear el Dto a un arreglo puro
-            $data = $dto->toArray();    
+            $data = $dto->toArray();
+            
+            $esCorreoInstitucional = $this->cuentaRepository->esCorreoInstitucional(Auth::user()->id);
 
             // Obtener la imagen del request
             $file = request()->file('imagen');
@@ -35,6 +43,11 @@ class MensajeService implements IMensajeService
             $rutaPapelera = null;
             // Redimensionar y crear la ruta de la imagen, que se guardara en la base de datos
             if ($file instanceof UploadedFile) {
+
+                if (!$esCorreoInstitucional) {
+                    throw new BusinessException("Solo las cuentas con correo institucional pueden subir imagenes", 422);
+                }
+
                 $image = Image::read($file->getPathname())
                     ->resize(512, 512)
                     ->toWebp(90);
@@ -80,6 +93,10 @@ class MensajeService implements IMensajeService
             if ($mensaje->es_comprador) {
 
                 if ($file) {
+                    if (!$esCorreoInstitucional) {
+                        throw new BusinessException("Solo las cuentas con correo institucional pueden subir imagenes", 422);
+                        }
+                        
                     $compradorId = $chat->comprador->id;
 
                     DB::table('papelera')->insert([
@@ -96,6 +113,10 @@ class MensajeService implements IMensajeService
                 ]);
             } else {
                 if ($file) {
+                    if (!$esCorreoInstitucional) {
+                        throw new BusinessException("Solo las cuentas con correo institucional pueden subir imagenes", 422);
+                    }
+
                     $vendedorId = $chat->producto->vendedor->id;
 
                     DB::table('papelera')->insert([

@@ -2,6 +2,7 @@
 
 namespace App\Services\Usuario;
 
+use App\Contracts\Auth\Repositories\ICuentaRepository;
 use App\Contracts\Usuario\Services\IUsuarioService;
 use App\Contracts\Usuario\Repositories\IUsuarioRepository;
 use App\DTOs\Usuario\EditarPerfil\InputDto;
@@ -23,7 +24,8 @@ use Illuminate\Http\UploadedFile;
 class UsuarioService implements IUsuarioService
 {
     public function __construct(
-        private IUsuarioRepository $usuarioRepository
+        private IUsuarioRepository $usuarioRepository,
+        private ICuentaRepository $cuentaRepository
     ) 
     {}
 
@@ -45,6 +47,13 @@ class UsuarioService implements IUsuarioService
 
         return DB::transaction(function () use ($usuarioId, $dto) {
             if ($dto->imagen){
+                // Validar que el usuario tenga un correo institucional
+                if (!$this->cuentaRepository->esCorreoInstitucional($usuarioId)) {
+                    throw new BusinessException(
+                        "Solo los que cuentan con correo institucional pueden cambiar su avatar",
+                        422
+                    );
+                }
                 // Validar que haya llegado la ruta de la imagen del mapeado de los datos
                 $file = request()->file('imagen');
 

@@ -51,4 +51,13 @@ interface ICuentaRepository
     public function actualizarClave(Cuenta $cuentaModelo, string $nuevaClave): ?Cuenta;
 
     public function isCorreoVigente(string $correo):bool;
+
+    /**
+     * Función para determinar si el usuario tiene correo institucional
+     * O no
+     * 
+     * @param int $cuentaId
+     * @return bool
+     */
+    public function esCorreoInstitucional(int $cuentaId): bool;
 }

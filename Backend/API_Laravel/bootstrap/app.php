@@ -26,6 +26,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'jwtVerify' => \App\Http\Middleware\ValidateJWTToken::class,
             'CheckChatBlock' => \App\Http\Middleware\CheckChatBlock::class,
+            'CheckGmailRestriction' => \App\Http\Middleware\CheckGmailRestriction::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -6,4 +6,6 @@ interface IUsuarioRepository
 {
     public function findById(int $id);
     public function update(int $id,array $data);
+
+
 }

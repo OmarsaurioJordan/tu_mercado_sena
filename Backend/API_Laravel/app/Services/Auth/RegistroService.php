@@ -191,7 +191,7 @@ class RegistroService implements IRegistroService
                 'ultimo_uso'  => Carbon::now()
             ]);
 
-            if(!$data['imagen']) {
+            if(!empty($data['imagen'])) {
                 // Insertar datos en la papelera
                 DB::table('papelera')->insert([
                     'usuario_id' => $usuario->id,

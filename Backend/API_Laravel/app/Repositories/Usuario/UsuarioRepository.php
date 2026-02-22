@@ -4,6 +4,7 @@ namespace App\Repositories\Usuario;
 
 use App\Contracts\Usuario\Repositories\IUsuarioRepository;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Auth;
 
 class UsuarioRepository implements IUsuarioRepository
 {
@@ -26,4 +27,5 @@ class UsuarioRepository implements IUsuarioRepository
 
         return $usuario;
     }
+
 }

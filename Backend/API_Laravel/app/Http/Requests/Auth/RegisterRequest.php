@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\RestrictionGmailRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rule;
@@ -21,7 +22,8 @@ class RegisterRequest extends FormRequest
                 'string',
                 'email',
                 'max:64',
-                'regex:/^[\w\.-]+@soy\.sena\.edu\.co$/', //soy.sena.edu.co
+                'regex:/^[\w\.-]+@(soy\.sena\.edu\.co|gmail\.com)$/',                
+                new RestrictionGmailRule()
             ],
 
             'password' => [

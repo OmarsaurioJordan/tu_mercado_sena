@@ -67,4 +67,17 @@ class CuentaRepository implements ICuentaRepository
 
         return $cuentaModelo->fresh();
     }
+
+    public function esCorreoInstitucional(int $cuentaId): bool
+    {
+        $cuentaUsuario = $this->findById($cuentaId);
+
+        $correoUsuario = $cuentaUsuario->email;
+
+        if (str_ends_with(strtolower($correoUsuario), '@gmail.com')) {
+            return false;
+        }
+
+        return true;
+    }
 }

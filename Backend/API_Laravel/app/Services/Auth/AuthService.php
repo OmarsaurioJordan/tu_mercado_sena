@@ -70,8 +70,26 @@ class AuthService implements IAuthService
      * @param RegisterDTO $dto - Datos del usuario a registrar
      * @return array - Resultado del proceso
      */
+    public function validateGmailRestriction(string $email): void {
+        $allowGmail = config('services.allow_gmail');
+        $isGmail = str_ends_with(strtolower($email), '@gmail.com');
+
+        if (!$allowGmail && $isGmail) {
+            throw new ValidationException("El acceso para cuentas Gmail está restringido globalmente");
+        }
+    }
+
     public function iniciarRegistro(RegisterDTO $dto): array
     {
+        $this->validateGmailRestriction($dto->email);
+
+        // Validar que la cuenta institucional
+        if(str_ends_with(strtolower($dto->email), "@gmail.com")) {
+            if (!empty($dto->imagen)) {
+                throw new BusinessException("Solo las cuentas con correo institucional pueden tener avatar", 422);
+            }
+        }
+
         $inicioProceso = $this->registroService->iniciarRegistro($dto->email, $dto->password);
 
         $cuenta_id = $inicioProceso['cuenta_id'];
@@ -80,9 +98,10 @@ class AuthService implements IAuthService
         $ruta = null;
 
         if (!empty($dto->imagen)) {
+ 
+
             $file = request()->file('imagen');
 
-            
             // Validar si la imagen es instacia de la clase UploadedFile para formatearla y subir solo su ruta
             if ($file instanceof UploadedFile) {
                 $image = Image::read($file->getPathname())
@@ -97,7 +116,6 @@ class AuthService implements IAuthService
             }
         }
 
-        
         // Retornar al authService los datos
         return [
             'cuenta_id'        => $cuenta_id,
@@ -138,6 +156,7 @@ class AuthService implements IAuthService
      */
     public function login(LoginDTO $dto): array
     {
+        $this->validateGmailRestriction($dto->email);
         // 1. Buscar cuenta y validar credenciales
         $cuenta = $this->cuentaRepository->findByCorreo($dto->email);
 

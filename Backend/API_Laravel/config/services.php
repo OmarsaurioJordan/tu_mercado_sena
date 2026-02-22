@@ -13,6 +13,8 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'allow_gmail' => env('ALLOW_GMAIL', false),
+
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
