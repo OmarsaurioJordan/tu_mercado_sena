@@ -185,14 +185,14 @@ class UsuarioBody(QWidget):
             producto = ctrlProducto.get_producto(producto_id)
             if producto is not None:
                 ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-                usuario = ctrlUsuario.get_usuario(producto.vendedor_id, True)
+                usuario = ctrlUsuario.get_usuario(producto.vendedor_id)
                 self.setData(usuario)
     
     def set_from_pqrs(self, pqrs_id=0):
         if pqrs_id != 0:
-            ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+            ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
             pqrs = ctrlPqrs.get_pqrs(pqrs_id)
             if pqrs is not None:
                 ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-                usuario = ctrlUsuario.get_usuario(pqrs.usuario_id, True)
+                usuario = ctrlUsuario.get_usuario(pqrs.usuario_id)
                 self.setData(usuario)

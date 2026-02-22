@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal
 from components.selector import Selector
 from components.usuario_card import UsuarioCard
+from components.boton import Boton
 
 class PqrsBody(QWidget):
     cambioData = Signal(int)
@@ -13,7 +14,7 @@ class PqrsBody(QWidget):
         super().__init__()
         self.id = 0
 
-        ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+        ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
         ctrlPqrs.pqrs_signal.hubo_cambio.connect(self.actualizar)
 
         ctrlData = QApplication.instance().property("controls").get_data()
@@ -149,7 +150,7 @@ class PqrsBody(QWidget):
 
     def actualizar(self, id=0):
         if id == self.id:
-            ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+            ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
             self.setData(ctrlPqrs.get_pqrs(id))
 
     def set_is_seleccionado(self, seleccionado_id=0):

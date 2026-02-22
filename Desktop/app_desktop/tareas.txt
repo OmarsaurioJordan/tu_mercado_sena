@@ -1,21 +1,45 @@
 TAREAS:
 ...
+- no está permitiendo cambiar rol de usuario
+- no permite cambiar estado de pqrs y denuncia
+- al buscar productos aparecen ventanas emergentes de carga de imágenes
+- en modo debug sin login, pone carta admin prueba como primer usuario de búsqueda
+- denuncias y pqrs tienen las fichas alargadas en lo vertical, y superpuestas horizontalmente
+- fichas de body denuncias se alargan horizontalmente
+- fichas de body denuncias no se pueden clickear
+- no está cargando body pqrs al dar clic a ficha, ni salen errores
+- quitar envo de mensajes en body pqrs
+...
 - primer clic en producto ficha con multiples imágenes, no deja resaltada la ficha
-- revisar todo llamado a get_usuario o get_producto si ok bool forzado
-- están fallando algunos filtros de producto, revisar todos
 - al seleccionar ficha, poner pestaña adecuada
-- PQRS + denuncias:
--   cards (ya)
--   body (falta denuncias)
--   filter
--   busqueda
--   model (ya)
--   controller
+- modulos de las entidades para administración y búsqueda:
 -   API (ya)
--   llamado
+-   model (ya)
+-   cards (ya)
+-   body (ya)
+-   filter (ya)
+-   controller (ya)
+-   confirmaciones (ya)
+-   controllers_manager (ya)
+-   tools_widget (ya)
+...
+- módulo de chats: búsqueda + body
+- módulo de auditorías: búsqueda + body
+- ver catálogo de productos de usuario
+- ver papelera del usuario
+- ver historial del usuario
+- cargar pqrs y denuncias num total cada 5s
+- ver pqrs y denuncias al pulsar botones de notificación
+- navegar a la página oficial con el botón en menú, link adminn master
+- cargar datos de análisis para gráficas
+- ver logins de administradores
+- config. cambiar pin
+- config. cambiar tiempo de bloqueo con pin
+- config. cambiar volúmen de notificaciónes pqrs y denuncias
+- config. editar nombre, link a TMS y descripción del perfil
 ...
 PRUEBAS:
 ...
 - quitar imágen en TMS y ver si al refrescar en Desktop se quita
+- revisar todos los filtros, sospecha fallan los de productos
 ...
-quedé haciendo DenunciaBody

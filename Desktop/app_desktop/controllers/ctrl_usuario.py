@@ -92,16 +92,14 @@ class CtrlUsuario:
 
     # obtencion de informacion de usuarios
 
-    def get_usuario(self, id=0, forzado=False):
+    def get_usuario(self, id=0):
         for usr in self.usuarios:
             if usr.id == id:
                 return usr
         for usr in self.usuarios_busqueda:
             if usr.id == id:
                 return usr
-        if forzado:
-            return self.api_usuario(id)
-        return None
+        return self.api_usuario(id)
     
     def get_busqueda(self):
         return self.usuarios_busqueda

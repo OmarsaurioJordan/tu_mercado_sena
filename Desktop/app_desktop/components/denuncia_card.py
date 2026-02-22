@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
+    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
 )
 from PySide6.QtCore import Qt, Signal
 

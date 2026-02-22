@@ -19,7 +19,7 @@ class HeaderLayout(QVBoxLayout):
         if admin_id == 0:
             admin = self.usuario_debug()
         else:
-            admin = ctrlUsuario.get_usuario(admin_id, True)
+            admin = ctrlUsuario.get_usuario(admin_id)
             if admin is None:
                 admin_id = 0
                 admin = self.usuario_debug()
@@ -45,7 +45,7 @@ class HeaderLayout(QVBoxLayout):
         else:
             btnMenu = QLabel()
         
-        notifica_pqrs = Boton("PQRS: 0","bell")
+        notifica_pqrss = Boton("PQRS: 0","bell")
         notifica_denuncias = Boton("Denuncias: 0", "bell")
 
         header = QWidget()
@@ -58,7 +58,7 @@ class HeaderLayout(QVBoxLayout):
         layHorizontal.addWidget(btnMenu)
         layHorizontal.addSpacing(10)
         layHorizontal.addStretch()
-        layHorizontal.addWidget(notifica_pqrs)
+        layHorizontal.addWidget(notifica_pqrss)
         layHorizontal.addSpacing(10)
         layHorizontal.addWidget(notifica_denuncias)
         layHorizontal.addSpacing(10)

@@ -8,7 +8,7 @@ class Denuncia:
         self.motivo_id = motivo_id
         self.estado_id = estado_id
         self.fecha_registro = fecha_registro
-        self.denunciante_name = denunciante_name,
+        self.denunciante_name = denunciante_name
         self.usuario_name = usuario_name
         self.producto_name = producto_name
         self.email = email
@@ -20,7 +20,7 @@ class Denuncia:
         res = Denuncia(
             id = int(data.get('id')),
             denunciante_id = int(data.get('denunciante_id')),
-            usuario_id = int(data.get("usuario_id"))
+            usuario_id = int(data.get("usuario_id")),
             producto_id = int(data['producto_id']) if data.get('producto_id') is not None else 0,
             chat_id = int(data['chat_id']) if data.get('chat_id') is not None else 0,
             motivo_id = int(data.get('motivo_id')),

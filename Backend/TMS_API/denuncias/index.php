@@ -30,6 +30,21 @@ if ($estado_id != "0") {
     }
 }
 
+$tipo = isset($_GET["tipo"]) ? $_GET["tipo"] : "0";
+if ($tipo != "0") {
+    switch ($tipo) {
+        case "1": // usuario
+            $cond .= " AND d.chat_id IS NULL AND d.producto_id IS NULL";
+            break;
+        case "2": // producto
+            $cond .= " AND d.chat_id IS NULL AND d.producto_id IS NOT NULL";
+            break;
+        case "3": // chat
+            $cond .= " AND d.chat_id IS NOT NULL";
+            break;
+    }
+}
+
 $registro_desde = isset($_GET["registro_desde"]) ? $_GET["registro_desde"] : "";
 if ($registro_desde != "") {
     $cond .= " AND d.fecha_registro >= ?";
@@ -89,13 +104,13 @@ if (count($vars) > 0) {
 }
 $stmt->execute();
 $result = $stmt->get_result();
-$pqrs = $result->fetch_all(MYSQLI_ASSOC);
+$denuncias = $result->fetch_all(MYSQLI_ASSOC);
 
-if (!$pqrs) {
+if (!$denuncias) {
     http_response_code(404);
     echo json_encode(["error" => "denuncias no encontradas"]);
     exit;
 }
 
-echo json_encode($pqrs);
+echo json_encode($denuncias);
 ?>

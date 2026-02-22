@@ -92,16 +92,14 @@ class CtrlProducto:
 
     # obtencion de informacion de productos
 
-    def get_producto(self, id=0, forzado=False):
+    def get_producto(self, id=0):
         for prd in self.productos:
             if prd.id == id:
                 return prd
         for prd in self.productos_busqueda:
             if prd.id == id:
                 return prd
-        if forzado:
-            return self.api_producto(id)
-        return None
+        return self.api_producto(id)
     
     def get_busqueda(self):
         return self.productos_busqueda

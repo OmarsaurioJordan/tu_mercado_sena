@@ -9,7 +9,7 @@ from components.spinbox import SpinBox
 from components.date_edit import DateEdit
 from components.boton import Boton
 
-class UsuarioFilter(QWidget):
+class PqrsFilter(QWidget):
     clicAplicar = Signal(dict)
 
     def __init__(self):
@@ -23,25 +23,16 @@ class UsuarioFilter(QWidget):
         layVertical.addWidget(self.txtNickname)
         self.txtEmail = TxtEdit("Email", "email")
         layVertical.addWidget(self.txtEmail)
-        self.selRol = Selector(
-            [["Todos", 0]] + ctrlData.get_roles_basicos(),
-            "rol...", "Rol", 1
+        self.selMotivo = Selector(
+            [["Todos", 0]] + ctrlData.get_motivos("pqrs"),
+            "motivo...", "Motivo", 0
         )
-        self.selRol.set_index_from_data(1)
-        layVertical.addWidget(self.selRol)
+        layVertical.addWidget(self.selMotivo)
         self.selEstado = Selector(
-            [["Todos", 0]] + ctrlData.get_estados_basicos() + [["Act-Inv", 100], ["Bloq-Denun", 101]],
+            [["Todos", 0]] + ctrlData.get_estados_resueltos(),
             "estado...", "Estado", 1
         )
         layVertical.addWidget(self.selEstado)
-        self.chkLink = Checkbox("Con Link")
-        layVertical.addWidget(self.chkLink)
-        self.chkTexto = Checkbox("Con Texto")
-        layVertical.addWidget(self.chkTexto)
-        self.chkProductos = Checkbox("Con Productos")
-        layVertical.addWidget(self.chkProductos)
-        self.dias_actividad = SpinBox("Días activo", 0, 365, 0)
-        layVertical.addWidget(self.dias_actividad)
         self.date_registro_min = DateEdit("Reg. desde", QDate(2010, 1, 1))
         layVertical.addWidget(self.date_registro_min)
         self.date_registro_max = DateEdit("Reg. hasta")
@@ -61,12 +52,8 @@ class UsuarioFilter(QWidget):
         filtros = {
             "nickname": self.txtNickname.get_value(),
             "email": self.txtEmail.get_value(),
-            "rol_id": self.selRol.get_data(),
+            "motivo_id": self.selMotivo.get_data(),
             "estado_id": self.selEstado.get_data(),
-            "dias_activo": self.dias_actividad.get_value(),
-            "con_link": self.chkLink.get_bool(),
-            "con_descripcion": self.chkTexto.get_bool(),
-            "con_productos": self.chkProductos.get_bool(),
             "registro_desde": self.date_registro_min.get_value_utc(),
             "registro_hasta": self.date_registro_max.get_value_utc()
         }

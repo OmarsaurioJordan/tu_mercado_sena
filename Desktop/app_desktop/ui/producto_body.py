@@ -208,7 +208,7 @@ class ProductoBody(QWidget):
                 self.imagenes.addSpacing(4)
             self.update()
 
-    def set_is_vendedor(self, vendedor_id=0):
+    def set_is_seleccionado(self, vendedor_id=0):
         if self.current_product is not None:
             if vendedor_id != self.current_product.vendedor_id:
                 self.resetData()

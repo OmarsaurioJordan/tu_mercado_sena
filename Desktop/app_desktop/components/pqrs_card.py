@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
+    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
 )
 from PySide6.QtCore import Qt, Signal
 
@@ -10,7 +10,7 @@ class PqrsCard(QFrame):
         super().__init__()
         self.id = pqrs.id
 
-        ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+        ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
         ctrlPqrs.pqrs_signal.hubo_cambio.connect(self.actualizar)
 
         self.setFrameShape(QFrame.Shape.StyledPanel)
@@ -73,7 +73,7 @@ class PqrsCard(QFrame):
 
     def actualizar(self, id=0):
         if id == self.id:
-            ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
+            ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
             self.setData(ctrlPqrs.get_pqrs(id))
 
     def setPulsado(self, is_pulsado=False):

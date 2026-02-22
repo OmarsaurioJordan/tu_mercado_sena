@@ -87,13 +87,13 @@ if (count($vars) > 0) {
 }
 $stmt->execute();
 $result = $stmt->get_result();
-$pqrs = $result->fetch_all(MYSQLI_ASSOC);
+$pqrss = $result->fetch_all(MYSQLI_ASSOC);
 
-if (!$pqrs) {
+if (!$pqrss) {
     http_response_code(404);
-    echo json_encode(["error" => "PQRS no encontradas"]);
+    echo json_encode(["error" => "PQRSs no encontradas"]);
     exit;
 }
 
-echo json_encode($pqrs);
+echo json_encode($pqrss);
 ?>

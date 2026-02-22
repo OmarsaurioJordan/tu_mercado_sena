@@ -8,11 +8,16 @@ from components.producto_card import ProductoCard
 
 class DenunciaBody(QWidget):
     cambioData = Signal(int)
-    card_clic = Signal(int)
+    card_usuario_clic = Signal(int)
+    card_producto_clic = Signal(int)
 
     def __init__(self):
         super().__init__()
         self.id = 0
+        self.denunciante_id = 0
+        self.producto_id = 0
+        self.usuario_id = 0
+        self.chat_id = 0
 
         ctrlDenuncia = QApplication.instance().property("controls").get_denuncias()
         ctrlDenuncia.denuncia_signal.hubo_cambio.connect(self.actualizar)
@@ -61,7 +66,7 @@ class DenunciaBody(QWidget):
         layVertical.addSpacing(10)
         layVertical.addLayout(laySelectores)
         layVertical.addSpacing(20)
-        layVertical.addWidget(self.portaFichas)
+        layVertical.addLayout(self.portaFichas)
         layVertical.addSpacing(20)
         layVertical.addWidget(self.registro)
         layVertical.addStretch()
@@ -112,25 +117,43 @@ class DenunciaBody(QWidget):
         self.sel_motivo.set_ente_id(denuncia.id)
         self.sel_estado.set_ente_id(denuncia.id)
         self.limpiarFichas()
-        
+        self.newFicha(denuncia.denunciante_id, True, self.portaFicha)
+        self.newFicha(denuncia.usuario_id, True, self.portaFichas)
+        self.newFicha(denuncia.producto_id, False, self.portaFichas)
+        # Tarea falta chat
         self.cambioData.emit(denuncia.id)
 
-    def newFicha(self, id=0):
+    def newFicha(self, id=0, is_usuario=True, layer_padre=None):
         if id != 0:
-            ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-            usr = ctrlUsuario.get_usuario(id)
-            ficha = UsuarioCard(usr)
-            ficha.card_clic.connect(self._click_event)
-            self.portaFicha.addWidget(ficha)
+            if is_usuario:
+                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                usr = ctrlUsuario.get_usuario(id)
+                ficha = UsuarioCard(usr)
+                ficha.card_clic.connect(self._click_usuario_event)
+            else:
+                ctrlProducto = QApplication.instance().property("controls").get_productos()
+                prod = ctrlProducto.get_producto(id)
+                ficha = ProductoCard(prod)
+                ficha.card_clic.connect(self._click_producto_event)
+            layer_padre.addWidget(ficha)
     
-    def _click_event(self, user_id):
-        self.card_clic.emit(user_id)
+    def _click_usuario_event(self, user_id):
+        self.card_usuario_clic.emit(user_id)
+    
+    def _click_producto_event(self, prod_id):
+        self.card_producto_clic.emit(prod_id)
 
     def actualizar(self, id=0):
         if id == self.id:
-            ctrlPqrs = QApplication.instance().property("controls").get_pqrs()
-            self.setData(ctrlPqrs.get_pqrs(id))
+            ctrlDenuncia = QApplication.instance().property("controls").get_denuncias()
+            self.setData(ctrlDenuncia.get_denuncia(id))
 
-    def set_is_seleccionado(self, seleccionado_id=0):
-        if seleccionado_id != self.id:
-            self.resetData()
+    def set_is_seleccionado(self, usuario_id=0):
+        if usuario_id != 0:
+            if usuario_id != self.denunciante_id and usuario_id != self.usuario_id:
+                self.resetData()
+    
+    def set_is_producto(self, producto_id=0):
+        if producto_id != 0:
+            if producto_id != self.producto_id:
+                self.resetData()
