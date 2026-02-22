@@ -70,6 +70,8 @@ interface IChatService
      */
     public function terminarDevolucion(Chat $chat, int $usuarioId);
 
+    public function transferencias(int $usuarioId): array;
+
     public function mostrarTransferencias(int $usuarioId, array $estados): array;
 
 }

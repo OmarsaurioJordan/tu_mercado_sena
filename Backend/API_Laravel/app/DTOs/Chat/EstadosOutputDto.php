@@ -12,8 +12,8 @@ class EstadosOutputDto implements Arrayable
     public function __construct(
         public int $id,
         public array $producto,
-        public array $vendedor,
-        public int $estado_id,
+        public array $usuario,
+        public array $estado,
         public ?int $cantidad,
         public ?int $precio,
         public ?int $calificacion,
@@ -28,8 +28,8 @@ class EstadosOutputDto implements Arrayable
         return [
             "id" => $this->id,
             "producto" => $this->producto,
-            "vendedor" => $this->vendedor,
-            "estado_id" => $this->estado_id,
+            "usuario" => $this->usuario,
+            "estado" => $this->estado,
             "cantidad" => $this->cantidad,
             "precio" => $this->precio,
             "calificacion" => $this->calificacion,
@@ -38,11 +38,18 @@ class EstadosOutputDto implements Arrayable
         ];
     }
 
-    public static function fromModel(Chat $chat): self
+    public static function fromModel(Chat $chat, int $usuarioId): self
     {
+
+        $esComprador = $chat->comprador_id === $usuarioId;
+
+        $otroUsuario = $esComprador
+            ? $chat->producto->vendedor
+            : $chat->comprador;
+
         return new self(
             id: $chat->id,
-            producto: $chat->producto->relationLoaded("producto") && $chat->producto
+            producto: $chat->relationLoaded("producto") && $chat->producto
                 ? [
                     "id" => $chat->producto->id,
                     "nombre" => $chat->producto->nombre,
@@ -50,13 +57,17 @@ class EstadosOutputDto implements Arrayable
                                     ? $chat->producto->fotos->first()?->imagen 
                                     : null,
                 ] : [], // Si no hay una relación de producto retonar array vacio
-            vendedor: $chat->producto->relationLoaded("vendedor") && $chat->producto->vendedor
+            usuario: $otroUsuario
                 ? [
                     "id" => $chat->producto->vendedor->id,
                     "nickname" => $chat->producto->vendedor->nickname,
                     "avatar" => $chat->producto->vendedor->imagen
                 ]: [], // Si no hay una relación de vendedor retonar array vacio
-            estado_id: $chat->estado->id,
+            estado: $chat->relationLoaded('estado') && $chat->estado
+                ? [
+                    "id" => $chat->estado->id,
+                    "nombre" => $chat->estado->nombre
+                ] : [],
             cantidad: $chat->cantidad ?? null,
             precio: $chat->precio ?? null,
             calificacion: $chat->calificacion ?? null,
@@ -65,8 +76,8 @@ class EstadosOutputDto implements Arrayable
         );
     }
 
-    public static function fromModelCollection(Collection $chats): array 
+    public static function fromModelCollection(Collection $chats, int $usuarioId): array 
     {
-        return $chats->map(fn (Chat $chat) => self::fromModel($chat)->toArray())->all();
+        return $chats->map(fn (Chat $chat) => self::fromModel($chat, $usuarioId)->toArray())->all();
     }
 }

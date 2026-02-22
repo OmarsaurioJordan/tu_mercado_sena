@@ -177,6 +177,23 @@ class ChatRepository implements IChatRepository
         return $chat;
     }
 
+    public function mostrarTransferencias(int $usuarioId): Collection
+    {
+        Log::info('Consultado método mostrarTransferencias en el repositorio del chat');
+
+        return Chat::where(function($q) use ($usuarioId) {
+            $q->where('comprador_id', $usuarioId)
+              ->orWhereHas('producto', fn($p) => $p->where('vendedor_id', $usuarioId));
+        })
+        ->with([
+            'producto:id,nombre,precio,vendedor_id',
+            'producto.vendedor:id,nickname,imagen',
+            'producto.fotos:id,producto_id,imagen',
+            'estado:id,nombre',
+        ])
+        ->get();
+    }
+
 
     public function listarConFiltros(int $usuarioId, array $estados = []): Collection
     {
@@ -184,7 +201,7 @@ class ChatRepository implements IChatRepository
 
         return Chat::where(function($q) use ($usuarioId) {
             $q->where('comprador_id', $usuarioId)
-              ->orWhereHas('producto', fn($p) => $p->where('usuario_id', $usuarioId));
+              ->orWhereHas('producto', fn($p) => $p->where('vendedor_id', $usuarioId));
         })
         ->deEstados($estados)
         ->with([

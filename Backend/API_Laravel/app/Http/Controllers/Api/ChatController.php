@@ -130,7 +130,12 @@ class ChatController extends Controller
         return response()->json($resultado, 200);
     }
 
-    public function mostrarTransferencias(TransferenciasRequest $request)
+    public function transferencias(){
+        $transferencias = $this->chatService->transferencias(Auth::user()->usuario->id);
+        return $transferencias;
+    }
+
+    public function filtrarTransferencias(TransferenciasRequest $request)
     {
         $estados = $request->input("estados", []);
 

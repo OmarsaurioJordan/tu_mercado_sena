@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\ProductoController; 
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\EstadosController;
 use App\Http\Controllers\Api\MensajeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -199,6 +200,12 @@ Route::middleware('jwtVerify')->group(function (){
     Route::post('chats/{chat}/mensajes', [MensajeController::class, 'store'])->middleware('CheckChatBlock');
     // RUTA: api/mensajes/{mensaje}
     Route::delete('mensajes/{mensaje}', [MensajeController::class, 'destroy']);
+
+    Route::get('estados', [EstadosController::class, 'index']);
+
+    Route::get('transferencias', [ChatController::class, 'transferencias']);
+
+    Route::get('transferencias-filtros', [ChatController::class, 'filtrarTransferencias']);
 });
 
 

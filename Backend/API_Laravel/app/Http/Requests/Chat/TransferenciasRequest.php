@@ -24,7 +24,15 @@ class TransferenciasRequest extends FormRequest
     {
         return [
             "estados" => "nullable|array",
-            "estados.*" => "integer|exists:estados,id"
+            "estados.*" => "integer|in:1,5,6,7,8"
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'estados.*.in' => 'Uno o más estados seleccionados no son válidos.',
+            'estados.*.integer' => 'Los estados deben ser valores numéricos.',
         ];
     }
 }

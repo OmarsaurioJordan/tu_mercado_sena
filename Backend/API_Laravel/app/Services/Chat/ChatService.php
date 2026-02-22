@@ -256,6 +256,16 @@ class ChatService implements IChatService
         });
     }
 
+    public function transferencias(int $usuarioId): array
+    {
+        $transferencias = $this->repository->mostrarTransferencias($usuarioId);
+
+        return [
+            "success" => true,
+            "data" => $transferencias->isEmpty() ? 'No tienes transferencias hechas' : EstadosOutputDto::fromModelCollection($transferencias, $usuarioId)
+        ];
+    }
+
     public function mostrarTransferencias(int $usuarioId, array $estados): array
     {
         if (empty($estados)) {
@@ -266,7 +276,8 @@ class ChatService implements IChatService
 
         return [
             "success" => true,
-           "data" =>  empty(!$transferencias) ? EstadosOutputDto:: fromModelCollection($transferencias) : 'No tienes tranferencias hechas'
+           "data" => $transferencias->isNotEmpty() ? EstadosOutputDto:: fromModelCollection($transferencias, $usuarioId) : 'No tienes tranferencias hechas'
+
         ];
     }
 } 
