@@ -5,6 +5,7 @@ namespace App\Services\Chat;
 use App\Contracts\Chat\Repositories\IChatRepository;
 use Illuminate\Support\Facades\DB;
 use App\Contracts\Chat\Services\IChatService;
+use App\DTOs\Chat\EstadosOutputDto;
 use App\Exceptions\BusinessException;
 Use App\DTOs\Chat\InputDto;
 Use App\DTOs\Chat\UpdateInputDto;
@@ -253,5 +254,30 @@ class ChatService implements IChatService
                 'message' => 'Devolución registrada con exito'
             ];
         });
+    }
+
+    public function transferencias(int $usuarioId): array
+    {
+        $transferencias = $this->repository->mostrarTransferencias($usuarioId);
+
+        return [
+            "success" => true,
+            "data" => $transferencias->isEmpty() ? 'No tienes transferencias hechas' : EstadosOutputDto::fromModelCollection($transferencias, $usuarioId)
+        ];
+    }
+
+    public function mostrarTransferencias(int $usuarioId, array $estados): array
+    {
+        if (empty($estados)) {
+            throw new BusinessException("Transferencias no enviadas para su busqueda", 422);
+        }
+
+        $transferencias = $this->repository->listarConFiltros($usuarioId, $estados);
+
+        return [
+            "success" => true,
+           "data" => $transferencias->isNotEmpty() ? EstadosOutputDto:: fromModelCollection($transferencias, $usuarioId) : 'No tienes tranferencias hechas'
+
+        ];
     }
 } 
