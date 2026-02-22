@@ -69,4 +69,7 @@ interface IChatService
      * @return array - Arreglo con la confirmación de que se concreto la validación
      */
     public function terminarDevolucion(Chat $chat, int $usuarioId);
+
+    public function mostrarTransferencias(int $usuarioId, array $estados): array;
+
 }

@@ -16,6 +16,7 @@ use App\Http\Requests\Chat\IniciarCompraventaRequest;
 use App\Http\Requests\Chat\ModifyChatRequest;
 use App\Http\Requests\Chat\TerminarCompraventa;
 use App\Http\Requests\Chat\TerminarCompraventaRequest;
+use App\Http\Requests\Chat\TransferenciasRequest;
 use Illuminate\Support\Facades\Request;
 
 class ChatController extends Controller
@@ -127,6 +128,15 @@ class ChatController extends Controller
 
         // Retornar json
         return response()->json($resultado, 200);
+    }
+
+    public function mostrarTransferencias(TransferenciasRequest $request)
+    {
+        $estados = $request->input("estados", []);
+
+        $transferencias = $this->chatService->mostrarTransferencias(Auth::user()->usuario->id, $estados);
+
+        return response()->json($transferencias);
     }
 
 
