@@ -1393,15 +1393,165 @@ MÉTODO: **PATCH**
 }
 ```
 
+**5️⃣Mostrar Estados para transferencias**
+
+**👁️OJO** Método para obtener los estados de las transferencias. Util para hacer el input de tipo checkbox dinamico, a la par con la base de datos.
+
+RUTA: **http://127.0.0.1:8000/api/estados**
+
+MÉTODO: **GET**
+
+**Salida Json**
+
+```Json
+[
+  {
+    "id": 1,
+    "nombre": "activo",
+    "descripcion": "Cuando funciona con completa normalidad"
+  },
+  {
+    "id": 5,
+    "nombre": "vendido",
+    "descripcion": "aplicado a un chat cuando se hizo la transacción"
+  },
+  {
+    "id": 6,
+    "nombre": "esperando",
+    "descripcion": "la transacción del chat espera el visto bueno del comprador"
+  },
+  {
+    "id": 7,
+    "nombre": "devolviendo",
+    "descripcion": "el historial abre una solicitud de devolución, a espera de respuesta del vendedor"
+  },
+  {
+    "id": 8,
+    "nombre": "devuelto",
+    "descripcion": "el chat finalizó con una transacción que fué cancelada"
+  }
+]
+```
+
+
+
+**6️⃣Mostrar lista de transferencias**
+
+RUTA: **http://127.0.0.1:8000/api/transferencias**
+
+MÉTODO: **POST**
+
+**👁️OJO** Solo se muestra uno porque solo hay uno registro porque el usuario solo tiene una transferencia
+
+**RESTRICCIONES**
+
+✖️ Si el usuario no tiene transferencias (chats activos, esperando respuesta del vendedor, vendidos, devolviendo producto y producto devuelto) mostrara un mensaje diciendo que no tiene transferencias
+
+**Salida Json**
+
+```Json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 2,
+      "producto": {
+        "id": 1,
+        "nombre": "Mouse Gamer",
+        "imagen": null
+      },
+      "vendedor": {
+        "id": 1,
+        "nickname": "julian1223",
+        "avatar": "usuarios/1/698a9969b97db.webp"
+      },
+      "estado": {
+        "id": 8,
+        "nombre": "devuelto"
+      },
+      "cantidad": 1,
+      "precio": 70000,
+      "calificacion": 4,
+      "comentario": "4",
+      "fecha_venta": "2026-02-15T19:55:53.000000Z"
+    }
+  ]
+}
+```
+
+**6️⃣Mostrar lista de transferencias**
+
+RUTA: **http://127.0.0.1:8000/api/transferencias-filtros?estados[]=1&estados[]=5**
+
+**OJO👁️** Los estados[]=1 o estados[]=6 son solo de ejemplo, mostrando unicamente los chats con estados activos o esperando pero pueden cambiar según las transferencias que marque el usuario. Pueden ser estados[]=7 para mostrar los chats con estado devolviendo
+
+MÉTODO: **POST**
+
+**👁️OJO** Solo se muestra uno porque solo hay uno registro porque el usuario solo tiene una transferencia
+
+**RESTRICCIONES**
+
+✖️ Si el usuario no tiene transferencias (chats activos, esperando respuesta del vendedor, vendidos, devolviendo producto y producto devuelto) mostrara un mensaje diciendo que no tiene transferencias.
+
+✖️ Deben enviarse al menos un parametro de consulta ejemplo: **?estados[]=1** 
+
+
+**Salidas Json**
+
+Si el usuario consulta una transferencias que no tiene hecha
+
+```Json
+{
+  "success": true,
+  "data": "No tienes tranferencias hechas"
+}
+```
+
+Si el usuario marca varios transferencias para su consulta. Ejemplo **?estados[]=1&estados[]=8** mostrara solo la que tiene activa.
+
+```Json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 2,
+      "producto": {
+        "id": 1,
+        "nombre": "Mouse Gamer",
+        "imagen": null
+      },
+      "vendedor": {
+        "id": 1,
+        "nickname": "julian1223",
+        "avatar": "usuarios/1/698a9969b97db.webp"
+      },
+      "estado": {
+        "id": 8,
+        "nombre": "devuelto"
+      },
+      "cantidad": 1,
+      "precio": 70000,
+      "calificacion": 4,
+      "comentario": "4",
+      "fecha_venta": "2026-02-15T19:55:53.000000Z"
+    }
+  ]
+}
+```
 
 
 
 
+**Código	Significado**
 
-Código	Significado
 200	Operación exitosa
+
 201	Registro completado
+
 401	Token inválido / no autenticado
+
 422	Error de validación
+
 500	Error interno del servidor
+
 La parte de fotos sigue en prueba (Con exactitud puede que funcione) Mirar LOGS, falta probar con postman
