@@ -1,0 +1,119 @@
+# 🎬 DIRECTOR SCRIPT – VIDEO GENERATION
+
+Create a **10-second promotional commercial** for the web platform:
+
+**Product:** “Tu Mercado Sena”
+**Spoken language:** Latin American Spanish (all dialogue must remain in Spanish)
+**Aspect ratio:** 16:9 (desktop format)
+**Style:** Realistic, cinematic, energetic university tone
+**Audio:** Clean, clear, natural ambience
+
+---
+
+## 🎞 TOTAL DURATION: 10 seconds
+
+---
+
+## 🎬 SCENE 1 — CAFETERIA INTRO (0s–3s)
+
+**Location:** `cafeteria.png`
+
+* Use the cafeteria exactly as shown.
+* Remove the wooden table in the foreground to create space.
+* Do not redesign walls, lighting, or layout.
+
+**Presenter:** `kevin.png`
+**Voice:** `kevin.ogg`
+
+* Maintain facial accuracy.
+* Lip sync must match the provided voice.
+* Natural body gestures, friendly energy.
+
+**Dialogue (Spanish):**
+“Hola a todos, bienvenidos a Tu Mercado Sena, la plataforma exclusiva de nuestra comunidad.”
+
+Camera:
+
+* Medium shot.
+* Slight natural camera movement (subtle handheld or soft cinematic motion).
+
+Smooth dynamic transition to next scene.
+
+---
+
+## 🎬 SCENE 2 — COMPUTER ROOM + WEB DEMO (3s–7s)
+
+**Location:** `sala.png`
+
+* First show the computer room exactly as provided.
+* A visible desktop PC is present.
+* The web interface appears on the monitor.
+
+### Step 1 (Wide Context View – 3s–4s)
+
+* Show the room naturally.
+* The PC screen displays `bienvenida.png`.
+
+### Step 2 (Camera Movement – 4s–5s)
+
+* The camera performs a smooth cinematic zoom-in toward the PC monitor.
+* The zoom continues until the web interface fills the entire frame.
+* The environment fades from focus as the interface becomes full-screen.
+
+### Step 3 (Product Page Demo – 5s–7s)
+
+* Transition to `productos.png`.
+* Dynamically populate the interface with multiple realistic products:
+
+  * Teddy bears
+  * Smartphones
+  * Dresses
+  * Cosmetics
+  * Hamburgers
+* Simulate natural vertical scrolling.
+* Keep the interface realistic and consistent.
+
+**Voiceover (Spanish, same presenter voice):**
+“Donde podrás vender y comprar productos y servicios.”
+
+No background music overpowering the narration.
+
+Smooth transition to final scene.
+
+---
+
+## 🎬 SCENE 3 — STUDENT CELEBRATION (7s–9s)
+
+**Image:** `grupo.png`
+
+* Animate the group naturally.
+* Add subtle movement before the cheer.
+* Then all students raise their arms happily.
+
+**Chant (Spanish, energetic group voice):**
+“¡Únete a Tu Mercado Sena!”
+
+Facial expressions must show joy and enthusiasm.
+
+---
+
+## 🎬 FINAL FRAME — LOGO (9s–10s)
+
+**File:** `logo.png`
+
+* Display full-screen.
+* Clean white or neutral background if needed.
+* Slight fade-in or subtle scale animation.
+* No distortion of the logo.
+* End cleanly.
+
+---
+
+## ⚙️ IMPORTANT CONSTRAINTS
+
+* Total runtime must not exceed 10 seconds.
+* All dialogue must remain in Latin American Spanish.
+* Maintain realism — do not cartoonize the scenes.
+* Do not redesign locations beyond specified edits.
+* Keep pacing energetic but natural.
+* Maintain visual continuity between scenes.
