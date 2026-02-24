@@ -170,6 +170,12 @@ return new class extends Migration
                 'tipo' => 'denuncia',
                 'descripcion' => 'un producto o perfil aparece muchas veces como si lo pusieran en demasia para llamar la atención'
             ],
+            [
+                // id: 26
+                "nombre" => "sexual",
+                "tipo" => "denuncia",
+                "descripcion" => "un perfil o producto exhibe temáticas sexuales o provocativas"
+            ],
         ]);
     }
 
