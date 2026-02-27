@@ -1,0 +1,477 @@
+[gd_scene load_steps=27 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://sprites/dispositivo.png" type="Texture" id=2]
+[ext_resource path="res://sprites/ropa.png" type="Texture" id=3]
+[ext_resource path="res://sprites/alimento.png" type="Texture" id=4]
+[ext_resource path="res://scripts/Filtro.gd" type="Script" id=5]
+
+[sub_resource type="StyleBoxEmpty" id=6]
+
+[sub_resource type="StyleBoxEmpty" id=7]
+
+[sub_resource type="StyleBoxEmpty" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=9]
+
+[sub_resource type="StyleBoxEmpty" id=10]
+
+[sub_resource type="StyleBoxEmpty" id=11]
+
+[sub_resource type="StyleBoxEmpty" id=12]
+
+[sub_resource type="StyleBoxEmpty" id=13]
+
+[sub_resource type="StyleBoxEmpty" id=14]
+
+[sub_resource type="StyleBoxEmpty" id=15]
+
+[sub_resource type="StyleBoxFlat" id=16]
+bg_color = Color( 0.290196, 0.6, 0.529412, 1 )
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[sub_resource type="StyleBoxEmpty" id=17]
+
+[sub_resource type="StyleBoxEmpty" id=18]
+
+[sub_resource type="StyleBoxEmpty" id=19]
+
+[sub_resource type="StyleBoxEmpty" id=20]
+
+[sub_resource type="StyleBoxEmpty" id=21]
+
+[node name="Filtro" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 252.0
+margin_top = 43.0001
+margin_right = 406.0
+margin_bottom = 76.0001
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Filtro de Búsqueda"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel1" type="Panel" parent="."]
+margin_left = 3.0
+margin_top = 405.0
+margin_right = 719.0
+margin_bottom = 635.0
+rect_pivot_offset = Vector2( -3, -405 )
+focus_mode = 2
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel2" type="Panel" parent="."]
+margin_left = 1.0
+margin_top = 635.0
+margin_right = 717.0
+margin_bottom = 850.0
+rect_pivot_offset = Vector2( -3, -405 )
+focus_mode = 2
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel4" type="Panel" parent="."]
+margin_left = 1.0
+margin_top = 849.0
+margin_right = 717.0
+margin_bottom = 1080.0
+rect_pivot_offset = Vector2( -3, -405 )
+focus_mode = 2
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel3" type="Panel" parent="."]
+margin_left = 1.0
+margin_top = 155.0
+margin_right = 717.0
+margin_bottom = 406.0
+rect_pivot_offset = Vector2( -3, -405 )
+focus_mode = 2
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCatL" type="Button" parent="."]
+margin_left = 11.0
+margin_top = 221.0
+margin_right = 29.0
+margin_bottom = 252.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+text = "<"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCatR" type="Button" parent="."]
+margin_left = 629.0
+margin_top = 217.0
+margin_right = 647.0
+margin_bottom = 248.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+text = ">"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ImgCat" type="TextureRect" parent="."]
+margin_left = 262.0
+margin_top = 178.0
+margin_right = 431.0
+margin_bottom = 337.0
+texture = ExtResource( 4 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="TxtCat" type="Label" parent="."]
+margin_left = 257.0
+margin_top = 338.0
+margin_right = 379.0
+margin_bottom = 371.0
+rect_scale = Vector2( 1.5, 1.5 )
+text = "Alimentos"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ImgCatL" type="TextureRect" parent="."]
+margin_left = 109.0
+margin_top = 201.0
+margin_right = 221.0
+margin_bottom = 302.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="TxtCatL" type="Label" parent="."]
+margin_left = 74.0
+margin_top = 304.0
+margin_right = 196.0
+margin_bottom = 337.0
+rect_scale = Vector2( 1.5, 1.5 )
+text = "Dispositivos"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ImgCatR" type="TextureRect" parent="."]
+margin_left = 473.0
+margin_top = 198.0
+margin_right = 585.0
+margin_bottom = 299.0
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="TxtCatR" type="Label" parent="."]
+margin_left = 438.0
+margin_top = 301.0
+margin_right = 560.0
+margin_bottom = 334.0
+rect_scale = Vector2( 1.5, 1.5 )
+text = "Vestimenta"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCatLm" type="Button" parent="."]
+margin_left = 68.0
+margin_top = 192.0
+margin_right = 169.0
+margin_bottom = 291.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 11 )
+custom_styles/pressed = SubResource( 12 )
+custom_styles/focus = SubResource( 13 )
+custom_styles/disabled = SubResource( 14 )
+custom_styles/normal = SubResource( 15 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCatRm" type="Button" parent="."]
+margin_left = 452.0
+margin_top = 195.0
+margin_right = 553.0
+margin_bottom = 294.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 11 )
+custom_styles/pressed = SubResource( 12 )
+custom_styles/focus = SubResource( 13 )
+custom_styles/disabled = SubResource( 14 )
+custom_styles/normal = SubResource( 15 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Costo1" type="Label" parent="."]
+margin_left = 43.0
+margin_top = 428.0
+margin_right = 179.0
+margin_bottom = 471.0
+rect_scale = Vector2( 2, 2 )
+text = "valor Mínimo:"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Pan1" type="Panel" parent="."]
+margin_left = 313.0
+margin_top = 522.0
+margin_right = 356.0
+margin_bottom = 575.0
+custom_styles/panel = SubResource( 16 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="LinCostoMin" type="SpinBox" parent="."]
+margin_left = 36.0
+margin_top = 503.0
+margin_right = 197.0
+margin_bottom = 549.0
+rect_scale = Vector2( 2, 2 )
+max_value = 1e+06
+step = 1000.0
+rounded = true
+align = 1
+prefix = "$"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Costo2" type="Label" parent="."]
+margin_left = 373.0
+margin_top = 426.0
+margin_right = 509.0
+margin_bottom = 469.0
+rect_scale = Vector2( 2, 2 )
+text = "valor Máximo:"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Pan2" type="Panel" parent="."]
+margin_left = 643.0
+margin_top = 520.0
+margin_right = 686.0
+margin_bottom = 573.0
+custom_styles/panel = SubResource( 16 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="LinCostoMax" type="SpinBox" parent="."]
+margin_left = 366.0
+margin_top = 501.0
+margin_right = 527.0
+margin_bottom = 547.0
+rect_scale = Vector2( 2, 2 )
+max_value = 1e+06
+step = 1000.0
+value = 1e+06
+rounded = true
+align = 1
+prefix = "$"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Subtitulo1" type="Label" parent="."]
+margin_left = 67.0
+margin_top = 662.0
+margin_right = 195.0
+margin_bottom = 695.0
+rect_scale = Vector2( 2, 2 )
+text = "Calidad:"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCalidad" type="Button" parent="."]
+margin_left = 58.0
+margin_top = 722.0
+margin_right = 211.0
+margin_bottom = 768.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = "(N) Nuevo"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCalificar" type="Button" parent="."]
+margin_left = 462.0
+margin_top = 663.0
+margin_right = 562.0
+margin_bottom = 741.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 17 )
+custom_styles/pressed = SubResource( 18 )
+custom_styles/focus = SubResource( 19 )
+custom_styles/disabled = SubResource( 20 )
+custom_styles/normal = SubResource( 21 )
+text = "Calificación
+Mínima
+xxxoo"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnOnline" type="CheckButton" parent="."]
+margin_left = 227.0
+margin_top = 919.0
+margin_right = 380.0
+margin_bottom = 971.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+enabled_focus_mode = 0
+text = "Online"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnBuscar" type="Button" parent="."]
+margin_left = 98.0
+margin_top = 1125.0
+margin_right = 360.0
+margin_bottom = 1171.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Buscar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="BtnCatL" to="." method="_on_BtnCatL_pressed"]
+[connection signal="pressed" from="BtnCatR" to="." method="_on_BtnCatR_pressed"]
+[connection signal="pressed" from="BtnCatLm" to="." method="_on_BtnCatLm_pressed"]
+[connection signal="pressed" from="BtnCatRm" to="." method="_on_BtnCatRm_pressed"]
+[connection signal="pressed" from="BtnCalidad" to="." method="_on_BtnCalidad_pressed"]
+[connection signal="pressed" from="BtnCalificar" to="." method="_on_BtnCalificar_pressed"]
+[connection signal="pressed" from="BtnBuscar" to="." method="_on_BtnBuscar_pressed"]

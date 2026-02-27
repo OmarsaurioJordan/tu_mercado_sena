@@ -1,0 +1,366 @@
+[gd_scene load_steps=20 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://avatares/erick.png" type="Texture" id=2]
+[ext_resource path="res://fotos/casco.jpg" type="Texture" id=3]
+[ext_resource path="res://scenes/ImgR.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/ImgL.tscn" type="PackedScene" id=5]
+[ext_resource path="res://scenes/TxtL.tscn" type="PackedScene" id=6]
+[ext_resource path="res://scenes/TxtR.tscn" type="PackedScene" id=7]
+[ext_resource path="res://scripts/Chat.gd" type="Script" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=6]
+
+[sub_resource type="StyleBoxEmpty" id=7]
+
+[sub_resource type="StyleBoxEmpty" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=9]
+
+[sub_resource type="StyleBoxEmpty" id=10]
+
+[sub_resource type="StyleBoxFlat" id=11]
+bg_color = Color( 0.180392, 0.823529, 0.156863, 1 )
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color( 0.376471, 0.584314, 0.768627, 1 )
+border_blend = true
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[node name="Chat" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Msjs" type="Control" parent="."]
+margin_left = 7.0
+margin_top = 263.0
+margin_right = 47.0
+margin_bottom = 303.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="TxtR" parent="Msjs" instance=ExtResource( 7 )]
+
+[node name="TxtL" parent="Msjs" instance=ExtResource( 6 )]
+
+[node name="ImgR" parent="Msjs" instance=ExtResource( 4 )]
+
+[node name="ImgL" parent="Msjs" instance=ExtResource( 5 )]
+
+[node name="Panel1" type="Panel" parent="."]
+margin_left = 3.0
+margin_top = 3.0
+margin_right = 719.0
+margin_bottom = 251.0
+rect_pivot_offset = Vector2( -3, -405 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel2" type="Panel" parent="."]
+margin_left = 3.0
+margin_top = 969.0
+margin_right = 719.0
+margin_bottom = 1277.0
+rect_pivot_offset = Vector2( -3, -405 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Chats"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnOk" type="Button" parent="."]
+margin_left = 77.0
+margin_top = 136.0
+margin_right = 115.0
+margin_bottom = 162.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+text = "Ok"
+icon_align = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ImgUsr" type="TextureRect" parent="."]
+margin_left = 201.0
+margin_top = 42.0
+margin_right = 344.0
+margin_bottom = 183.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnUsr" type="Button" parent="."]
+margin_left = 198.0
+margin_top = 40.0
+margin_right = 383.0
+margin_bottom = 119.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+align = 0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ImgPro" type="TextureRect" parent="."]
+margin_left = 568.0
+margin_top = 43.0
+margin_right = 679.0
+margin_bottom = 139.0
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto" type="Label" parent="ImgPro"]
+self_modulate = Color( 1, 1, 1, 0.470588 )
+margin_left = -25.0
+margin_top = 103.0
+margin_right = 70.0
+margin_bottom = 131.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Casco en buen estado"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnPro" type="Button" parent="ImgPro"]
+margin_left = -29.0
+margin_top = -3.0
+margin_right = 57.0
+margin_bottom = 76.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+align = 0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="."]
+margin_left = 323.0
+margin_top = 161.0
+margin_right = 348.0
+margin_bottom = 186.0
+custom_styles/panel = SubResource( 11 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="."]
+margin_left = 357.0
+margin_top = 42.0
+margin_right = 471.0
+margin_bottom = 93.0
+rect_scale = Vector2( 1.75, 1.75 )
+custom_constants/line_spacing = -5
+text = "Erick"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Fecha" type="Label" parent="."]
+self_modulate = Color( 1, 1, 1, 0.705882 )
+margin_left = 369.0
+margin_top = 140.0
+margin_right = 469.0
+margin_bottom = 168.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "ayer"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="LinMsj" type="TextEdit" parent="."]
+margin_left = 34.0
+margin_top = 1048.0
+margin_right = 326.0
+margin_bottom = 1159.0
+rect_scale = Vector2( 1.75, 1.75 )
+text = "es que ni que fuera el único ese casco de mi%#$da..."
+wrap_enabled = true
+caret_blink = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnSend" type="Button" parent="."]
+margin_left = 563.0
+margin_top = 1149.0
+margin_right = 625.0
+margin_bottom = 1195.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Send"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnImg" type="Button" parent="."]
+self_modulate = Color( 0.988235, 1, 0.67451, 1 )
+margin_left = 568.0
+margin_top = 1054.0
+margin_right = 630.0
+margin_bottom = 1100.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+text = "Img"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnUp" type="Button" parent="."]
+margin_left = 71.0
+margin_top = 244.0
+margin_right = 84.0
+margin_bottom = 385.0
+rect_rotation = -90.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = ">"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDown" type="Button" parent="."]
+margin_left = 65.0
+margin_top = 1032.0
+margin_right = 78.0
+margin_bottom = 1173.0
+rect_rotation = -90.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = "<"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Mensaje" type="Label" parent="."]
+visible = false
+margin_left = 555.0
+margin_top = 39.0
+margin_right = 635.0
+margin_bottom = 126.0
+rect_scale = Vector2( 1.75, 1.75 )
+custom_colors/font_color = Color( 0.627451, 0.215686, 0.0745098, 1 )
+custom_constants/line_spacing = -4
+text = "solo chats con producto"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="RelojIA" type="Timer" parent="."]
+one_shot = true
+
+[node name="Reloj" type="Timer" parent="."]
+wait_time = 4.0
+one_shot = true
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="BtnOk" to="." method="_on_BtnOk_pressed"]
+[connection signal="pressed" from="BtnUsr" to="." method="_on_BtnUsr_pressed"]
+[connection signal="pressed" from="ImgPro/BtnPro" to="." method="_on_BtnPro_pressed"]
+[connection signal="pressed" from="BtnSend" to="." method="_on_BtnSend_pressed"]
+[connection signal="pressed" from="BtnImg" to="." method="_on_BtnImg_pressed"]
+[connection signal="pressed" from="BtnUp" to="." method="_on_BtnUp_pressed"]
+[connection signal="pressed" from="BtnDown" to="." method="_on_BtnDown_pressed"]
+[connection signal="timeout" from="RelojIA" to="." method="_on_RelojIA_timeout"]
+[connection signal="timeout" from="Reloj" to="." method="_on_Reloj_timeout"]

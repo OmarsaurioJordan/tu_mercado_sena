@@ -1,0 +1,799 @@
+[gd_scene load_steps=20 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://fotos/casco.jpg" type="Texture" id=2]
+[ext_resource path="res://scripts/Ventas.gd" type="Script" id=3]
+[ext_resource path="res://fotos/camisena.jpg" type="Texture" id=4]
+[ext_resource path="res://fotos/cuaderno.jpg" type="Texture" id=5]
+[ext_resource path="res://fotos/skateboard.jpg" type="Texture" id=6]
+[ext_resource path="res://fotos/nintendo.jpg" type="Texture" id=7]
+[ext_resource path="res://fotos/gorra.jpg" type="Texture" id=8]
+[ext_resource path="res://fotos/zapatos.jpg" type="Texture" id=9]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[sub_resource type="StyleBoxEmpty" id=6]
+
+[sub_resource type="StyleBoxEmpty" id=7]
+
+[sub_resource type="StyleBoxEmpty" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=9]
+
+[sub_resource type="StyleBoxEmpty" id=10]
+
+[node name="Ventas" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 252.0
+margin_top = 43.0001
+margin_right = 406.0
+margin_bottom = 76.0001
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Mi Catálogo"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto1" type="Control" parent="."]
+margin_left = 154.0
+margin_top = 293.0
+margin_right = 194.0
+margin_bottom = 333.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto1"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto1"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Casco de segunda"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto1"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$100.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto1" type="Button" parent="Producto1"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto2" type="Control" parent="."]
+margin_left = 352.0
+margin_top = 291.0
+margin_right = 392.0
+margin_bottom = 331.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto2"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 4 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto2"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Camisa del Sena"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto2"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$80.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto2" type="Button" parent="Producto2"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto3" type="Control" parent="."]
+margin_left = 552.0
+margin_top = 291.0
+margin_right = 592.0
+margin_bottom = 331.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto3"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 5 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto3"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Cuaderno
+rancio"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto3"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$22.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto3" type="Button" parent="Producto3"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto4" type="Control" parent="."]
+margin_left = 149.0
+margin_top = 619.0
+margin_right = 189.0
+margin_bottom = 659.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto4"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 8 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto4"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Gorra
+para
+pesca"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto4"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$8.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto4" type="Button" parent="Producto4"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto5" type="Control" parent="."]
+margin_left = 347.0
+margin_top = 617.0
+margin_right = 387.0
+margin_bottom = 657.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto5"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 7 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto5"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Nintendo
+viejo"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto5"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$220.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto5" type="Button" parent="Producto5"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto6" type="Control" parent="."]
+margin_left = 547.0
+margin_top = 617.0
+margin_right = 587.0
+margin_bottom = 657.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto6"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 6 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto6"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Skateboard"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto6"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$50.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto6" type="Button" parent="Producto6"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto7" type="Control" parent="."]
+margin_left = 149.0
+margin_top = 939.0
+margin_right = 189.0
+margin_bottom = 979.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto7"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 9 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto7"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Zapatos
+de mi
+tío fallecido"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto7"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$3.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto7" type="Button" parent="Producto7"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto8" type="Control" parent="."]
+visible = false
+margin_left = 347.0
+margin_top = 937.0
+margin_right = 387.0
+margin_bottom = 977.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto8"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto8"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Casco buenísimo jajaja"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto8"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$100.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto8" type="Button" parent="Producto8"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Producto9" type="Control" parent="."]
+visible = false
+margin_left = 547.0
+margin_top = 937.0
+margin_right = 587.0
+margin_bottom = 977.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="Producto9"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 89.0
+margin_bottom = 93.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="Producto9"]
+margin_left = -85.0
+margin_top = 91.0
+margin_right = 37.0
+margin_bottom = 164.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Casco buenísimo jajaja"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Precio" type="Label" parent="Producto9"]
+margin_left = -85.0
+margin_top = 202.0
+margin_right = 37.0
+margin_bottom = 236.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_colors/font_color = Color( 0.133333, 0.435294, 0.419608, 1 )
+text = "$100.000"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnProducto9" type="Button" parent="Producto9"]
+margin_left = -84.0
+margin_top = -68.0
+margin_right = 17.0
+margin_bottom = 113.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnUp" type="Button" parent="."]
+margin_left = 67.0
+margin_top = 1241.0
+margin_right = 80.0
+margin_bottom = 1382.0
+rect_rotation = -90.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+text = "<"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDown" type="Button" parent="."]
+margin_left = 76.0
+margin_top = 215.0
+margin_right = 89.0
+margin_bottom = 356.0
+rect_rotation = -90.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+text = ">"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="Producto1/BtnProducto1" to="." method="_on_BtnProducto1_pressed"]
+[connection signal="pressed" from="Producto2/BtnProducto2" to="." method="_on_BtnProducto2_pressed"]
+[connection signal="pressed" from="Producto3/BtnProducto3" to="." method="_on_BtnProducto3_pressed"]
+[connection signal="pressed" from="Producto4/BtnProducto4" to="." method="_on_BtnProducto4_pressed"]
+[connection signal="pressed" from="Producto5/BtnProducto5" to="." method="_on_BtnProducto5_pressed"]
+[connection signal="pressed" from="Producto6/BtnProducto6" to="." method="_on_BtnProducto6_pressed"]
+[connection signal="pressed" from="Producto7/BtnProducto7" to="." method="_on_BtnProducto7_pressed"]
+[connection signal="pressed" from="Producto8/BtnProducto8" to="." method="_on_BtnProducto8_pressed"]
+[connection signal="pressed" from="Producto9/BtnProducto9" to="." method="_on_BtnProducto9_pressed"]
+[connection signal="pressed" from="BtnUp" to="." method="_on_BtnUp_pressed"]
+[connection signal="pressed" from="BtnDown" to="." method="_on_BtnDown_pressed"]

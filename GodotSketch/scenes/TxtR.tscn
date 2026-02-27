@@ -1,0 +1,23 @@
+[gd_scene format=2]
+
+[node name="TxtR" type="Control"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Txt" type="Label" parent="."]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = 142.0
+margin_right = 448.0
+margin_bottom = 55.0
+rect_scale = Vector2( 1.75, 1.75 )
+custom_constants/line_spacing = -5
+text = "hola, vendeme ese caso jajaja, no en verdad lo necesito pero urgente!!!"
+align = 2
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}

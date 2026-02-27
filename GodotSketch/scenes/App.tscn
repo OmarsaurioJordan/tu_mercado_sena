@@ -1,0 +1,189 @@
+[gd_scene load_steps=29 format=2]
+
+[ext_resource path="res://scenes/Chat.tscn" type="PackedScene" id=1]
+[ext_resource path="res://scenes/Vender.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scenes/Login.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scenes/Registro.tscn" type="PackedScene" id=4]
+[ext_resource path="res://scenes/Main.tscn" type="PackedScene" id=5]
+[ext_resource path="res://scenes/Bloqueados.tscn" type="PackedScene" id=6]
+[ext_resource path="res://scenes/Opciones.tscn" type="PackedScene" id=7]
+[ext_resource path="res://scenes/Historial.tscn" type="PackedScene" id=8]
+[ext_resource path="res://scenes/Estadisticas.tscn" type="PackedScene" id=9]
+[ext_resource path="res://scenes/Perfil.tscn" type="PackedScene" id=10]
+[ext_resource path="res://scenes/Recuperar.tscn" type="PackedScene" id=11]
+[ext_resource path="res://scripts/App.gd" type="Script" id=12]
+[ext_resource path="res://scenes/Producto.tscn" type="PackedScene" id=13]
+[ext_resource path="res://scenes/Usuario.tscn" type="PackedScene" id=14]
+[ext_resource path="res://scenes/Repassword.tscn" type="PackedScene" id=15]
+[ext_resource path="res://scenes/Editar.tscn" type="PackedScene" id=16]
+[ext_resource path="res://scenes/Mio.tscn" type="PackedScene" id=17]
+[ext_resource path="res://scenes/Ventas.tscn" type="PackedScene" id=18]
+[ext_resource path="res://scenes/Modificar.tscn" type="PackedScene" id=19]
+[ext_resource path="res://scenes/Market.tscn" type="PackedScene" id=20]
+[ext_resource path="res://scenes/Filtro.tscn" type="PackedScene" id=21]
+[ext_resource path="res://scenes/Introduccion.tscn" type="PackedScene" id=22]
+[ext_resource path="res://scenes/Legal.tscn" type="PackedScene" id=23]
+[ext_resource path="res://scenes/Ayuda.tscn" type="PackedScene" id=24]
+[ext_resource path="res://scenes/Mensajes.tscn" type="PackedScene" id=25]
+[ext_resource path="res://scenes/Catalogo.tscn" type="PackedScene" id=26]
+[ext_resource path="res://scenes/Favoritos.tscn" type="PackedScene" id=27]
+[ext_resource path="res://scenes/Transaccion.tscn" type="PackedScene" id=28]
+
+[node name="App" type="Node"]
+script = ExtResource( 12 )
+
+[node name="Main" parent="." instance=ExtResource( 5 )]
+
+[node name="Login" parent="." instance=ExtResource( 3 )]
+margin_left = -829.0
+margin_top = -2.0
+margin_right = -829.0
+margin_bottom = -2.0
+
+[node name="Registro" parent="." instance=ExtResource( 4 )]
+margin_left = -1698.0
+margin_top = -10.0
+margin_right = -1698.0
+margin_bottom = -10.0
+
+[node name="Transaccion" parent="." instance=ExtResource( 28 )]
+margin_left = 2772.0
+margin_top = 1414.0
+margin_right = 2772.0
+margin_bottom = 1414.0
+
+[node name="Opciones" parent="." instance=ExtResource( 7 )]
+margin_left = 5.0
+margin_top = -1415.0
+margin_right = 5.0
+margin_bottom = -1415.0
+
+[node name="Chat" parent="." instance=ExtResource( 1 )]
+margin_left = 2766.0
+margin_top = 12.0
+margin_right = 2766.0
+margin_bottom = 12.0
+
+[node name="Mensajes" parent="." instance=ExtResource( 25 )]
+margin_left = 2765.0
+margin_top = -1399.0
+margin_right = 2765.0
+margin_bottom = -1399.0
+
+[node name="Catalogo" parent="." instance=ExtResource( 26 )]
+margin_left = 1833.0
+margin_top = 1415.0
+margin_right = 1833.0
+margin_bottom = 1415.0
+
+[node name="Favoritos" parent="." instance=ExtResource( 27 )]
+margin_left = 1843.0
+margin_top = 2860.0
+margin_right = 1843.0
+margin_bottom = 2860.0
+
+[node name="Bloqueados" parent="." instance=ExtResource( 6 )]
+margin_left = -2578.0
+margin_top = -1455.0
+margin_right = -2578.0
+margin_bottom = -1455.0
+
+[node name="Historial" parent="." instance=ExtResource( 8 )]
+margin_left = -1703.0
+margin_top = 1413.0
+margin_right = -1703.0
+margin_bottom = 1413.0
+
+[node name="Estadisticas" parent="." instance=ExtResource( 9 )]
+margin_left = -1695.0
+margin_top = 2837.0
+margin_right = -1695.0
+margin_bottom = 2837.0
+
+[node name="Recuperar" parent="." instance=ExtResource( 11 )]
+margin_left = -2563.0
+margin_top = -1.0
+margin_right = -2563.0
+margin_bottom = -1.0
+
+[node name="Producto" parent="." instance=ExtResource( 13 )]
+margin_left = 886.0
+margin_right = 886.0
+
+[node name="Usuario" parent="." instance=ExtResource( 14 )]
+margin_left = 892.0
+margin_top = -1411.0
+margin_right = 892.0
+margin_bottom = -1411.0
+
+[node name="Vender" parent="." instance=ExtResource( 2 )]
+margin_left = 900.0
+margin_top = 1412.0
+margin_right = 900.0
+margin_bottom = 1412.0
+
+[node name="Repassword" parent="." instance=ExtResource( 15 )]
+margin_left = -1701.0
+margin_top = -1448.0
+margin_right = -1701.0
+margin_bottom = -1448.0
+
+[node name="Perfil" parent="." instance=ExtResource( 10 )]
+margin_left = 1836.0
+margin_top = -2.0
+margin_right = 1836.0
+margin_bottom = -2.0
+
+[node name="Editar" parent="." instance=ExtResource( 16 )]
+margin_left = 1829.0
+margin_top = -1420.0
+margin_right = 1829.0
+margin_bottom = -1420.0
+
+[node name="Mio" parent="." instance=ExtResource( 17 )]
+margin_left = 3.0
+margin_top = 2873.0
+margin_right = 3.0
+margin_bottom = 2873.0
+
+[node name="Ventas" parent="." instance=ExtResource( 18 )]
+margin_left = 5.0
+margin_top = 1412.0
+margin_right = 5.0
+margin_bottom = 1412.0
+
+[node name="Modificar" parent="." instance=ExtResource( 19 )]
+margin_left = 911.0
+margin_top = 2854.0
+margin_right = 911.0
+margin_bottom = 2854.0
+
+[node name="Market" parent="." instance=ExtResource( 20 )]
+margin_left = -836.0
+margin_top = 2849.0
+margin_right = -836.0
+margin_bottom = 2849.0
+
+[node name="Filtro" parent="." instance=ExtResource( 21 )]
+margin_left = -841.0
+margin_top = 1408.0
+margin_right = -841.0
+margin_bottom = 1408.0
+
+[node name="Introduccion" parent="." instance=ExtResource( 22 )]
+margin_left = -2585.0
+margin_top = 1418.0
+margin_right = -2585.0
+margin_bottom = 1418.0
+
+[node name="Legal" parent="." instance=ExtResource( 23 )]
+margin_left = -2591.0
+margin_top = 2831.0
+margin_right = -2591.0
+margin_bottom = 2831.0
+
+[node name="Ayuda" parent="." instance=ExtResource( 24 )]
+margin_left = -837.0
+margin_top = -1438.0
+margin_right = -837.0
+margin_bottom = -1438.0

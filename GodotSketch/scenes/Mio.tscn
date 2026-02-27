@@ -1,0 +1,169 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://fotos/casco.jpg" type="Texture" id=2]
+[ext_resource path="res://scripts/Mio.gd" type="Script" id=4]
+
+[node name="Mio" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 257.0
+margin_top = 37.0
+margin_right = 411.0
+margin_bottom = 70.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Mi Producto"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Foto" type="TextureRect" parent="."]
+margin_left = 58.0
+margin_top = 144.0
+margin_right = 668.0
+margin_bottom = 610.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="."]
+margin_left = 116.0
+margin_top = 617.0
+margin_right = 335.0
+margin_bottom = 647.0
+rect_scale = Vector2( 2.5, 2.5 )
+custom_constants/line_spacing = -5
+text = "Casco de segunda"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Calidad" type="Label" parent="."]
+margin_left = 45.0
+margin_top = 622.0
+margin_right = 90.0
+margin_bottom = 673.0
+rect_scale = Vector2( 1.5, 1.5 )
+text = "(S)"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Descripcion" type="Label" parent="."]
+margin_left = 62.0
+margin_top = 692.0
+margin_right = 410.0
+margin_bottom = 839.0
+rect_scale = Vector2( 1.75, 1.75 )
+text = "este caso me salvó de 5 accidentes mortales, mejor dicho, está vendecido, vea eso lo han intentado romper jugando tejo y nada, es de adamantium"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Costo" type="Label" parent="."]
+margin_left = 59.0
+margin_top = 943.0
+margin_right = 210.0
+margin_bottom = 986.0
+rect_scale = Vector2( 2, 2 )
+text = "valor: $100.000"
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Disponible" type="Label" parent="."]
+margin_left = 372.0
+margin_top = 943.0
+margin_right = 518.0
+margin_bottom = 986.0
+rect_scale = Vector2( 2, 2 )
+text = "disponibles: 1"
+align = 2
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Vistas" type="Label" parent="."]
+margin_left = 219.0
+margin_top = 1027.0
+margin_right = 365.0
+margin_bottom = 1070.0
+rect_scale = Vector2( 2, 2 )
+text = "vitas: 12"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnEditar" type="Button" parent="."]
+margin_left = 461.0
+margin_top = 1130.0
+margin_right = 562.0
+margin_bottom = 1176.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Editar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnEliminar" type="Button" parent="."]
+margin_left = 69.0
+margin_top = 1132.0
+margin_right = 170.0
+margin_bottom = 1178.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Eliminar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="BtnEditar" to="." method="_on_BtnEditar_pressed"]
+[connection signal="pressed" from="BtnEliminar" to="." method="_on_BtnEliminar_pressed"]

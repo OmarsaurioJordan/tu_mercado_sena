@@ -1,0 +1,151 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://scripts/Opciones.gd" type="Script" id=2]
+
+[node name="Opciones" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 267.0
+margin_top = 39.0
+margin_right = 421.0
+margin_bottom = 72.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Opciónes"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnNotifi" type="CheckButton" parent="."]
+margin_left = 169.0
+margin_top = 206.0
+margin_right = 403.0
+margin_bottom = 269.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+pressed = true
+enabled_focus_mode = 0
+text = "Notifi Push"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnMail" type="CheckButton" parent="."]
+margin_left = 171.0
+margin_top = 317.0
+margin_right = 405.0
+margin_bottom = 380.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+enabled_focus_mode = 0
+text = "Notifi Correo"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDatos" type="CheckButton" parent="."]
+margin_left = 169.0
+margin_top = 426.0
+margin_right = 403.0
+margin_bottom = 489.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+enabled_focus_mode = 0
+text = "Usar Datos"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVisible" type="CheckButton" parent="."]
+margin_left = 169.0
+margin_top = 537.0
+margin_right = 403.0
+margin_bottom = 600.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+pressed = true
+enabled_focus_mode = 0
+text = "Estar Visible"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnAyuda" type="Button" parent="."]
+margin_left = 157.0
+margin_top = 794.0
+margin_right = 370.0
+margin_bottom = 840.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Contacta a la Ayuda"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnPassword" type="Button" parent="."]
+margin_left = 157.0
+margin_top = 903.0
+margin_right = 370.0
+margin_bottom = 949.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Cambio de Contraseña"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnBloqueados" type="Button" parent="."]
+margin_left = 159.0
+margin_top = 1012.0
+margin_right = 372.0
+margin_bottom = 1058.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Lista de Bloqueados"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCerrar" type="Button" parent="."]
+margin_left = 159.0
+margin_top = 1123.0
+margin_right = 372.0
+margin_bottom = 1169.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Cerrar Sesion"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="BtnAyuda" to="." method="_on_BtnAyuda_pressed"]
+[connection signal="pressed" from="BtnPassword" to="." method="_on_BtnPassword_pressed"]
+[connection signal="pressed" from="BtnBloqueados" to="." method="_on_BtnBloqueados_pressed"]
+[connection signal="pressed" from="BtnCerrar" to="." method="_on_BtnCerrar_pressed"]

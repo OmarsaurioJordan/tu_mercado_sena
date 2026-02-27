@@ -1,0 +1,23 @@
+[gd_scene format=2]
+
+[node name="TxtL" type="Control"]
+margin_top = 115.0
+margin_right = 40.0
+margin_bottom = 155.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Txt" type="Label" parent="."]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = 32.0
+margin_right = 347.0
+margin_bottom = 55.0
+rect_scale = Vector2( 1.75, 1.75 )
+custom_constants/line_spacing = -5
+text = "pues mire socio, hay como 11 personas preguntando, si es urgente vale más"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}

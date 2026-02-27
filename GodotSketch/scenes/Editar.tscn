@@ -1,0 +1,124 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://avatares/juanseb.png" type="Texture" id=2]
+[ext_resource path="res://scripts/Editar.gd" type="Script" id=3]
+
+[node name="Editar" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 219.0
+margin_top = 37.0
+margin_right = 350.0
+margin_bottom = 70.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Editar Perfil"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Foto" type="TextureRect" parent="."]
+margin_left = 210.0
+margin_top = 150.0
+margin_right = 510.0
+margin_bottom = 450.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnFoto" type="Button" parent="."]
+margin_left = 233.0
+margin_top = 468.0
+margin_right = 358.0
+margin_bottom = 514.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Foto"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="LinNombre" type="LineEdit" parent="."]
+margin_left = 64.0
+margin_top = 581.0
+margin_right = 360.0
+margin_bottom = 627.0
+rect_scale = Vector2( 2, 2 )
+text = "Juan Sebastián"
+align = 1
+max_length = 32
+placeholder_text = "Nombre"
+placeholder_alpha = 0.4
+caret_blink = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="LinDescripcion" type="TextEdit" parent="."]
+margin_left = 71.0
+margin_top = 697.0
+margin_right = 401.0
+margin_bottom = 852.0
+rect_scale = Vector2( 1.75, 1.75 )
+text = "soy un vendedor de juegos entretenidos, pero son más entretenidos si usted los compara oyó?"
+wrap_enabled = true
+caret_blink = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="LinLink" type="LineEdit" parent="."]
+margin_left = 72.0
+margin_top = 1003.0
+margin_right = 368.0
+margin_bottom = 1049.0
+rect_scale = Vector2( 2, 2 )
+align = 1
+max_length = 120
+placeholder_text = "Link a tus redes sociales"
+placeholder_alpha = 0.4
+caret_blink = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnGuardar" type="Button" parent="."]
+margin_left = 243.0
+margin_top = 1127.0
+margin_right = 365.0
+margin_bottom = 1173.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Guardar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="BtnFoto" to="." method="_on_BtnFoto_pressed"]
+[connection signal="pressed" from="BtnGuardar" to="." method="_on_BtnGuardar_pressed"]

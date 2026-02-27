@@ -1,0 +1,881 @@
+[gd_scene load_steps=22 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://avatares/erick.png" type="Texture" id=2]
+[ext_resource path="res://scripts/Mensajes.gd" type="Script" id=3]
+[ext_resource path="res://avatares/freddy.png" type="Texture" id=4]
+[ext_resource path="res://avatares/kelly.png" type="Texture" id=5]
+[ext_resource path="res://avatares/valery.png" type="Texture" id=6]
+[ext_resource path="res://avatares/gerardo.png" type="Texture" id=7]
+[ext_resource path="res://avatares/omar.png" type="Texture" id=8]
+[ext_resource path="res://avatares/johan.png" type="Texture" id=9]
+
+[sub_resource type="StyleBoxFlat" id=11]
+bg_color = Color( 0.141176, 0.435294, 0.380392, 1 )
+
+[sub_resource type="StyleBoxFlat" id=12]
+bg_color = Color( 0.180392, 0.823529, 0.156863, 1 )
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color( 0.376471, 0.584314, 0.768627, 1 )
+border_blend = true
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[sub_resource type="StyleBoxEmpty" id=6]
+
+[sub_resource type="StyleBoxEmpty" id=7]
+
+[sub_resource type="StyleBoxEmpty" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=9]
+
+[sub_resource type="StyleBoxEmpty" id=10]
+
+[node name="Mensajes" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 257.0
+margin_top = 37.0
+margin_right = 395.0
+margin_bottom = 70.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Mensajes"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User1" type="Control" parent="."]
+margin_left = 179.0
+margin_top = 290.0
+margin_right = 215.0
+margin_bottom = 330.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel" type="Panel" parent="User1"]
+margin_left = -6.0
+margin_top = -63.0
+margin_right = 490.0
+margin_bottom = -59.0
+custom_styles/panel = SubResource( 11 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User1"]
+margin_left = -142.0
+margin_top = -66.0
+margin_right = -27.0
+margin_bottom = 45.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User1"]
+margin_left = -11.0
+margin_top = -56.0
+margin_right = 191.0
+margin_bottom = -28.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Erick"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Fecha" type="Label" parent="User1"]
+self_modulate = Color( 1, 1, 1, 0.705882 )
+margin_left = 364.0
+margin_top = -48.0
+margin_right = 464.0
+margin_bottom = -20.0
+rect_scale = Vector2( 1.25, 1.25 )
+custom_constants/line_spacing = -5
+text = "ayer"
+align = 2
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Chat" type="Label" parent="User1"]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = -10.0
+margin_top = -2.0
+margin_right = 325.0
+margin_bottom = 26.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "> hole cómo van esos intentos de dominio global"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="User1"]
+margin_left = -47.0
+margin_top = 26.0
+margin_right = -22.0
+margin_bottom = 51.0
+rect_scale = Vector2( 0.75, 0.75 )
+custom_styles/panel = SubResource( 12 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn1" type="Button" parent="User1"]
+margin_left = -142.0
+margin_top = -65.0
+margin_right = 224.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User2" type="Control" parent="."]
+margin_left = 181.0
+margin_top = 420.0
+margin_right = 217.0
+margin_bottom = 460.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel" type="Panel" parent="User2"]
+margin_left = -6.0
+margin_top = -63.0
+margin_right = 490.0
+margin_bottom = -59.0
+custom_styles/panel = SubResource( 11 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User2"]
+margin_left = -142.0
+margin_top = -66.0
+margin_right = -27.0
+margin_bottom = 45.0
+texture = ExtResource( 4 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User2"]
+margin_left = -11.0
+margin_top = -56.0
+margin_right = 191.0
+margin_bottom = -28.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Freddy"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Fecha" type="Label" parent="User2"]
+self_modulate = Color( 1, 1, 1, 0.705882 )
+margin_left = 364.0
+margin_top = -48.0
+margin_right = 464.0
+margin_bottom = -20.0
+rect_scale = Vector2( 1.25, 1.25 )
+custom_constants/line_spacing = -5
+text = "martes"
+align = 2
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Chat" type="Label" parent="User2"]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = -10.0
+margin_top = -2.0
+margin_right = 325.0
+margin_bottom = 26.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "tú: entonces Freddy? si me la vendes?"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="User2"]
+margin_left = -47.0
+margin_top = 26.0
+margin_right = -22.0
+margin_bottom = 51.0
+rect_scale = Vector2( 0.75, 0.75 )
+custom_styles/panel = SubResource( 12 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn2" type="Button" parent="User2"]
+margin_left = -142.0
+margin_top = -65.0
+margin_right = 224.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User3" type="Control" parent="."]
+margin_left = 182.0
+margin_top = 553.0
+margin_right = 218.0
+margin_bottom = 593.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel" type="Panel" parent="User3"]
+margin_left = -6.0
+margin_top = -63.0
+margin_right = 490.0
+margin_bottom = -59.0
+custom_styles/panel = SubResource( 11 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User3"]
+margin_left = -142.0
+margin_top = -66.0
+margin_right = -27.0
+margin_bottom = 45.0
+texture = ExtResource( 5 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User3"]
+margin_left = -11.0
+margin_top = -56.0
+margin_right = 191.0
+margin_bottom = -28.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Kelly"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Fecha" type="Label" parent="User3"]
+self_modulate = Color( 1, 1, 1, 0.705882 )
+margin_left = 364.0
+margin_top = -48.0
+margin_right = 464.0
+margin_bottom = -20.0
+rect_scale = Vector2( 1.25, 1.25 )
+custom_constants/line_spacing = -5
+text = "1 mes"
+align = 2
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Chat" type="Label" parent="User3"]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = -10.0
+margin_top = -2.0
+margin_right = 325.0
+margin_bottom = 26.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "> jajaja por acá en otro lado nooo te imaginás"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="User3"]
+margin_left = -47.0
+margin_top = 26.0
+margin_right = -22.0
+margin_bottom = 51.0
+rect_scale = Vector2( 0.75, 0.75 )
+custom_styles/panel = SubResource( 12 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn3" type="Button" parent="User3"]
+margin_left = -142.0
+margin_top = -65.0
+margin_right = 224.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User4" type="Control" parent="."]
+margin_left = 184.0
+margin_top = 689.0
+margin_right = 220.0
+margin_bottom = 729.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel" type="Panel" parent="User4"]
+margin_left = -6.0
+margin_top = -63.0
+margin_right = 490.0
+margin_bottom = -59.0
+custom_styles/panel = SubResource( 11 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User4"]
+margin_left = -142.0
+margin_top = -66.0
+margin_right = -27.0
+margin_bottom = 45.0
+texture = ExtResource( 9 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User4"]
+margin_left = -11.0
+margin_top = -56.0
+margin_right = 191.0
+margin_bottom = -28.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Johan"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Fecha" type="Label" parent="User4"]
+self_modulate = Color( 1, 1, 1, 0.705882 )
+margin_left = 364.0
+margin_top = -48.0
+margin_right = 464.0
+margin_bottom = -20.0
+rect_scale = Vector2( 1.25, 1.25 )
+custom_constants/line_spacing = -5
+text = "1 año"
+align = 2
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Chat" type="Label" parent="User4"]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = -10.0
+margin_top = -2.0
+margin_right = 325.0
+margin_bottom = 26.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "> en la buena pa"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="User4"]
+margin_left = -47.0
+margin_top = 26.0
+margin_right = -22.0
+margin_bottom = 51.0
+rect_scale = Vector2( 0.75, 0.75 )
+custom_styles/panel = SubResource( 12 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn4" type="Button" parent="User4"]
+margin_left = -142.0
+margin_top = -65.0
+margin_right = 224.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User5" type="Control" parent="."]
+margin_left = 185.0
+margin_top = 822.0
+margin_right = 221.0
+margin_bottom = 862.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel" type="Panel" parent="User5"]
+margin_left = -6.0
+margin_top = -63.0
+margin_right = 490.0
+margin_bottom = -59.0
+custom_styles/panel = SubResource( 11 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User5"]
+margin_left = -142.0
+margin_top = -66.0
+margin_right = -27.0
+margin_bottom = 45.0
+texture = ExtResource( 6 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User5"]
+margin_left = -11.0
+margin_top = -56.0
+margin_right = 191.0
+margin_bottom = -28.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Valery"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Fecha" type="Label" parent="User5"]
+self_modulate = Color( 1, 1, 1, 0.705882 )
+margin_left = 364.0
+margin_top = -48.0
+margin_right = 464.0
+margin_bottom = -20.0
+rect_scale = Vector2( 1.25, 1.25 )
+custom_constants/line_spacing = -5
+text = "ayer"
+align = 2
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Chat" type="Label" parent="User5"]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = -10.0
+margin_top = -2.0
+margin_right = 325.0
+margin_bottom = 26.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "tú: al fin vamos o no? contestáaaaaaa"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="User5"]
+margin_left = -47.0
+margin_top = 26.0
+margin_right = -22.0
+margin_bottom = 51.0
+rect_scale = Vector2( 0.75, 0.75 )
+custom_styles/panel = SubResource( 12 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn5" type="Button" parent="User5"]
+margin_left = -142.0
+margin_top = -65.0
+margin_right = 224.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User6" type="Control" parent="."]
+margin_left = 182.0
+margin_top = 958.0
+margin_right = 218.0
+margin_bottom = 998.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel" type="Panel" parent="User6"]
+margin_left = -6.0
+margin_top = -63.0
+margin_right = 490.0
+margin_bottom = -59.0
+custom_styles/panel = SubResource( 11 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User6"]
+margin_left = -142.0
+margin_top = -66.0
+margin_right = -27.0
+margin_bottom = 45.0
+texture = ExtResource( 8 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User6"]
+margin_left = -11.0
+margin_top = -56.0
+margin_right = 191.0
+margin_bottom = -28.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Omar"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Fecha" type="Label" parent="User6"]
+self_modulate = Color( 1, 1, 1, 0.705882 )
+margin_left = 364.0
+margin_top = -48.0
+margin_right = 464.0
+margin_bottom = -20.0
+rect_scale = Vector2( 1.25, 1.25 )
+custom_constants/line_spacing = -5
+text = "sábado"
+align = 2
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Chat" type="Label" parent="User6"]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = -10.0
+margin_top = -2.0
+margin_right = 325.0
+margin_bottom = 26.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "> si,está bien, ahora son fantástico ujum"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="User6"]
+margin_left = -47.0
+margin_top = 26.0
+margin_right = -22.0
+margin_bottom = 51.0
+rect_scale = Vector2( 0.75, 0.75 )
+custom_styles/panel = SubResource( 12 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn6" type="Button" parent="User6"]
+margin_left = -142.0
+margin_top = -65.0
+margin_right = 224.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User7" type="Control" parent="."]
+margin_left = 184.0
+margin_top = 1095.0
+margin_right = 220.0
+margin_bottom = 1135.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Panel" type="Panel" parent="User7"]
+margin_left = -6.0
+margin_top = -63.0
+margin_right = 490.0
+margin_bottom = -59.0
+custom_styles/panel = SubResource( 11 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User7"]
+margin_left = -142.0
+margin_top = -66.0
+margin_right = -27.0
+margin_bottom = 45.0
+texture = ExtResource( 7 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User7"]
+margin_left = -11.0
+margin_top = -56.0
+margin_right = 191.0
+margin_bottom = -28.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Gerardo"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Fecha" type="Label" parent="User7"]
+self_modulate = Color( 1, 1, 1, 0.705882 )
+margin_left = 364.0
+margin_top = -48.0
+margin_right = 464.0
+margin_bottom = -20.0
+rect_scale = Vector2( 1.25, 1.25 )
+custom_constants/line_spacing = -5
+text = "ayer"
+align = 2
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Chat" type="Label" parent="User7"]
+self_modulate = Color( 1, 1, 1, 0.627451 )
+margin_left = -10.0
+margin_top = -2.0
+margin_right = 325.0
+margin_bottom = 26.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "> joven, me debe un plan de mejoramiento"
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="User7"]
+margin_left = -47.0
+margin_top = 26.0
+margin_right = -22.0
+margin_bottom = 51.0
+rect_scale = Vector2( 0.75, 0.75 )
+custom_styles/panel = SubResource( 12 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn7" type="Button" parent="User7"]
+margin_left = -142.0
+margin_top = -65.0
+margin_right = 224.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnUp" type="Button" parent="."]
+margin_left = 76.0
+margin_top = 209.0
+margin_right = 89.0
+margin_bottom = 350.0
+rect_rotation = -90.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+text = ">"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDown" type="Button" parent="."]
+margin_left = 67.0
+margin_top = 1226.0
+margin_right = 80.0
+margin_bottom = 1367.0
+rect_rotation = -90.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 6 )
+custom_styles/pressed = SubResource( 7 )
+custom_styles/focus = SubResource( 8 )
+custom_styles/disabled = SubResource( 9 )
+custom_styles/normal = SubResource( 10 )
+text = "<"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="User1/Btn1" to="." method="_on_Btn1_pressed"]
+[connection signal="pressed" from="User2/Btn2" to="." method="_on_Btn2_pressed"]
+[connection signal="pressed" from="User3/Btn3" to="." method="_on_Btn3_pressed"]
+[connection signal="pressed" from="User4/Btn4" to="." method="_on_Btn4_pressed"]
+[connection signal="pressed" from="User5/Btn5" to="." method="_on_Btn5_pressed"]
+[connection signal="pressed" from="User6/Btn6" to="." method="_on_Btn6_pressed"]
+[connection signal="pressed" from="User7/Btn7" to="." method="_on_Btn7_pressed"]
+[connection signal="pressed" from="BtnUp" to="." method="_on_BtnUp_pressed"]
+[connection signal="pressed" from="BtnDown" to="." method="_on_BtnDown_pressed"]

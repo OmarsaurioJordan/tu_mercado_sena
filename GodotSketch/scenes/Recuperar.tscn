@@ -1,0 +1,131 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://sprites/logo.png" type="Texture" id=1]
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=2]
+[ext_resource path="res://scripts/Recuperar.gd" type="Script" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[node name="Recuperar" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 2 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Logo" type="Sprite" parent="."]
+position = Vector2( 169, 200 )
+scale = Vector2( 0.8, 0.8 )
+texture = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 281.0
+margin_top = 138.0
+margin_right = 435.0
+margin_bottom = 193.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Tu Mercado Sena
+Recuperación"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Subtitulo2" type="Label" parent="."]
+margin_left = 62.0
+margin_top = 352.0
+margin_right = 319.0
+margin_bottom = 385.0
+rect_scale = Vector2( 2, 2 )
+text = "Tu correo institucional"
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="LinCorreo" type="LineEdit" parent="."]
+margin_left = 55.0
+margin_top = 430.0
+margin_right = 351.0
+margin_bottom = 476.0
+rect_scale = Vector2( 2, 2 )
+align = 1
+max_length = 32
+placeholder_text = "Correo Sena"
+placeholder_alpha = 0.4
+caret_blink = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Mensaje" type="Label" parent="."]
+margin_left = 111.0
+margin_top = 710.0
+margin_right = 358.0
+margin_bottom = 822.0
+rect_scale = Vector2( 2, 2 )
+custom_colors/font_color = Color( 0.627451, 0.215686, 0.0745098, 1 )
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnRecuperar" type="Button" parent="."]
+margin_left = 145.0
+margin_top = 574.0
+margin_right = 358.0
+margin_bottom = 620.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Recuperar Contraseña"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnLogin" type="Button" parent="."]
+margin_left = 151.0
+margin_top = 1144.0
+margin_right = 388.0
+margin_bottom = 1190.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = "Accede si ya tienes cuenta"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Reloj" type="Timer" parent="."]
+wait_time = 4.0
+one_shot = true
+
+[connection signal="pressed" from="BtnRecuperar" to="." method="_on_BtnRecuperar_pressed"]
+[connection signal="pressed" from="BtnLogin" to="." method="_on_BtnLogin_pressed"]
+[connection signal="timeout" from="Reloj" to="." method="_on_Reloj_timeout"]

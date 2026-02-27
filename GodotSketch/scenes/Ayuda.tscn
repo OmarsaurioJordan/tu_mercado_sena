@@ -1,0 +1,192 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://scripts/Ayuda.gd" type="Script" id=2]
+
+[node name="Ayuda" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 271.0
+margin_top = 41.0
+margin_right = 402.0
+margin_bottom = 74.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Ayuda PQRS"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Subtitulo4" type="Label" parent="."]
+margin_left = 81.0
+margin_top = 178.0
+margin_right = 353.0
+margin_bottom = 270.0
+rect_scale = Vector2( 2, 2 )
+custom_constants/line_spacing = -4
+text = "cuando un usuario se comporte mal, puedes bloquearlo y luego denunciarlo desde el menú de bloqueados"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Subtitulo1" type="Label" parent="."]
+margin_left = 85.0
+margin_top = 390.0
+margin_right = 357.0
+margin_bottom = 423.0
+rect_scale = Vector2( 2, 2 )
+text = "selecciona un motivo del contacto"
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn1" type="Button" parent="."]
+margin_left = 50.0
+margin_top = 458.0
+margin_right = 121.0
+margin_bottom = 504.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Peti"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn2" type="Button" parent="."]
+margin_left = 206.0
+margin_top = 458.0
+margin_right = 277.0
+margin_bottom = 504.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Quej"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn3" type="Button" parent="."]
+margin_left = 363.0
+margin_top = 458.0
+margin_right = 434.0
+margin_bottom = 504.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Recla"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Btn4" type="Button" parent="."]
+margin_left = 523.0
+margin_top = 458.0
+margin_right = 594.0
+margin_bottom = 504.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Suge"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Subtitulo2" type="Label" parent="."]
+margin_left = 101.0
+margin_top = 554.0
+margin_right = 352.0
+margin_bottom = 587.0
+rect_scale = Vector2( 2, 2 )
+text = "escribe un mensaje al correo"
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="LinDescripcion" type="TextEdit" parent="."]
+margin_left = 71.0
+margin_top = 623.0
+margin_right = 401.0
+margin_bottom = 820.0
+rect_scale = Vector2( 1.75, 1.75 )
+wrap_enabled = true
+caret_blink = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Mensaje" type="Label" parent="."]
+visible = false
+margin_left = 103.0
+margin_top = 652.0
+margin_right = 357.0
+margin_bottom = 788.0
+rect_scale = Vector2( 2, 2 )
+custom_colors/font_color = Color( 0.627451, 0.215686, 0.0745098, 1 )
+text = "Gracias por ponerte en contacto, te responderemos a tu correo institucional lo más pronto posible!!!"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnMail" type="Button" parent="."]
+margin_left = 147.0
+margin_top = 993.0
+margin_right = 360.0
+margin_bottom = 1039.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Enviar Mail"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Subtitulo3" type="Label" parent="."]
+margin_left = 119.0
+margin_top = 1114.0
+margin_right = 365.0
+margin_bottom = 1177.0
+rect_scale = Vector2( 2, 2 )
+text = "también puedes comunicarte a la línea 018000 - 420 - 269"
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Reloj" type="Timer" parent="."]
+wait_time = 8.0
+one_shot = true
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="Btn1" to="." method="_on_Btn1_pressed"]
+[connection signal="pressed" from="Btn2" to="." method="_on_Btn2_pressed"]
+[connection signal="pressed" from="Btn3" to="." method="_on_Btn3_pressed"]
+[connection signal="pressed" from="Btn4" to="." method="_on_Btn4_pressed"]
+[connection signal="pressed" from="BtnMail" to="." method="_on_BtnMail_pressed"]
+[connection signal="timeout" from="Reloj" to="." method="_on_Reloj_timeout"]

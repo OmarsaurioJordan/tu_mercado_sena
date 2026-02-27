@@ -1,0 +1,481 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://avatares/erick.png" type="Texture" id=2]
+[ext_resource path="res://scripts/Bloqueados.gd" type="Script" id=3]
+[ext_resource path="res://avatares/heidy.png" type="Texture" id=4]
+[ext_resource path="res://avatares/johan.png" type="Texture" id=5]
+[ext_resource path="res://avatares/felipe.png" type="Texture" id=6]
+[ext_resource path="res://avatares/janier.png" type="Texture" id=7]
+[ext_resource path="res://avatares/ashly.png" type="Texture" id=8]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[node name="Bloqueados" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 257.0
+margin_top = 37.0
+margin_right = 395.0
+margin_bottom = 70.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Bloqueados"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User1" type="Control" parent="."]
+margin_left = 176.0
+margin_top = 317.0
+margin_right = 212.0
+margin_bottom = 357.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User1"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 35.0
+margin_bottom = 45.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User1"]
+margin_left = 49.0
+margin_top = -65.0
+margin_right = 274.0
+margin_bottom = -37.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Erick"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDenun1" type="Button" parent="User1"]
+margin_left = 45.0
+margin_top = -21.0
+margin_right = 147.0
+margin_bottom = 25.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+text = "Denunciar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDesbloq1" type="Button" parent="User1"]
+margin_left = 210.0
+margin_top = -24.0
+margin_right = 312.0
+margin_bottom = 22.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+text = "Desbloquear"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User2" type="Control" parent="."]
+margin_left = 176.0
+margin_top = 465.0
+margin_right = 212.0
+margin_bottom = 505.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User2"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 35.0
+margin_bottom = 45.0
+texture = ExtResource( 6 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User2"]
+margin_left = 49.0
+margin_top = -65.0
+margin_right = 274.0
+margin_bottom = -37.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Felipe"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDenun2" type="Button" parent="User2"]
+margin_left = 45.0
+margin_top = -21.0
+margin_right = 147.0
+margin_bottom = 25.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+disabled = true
+text = "Denunciar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDesbloq2" type="Button" parent="User2"]
+margin_left = 210.0
+margin_top = -24.0
+margin_right = 312.0
+margin_bottom = 22.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+disabled = true
+text = "Desbloquear"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User3" type="Control" parent="."]
+margin_left = 174.0
+margin_top = 623.0
+margin_right = 210.0
+margin_bottom = 663.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User3"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 35.0
+margin_bottom = 45.0
+texture = ExtResource( 8 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User3"]
+margin_left = 49.0
+margin_top = -65.0
+margin_right = 274.0
+margin_bottom = -37.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Ashly"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDenun3" type="Button" parent="User3"]
+margin_left = 45.0
+margin_top = -21.0
+margin_right = 147.0
+margin_bottom = 25.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+text = "Denunciar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDesbloq3" type="Button" parent="User3"]
+margin_left = 210.0
+margin_top = -24.0
+margin_right = 312.0
+margin_bottom = 22.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+text = "Desbloquear"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User4" type="Control" parent="."]
+margin_left = 176.0
+margin_top = 774.0
+margin_right = 212.0
+margin_bottom = 814.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User4"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 35.0
+margin_bottom = 45.0
+texture = ExtResource( 4 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User4"]
+margin_left = 49.0
+margin_top = -65.0
+margin_right = 274.0
+margin_bottom = -37.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Heidy"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDenun4" type="Button" parent="User4"]
+margin_left = 45.0
+margin_top = -21.0
+margin_right = 147.0
+margin_bottom = 25.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+text = "Denunciar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDesbloq4" type="Button" parent="User4"]
+margin_left = 210.0
+margin_top = -24.0
+margin_right = 312.0
+margin_bottom = 22.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+text = "Desbloquear"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User5" type="Control" parent="."]
+margin_left = 174.0
+margin_top = 930.0
+margin_right = 210.0
+margin_bottom = 970.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User5"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 35.0
+margin_bottom = 45.0
+texture = ExtResource( 5 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User5"]
+margin_left = 49.0
+margin_top = -65.0
+margin_right = 274.0
+margin_bottom = -37.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Johan"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDenun5" type="Button" parent="User5"]
+margin_left = 45.0
+margin_top = -21.0
+margin_right = 147.0
+margin_bottom = 25.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+text = "Denunciar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDesbloq5" type="Button" parent="User5"]
+margin_left = 210.0
+margin_top = -24.0
+margin_right = 312.0
+margin_bottom = 22.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+text = "Desbloquear"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="User6" type="Control" parent="."]
+margin_left = 174.0
+margin_top = 1081.0
+margin_right = 210.0
+margin_bottom = 1121.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Img" type="TextureRect" parent="User6"]
+margin_left = -80.0
+margin_top = -66.0
+margin_right = 35.0
+margin_bottom = 45.0
+texture = ExtResource( 7 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="User6"]
+margin_left = 49.0
+margin_top = -65.0
+margin_right = 274.0
+margin_bottom = -37.0
+rect_scale = Vector2( 1.5, 1.5 )
+custom_constants/line_spacing = -5
+text = "Janier"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDenun6" type="Button" parent="User6"]
+margin_left = 45.0
+margin_top = -21.0
+margin_right = 147.0
+margin_bottom = 25.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+disabled = true
+text = "Denunciar"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDesbloq6" type="Button" parent="User6"]
+margin_left = 210.0
+margin_top = -24.0
+margin_right = 312.0
+margin_bottom = 22.0
+rect_scale = Vector2( 1.5, 1.5 )
+focus_mode = 0
+disabled = true
+text = "Desbloquear"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnDown" type="Button" parent="."]
+margin_left = 67.0
+margin_top = 1241.0
+margin_right = 80.0
+margin_bottom = 1382.0
+rect_rotation = -90.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = "<"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnUp" type="Button" parent="."]
+margin_left = 76.0
+margin_top = 215.0
+margin_right = 89.0
+margin_bottom = 356.0
+rect_rotation = -90.0
+rect_scale = Vector2( 4, 4 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = ">"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="User1/BtnDenun1" to="." method="_on_BtnDenun1_pressed"]
+[connection signal="pressed" from="User1/BtnDesbloq1" to="." method="_on_BtnDesbloq1_pressed"]
+[connection signal="pressed" from="User2/BtnDenun2" to="." method="_on_BtnDenun2_pressed"]
+[connection signal="pressed" from="User2/BtnDesbloq2" to="." method="_on_BtnDesbloq2_pressed"]
+[connection signal="pressed" from="User3/BtnDenun3" to="." method="_on_BtnDenun3_pressed"]
+[connection signal="pressed" from="User3/BtnDesbloq3" to="." method="_on_BtnDesbloq3_pressed"]
+[connection signal="pressed" from="User4/BtnDenun4" to="." method="_on_BtnDenun4_pressed"]
+[connection signal="pressed" from="User4/BtnDesbloq4" to="." method="_on_BtnDesbloq4_pressed"]
+[connection signal="pressed" from="User5/BtnDenun5" to="." method="_on_BtnDenun5_pressed"]
+[connection signal="pressed" from="User5/BtnDesbloq5" to="." method="_on_BtnDesbloq5_pressed"]
+[connection signal="pressed" from="User6/BtnDenun6" to="." method="_on_BtnDenun6_pressed"]
+[connection signal="pressed" from="User6/BtnDesbloq6" to="." method="_on_BtnDesbloq6_pressed"]
+[connection signal="pressed" from="BtnDown" to="." method="_on_BtnDown_pressed"]
+[connection signal="pressed" from="BtnUp" to="." method="_on_BtnUp_pressed"]

@@ -1,0 +1,241 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://avatares/freddy.png" type="Texture" id=2]
+[ext_resource path="res://scripts/Perfil.gd" type="Script" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[sub_resource type="StyleBoxFlat" id=6]
+bg_color = Color( 0.180392, 0.823529, 0.156863, 1 )
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color( 0.376471, 0.584314, 0.768627, 1 )
+border_blend = true
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[node name="Perfil" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 257.0
+margin_top = 37.0
+margin_right = 334.0
+margin_bottom = 70.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Perfil"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnFavorito" type="Button" parent="."]
+margin_left = 589.0
+margin_top = 44.0
+margin_right = 635.0
+margin_bottom = 96.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = "Fav
+O"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Foto" type="TextureRect" parent="."]
+margin_left = 210.0
+margin_top = 150.0
+margin_right = 510.0
+margin_bottom = 450.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="."]
+margin_left = 112.0
+margin_top = 469.0
+margin_right = 355.0
+margin_bottom = 502.0
+rect_scale = Vector2( 2, 2 )
+text = "Freddy Antonio"
+align = 1
+valign = 1
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Estrellas" type="Label" parent="."]
+margin_left = 147.0
+margin_top = 549.0
+margin_right = 236.0
+margin_bottom = 605.0
+rect_scale = Vector2( 2, 2 )
+text = "xxxoo
+23"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCalificar" type="Button" parent="."]
+margin_left = 390.0
+margin_top = 554.0
+margin_right = 490.0
+margin_bottom = 606.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = "califica
+xxxoo"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCatalogo" type="Button" parent="."]
+margin_left = 241.0
+margin_top = 691.0
+margin_right = 363.0
+margin_bottom = 737.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Catálogo"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnChat" type="Button" parent="."]
+margin_left = 503.0
+margin_top = 689.0
+margin_right = 591.0
+margin_bottom = 735.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Chat"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnBloquear" type="Button" parent="."]
+margin_left = 41.0
+margin_top = 689.0
+margin_right = 131.0
+margin_bottom = 735.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Bloq"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Descripcion" type="Label" parent="."]
+margin_left = 53.0
+margin_top = 810.0
+margin_right = 403.0
+margin_bottom = 1001.0
+rect_scale = Vector2( 1.75, 1.75 )
+text = "estudiante de software interesado en el frontend y en la salchipapa, más cuando tiene más salchicha que papa"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnLink" type="Button" parent="."]
+margin_left = 79.0
+margin_top = 1141.0
+margin_right = 392.0
+margin_bottom = 1187.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = "http:youtube/salsacali.com"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="."]
+margin_left = 496.0
+margin_top = 434.0
+margin_right = 536.0
+margin_bottom = 474.0
+custom_styles/panel = SubResource( 6 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="BtnFavorito" to="." method="_on_BtnFavorito_pressed"]
+[connection signal="pressed" from="BtnCalificar" to="." method="_on_BtnCalificar_pressed"]
+[connection signal="pressed" from="BtnCatalogo" to="." method="_on_BtnCatalogo_pressed"]
+[connection signal="pressed" from="BtnChat" to="." method="_on_BtnChat_pressed"]
+[connection signal="pressed" from="BtnBloquear" to="." method="_on_BtnBloquear_pressed"]
+[connection signal="pressed" from="BtnLink" to="." method="_on_BtnLink_pressed"]

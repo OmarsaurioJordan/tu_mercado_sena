@@ -1,0 +1,265 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://sprites/theme.tres" type="Theme" id=1]
+[ext_resource path="res://fotos/boxer.jpg" type="Texture" id=2]
+[ext_resource path="res://avatares/freddy.png" type="Texture" id=3]
+[ext_resource path="res://scripts/Producto.gd" type="Script" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="StyleBoxEmpty" id=2]
+
+[sub_resource type="StyleBoxEmpty" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="StyleBoxEmpty" id=5]
+
+[sub_resource type="StyleBoxFlat" id=6]
+bg_color = Color( 0.180392, 0.823529, 0.156863, 1 )
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color( 0.376471, 0.584314, 0.768627, 1 )
+border_blend = true
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[node name="Producto" type="Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme = ExtResource( 1 )
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnVolver" type="Button" parent="."]
+margin_left = 35.0
+margin_top = 35.0
+margin_right = 110.0
+margin_bottom = 81.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Volver"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Titulo" type="Label" parent="."]
+margin_left = 257.0
+margin_top = 37.0
+margin_right = 379.0
+margin_bottom = 70.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "Producto"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Foto" type="TextureRect" parent="."]
+margin_left = 58.0
+margin_top = 144.0
+margin_right = 668.0
+margin_bottom = 610.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Nombre" type="Label" parent="."]
+margin_left = 116.0
+margin_top = 617.0
+margin_right = 335.0
+margin_bottom = 647.0
+rect_scale = Vector2( 2.5, 2.5 )
+custom_constants/line_spacing = -5
+text = "Calzones Azules"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Calidad" type="Label" parent="."]
+margin_left = 45.0
+margin_top = 622.0
+margin_right = 90.0
+margin_bottom = 673.0
+rect_scale = Vector2( 1.5, 1.5 )
+text = "(S)"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Descripcion" type="Label" parent="."]
+margin_left = 62.0
+margin_top = 692.0
+margin_right = 410.0
+margin_bottom = 839.0
+rect_scale = Vector2( 1.75, 1.75 )
+text = "aunque ya los usé un tiempo, todavía sirven, eso se les dan tres lavadas, unas cuantas punteadas y sirven para varios años más, aproveche la ganga"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Costo" type="Label" parent="."]
+margin_left = 59.0
+margin_top = 943.0
+margin_right = 210.0
+margin_bottom = 986.0
+rect_scale = Vector2( 2, 2 )
+text = "valor: $1.000"
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Disponible" type="Label" parent="."]
+margin_left = 372.0
+margin_top = 943.0
+margin_right = 518.0
+margin_bottom = 986.0
+rect_scale = Vector2( 2, 2 )
+text = "disponibles: 1"
+align = 2
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="NombreVend" type="Label" parent="."]
+margin_left = 260.0
+margin_top = 1034.0
+margin_right = 356.0
+margin_bottom = 1090.0
+rect_scale = Vector2( 2, 2 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_constants/line_spacing = -5
+text = "Freddy Antonio"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnCatalogo" type="Button" parent="."]
+margin_left = 483.0
+margin_top = 1048.0
+margin_right = 565.0
+margin_bottom = 1085.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+text = "Catálogo"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="FotoVende" type="TextureRect" parent="."]
+margin_left = 52.0
+margin_top = 1040.0
+margin_right = 268.0
+margin_bottom = 1224.0
+texture = ExtResource( 3 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Online" type="Panel" parent="."]
+margin_left = 242.0
+margin_top = 1210.0
+margin_right = 267.0
+margin_bottom = 1235.0
+custom_styles/panel = SubResource( 6 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnFoto" type="Button" parent="."]
+margin_left = 51.0
+margin_top = 1033.0
+margin_right = 268.0
+margin_bottom = 1147.0
+rect_scale = Vector2( 1.75, 1.75 )
+focus_mode = 0
+custom_colors/font_color_disabled = Color( 0.592157, 0.596078, 0.596078, 1 )
+custom_colors/font_color_hover_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_colors/font_color = Color( 0.141176, 0.454902, 0.388235, 1 )
+custom_colors/font_color_hover = Color( 0.643137, 0.498039, 0.188235, 1 )
+custom_colors/font_color_pressed = Color( 0.0705882, 0.254902, 0.215686, 1 )
+custom_styles/hover = SubResource( 1 )
+custom_styles/pressed = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/disabled = SubResource( 4 )
+custom_styles/normal = SubResource( 5 )
+align = 0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Estrellas" type="Label" parent="."]
+margin_left = 277.0
+margin_top = 1137.0
+margin_right = 366.0
+margin_bottom = 1193.0
+rect_scale = Vector2( 1.75, 1.75 )
+text = "xxxoo
+23"
+align = 1
+autowrap = true
+clip_text = true
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="BtnChat" type="Button" parent="."]
+margin_left = 461.0
+margin_top = 1130.0
+margin_right = 562.0
+margin_bottom = 1176.0
+rect_scale = Vector2( 2, 2 )
+focus_mode = 0
+text = "Chat"
+__meta__ = {
+"_edit_lock_": true
+}
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_BtnVolver_pressed"]
+[connection signal="pressed" from="BtnCatalogo" to="." method="_on_BtnCatalogo_pressed"]
+[connection signal="pressed" from="BtnFoto" to="." method="_on_BtnFoto_pressed"]
+[connection signal="pressed" from="BtnChat" to="." method="_on_BtnChat_pressed"]
