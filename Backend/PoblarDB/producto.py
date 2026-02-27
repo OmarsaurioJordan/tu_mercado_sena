@@ -3,27 +3,35 @@ from db_sql import Conector
 
 class Producto:
     
-    def __init__(self, con_imagen, categos, integridad, vendedor,
+    def __init__(self, num_imagenes, categos, integridad, vendedor,
             tipo, go_troll, go_lacra, fecha, dt):
-        self.con_imagen = con_imagen
         self.subcategoria_id = categos[0]
         self.subname = categos[1]
         self.catname = categos[2]
         self.tipo = tipo # bad, joda, all, uno
         self.integridad_id = integridad
         self.vendedor_id = vendedor.id
-        self.nombre = self.newNombre(go_troll, go_lacra)
         self.estado_id = "1"
         self.descripcion = self.newDescripcion(go_troll, go_lacra)
         self.precio = self.newPrecio()
         self.disponibles = self.newDisponibles()
         self.fecha_registro = fecha
         self.fecha_actualiza = fecha
+        self.nombre = self.newNombre(go_troll, go_lacra)
+        self.imagenes = []
         self.registro_dt = dt
         self.id = self.sendSQL()
+        self.crearFotos(num_imagenes)
  
     def sendSQL(self):
-        return Conector.run_sql("INSERT INTO `productos` (`nombre`, `con_imagen`, `subcategoria_id`, `integridad_id`, `vendedor_id`, `estado_id`, `descripcion`, `precio`, `disponibles`, `fecha_registro`, `fecha_actualiza`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (self.nombre, self.con_imagen, self.subcategoria_id, self.integridad_id, self.vendedor_id, self.estado_id, self.descripcion, self.precio, self.disponibles, self.fecha_registro, self.fecha_actualiza))
+        return Conector.run_sql("INSERT INTO `productos` (`nombre`, `subcategoria_id`, `integridad_id`, `vendedor_id`, `estado_id`, `descripcion`, `precio`, `disponibles`, `fecha_registro`, `fecha_actualiza`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (self.nombre, self.subcategoria_id, self.integridad_id, self.vendedor_id, self.estado_id, self.descripcion, self.precio, self.disponibles, self.fecha_registro, self.fecha_actualiza))
+
+    def crearFotos(self, num_imagenes):
+        if self.id != -1:
+            if num_imagenes > 0:
+                for _r in range(random.randint(0, num_imagenes)):
+                    self.imagenes.append(self.newImagen())
+                    Conector.run_sql("INSERT INTO `fotos` (`producto_id`, `imagen`, `actualiza`) VALUES (%s, %s, %s)", (self.id, self.imagenes[-1], self.fecha_registro))
 
     def newNombre(self, go_troll=False, go_lacra=False):
         n = ""
@@ -118,6 +126,11 @@ class Producto:
                         "transformer", "juguete", "legos", "Netflix",
                         "dildo", "chatarra", "diamante", "Minecraft"
                     ])
+                case "adorno":
+                    n = random.choice([
+                        "porcelana", "florero", "peluche", "maceta",
+                        "estatuilla", "muñeco", "cortina", "amigurumi"
+                    ])
                 case _:
                     n = "???"
         n += " " + random.choice([
@@ -199,6 +212,8 @@ class Producto:
                     p = random.randint(0, 1000)
                 case "otro":
                     p = random.randint(0, 1000)
+                case "adorno":
+                    p = random.randint(0, 1000)
                 case _:
                     p = 0
         return str(p * 100)
@@ -227,3 +242,9 @@ class Producto:
                 return str(tot)
             case _:
                 return "1"
+
+    def newImagen(self):
+        img = "prd_"
+        for _r in range(64):
+            img += str(random.randint(0, 9))
+        return img + ".webp"

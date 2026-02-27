@@ -5,7 +5,7 @@ conexion = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
-    database="tu_mercado_sena"
+    database="tms_api"
 )
 
 # hacer la consulta

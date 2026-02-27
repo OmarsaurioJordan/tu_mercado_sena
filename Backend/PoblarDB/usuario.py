@@ -3,20 +3,23 @@ from db_sql import Conector
 
 class Usuario:
     
-    def __init__(self, correo, password, rol, con_link, fecha,
-            noti_correo, noti_push, uso_datos, lvl_descripcion, tipo, go_troll, go_lacra, dt):
-        self.correo = correo
+    def __init__(self, email, password, rol, con_link, con_imagen, fecha,
+            noti_correo, noti_push, uso_datos, lvl_descripcion, tipo, go_troll, go_lacra, dt, sena_desktop_info=""):
+        # tabla cuentas
+        self.email = email
         self.password = password
-        self.rol_id = rol
-        self.nombre = self.newNombre()
-        self.avatar = self.newAvatar()
-        self.tipo = tipo # master, admin, comprador, curioso, lacra, troll, vendeuno, vendeall
-        self.descripcion = self.newDescripcion(lvl_descripcion, go_troll, go_lacra)
-        self.link = self.newLink() if con_link else ""
-        self.estado_id = "1"
         self.notifica_correo = noti_correo
         self.notifica_push = noti_push
         self.uso_datos = uso_datos
+        self.pin = "" # Null
+        # tabla usuarios
+        self.nickname = self.newNombre()
+        self.imagen = self.newImagen() if con_imagen else ""
+        self.tipo = tipo # master, admin, comprador, curioso, lacra, troll, vendeuno, vendeall
+        self.descripcion = sena_desktop_info if rol == "3" else self.newDescripcion(lvl_descripcion, go_troll, go_lacra)
+        self.link = self.newLink() if con_link else ""
+        self.rol_id = rol
+        self.estado_id = "1"
         self.fecha_registro = fecha
         self.fecha_actualiza = fecha
         self.fecha_reciente = fecha
@@ -24,10 +27,11 @@ class Usuario:
         self.id = self.sendSQL()
     
     def sendSQL(self):
-        id = Conector.run_sql("INSERT INTO `correos` (`correo`, `clave`, `fecha_mail`) VALUES (%s, '', %s)", (self.correo, self.fecha_registro))
+        pin = "1234" if self.rol_id != "1" else "NULL"
+        id = Conector.run_sql("INSERT INTO `cuentas` (`email`, `password`, `clave`, `notifica_correo`, `notifica_push`, `uso_datos`, `pin`, `fecha_clave`) VALUES (%s, %s, '', %s, %s, %s, %s, %s)", (self.email, self.password, self.notifica_correo, self.notifica_push, self.uso_datos, pin, self.fecha_registro))
         if id == -1:
             return id
-        return Conector.run_sql("INSERT INTO `usuarios` (`correo_id`, `password`, `rol_id`, `nombre`, `avatar`, `descripcion`, `link`, `estado_id`, `notifica_correo`, `notifica_push`, `uso_datos`, `fecha_registro`, `fecha_actualiza`, `fecha_reciente`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, self.password, self.rol_id, self.nombre, self.avatar, self.descripcion, self.link, self.estado_id, self.notifica_correo, self.notifica_push, self.uso_datos, self.fecha_registro, self.fecha_actualiza, self.fecha_reciente))
+        return Conector.run_sql("INSERT INTO `usuarios` (`cuenta_id`, `nickname`, `imagen`, `descripcion`, `link`, `rol_id`, `estado_id`, `fecha_registro`, `fecha_actualiza`, `fecha_reciente`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, self.nickname, self.imagen, self.descripcion, self.link, self.rol_id, self.estado_id, self.fecha_registro, self.fecha_actualiza, self.fecha_reciente))
 
     def newNombre(self):
         nombresH = [
@@ -104,7 +108,7 @@ class Usuario:
             "Ramírez", "Ramos", "Reyes", "Ríos", "Romero",
             "Salazar", "Salinas", "Sánchez", "Sandoval", "Soto",
             "Téllez", "Torres", "Trejo", "Trujillo", "Tovar",
-            "Urbina", "Ureña", "Uribe", "Ulloa", "Urdiales",
+            "Urbina", "Ureña", "Usama", "Ulloa", "Urdiales",
             "Valdés", "Valencia", "Valenzuela", "Vásquez", "Vega",
             "King", "Walker", "Xu", "Yosa", "Werner",
             "Zambrano", "Zapata", "Zavala", "Zúñiga", "Zárate"
@@ -184,7 +188,7 @@ class Usuario:
             descrip += ("" if descrip == "" else " y ") + frase
         return descrip
     
-    def newMensaje(slef, go_troll=False, go_lacra=False):
+    def newMensaje(self, go_troll=False, go_lacra=False):
         limite = max(12, round(pow(random.random(), 3) * 512))
         palabras = [
             "jajaja", "uy no", "cómo así", "Si", "No", "pues bueno", "no quiero",
@@ -259,5 +263,8 @@ class Usuario:
         ]
         return random.choice(links)
     
-    def newAvatar(self):
-        return str(random.randint(1, 100))
+    def newImagen(self):
+        img = "usr_"
+        for _r in range(64):
+            img += str(random.randint(0, 9))
+        return img + ".webp"

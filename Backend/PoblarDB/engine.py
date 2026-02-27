@@ -9,6 +9,7 @@ from img_gen import MakeImg
 total_usuarios = 1000 # recomendable 1000+
 year_ini = 2024 # year para iniciar el sistema
 month_ini = 1 # mes para iniciar el sistema, 1 es enero
+dominiomail = "soy.sena.edu.co" # terminacion luego del usuarioname@
 password = "$2y$10$gl68EE0OBsVO8JX.r9k/Tu2BDUWj3qqirrd9L6f0w5N8rKbErqsKS" # 123456
 prob_tener_link = 0.15 # para que compartan su link a redes sociales
 prob_notifi = 0.25 # recibir correos, notifi push y usar datos
@@ -17,8 +18,9 @@ prob_superdescripcion = 0.333 # prob que la descripcion sea larga
 prob_troll = 1 / 5 # 1/5 acciones troll: chat, producto, perfil, pqrs, denuncia
 prob_lacra = 1 / 3 # 1/3 acciones lacra: chat, producto, perfil
 prob_hitos = [0.1, 0.8] # prob gran pausa vs prob continuacion corta
-prob_conimagen = 0.95 # que un producto posea foto
-integridades = [0.6, 0.3, 0.8, 0.2] # nuevo, usado, reparado, reciclable, suman 100%
+prob_conimagen = 0.95 # que un producto o usuario posea foto
+max_imagenes = 5 # cantidad de imagenes maxima por producto
+integridades = [0.6, 0.3, 0.08, 0.02] # nuevo, usado, reparado, reciclable, suman 100%
 tipo_usr_porc = { # probabilidad existir, deben sumar 100%
     "master": 0,
     "admin": 0.01,
@@ -69,6 +71,7 @@ tipo_usr_chatok = { # probabilidad la compra salga bien
     "vendeuno": 0.1,
     "vendeall": 0.2
 }
+sena_desktop_info = "Tel: 6668069\nmail: master@ayudeme.com\nSalomia calle 1-20\nPepe Collazos Admin" # esto se vera en las portadas como info de contacto
 
 # estructuras para los agentes
 usuarios = []
@@ -85,8 +88,13 @@ def limpiar_db():
     Conector.run_sql("DELETE FROM `mensajes`")
     Conector.run_sql("DELETE FROM `chats`")
     Conector.run_sql("DELETE FROM `productos`")
+    Conector.run_sql("DELETE FROM `fotos`")
     Conector.run_sql("DELETE FROM `usuarios`")
-    Conector.run_sql("DELETE FROM `correos`")
+    Conector.run_sql("DELETE FROM `cuentas`")
+    Conector.run_sql("DELETE FROM `papelera`")
+    Conector.run_sql("DELETE FROM `login_ip`")
+    Conector.run_sql("DELETE FROM `tokens_de_sesion`")
+    MakeImg.clear_all()
 
 def get_hitos(inicial_dt):
     global prob_hitos
@@ -110,25 +118,26 @@ def get_hitos(inicial_dt):
 
 # crear a los usuarios
 def crear_usuarios():
-    global usuarios, total_usuarios, year_ini, month_ini, password, prob_tener_link, prob_notifi, tipo_usr_porc, prob_descripcion, prob_superdescripcion, prob_troll, prob_lacra
+    global usuarios, total_usuarios, year_ini, month_ini, password, prob_tener_link, prob_notifi, tipo_usr_porc, prob_descripcion, prob_superdescripcion, prob_troll, prob_lacra, dominiomail, sena_desktop_info
 
     ini_dt = datetime(year_ini, month_ini, 1, 0, 0, 0).timestamp()
     fin_dt = datetime.now().timestamp()
     fecha = datetime.fromtimestamp(ini_dt).strftime("%Y-%m-%d %H:%M:%S")
-    usuarios.append(Usuario("master@sena", password, "1", False, fecha,
-        True, True, True, 0, "master", prob_troll, prob_lacra, ini_dt))
+    usuarios.append(Usuario("master@" + dominiomail, password, "3", False, True, fecha,
+        True, True, True, 0, "master", 0, 0, ini_dt, sena_desktop_info))
+    MakeImg.run_img(4, usuarios[-1].imagen)
     for i in range(total_usuarios):
         r = pow(random.random(), 3)
         dt = ini_dt + r * (fin_dt - ini_dt)
         fecha = datetime.fromtimestamp(dt).strftime("%Y-%m-%d %H:%M:%S")
-        rol = "2" if random.random() < tipo_usr_porc["admin"] else "3"
-        correo = "usr" + str(i) + "@sena"
-        con_link = random.random() < prob_tener_link if rol == "3" else False
-        noti_correo = random.random() < prob_notifi if rol == "3" else True
-        noti_push = random.random() < prob_notifi if rol == "3" else True
-        uso_datos = random.random() < prob_notifi if rol == "3" else True
+        rol = "2" if random.random() < tipo_usr_porc["admin"] else "1"
+        email = "usr" + str(i) + "@" + dominiomail
+        con_link = random.random() < prob_tener_link if rol == "1" else False
+        noti_correo = random.random() < prob_notifi if rol == "1" else True
+        noti_push = random.random() < prob_notifi if rol == "1" else True
+        uso_datos = random.random() < prob_notifi if rol == "1" else True
         lvl_descripcion = (2 if random.random() < prob_superdescripcion else 1) if random.random() < prob_descripcion else 0
-        lvl_descripcion = lvl_descripcion if rol == "3" else 0
+        lvl_descripcion = lvl_descripcion if rol == "1" else 0
         if rol == "2":
             tipo = "admin"
         else:
@@ -151,11 +160,15 @@ def crear_usuarios():
                 tipo = "comprador"
         go_troll = random.random() < prob_troll
         go_lacra = random.random() < prob_lacra
-        usuarios.append(Usuario(correo, password, rol, con_link, fecha,
+        con_imagen = random.random() < prob_conimagen
+        usuarios.append(Usuario(email, password, rol, con_link, con_imagen, fecha,
             noti_correo, noti_push, uso_datos, lvl_descripcion, tipo, go_troll, go_lacra, dt))
+        if con_imagen:
+            imgtipo = "lacra" if go_lacra else ("troll" if go_troll else "")
+            MakeImg.run_img(4, usuarios[-1].imagen, imgtipo)
 
 def crear_productos():
-    global usuarios, productos, tipo_usr_vende, prob_conimagen, prob_troll, prob_lacra, integridades
+    global usuarios, productos, tipo_usr_vende, prob_conimagen, prob_troll, prob_lacra, integridades, max_imagenes
 
     subcts = Conector.run_sql("SELECT s.id AS id, s.nombre AS subcategoria, c.nombre AS categoria FROM subcategorias s INNER JOIN categorias c ON c.id = s.categoria_id", None, True)
     for usr in usuarios:
@@ -163,7 +176,7 @@ def crear_productos():
         p = tipo_usr_vende[usr.tipo]
         for hit in hitos:
             if random.random() < p:
-                con_imagen = "1" if random.random() < prob_conimagen else "0"
+                num_imagenes = random.randint(1, max_imagenes) if random.random() < prob_conimagen else 0
                 categos = random.choice(subcts)
                 r = random.random()
                 if r < integridades[0]:
@@ -185,9 +198,9 @@ def crear_productos():
                 go_troll = random.random() < prob_troll
                 go_lacra = random.random() < prob_lacra
                 fecha = datetime.fromtimestamp(hit).strftime("%Y-%m-%d %H:%M:%S")
-                productos.append(Producto(con_imagen, categos, integridad, usr, tipo, go_troll, go_lacra, fecha, hit))
-                if con_imagen == "1":
-                    MakeImg.run_img(0, productos[-1].id, tipo)
+                productos.append(Producto(num_imagenes, categos, integridad, usr, tipo, go_troll, go_lacra, fecha, hit))
+                for img in productos[-1].imagenes:
+                    MakeImg.run_img(0, img, tipo)
 
 def ver_productos():
     pass

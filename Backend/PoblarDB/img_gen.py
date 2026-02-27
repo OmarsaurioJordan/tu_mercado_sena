@@ -4,7 +4,7 @@ import random
 from PIL import Image, ImageDraw
 
 class MakeImg:
-    folders = ["img_productos", "img_mensajes", "img_backup", "img_test"]
+    folders = ["img_productos", "img_mensajes", "img_backup", "img_test", "img_usuarios"]
     width = 200 # talla de las imagenes en px
     height = 200
     figuras = 20 # cuantas figuras maximo habra, fig/2 a fig
@@ -20,7 +20,7 @@ class MakeImg:
             cls.init = True
 
     @classmethod
-    def run_img(cls, ind_folder=3, ind_img=0, tipo_img=""):
+    def run_img(cls, ind_folder=3, filename="", tipo_img=""):
         cls.init_folders()
         # tipo_img: bad, joda, etc
         img = Image.new("RGB", (cls.width, cls.height), color=cls.color_azar())
@@ -47,8 +47,8 @@ class MakeImg:
                     draw.ellipse((x1, y1, x2, y2), outline=color, fill=None)
                 case "rec":
                     draw.rectangle((x1, y1, x2, y2), outline=color, fill=None)
-        fpath = os.path.join(cls.folders[ind_folder], f"img_{ind_img}.jpg")
-        img.save(fpath, "JPEG")
+        fpath = os.path.join(cls.folders[ind_folder], filename)
+        img.save(fpath)
 
     @classmethod
     def color_azar(cls):
@@ -61,3 +61,17 @@ class MakeImg:
     @classmethod
     def punto_xy_azar(cls):
         return random.randint(0, cls.width), random.randint(0, cls.height)
+
+    @classmethod
+    def clear_all(cls):
+        for fol in cls.folders:
+            if os.path.exists(fol):
+                for filename in os.listdir(fol):
+                    if filename == ".gitkeep":
+                        continue
+                    file_path = os.path.join(fol, filename)
+                    try:
+                        if os.path.isfile(file_path) or os.path.islink(file_path):
+                            os.unlink(file_path)
+                    except Exception as e:
+                        print("error: " + file_path)

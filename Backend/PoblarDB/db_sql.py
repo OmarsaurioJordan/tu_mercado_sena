@@ -11,7 +11,7 @@ class Conector:
                 host="localhost",
                 user="root",
                 password="",
-                database="tu_mercado_sena"
+                database="tms_api"
             )
         return cls.conexion
     

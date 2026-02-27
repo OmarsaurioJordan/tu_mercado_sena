@@ -106,7 +106,7 @@ INSERT INTO `categorias` (`id`, `nombre`) VALUES
 (11, 'vehículo'),
 (12, 'mascota'),
 (13, 'otro'),
-(14, 'adornos');
+(14, 'adorno');
 
 -- --------------------------------------------------------
 

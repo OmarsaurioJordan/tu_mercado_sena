@@ -10,3 +10,5 @@ TAREAS:
 - hacer que algunos usuarios abandonen el sistema.
 - agregar algunos correos con clave y sin usuario, pre registro.
 .
+- newAvatar() retorna nombre archivo, aplicarlo a pillow
+.
