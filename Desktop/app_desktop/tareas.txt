@@ -1,25 +1,30 @@
 TAREAS:
 ...
 - fichas de body denuncias se alargan horizontalmente
-- fichas de body pqrs no se pueden clickear
-- body pqrs carga al segundo clic en ficha
 - cuando se envía mensaje desde el body de una pqrs debe adjuntarse una parte automática y resolverse la pqrs
+- enviar mensaje al usuario con cuadro de confirmación, quedé en: send_message Tarea
+- crear admin master si no existe en la DB al inicio, solo si debug
+...
+- cargar pqrs y denuncias num total cada 5s
+- ver pqrs y denuncias al pulsar botones de notificación
+...
+- API colocar auditorias
+- módulo de auditorías: búsqueda + body
 ...
 - módulo de chats: búsqueda + body
-- módulo de auditorías: búsqueda + body
+...
 - ver catálogo de productos de usuario
 - ver papelera del usuario
 - ver historial del usuario
-- cargar pqrs y denuncias num total cada 5s
-- ver pqrs y denuncias al pulsar botones de notificación
-- navegar a la página oficial con el botón en menú, link adminn master
+...
 - cargar datos de análisis para gráficas
 - ver logins de administradores
+...
+- hacer que se bloquee con pin y temporizador
 - config. cambiar pin
 - config. cambiar tiempo de bloqueo con pin
 - config. cambiar volúmen de notificaciónes pqrs y denuncias
 - config. editar nombre, link a TMS y descripción del perfil
-- crear admin master si no existe en la DB al inicio
 ...
 PRUEBAS:
 ...

@@ -10,15 +10,14 @@ API_LIMIT_ITEMS = 50
 DOMINIO_EMAIL = "@soy.sena.edu.co"
 # poner a true para iniciar directamtente logeado
 DEBUG_NO_LOGIN = True
-# texto que se muestra cuando no hay descripcion de master
-DEFAULT_INFO = "Información de contacto:\n***vacío***\n(descripción del master)"
-# link a la web de TMS
-WEB_LINK = "https://omwekiatl.xyz/Prestamo/ensano_chat/"
+# texto que se muestra cuando no hay descripcion de master, y link a TMS server
+DEFAULT_INFO = "Información de contacto:\n***Admin Name***\ntel: 333666\nmail: master@soy.sena.edu.co\ndir: cra 1 # 12-69\nlugar: edif 328B"
+DEFAUL_LINK = "https://omwekiatl.xyz/Prestamo/"
 # url donde estan alojadas las imagenes de usuarios
-IMAGE_USER_LINK = "http://localhost/Prestamo/freddy/Frontend/assets/images/avatars/"
+IMAGE_USER_LINK = "http://localhost/Prestamo/freddy/Frontend/uploads/usuarios/"
 #IMAGE_USER_LINK = "https://omwekiatl.xyz/Prestamo/ensano_chat/uploads/"
 # url donde estan alojadas las imagenes de productos
-IMAGE_PROD_LINK = "http://localhost/Prestamo/freddy/Frontend/uploads/"
+IMAGE_PROD_LINK = "http://localhost/Prestamo/freddy/Frontend/uploads/productos/"
 #IMAGE_PROD_LINK = "https://omwekiatl.xyz/Prestamo/ensano_chat/uploads/"
 # precio maximo de la aplicacion
 PRECIO_MAX = 10000000

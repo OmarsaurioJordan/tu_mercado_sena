@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QApplication
+    QWidget, QVBoxLayout, QApplication
 )
 from ui.header_layout import HeaderLayout
 from components.boton import Boton

@@ -1,12 +1,12 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication, QMessageBox
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 from core.app_config import DOMINIO_EMAIL
 from components.selector import Selector
 from components.boton import Boton
-from components.txt_edit import TxtEdit
+from components.alerta import Alerta
 
 class UsuarioBody(QWidget):
     cambioData = Signal(int)
@@ -86,6 +86,7 @@ class UsuarioBody(QWidget):
         layRecup.addWidget(self.email_recup)
         layRecup.addSpacing(10)
         self.btnRecup = Boton("Recuperar clave")
+        self.btnRecup.clicked.connect(lambda: Alerta("Información", "Esta funcionalidad aún no está disponible", 2))
         layRecup.addWidget(self.btnRecup)
         groupRecuperacion.setLayout(layRecup)
 
@@ -97,8 +98,10 @@ class UsuarioBody(QWidget):
         layMsj.addWidget(self.mensaje)
         layMsj.addSpacing(10)
         self.btnMensaje = Boton("Enviar Mensaje")
+        self.btnMensaje.clicked.connect(self.enviarMensaje)
         layMsj.addWidget(self.btnMensaje)
         groupMensaje.setLayout(layMsj)
+        self.texto_msg = ""
 
         layVertical = QVBoxLayout()
         layVertical.addSpacing(10)
@@ -165,7 +168,7 @@ class UsuarioBody(QWidget):
         if usuario.link == "":
             self.link.setText("*** link ***")
         else:
-            self.link.setText("<a href=" + usuario.link + ">" + usuario.link + "</a>")
+            self.link.setText(f'<a href="{usuario.link}">{usuario.link}</a>')
         self.registro.setText("Registro\n" + usuario.fecha_registro.replace(" ", "\n"))
         self.edicion.setText("Edición\n" + usuario.fecha_actualiza.replace(" ", "\n"))
         self.actividad.setText("Actividad\n" + usuario.fecha_reciente.replace(" ", "\n"))
@@ -202,3 +205,23 @@ class UsuarioBody(QWidget):
                 ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
                 usuario = ctrlUsuario.get_usuario(pqrs.usuario_id)
                 self.setData(usuario)
+    
+    def set_from_denuncia(self, denu_id=0):
+        if denu_id != 0:
+            print(f"UsuarioBody {self.id} - {denu_id}: set_from_denuncia")
+            ctrlPqrs = QApplication.instance().property("controls").get_denuncias()
+            denuncia = ctrlPqrs.get_denuncia(denu_id)
+            if denuncia is not None:
+                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                usuario = ctrlUsuario.get_usuario(denuncia.denunciante_id)
+                self.setData(usuario)
+
+    def enviarMensaje(self):
+        self.texto_msg = self.mensaje.toPlainText()
+        if self.texto_msg != "":
+            resp = QMessageBox.question(self, "Confirmación", "¿Desea enviar el mensaje al usuario?")
+            if resp == QMessageBox.Yes:
+                print("UsuarioBody: enviarMensaje")
+                self.mensaje.setText("")
+                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                ctrlUsuario.send_message(self.id, self.texto_msg)

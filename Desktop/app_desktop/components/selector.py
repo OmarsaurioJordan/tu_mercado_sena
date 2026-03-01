@@ -9,6 +9,10 @@ class CenterDelegate(QStyledItemDelegate):
         option.displayAlignment = Qt.AlignCenter
         super().paint(painter, option, index)
 
+class NoScrollComboBox(QComboBox):
+    def wheelEvent(self, event):
+        event.ignore()
+
 class Selector(QWidget):
     onCambio = Signal()
 
@@ -17,7 +21,7 @@ class Selector(QWidget):
         super().__init__()
 
         self.valor_anterior = 0
-        self.combo = QComboBox()
+        self.combo = NoScrollComboBox()
         self.combo.setPlaceholderText(placeholder)
         self.set_items(items, selected)
         

@@ -13,4 +13,3 @@ if __name__ == "__main__":
     manager = WindowManager()
     app.setProperty("manager", manager)
     sys.exit(app.exec())
-    print("*** Fin ***")

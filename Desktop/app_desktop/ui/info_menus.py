@@ -1,10 +1,9 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
 )
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtCore import QUrl
-from core.app_config import (
-    VERSION, WEB_LINK
-)
+from core.app_config import VERSION
 from components.boton import Boton
 
 class InfoMenus(QWidget):
@@ -16,7 +15,8 @@ class InfoMenus(QWidget):
         ctrlUsuario = manager.get_usuarios()
 
         version = QLabel("v" + VERSION)
-        descripcion = QLabel(ctrlUsuario.get_master_info())
+        info = ctrlUsuario.get_master_info()
+        descripcion = QLabel(info["descripcion"])
 
         layIzq = QVBoxLayout()
         layIzq.addWidget(version)
@@ -24,7 +24,8 @@ class InfoMenus(QWidget):
         layIzq.addWidget(descripcion)
 
         btnWeb = Boton("Página\nWeb", "logo", 48)
-        btnWeb.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(WEB_LINK)))
+        btnWeb.clicked.connect(self.open_link)
+        self.link = info["link"]
 
         if show_salir:
             btnSalir = Boton("   Salir", "logout", 20)
@@ -53,3 +54,7 @@ class InfoMenus(QWidget):
         print("InfoMenus: logout")
         manager = QApplication.instance().property("manager")
         manager.set_login()
+
+    def open_link(self):
+        print("InfoMenus: open_link " + self.link)
+        QDesktopServices.openUrl(QUrl(self.link))

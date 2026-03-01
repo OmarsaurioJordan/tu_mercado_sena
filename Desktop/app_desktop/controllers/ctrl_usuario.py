@@ -1,7 +1,7 @@
 import requests
 from PySide6.QtCore import Signal, QObject
 from core.app_config import (
-    API_LIMIT_ITEMS, DEFAULT_INFO, API_BASE_URL, TIME_OUT
+    API_LIMIT_ITEMS, DEFAULT_INFO, DEFAUL_LINK, API_BASE_URL, TIME_OUT
 )
 from models.usuario import Usuario
 from core.session import Session
@@ -118,8 +118,8 @@ class CtrlUsuario:
         response = requests.get(API_BASE_URL + "admin/master_info.php", timeout=TIME_OUT)
         if response.status_code == 200:
             print("CtrlUsuario: get_master_info-ok")
-            return response.json().get('descripcion')
-        return DEFAULT_INFO
+            return response.json()
+        return { "descripcion": DEFAULT_INFO, "link": DEFAUL_LINK }
 
     def admin_login(self, email="", password=""):
         print("CtrlUsuario: admin_login-init")
@@ -189,6 +189,27 @@ class CtrlUsuario:
                 self.api_usuario(id)
             return res
         return False
+    
+    # envio de mensajes y notificaciones
+
+    def send_message(self, id=0, texto=""):
+        print("CtrlUsuario: send_message-init")
+        # Tarea
+        """
+        ses = Session()
+        admindata = ses.get_login()
+        params = {"id": id, "texto": texto,
+            "admin_email": admindata["email"], "admin_token": admindata["token"]
+        }
+        response = requests.get(API_BASE_URL + "usuarios/set_estado.php", params=params, timeout=TIME_OUT)
+        if response.status_code == 200:
+            print("CtrlUsuario: set_estado-ok")
+            res = response.json()["Ok"] == "1"
+            if res:
+                self.api_usuario(id)
+            return res
+        return False
+        """
 
     # metodos de apoyo
 

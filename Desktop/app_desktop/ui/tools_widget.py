@@ -51,6 +51,9 @@ class ToolsWidget(QWidget):
         denunciaBody.card_producto_clic.connect(
             lambda prod_id: self.buscarProducto(prod_id, productoBody)
         )
+        pqrsBody.card_clic.connect(
+            lambda user_id: self.buscarUsuario(user_id, usuarioBody)
+        )
 
         tabsFind = QTabWidget()
         # estructura de la busqueda de usuarios
@@ -125,6 +128,8 @@ class ToolsWidget(QWidget):
         productoBody.cambioData.connect(denunciaBody.set_is_producto)
         # cuando cambia PQRS
         pqrsBody.cambioData.connect(usuarioBody.set_from_pqrs)
+        # cuando cambia denuncia
+        denunciaBody.cambioData.connect(usuarioBody.set_from_denuncia)
 
         # colocar todo en layout principal
         layFondoTres = QHBoxLayout()
@@ -193,6 +198,8 @@ class ToolsWidget(QWidget):
     def buscarPqrs(self, pqrs_id, widgetResultado):
         print(f"ToolsWidget {pqrs_id}: buscarPqrs")
         pqrs = self.ctrlPqrs.get_pqrs(pqrs_id)
+        if pqrs is not None:
+            self.ctrlUsuario.get_usuario(pqrs.usuario_id)
         widgetResultado.setData(pqrs)
         self.select_tab("PQRS")
 
@@ -209,5 +216,10 @@ class ToolsWidget(QWidget):
     def buscarDenuncia(self, den_id, widgetResultado):
         print(f"ToolsWidget {den_id}: buscarDenuncia")
         denuncia = self.ctrlDenuncia.get_denuncia(den_id)
+        if denuncia is not None:
+            self.ctrlUsuario.get_usuario(denuncia.denunciante_id)
+            self.ctrlUsuario.get_usuario(denuncia.usuario_id)
+            if denuncia.producto_id != 0:
+                self.ctrlProducto.get_producto(denuncia.producto_id)
         widgetResultado.setData(denuncia)
         self.select_tab("Denuncia")

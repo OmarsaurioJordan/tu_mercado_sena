@@ -164,6 +164,7 @@ class PqrsBody(QWidget):
         self.setData(ctrlPqrs.get_pqrs(id))
 
     def set_is_seleccionado(self, seleccionado_id=0):
-        if seleccionado_id != self.id:
-            print(f"PqrsBody {self.id} - {seleccionado_id}: set_is_seleccionado")
-            self.resetData()
+        if seleccionado_id != 0:
+            if seleccionado_id != self.usuario_id:
+                print(f"PqrsBody {self.id} - {seleccionado_id}: set_is_seleccionado")
+                self.resetData()

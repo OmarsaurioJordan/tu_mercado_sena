@@ -3,7 +3,7 @@ $host = "localhost";
 $user = "root";
 $pass = "";
 $db = "api_tms";
-$debug = false;
+$debug = true; // habilita o inhabilita validacion con token
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
