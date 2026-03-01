@@ -65,6 +65,7 @@ class ProductoFilter(QWidget):
         self.setLayout(layVertical)
 
     def emitir_aplicar(self):
+        print("ProductoFilter: emitir_aplicar")
         filtros = self.obtener_filtros()
         self.clicAplicar.emit(filtros)
 
@@ -84,6 +85,7 @@ class ProductoFilter(QWidget):
         return filtros
     
     def cambioCategoria(self):
+        print("ProductoFilter: cambioCategoria")
         ctrlData = QApplication.instance().property("controls").get_data()
         ind = self.selCategoria.get_data()
         if ind == 0:

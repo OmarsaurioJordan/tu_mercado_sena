@@ -66,17 +66,21 @@ class Producto:
 
     def load_image(self, img_ind=0):
         if not self.imagenes[img_ind]:
-            self.workers.append(ImageWorker("", False))
+            self.workers.append(ImageWorker(""))
             QThreadPool.globalInstance().start(self.workers[-1])
             return
         url = IMAGE_PROD_LINK + self.imagenes[img_ind]
-        self.workers.append(ImageWorker(url, False))
+        self.workers.append(ImageWorker(url))
         self.workers[-1].signals.finished.connect(
             lambda img, i = img_ind: self.set_image(img, i))
         QThreadPool.globalInstance().start(self.workers[-1])
 
     def set_image(self, image, img_ind=0):
-        self.img_pix[img_ind] = image
+        if not image.isNull():
+            pix = QPixmap.fromImage(image)
+        else:
+            pix = QPixmap()
+        self.img_pix[img_ind] = pix
         self.is_img_load[img_ind] = True
         self.img_signal.ok_image.emit(self.id)
 

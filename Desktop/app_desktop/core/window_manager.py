@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import (
     QMainWindow, QStackedWidget, QApplication
 )
+from PySide6.QtGui import QShortcut, QKeySequence
 from windows.login_window import LoginWindow
 from windows.menu_window import MenuWindow
 from windows.tools_window import ToolsWindow
@@ -15,8 +16,11 @@ class WindowManager(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("TuMercadoSena-Desktop")
+        self.setWindowTitle("TMS-Administración")
         self.resize(800, 600)
+
+        shortcut = QShortcut(QKeySequence("F2"), self)
+        shortcut.activated.connect(lambda: print("..."))
 
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)
@@ -28,6 +32,7 @@ class WindowManager(QMainWindow):
         self.show()
 
     def set_login(self):
+        print("WindowManager: set_login")
         ses = Session()
         ses.set_login()
         login = LoginWindow()
@@ -37,6 +42,7 @@ class WindowManager(QMainWindow):
         self.change_tool("login")
 
     def set_tools(self, token="", email="", id=0):
+        print("WindowManager: set_tools")
         ses = Session()
         ses.set_login(token, email, id)
         self.views = {
@@ -53,9 +59,11 @@ class WindowManager(QMainWindow):
         self.change_tool("menu")
 
     def change_tool(self, tool_name):
+        print(f"WindowManager: change_tool-{tool_name}")
         self.stack.setCurrentWidget(self.views[tool_name])
 
     def limpiar_stack(self):
+        print("WindowManager: limpiar_stack")
         QApplication.instance().property("controls").limpiar()
         while self.stack.count() > 0:
             widget = self.stack.widget(0)

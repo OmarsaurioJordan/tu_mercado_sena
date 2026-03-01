@@ -1,27 +1,9 @@
 TAREAS:
 ...
-- no está permitiendo cambiar rol de usuario
-- no permite cambiar estado de pqrs y denuncia
-- al buscar productos aparecen ventanas emergentes de carga de imágenes
-- en modo debug sin login, pone carta admin prueba como primer usuario de búsqueda
-- denuncias y pqrs tienen las fichas alargadas en lo vertical, y superpuestas horizontalmente
 - fichas de body denuncias se alargan horizontalmente
-- fichas de body denuncias no se pueden clickear
-- no está cargando body pqrs al dar clic a ficha, ni salen errores
-- quitar envo de mensajes en body pqrs
-...
-- primer clic en producto ficha con multiples imágenes, no deja resaltada la ficha
-- al seleccionar ficha, poner pestaña adecuada
-- modulos de las entidades para administración y búsqueda:
--   API (ya)
--   model (ya)
--   cards (ya)
--   body (ya)
--   filter (ya)
--   controller (ya)
--   confirmaciones (ya)
--   controllers_manager (ya)
--   tools_widget (ya)
+- fichas de body pqrs no se pueden clickear
+- body pqrs carga al segundo clic en ficha
+- cuando se envía mensaje desde el body de una pqrs debe adjuntarse una parte automática y resolverse la pqrs
 ...
 - módulo de chats: búsqueda + body
 - módulo de auditorías: búsqueda + body
@@ -37,6 +19,7 @@ TAREAS:
 - config. cambiar tiempo de bloqueo con pin
 - config. cambiar volúmen de notificaciónes pqrs y denuncias
 - config. editar nombre, link a TMS y descripción del perfil
+- crear admin master si no existe en la DB al inicio
 ...
 PRUEBAS:
 ...

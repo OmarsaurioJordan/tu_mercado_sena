@@ -45,6 +45,7 @@ class PqrsFilter(QWidget):
         self.setLayout(layVertical)
 
     def emitir_aplicar(self):
+        print("PqrsFilter: emitir_aplicar")
         filtros = self.obtener_filtros()
         self.clicAplicar.emit(filtros)
 

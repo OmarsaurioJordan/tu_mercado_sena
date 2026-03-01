@@ -9,6 +9,7 @@ class CtrlData:
         self.limpiar()
     
     def limpiar(self):
+        print("CtrlData: limpiar")
         # son arrays [] de diccionarios { id, nombre, extra }
         self.motivos = self.api_data("motivos")
         self.sucesos = self.api_data("sucesos")
@@ -128,9 +129,11 @@ class CtrlData:
         return res
 
     def api_data(self, tabla=""):
+        print(f"CtrlData: api_data-{tabla}-init")
         params = {"tabla": tabla}
         response = requests.get(API_BASE_URL + "get_data.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print(f"CtrlData: api_data-{tabla}-ok")
             data = response.json()
             return data
         return None

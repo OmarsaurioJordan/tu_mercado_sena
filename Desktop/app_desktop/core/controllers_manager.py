@@ -29,6 +29,7 @@ class ControllersManager:
         return self.denuncias
 
     def limpiar(self):
+        print("ControllersManager: limpiar")
         self.usuarios.limpiar()
         self.productos.limpiar()
         self.pqrss.limpiar()

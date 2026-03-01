@@ -72,8 +72,10 @@ class HeaderLayout(QVBoxLayout):
             self.addWidget(widget)
 
     def usuario_debug(self):
+        print("HeaderLayout: usuario_debug")
         return Usuario(0, "email_administrativo@sena.edu.co", 3, "Usuario Administrador", 0, "", "", 1, "", "", "")
 
     def cambiaPagina(self, pagina=""):
+        print("HeaderLayout: cambiaPagina")
         manager = QApplication.instance().property("manager")
         manager.change_tool(pagina)

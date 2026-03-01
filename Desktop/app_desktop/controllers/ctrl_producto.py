@@ -16,6 +16,7 @@ class CtrlProducto:
         self.limpiar()
     
     def limpiar(self, solo_busqueda=False):
+        print("CtrlProducto: limpiar")
         if not solo_busqueda:
             self.productos = []
         self.productos_busqueda = []
@@ -30,9 +31,11 @@ class CtrlProducto:
     # llamadas a la API para informacion de productos
 
     def api_producto(self, id=0):
+        print("CtrlProducto: api_producto-init")
         params = {"id": id}
         response = requests.get(API_BASE_URL + "productos", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlProducto: api_producto-ok")
             data = response.json()
             prd = self.new_producto(data[0])
             self.add_productos([prd], False)
@@ -41,6 +44,7 @@ class CtrlProducto:
         return None
 
     def api_productos(self, filtros={}):
+        print("CtrlProducto: api_productos-init")
         if self.cursor_busqueda["finalizo"] or self.cursor_busqueda["running"]:
             return []
         self.cursor_busqueda["running"] = True
@@ -51,6 +55,7 @@ class CtrlProducto:
             response = requests.get(API_BASE_URL + "productos", params=filtros, timeout=TIME_OUT)
             productos = []
             if response.status_code == 200:
+                print("CtrlProducto: api_productos-ok")
                 data = response.json()
                 for item in data:
                     prd = self.new_producto(item)
@@ -69,8 +74,10 @@ class CtrlProducto:
 
     def do_busqueda(self, filtros={}, rebusqueda=False):
         if rebusqueda:
+            print("CtrlProducto: do_busqueda-rebusqueda")
             filtros = self.cursor_busqueda["filtros"]
         else:
+            print("CtrlProducto: do_busqueda-busqueda")
             self.limpiar(True)
             self.cursor_busqueda["filtros"] = filtros
         self.api_productos(filtros)
@@ -107,6 +114,7 @@ class CtrlProducto:
     # llamadas a la API para modificar productos
     
     def set_estado(self, id=0, estado_id=0):
+        print("CtrlProducto: set_estado-init")
         ses = Session()
         admindata = ses.get_login()
         params = {"id": id, "estado": estado_id,
@@ -114,6 +122,7 @@ class CtrlProducto:
         }
         response = requests.get(API_BASE_URL + "productos/set_estado.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlProducto: set_estado-ok")
             res = response.json()["Ok"] == "1"
             if res:
                 self.api_producto(id)
@@ -121,12 +130,15 @@ class CtrlProducto:
         return False
     
     def set_integridad(self, id=0, integridad=0):
+        print("CtrlProducto: set_integridad-init")
         return False
     
     def set_subcategoria(self, id=0, subcategoria=0):
+        print("CtrlProducto: set_subcategoria-init")
         return False
     
     def set_categoria(self, id=0, categoria=0):
+        print("CtrlProducto: set_categoria-init")
         return False
 
     # metodos de apoyo

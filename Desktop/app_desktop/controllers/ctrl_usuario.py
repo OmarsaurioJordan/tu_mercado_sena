@@ -16,6 +16,7 @@ class CtrlUsuario:
         self.limpiar()
     
     def limpiar(self, solo_busqueda=False):
+        print("CtrlUsuario: limpiar")
         if not solo_busqueda:
             self.usuarios = []
         self.usuarios_busqueda = []
@@ -30,9 +31,11 @@ class CtrlUsuario:
     # llamadas a la API para informacion de usuarios
 
     def api_usuario(self, id=0):
+        print("CtrlUsuario: api_usuario-init")
         params = {"id": id}
         response = requests.get(API_BASE_URL + "usuarios", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlUsuario: api_usuario-ok")
             data = response.json()
             usr = self.new_usuario(data[0])
             self.add_usuarios([usr], False)
@@ -41,6 +44,7 @@ class CtrlUsuario:
         return None
 
     def api_usuarios(self, filtros={}):
+        print("CtrlUsuario: api_usuarios-init")
         if self.cursor_busqueda["finalizo"] or self.cursor_busqueda["running"]:
             return []
         self.cursor_busqueda["running"] = True
@@ -51,6 +55,7 @@ class CtrlUsuario:
             response = requests.get(API_BASE_URL + "usuarios", params=filtros, timeout=TIME_OUT)
             usuarios = []
             if response.status_code == 200:
+                print("CtrlUsuario: api_usuarios-ok")
                 data = response.json()
                 for item in data:
                     usr = self.new_usuario(item)
@@ -69,8 +74,10 @@ class CtrlUsuario:
 
     def do_busqueda(self, filtros={}, rebusqueda=False):
         if rebusqueda:
+            print("CtrlUsuario: do_busqueda-rebusqueda")
             filtros = self.cursor_busqueda["filtros"]
         else:
+            print("CtrlUsuario: do_busqueda-busqueda")
             self.limpiar(True)
             self.cursor_busqueda["filtros"] = filtros
         self.api_usuarios(filtros)
@@ -107,15 +114,19 @@ class CtrlUsuario:
     # llamadas a la API para administrador
 
     def get_master_info(self):
+        print("CtrlUsuario: get_master_info-init")
         response = requests.get(API_BASE_URL + "admin/master_info.php", timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlUsuario: get_master_info-ok")
             return response.json().get('descripcion')
         return DEFAULT_INFO
 
     def admin_login(self, email="", password=""):
+        print("CtrlUsuario: admin_login-init")
         params = {"email": email, "password": password}
         response = requests.get(API_BASE_URL + "admin/admin_login.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlUsuario: admin_login-ok")
             data = response.json()
             return {
                 "token": data.get('token'),
@@ -132,6 +143,7 @@ class CtrlUsuario:
         return {"token": "", "id": 0, "error": ""}
 
     def admin_pin(self, email="", pin=""):
+        print("CtrlUsuario: admin_pin-init")
         ses = Session()
         admindata = ses.get_login()
         params = {"email": email, "pin": pin,
@@ -140,12 +152,14 @@ class CtrlUsuario:
         response = requests.get(API_BASE_URL + "admin/admin_pin.php", params=params, timeout=TIME_OUT)
         data = response.json()
         if response.status_code == 200:
+            print("CtrlUsuario: admin_pin-ok")
             return int(data.get('Ok')) # 0 o 1
         return 2 # error
 
     # llamadas a la API para modificar usuarios
     
     def set_rol(self, id=0, rol_id=0):
+        print("CtrlUsuario: set_rol-init")
         ses = Session()
         admindata = ses.get_login()
         params = {"id": id, "rol": rol_id,
@@ -153,6 +167,7 @@ class CtrlUsuario:
         }
         response = requests.get(API_BASE_URL + "usuarios/set_rol.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlUsuario: set_rol-ok")
             res = response.json()["Ok"] == "1"
             if res:
                 self.api_usuario(id)
@@ -160,6 +175,7 @@ class CtrlUsuario:
         return False
     
     def set_estado(self, id=0, estado_id=0):
+        print("CtrlUsuario: set_estado-init")
         ses = Session()
         admindata = ses.get_login()
         params = {"id": id, "estado": estado_id,
@@ -167,6 +183,7 @@ class CtrlUsuario:
         }
         response = requests.get(API_BASE_URL + "usuarios/set_estado.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlUsuario: set_estado-ok")
             res = response.json()["Ok"] == "1"
             if res:
                 self.api_usuario(id)

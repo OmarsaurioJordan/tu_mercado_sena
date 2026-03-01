@@ -5,6 +5,7 @@ from core.controllers_manager import ControllersManager
 from PySide6.QtGui import QFont
 
 if __name__ == "__main__":
+    print("*** Tu Mercado Sena ***")
     app = QApplication(sys.argv)
     app.setFont(QFont("Times New Roman", 12))
     ctrls = ControllersManager()
@@ -12,3 +13,4 @@ if __name__ == "__main__":
     manager = WindowManager()
     app.setProperty("manager", manager)
     sys.exit(app.exec())
+    print("*** Fin ***")

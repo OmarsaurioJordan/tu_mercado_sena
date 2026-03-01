@@ -26,16 +26,20 @@ class ResultBusqueda(QListWidget):
                 ctrl.pqrs_signal.hubo_cambio.connect(self.actualizar)
             case "denuncias":
                 ctrl.denuncia_signal.hubo_cambio.connect(self.actualizar)
-
-        if tipo in["usuarios", "productos"]:
+        
+        if tipo in ["usuarios", "productos"]:
             self.setViewMode(QListWidget.IconMode)
             self.setWrapping(True)
+            self.setFlow(QListWidget.LeftToRight)
+            self.setUniformItemSizes(False)
         else:
             self.setViewMode(QListWidget.ListMode)
             self.setWrapping(False)
+            self.setFlow(QListWidget.TopToBottom)
+            self.setUniformItemSizes(True)
+        
         self.setResizeMode(QListWidget.Adjust)
         self.setSpacing(10)
-        self.setFlow(QListWidget.LeftToRight)
         self.setDragEnabled(False)
         self.setDragDropMode(QAbstractItemView.NoDragDrop)
         self.verticalScrollBar().valueChanged.connect(self._check_scroll)
@@ -55,6 +59,7 @@ class ResultBusqueda(QListWidget):
     # signal cuando llega al fondo del scroll
 
     def _check_scroll(self, value):
+        print(f"ResultBusqueda {self.tipo}: _check_scroll")
         scroll = self.verticalScrollBar()
         if value == scroll.maximum():
             self.scroll_at_end.emit()
@@ -62,14 +67,17 @@ class ResultBusqueda(QListWidget):
     # CRUD de fichas
 
     def eliminar_items(self):
+        print(f"ResultBusqueda {self.tipo}: eliminar_items")
         self.clear()
 
     def actualizar(self, id=0):
+        print(f"ResultBusqueda {self.tipo}: actualizar")
         ctrl = self.get_control()
         if id == 0:
             items = ctrl.get_busqueda()
             self.agregar_items(items)
         else:
+            print(f"ResultBusqueda {self.tipo}: actualizar-ficha")
             for i in range(self.count()):
                 item = self.item(i)
                 ficha = self.itemWidget(item)
@@ -86,6 +94,7 @@ class ResultBusqueda(QListWidget):
                     break
     
     def agregar_items(self, items):
+        print(f"ResultBusqueda {self.tipo}: agregar_items")
         ids = self.obtener_ids()
         for it in items:
             if it.id in ids:
@@ -93,18 +102,19 @@ class ResultBusqueda(QListWidget):
             ids.add(it.id)
             match self.tipo:
                 case "usuarios":
-                    ficha = UsuarioCard(it)
+                    ficha = UsuarioCard(it, parent=self)
                 case "productos":
-                    ficha = ProductoCard(it)
+                    ficha = ProductoCard(it, parent=self)
                 case "pqrss":
-                    ficha = PqrsCard(it)
+                    ficha = PqrsCard(it, parent=self)
                 case "denuncias":
-                    ficha = DenunciaCard(it)
+                    ficha = DenunciaCard(it, parent=self)
             ficha.card_clic.connect(self._click_event)
             item = QListWidgetItem()
             item.setSizeHint(ficha.sizeHint())
             self.addItem(item)
             self.setItemWidget(item, ficha)
+            ficha.miItem = item
 
     def obtener_ids(self):
         ids = set()
@@ -117,9 +127,11 @@ class ResultBusqueda(QListWidget):
     # pulsacion de fichas
     
     def _click_event(self, item_id):
+        print(f"ResultBusqueda {self.tipo}: _click_event")
         self.card_clic.emit(item_id)
     
     def set_sombrear(self, item_id=0):
+        print(f"ResultBusqueda {self.tipo}: set_sombrear")
         for i in range(self.count()):
             item = self.item(i)
             widget = self.itemWidget(item)

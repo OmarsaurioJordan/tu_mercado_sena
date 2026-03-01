@@ -42,6 +42,16 @@ class ToolsWidget(QWidget):
         tabsB.addTab(Scroll(), "Papelera")
         tabsB.addTab(Scroll(), "Historial")
 
+        self.tabs = [tabsA, tabsB]
+
+        # conectar otras fichas
+        denunciaBody.card_usuario_clic.connect(
+            lambda user_id: self.buscarUsuario(user_id, usuarioBody)
+        )
+        denunciaBody.card_producto_clic.connect(
+            lambda prod_id: self.buscarProducto(prod_id, productoBody)
+        )
+
         tabsFind = QTabWidget()
         # estructura de la busqueda de usuarios
         usuarioFilter = UsuarioFilter()
@@ -128,50 +138,76 @@ class ToolsWidget(QWidget):
         layFondoTres.setStretch(2, 3)
         self.setLayout(layFondoTres)
 
+    def select_tab(self, target=""):
+        print(f"ToolsWidget: select_tab {target}")
+        for tabs in (self.tabs[0], self.tabs[1]):
+            for idx in range(tabs.count()):
+                text = tabs.tabText(idx)
+                if text == target:
+                    tabs.setCurrentIndex(idx)
+                    return True
+        return False
+
     def buscarUsuarios(self, filtros, widgetResultado, widgetReset):
+        print("ToolsWidget: buscarUsuarios")
         widgetResultado.eliminar_items()
         widgetReset.resetData()
         self.ctrlUsuario.do_busqueda(filtros=filtros)
     
     def rebuscarUsuarios(self):
+        print("ToolsWidget: rebuscarUsuarios")
         self.ctrlUsuario.do_busqueda(rebusqueda=True)
 
     def buscarUsuario(self, user_id, widgetResultado):
+        print(f"ToolsWidget {user_id}: buscarUsuario")
         usuario = self.ctrlUsuario.get_usuario(user_id)
         widgetResultado.setData(usuario)
+        self.select_tab("Usuario")
     
     def buscarProductos(self, filtros, widgetResultado, widgetReset):
+        print("ToolsWidget: buscarProductos")
         widgetResultado.eliminar_items()
         widgetReset.resetData()
         self.ctrlProducto.do_busqueda(filtros=filtros)
     
     def rebuscarProductos(self):
+        print("ToolsWidget: rebuscarProductos")
         self.ctrlProducto.do_busqueda(rebusqueda=True)
 
     def buscarProducto(self, prod_id, widgetResultado):
+        print(f"ToolsWidget {prod_id}: buscarProducto")
         producto = self.ctrlProducto.get_producto(prod_id)
         widgetResultado.setData(producto)
+        self.select_tab("Producto")
     
     def buscarPqrss(self, filtros, widgetResultado, widgetReset):
+        print("ToolsWidget: buscarPqrss")
         widgetResultado.eliminar_items()
         widgetReset.resetData()
         self.ctrlPqrs.do_busqueda(filtros=filtros)
     
     def rebuscarPqrss(self):
+        print("ToolsWidget: rebuscarPqrss")
         self.ctrlPqrs.do_busqueda(rebusqueda=True)
 
     def buscarPqrs(self, pqrs_id, widgetResultado):
+        print(f"ToolsWidget {pqrs_id}: buscarPqrs")
         pqrs = self.ctrlPqrs.get_pqrs(pqrs_id)
         widgetResultado.setData(pqrs)
+        self.select_tab("PQRS")
 
     def buscarDenuncias(self, filtros, widgetResultado, widgetReset):
+        print("ToolsWidget: buscarDenuncias")
         widgetResultado.eliminar_items()
         widgetReset.resetData()
         self.ctrlDenuncia.do_busqueda(filtros=filtros)
     
     def rebuscarDenuncias(self):
+        print("ToolsWidget: rebuscarDenuncias")
         self.ctrlDenuncia.do_busqueda(rebusqueda=True)
 
     def buscarDenuncia(self, den_id, widgetResultado):
+        print(f"ToolsWidget {den_id}: buscarDenuncia")
         denuncia = self.ctrlDenuncia.get_denuncia(den_id)
         widgetResultado.setData(denuncia)
+        self.select_tab("Denuncia")

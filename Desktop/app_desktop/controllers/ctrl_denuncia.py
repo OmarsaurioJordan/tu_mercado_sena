@@ -16,6 +16,7 @@ class CtrlDenuncia:
         self.limpiar()
     
     def limpiar(self, solo_busqueda=False):
+        print("CtrlDenuncia: limpiar")
         if not solo_busqueda:
             self.denuncias = []
         self.denuncias_busqueda = []
@@ -30,9 +31,11 @@ class CtrlDenuncia:
     # llamadas a la API para informacion de denuncias
 
     def api_denuncia(self, id=0):
+        print("CtrlDenuncia: api_denuncia-init")
         params = {"id": id}
         response = requests.get(API_BASE_URL + "denuncias", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlDenuncia: api_denuncia-ok")
             data = response.json()
             denuncia = self.new_denuncia(data[0])
             self.add_denuncias([denuncia], False)
@@ -41,6 +44,7 @@ class CtrlDenuncia:
         return None
 
     def api_denuncias(self, filtros={}):
+        print("CtrlDenuncia: api_denuncias-init")
         if self.cursor_busqueda["finalizo"] or self.cursor_busqueda["running"]:
             return []
         self.cursor_busqueda["running"] = True
@@ -51,6 +55,7 @@ class CtrlDenuncia:
             response = requests.get(API_BASE_URL + "denuncias", params=filtros, timeout=TIME_OUT)
             denuncias = []
             if response.status_code == 200:
+                print("CtrlDenuncia: api_denuncias-ok")
                 data = response.json()
                 for item in data:
                     denuncia = self.new_denuncia(item)
@@ -69,8 +74,10 @@ class CtrlDenuncia:
 
     def do_busqueda(self, filtros={}, rebusqueda=False):
         if rebusqueda:
+            print("CtrlDenuncia: do_busqueda-rebusqueda")
             filtros = self.cursor_busqueda["filtros"]
         else:
+            print("CtrlDenuncia: do_busqueda-busqueda")
             self.limpiar(True)
             self.cursor_busqueda["filtros"] = filtros
         self.api_denuncias(filtros)
@@ -107,6 +114,7 @@ class CtrlDenuncia:
     # llamadas a la API para modificar denuncias
     
     def set_estado(self, id=0, estado_id=0):
+        print("CtrlDenuncia: set_estado-init")
         ses = Session()
         admindata = ses.get_login()
         params = {"id": id, "estado": estado_id,
@@ -114,6 +122,7 @@ class CtrlDenuncia:
         }
         response = requests.get(API_BASE_URL + "denuncias/set_estado.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlDenuncia: set_estado-ok")
             res = response.json()["Ok"] == "1"
             if res:
                 self.api_denuncia(id)
@@ -121,6 +130,7 @@ class CtrlDenuncia:
         return False
     
     def set_motivo(self, id=0, motivo=0):
+        print("CtrlDenuncia: set_motivo-init")
         return False
 
     # metodos de apoyo

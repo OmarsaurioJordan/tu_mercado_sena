@@ -13,6 +13,7 @@ class PqrsBody(QWidget):
     def __init__(self):
         super().__init__()
         self.id = 0
+        self.usuario_id = 0
 
         ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
         ctrlPqrs.pqrs_signal.hubo_cambio.connect(self.actualizar)
@@ -21,7 +22,7 @@ class PqrsBody(QWidget):
 
         self.portaFicha = QVBoxLayout()
 
-        self.nickname = QLabel("")
+        self.nickname = QLabel("", self)
         self.nickname.setWordWrap(True)
         font = self.nickname.font()
         font.setBold(True)
@@ -31,7 +32,7 @@ class PqrsBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.email = QLabel("")
+        self.email = QLabel("", self)
         self.email.setWordWrap(True)
         self.email.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -47,7 +48,7 @@ class PqrsBody(QWidget):
             "estado...", "Estado", 0, "pqrs_estado")
         laySelectores.addWidget(self.sel_estado)
 
-        self.descripcion = QLabel("")
+        self.descripcion = QLabel("", self)
         self.descripcion.setWordWrap(True)
         self.descripcion.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -86,7 +87,7 @@ class PqrsBody(QWidget):
         self.resetData()
     
     def labelFechas(self, texto=""):
-        label = QLabel(texto)
+        label = QLabel(texto, self)
         label.setStyleSheet("color: #777777;")
         label.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -94,17 +95,18 @@ class PqrsBody(QWidget):
         return label
     
     def limpiarFicha(self):
+        print(f"PqrsBody {self.id}: limpiarFicha")
         while self.portaFicha.count():
             item = self.portaFicha.takeAt(0)
             widget = item.widget()
             if widget is not None:
-                widget.setParent(None)
                 widget.deleteLater()
-            del item
         self.update()
 
     def resetData(self):
+        print(f"PqrsBody {self.id}: resetData")
         self.id = 0
+        self.usuario_id = 0
         self.email.setText("*** email ***")
         self.nickname.setText("*** ??? ***")
         self.descripcion.setText("*** mensaje vacío ***")
@@ -114,6 +116,7 @@ class PqrsBody(QWidget):
         self.sel_estado.set_index(0)
         self.sel_motivo.set_ente_id(0)
         self.sel_estado.set_ente_id(0)
+        self.sel_estado.set_disabled(False)
         self.limpiarFicha()
         self.cambioData.emit(0)
 
@@ -121,7 +124,10 @@ class PqrsBody(QWidget):
         if pqrs is None:
             self.resetData()
             return
+        print(f"PqrsBody {pqrs.id}: setData")
         self.id = pqrs.id
+        self.usuario_id = pqrs.usuario_id
+        self.cambioData.emit(pqrs.id)
         self.email.setText(pqrs.email)
         self.nickname.setText(pqrs.usuario_name)
         if pqrs.mensaje == "":
@@ -133,26 +139,31 @@ class PqrsBody(QWidget):
         self.sel_estado.set_index_from_data(pqrs.estado_id)
         self.sel_motivo.set_ente_id(pqrs.id)
         self.sel_estado.set_ente_id(pqrs.id)
+        self.sel_estado.set_disabled(pqrs.estado_id != 1)
         self.limpiarFicha()
         self.newFicha(pqrs.usuario_id)
-        self.cambioData.emit(pqrs.id)
 
     def newFicha(self, id=0):
         if id != 0:
+            print(f"PqrsBody {id}: newFicha")
             ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
             usr = ctrlUsuario.get_usuario(id)
-            ficha = UsuarioCard(usr)
+            ficha = UsuarioCard(usr, parent=self)
             ficha.card_clic.connect(self._click_event)
             self.portaFicha.addWidget(ficha)
     
     def _click_event(self, user_id):
+        print(f"PqrsBody {user_id}: _click_event")
         self.card_clic.emit(user_id)
 
     def actualizar(self, id=0):
-        if id == self.id:
-            ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
-            self.setData(ctrlPqrs.get_pqrs(id))
+        if self.id == 0 or id != self.id:
+            return
+        print(f"PqrsBody {id}: actualizar")
+        ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
+        self.setData(ctrlPqrs.get_pqrs(id))
 
     def set_is_seleccionado(self, seleccionado_id=0):
         if seleccionado_id != self.id:
+            print(f"PqrsBody {self.id} - {seleccionado_id}: set_is_seleccionado")
             self.resetData()

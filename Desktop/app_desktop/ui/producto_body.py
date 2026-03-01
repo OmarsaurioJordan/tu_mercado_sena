@@ -21,7 +21,7 @@ class ProductoBody(QWidget):
         self.imagen = self.setImagen()
         self.imagenes = QVBoxLayout()
 
-        self.nombre = QLabel("")
+        self.nombre = QLabel("", self)
         self.nombre.setWordWrap(True)
         font = self.nombre.font()
         font.setBold(True)
@@ -52,20 +52,20 @@ class ProductoBody(QWidget):
             "estado...", "Estado", 0, "producto_estado")
         laySelectoresB.addWidget(self.sel_estado)
 
-        self.descripcion = QLabel("")
+        self.descripcion = QLabel("", self)
         self.descripcion.setWordWrap(True)
         self.descripcion.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
         layCantidades = QHBoxLayout()
-        self.precio = QLabel("Precio")
+        self.precio = QLabel("Precio", self)
         self.precio.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
         layCantidades.addWidget(self.precio)
         layCantidades.addSpacing(10)
-        self.disponibles = QLabel("Disponibles")
+        self.disponibles = QLabel("Disponibles", self)
         self.disponibles.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
@@ -100,7 +100,7 @@ class ProductoBody(QWidget):
         self.resetData()
     
     def setImagen(self, pixmap=None):
-        imagen = QLabel()
+        imagen = QLabel(self)
         if pixmap:
             imagen.setPixmap(pixmap)
         else:
@@ -113,7 +113,7 @@ class ProductoBody(QWidget):
         return imagen
 
     def labelFechas(self, texto=""):
-        label = QLabel(texto)
+        label = QLabel(texto, self)
         label.setStyleSheet("color: #777777;")
         label.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -129,6 +129,7 @@ class ProductoBody(QWidget):
         self.current_product = producto
 
     def resetData(self):
+        print(f"UsuarioBody {self.id}: resetData")
         self.changeProducto(None)
         self.id = 0
         self.nombre.setText("*** ??? ***")
@@ -150,13 +151,12 @@ class ProductoBody(QWidget):
         self.cambioData.emit(0)
 
     def limpiarImagenes(self):
+        print(f"UsuarioBody {self.id}: limpiarImagenes")
         while self.imagenes.count():
             item = self.imagenes.takeAt(0)
             widget = item.widget()
             if widget is not None:
-                widget.setParent(None)
                 widget.deleteLater()
-            del item
         self.imagenes.update()
         self.update()
 
@@ -164,6 +164,7 @@ class ProductoBody(QWidget):
         if producto is None:
             self.resetData()
             return
+        print(f"UsuarioBody {producto.id}: setData")
         self.changeProducto(producto)
         producto.img_signal.ok_image.connect(self.on_image_loaded)
         producto.load_images()
@@ -194,12 +195,15 @@ class ProductoBody(QWidget):
         self.cambioData.emit(producto.id)
 
     def actualizar(self, id=0):
-        if id == self.id:
-            ctrlProducto = QApplication.instance().property("controls").get_productos()
-            self.setData(ctrlProducto.get_producto(id))
+        if self.id == 0 or id != self.id:
+            return
+        print(f"UsuarioBody {id}: actualizar")
+        ctrlProducto = QApplication.instance().property("controls").get_productos()
+        self.setData(ctrlProducto.get_producto(id))
 
     def on_image_loaded(self, prod_id):
         if self.current_product and self.current_product.id == prod_id:
+            print(f"UsuarioBody {prod_id}: on_image_loaded")
             self.imagen.setPixmap(self.current_product.get_portada().copy())
             self.imagen.repaint()
             self.limpiarImagenes()
@@ -210,5 +214,6 @@ class ProductoBody(QWidget):
 
     def set_is_seleccionado(self, vendedor_id=0):
         if self.current_product is not None:
+            print(f"UsuarioBody {self.id} - {vendedor_id}: set_is_seleccionado")
             if vendedor_id != self.current_product.vendedor_id:
                 self.resetData()

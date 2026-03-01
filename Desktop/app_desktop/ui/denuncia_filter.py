@@ -50,6 +50,7 @@ class DenunciaFilter(QWidget):
         self.setLayout(layVertical)
 
     def emitir_aplicar(self):
+        print("DenunciaFilter: emitir_aplicar")
         filtros = self.obtener_filtros()
         self.clicAplicar.emit(filtros)
 

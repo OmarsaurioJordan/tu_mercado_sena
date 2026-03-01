@@ -20,7 +20,7 @@ class UsuarioBody(QWidget):
 
         ctrlData = QApplication.instance().property("controls").get_data()
 
-        self.imagen = QLabel()
+        self.imagen = QLabel(self)
         self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
         self.imagen.setScaledContents(True)
         self.imagen.setFixedSize(192, 192)
@@ -28,7 +28,7 @@ class UsuarioBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.nickname = QLabel("")
+        self.nickname = QLabel("", self)
         self.nickname.setWordWrap(True)
         font = self.nickname.font()
         font.setBold(True)
@@ -38,7 +38,7 @@ class UsuarioBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.email = QLabel("")
+        self.email = QLabel("", self)
         self.email.setWordWrap(True)
         self.email.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -53,7 +53,7 @@ class UsuarioBody(QWidget):
             "estado...", "Estado", 0, "usuario_estado")
         laySelectores.addWidget(self.sel_estado)
 
-        self.link = QLabel("")
+        self.link = QLabel("", self)
         self.link.setWordWrap(True)
         self.link.setStyleSheet("color: #777777;")
         self.link.setOpenExternalLinks(True)
@@ -62,7 +62,7 @@ class UsuarioBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
-        self.descripcion = QLabel("")
+        self.descripcion = QLabel("", self)
         self.descripcion.setWordWrap(True)
         self.descripcion.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
@@ -132,6 +132,7 @@ class UsuarioBody(QWidget):
         return label
 
     def resetData(self):
+        print(f"UsuarioBody {self.id}: resetData")
         self.id = 0
         self.email.setText("*** email ***")
         self.nickname.setText("*** ??? ***")
@@ -153,6 +154,7 @@ class UsuarioBody(QWidget):
         if usuario is None:
             self.resetData()
             return
+        print(f"UsuarioBody {usuario.id}: setData")
         self.id = usuario.id
         self.email.setText(usuario.email)
         self.nickname.setText(usuario.nickname)
@@ -175,12 +177,15 @@ class UsuarioBody(QWidget):
         self.cambioData.emit(usuario.id)
 
     def actualizar(self, id=0):
-        if id == self.id:
-            ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-            self.setData(ctrlUsuario.get_usuario(id))
+        if self.id == 0 or id != self.id:
+            return
+        print(f"UsuarioBody {id}: actualizar")
+        ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+        self.setData(ctrlUsuario.get_usuario(id))
 
     def set_from_producto(self, producto_id=0):
         if producto_id != 0:
+            print(f"UsuarioBody {self.id} - {producto_id}: set_from_producto")
             ctrlProducto = QApplication.instance().property("controls").get_productos()
             producto = ctrlProducto.get_producto(producto_id)
             if producto is not None:
@@ -190,6 +195,7 @@ class UsuarioBody(QWidget):
     
     def set_from_pqrs(self, pqrs_id=0):
         if pqrs_id != 0:
+            print(f"UsuarioBody {self.id} - {pqrs_id}: set_from_pqrs")
             ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
             pqrs = ctrlPqrs.get_pqrs(pqrs_id)
             if pqrs is not None:

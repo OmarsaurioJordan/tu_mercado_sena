@@ -54,6 +54,7 @@ class UsuarioFilter(QWidget):
         self.setLayout(layVertical)
 
     def emitir_aplicar(self):
+        print("UsuarioFilter: emitir_aplicar")
         filtros = self.obtener_filtros()
         self.clicAplicar.emit(filtros)
 

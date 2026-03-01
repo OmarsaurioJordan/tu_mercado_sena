@@ -2,6 +2,7 @@ from PySide6.QtCore import QThreadPool, Signal, QObject
 from PySide6.QtGui import QPixmap
 from services.load_image import ImageWorker
 from core.app_config import IMAGE_USER_LINK
+from services.image_utils import circular_pixmap
 
 class UsuarioSignal(QObject):
     ok_image = Signal(int)
@@ -44,15 +45,19 @@ class Usuario:
 
     def load_image(self):
         if not self.imagen:
-            self.worker = ImageWorker("", True)
+            self.worker = ImageWorker("")
             QThreadPool.globalInstance().start(self.worker)
             return
         url = IMAGE_USER_LINK + self.imagen
-        self.worker = ImageWorker(url, True)
+        self.worker = ImageWorker(url)
         self.worker.signals.finished.connect(self.set_image)
         QThreadPool.globalInstance().start(self.worker)
 
     def set_image(self, image):
-        self.img_pix = image
+        if hasattr(image, 'isNull') and not image.isNull():
+            pix = QPixmap.fromImage(image)
+        else:
+            pix = QPixmap()
+        self.img_pix = circular_pixmap(pix, 128)
         self.is_img_load = True
         self.img_signal.ok_image.emit(self.id)

@@ -50,5 +50,6 @@ class InfoMenus(QWidget):
         self.setLayout(layFondo)
 
     def logout(self):
+        print("InfoMenus: logout")
         manager = QApplication.instance().property("manager")
         manager.set_login()

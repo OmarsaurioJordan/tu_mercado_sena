@@ -16,6 +16,7 @@ class CtrlPqrs:
         self.limpiar()
     
     def limpiar(self, solo_busqueda=False):
+        print("CtrlPqrs: limpiar")
         if not solo_busqueda:
             self.pqrss = []
         self.pqrss_busqueda = []
@@ -30,9 +31,11 @@ class CtrlPqrs:
     # llamadas a la API para informacion de PQRSs
 
     def api_pqrs(self, id=0):
+        print("CtrlPqrs: api_pqrs-init")
         params = {"id": id}
         response = requests.get(API_BASE_URL + "pqrss", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlPqrs: api_pqrs-ok")
             data = response.json()
             pqrs = self.new_pqrs(data[0])
             self.add_pqrss([pqrs], False)
@@ -41,6 +44,7 @@ class CtrlPqrs:
         return None
 
     def api_pqrss(self, filtros={}):
+        print("CtrlPqrs: api_pqrss-init")
         if self.cursor_busqueda["finalizo"] or self.cursor_busqueda["running"]:
             return []
         self.cursor_busqueda["running"] = True
@@ -51,6 +55,7 @@ class CtrlPqrs:
             response = requests.get(API_BASE_URL + "pqrss", params=filtros, timeout=TIME_OUT)
             pqrss = []
             if response.status_code == 200:
+                print("CtrlPqrs: api_pqrss-ok")
                 data = response.json()
                 for item in data:
                     pqrs = self.new_pqrs(item)
@@ -69,8 +74,10 @@ class CtrlPqrs:
 
     def do_busqueda(self, filtros={}, rebusqueda=False):
         if rebusqueda:
+            print("CtrlPqrs: do_busqueda-rebusqueda")
             filtros = self.cursor_busqueda["filtros"]
         else:
+            print("CtrlPqrs: do_busqueda-busqueda")
             self.limpiar(True)
             self.cursor_busqueda["filtros"] = filtros
         self.api_pqrss(filtros)
@@ -107,6 +114,7 @@ class CtrlPqrs:
     # llamadas a la API para modificar PQRSs
     
     def set_estado(self, id=0, estado_id=0):
+        print("CtrlPqrs: set_estado-init")
         ses = Session()
         admindata = ses.get_login()
         params = {"id": id, "estado": estado_id,
@@ -114,6 +122,7 @@ class CtrlPqrs:
         }
         response = requests.get(API_BASE_URL + "pqrss/set_estado.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
+            print("CtrlPqrs: set_estado-ok")
             res = response.json()["Ok"] == "1"
             if res:
                 self.api_pqrs(id)
@@ -121,6 +130,7 @@ class CtrlPqrs:
         return False
     
     def set_motivo(self, id=0, motivo=0):
+        print("CtrlPqrs: set_motivo-init")
         return False
 
     # metodos de apoyo

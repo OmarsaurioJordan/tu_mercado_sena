@@ -98,6 +98,7 @@ class Selector(QWidget):
         self.ente_id = id
 
     def validar_cambio(self, new_index):
+        print("Selector: validar_cambio-init")
         self.onCambio.emit()
         
         if new_index == self.valor_anterior or self.conf_tipo == "":
@@ -106,8 +107,11 @@ class Selector(QWidget):
         resp = QMessageBox.question(self, "Confirmación",
             confirma_pregunta(self.conf_tipo) + self.combo.itemText(new_index) + "?")
         if resp == QMessageBox.Yes:
+            print("Selector: validar_cambio-ejecucion")
             if confirma_ejecucion(self.conf_tipo, self.ente_id, self.combo.currentData()):
+                print("Selector: validar_cambio-ok")
                 self.valor_anterior = new_index
                 return
         
+        print("Selector: validar_cambio-back")
         self.set_index(self.valor_anterior)

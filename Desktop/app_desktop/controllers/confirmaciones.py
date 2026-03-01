@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QApplication
 
 def confirma_ejecucion(tipo="", id=0, value=0):
+    print(f"confirma_ejecucion: confirma_ejecucion-{tipo}")
     manager = QApplication.instance().property("controls")
     match tipo:
         case "usuario_estado":
@@ -8,7 +9,7 @@ def confirma_ejecucion(tipo="", id=0, value=0):
             return ctrlUsuario.set_estado(id, value)
         case "usuario_rol":
             ctrlUsuario = manager.get_usuarios()
-            return ctrlUsuario.set_rol(value)
+            return ctrlUsuario.set_rol(id, value)
         case "producto_estado":
             ctrlProducto = manager.get_productos()
             return ctrlProducto.set_estado(id, value)

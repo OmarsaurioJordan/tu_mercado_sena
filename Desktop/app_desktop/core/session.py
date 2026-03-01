@@ -11,7 +11,7 @@ class Session:
         if self._initialized:
             return
         self._initialized = True
-        # agregar los atributos globales
+        # los atributos globales
         self.admin_token = ""
         self.admin_email = ""
         self.admin_id = 0

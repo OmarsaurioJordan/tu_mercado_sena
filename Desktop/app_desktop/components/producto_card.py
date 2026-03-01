@@ -7,9 +7,10 @@ from PySide6.QtGui import QPixmap
 class ProductoCard(QFrame):
     card_clic = Signal(int)
 
-    def __init__(self, producto):
-        super().__init__()
+    def __init__(self, producto, parent=None):
+        super().__init__(parent)
         self.id = producto.id
+        self.miItem = None
 
         ctrlProducto = QApplication.instance().property("controls").get_productos()
         ctrlProducto.producto_signal.hubo_cambio.connect(self.actualizar)
@@ -18,12 +19,12 @@ class ProductoCard(QFrame):
         self.setFrameShadow(QFrame.Shadow.Raised)
         self.setMaximumWidth(500)
 
-        self.imagen = QLabel()
+        self.imagen = QLabel(self)
         self.imagen.setScaledContents(True)
         self.imagen.setFixedSize(48, 48)
         self.imagen.setPixmap(QPixmap("assets/sprites/img_null.png"))
 
-        self.nombre = QLabel("")
+        self.nombre = QLabel("", self)
         self.nombre.setWordWrap(True)
         font = self.nombre.font()
         font.setBold(True)
@@ -32,7 +33,7 @@ class ProductoCard(QFrame):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
 
-        self.vendedor = QLabel("")
+        self.vendedor = QLabel("", self)
         self.vendedor.setWordWrap(True)
         self.vendedor.setStyleSheet("color: #777777;")
         self.vendedor.setAlignment(
@@ -52,6 +53,7 @@ class ProductoCard(QFrame):
     def setData(self, producto):
         if producto is None:
             return
+        print(f"ProductoCard {producto.id}: setData")
         self.imagen.setPixmap(producto.get_portada().copy())
         self.imagen.repaint()
         self.nombre.setText(producto.nombre)
@@ -59,18 +61,20 @@ class ProductoCard(QFrame):
         self.estado_color = {
             1: "#e6e5e5", # activo
             2: "#d2edf8", # invisible
-            3: "#999898", # eliminado
+            3: "#B9B9B9", # eliminado
             4: "#f7d9ac", # bloqueado
             10: "#f4f7ac" # denunciado
         }.get(producto.estado_id, "#f88eef") # error
         self.setPulsado()
 
     def actualizar(self, id=0):
-        if id == self.id:
+        if id != 0 and id == self.id:
+            print(f"ProductoCard {id}: actualizar")
             ctrlProducto = QApplication.instance().property("controls").get_productos()
             self.setData(ctrlProducto.get_producto(id))
 
     def setPulsado(self, is_pulsado=False):
+        print(f"ProductoCard {self.id}: setPulsado")
         if is_pulsado:
             self.setStyleSheet(f"""
                 ProductoCard {{
@@ -87,7 +91,11 @@ class ProductoCard(QFrame):
                     border-radius: 10px;
                 }}
             """)
+        self.adjustSize()
+        if self.miItem is not None:
+            self.miItem.setSizeHint(self.sizeHint())
 
     def mousePressEvent(self, event):
+        print(f"ProductoCard {self.id}: mousePressEvent")
         self.card_clic.emit(self.id)
         super().mousePressEvent(event)
