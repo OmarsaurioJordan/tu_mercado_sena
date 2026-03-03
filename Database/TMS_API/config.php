@@ -21,7 +21,6 @@ function validation() {
             echo json_encode(["error" => "Faltan credenciales"]);
             exit;
         }
-
         $admin_email = $_GET["admin_email"];
         $admin_token = $_GET['admin_token'];
 
@@ -43,6 +42,22 @@ function validation() {
             echo json_encode(["error" => "Credenciales inválidas"]);
             exit;
         }
+    }
+}
+
+function auditar($suceso_id, $descripcion) {
+    global $debug, $conn;
+    if (!$debug) {
+
+        if (!isset($_GET["admin_email"])) {
+            return;
+        }
+        $admin_email = $_GET["admin_email"];
+
+        $sql = "INSERT INTO auditorias (administrador_id, suceso_id, descripcion, fecha_registro) SELECT id, '$suceso_id', '$descripcion', NOW() FROM usuarios LEFt JOIN cuentas ON cuentas.id = usuarios.cuenta_id WHERE cuentas.email = $admin_email";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
     }
 }
 ?>

@@ -1,0 +1,30 @@
+TAREAS:
+...
+x auditorias, poner auditar()
+   3 ver_chat
+   4 enviar_mail
+   5 constante_modificada
+   6 cambio_password
+   7 noticia_masiva
+   11 estado_chat
+x devolver auditorias bajo demanda
+...
+x devolver número de pqrs y denuncias no contestadas
+...
+- enviar mensaje notificación al usuario
+...
+- devolver chats bajo demanda
+- cargar mensajes de chat bajo demanda
+- devolver historial bajo demanda
+- devolver papelera bajo demanda
+- modificar estado del chat
+...
+x guardar login de administrador
+x devolver logins de administradores bajo demanda
+...
+- devolver historia de análisis gráfico bajo demanda
+...
+- cambiar pin de administrador logeado
+- cambiar password de administrador logeado
+- editar nombre, link y descripcion del administrador logeado
+...

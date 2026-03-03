@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-require_once("config.php");
+require_once("../config.php");
 
 if (!isset($_GET["tabla"])) {
     http_response_code(400);

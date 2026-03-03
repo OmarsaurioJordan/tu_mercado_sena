@@ -3,3 +3,5 @@ __pycache__
 build/
 *.exe
 *.rar
+*.apk
+*.zip

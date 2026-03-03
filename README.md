@@ -4,15 +4,13 @@ proyecto final del ADSO 24 en el SENA sede Salomia, se trata de un marketplace s
 
 ## Propósito Académico y Objetivo
 
-este proyecto tiene como finalidad de aprendizaje demostrar el proceso de análisis y desarrollo de software, así como el trabajo en equipo, se lleva a cabo entre el 2do trimestre de 2024 y 1er trimestre de 2026, generando como entregable un sistema software listo para su puesta en marcha
+este proyecto tiene como finalidad de aprendizaje demostrar el proceso de análisis y desarrollo de software, así como el trabajo en equipo, se lleva a cabo entre el 2do trimestre de 2024 y 1er trimestre de 2026, generando como entregable un sistema software listo para su puesta en marcha a baja escala, prototipo mínimo viable
 
 ## Información
 
 puede ver en el archivo `Admin.md` información sobre los grupos de trabajo y distribución de carpetas y archivos del proyecto
 
 en el archivo `TutoGit.md` encuentra información sobre cómo usar Git y GitHub
-
-el archivo `Tareas.md` lista cosas pendientes por hacer, ya sea específicas de cada grupo o en general, se tiene un checklist de todo el proyecto
 
 ## Integrantes
 

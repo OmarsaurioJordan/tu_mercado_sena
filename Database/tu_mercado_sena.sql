@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-02-2026 a las 05:55:48
+-- Tiempo de generación: 03-03-2026 a las 04:33:32
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -75,7 +75,6 @@ CREATE TABLE `bloqueados` (
 -- Estructura de tabla para la tabla `categorias`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `categorias`;
@@ -106,7 +105,7 @@ INSERT INTO `categorias` (`id`, `nombre`) VALUES
 (11, 'vehículo'),
 (12, 'mascota'),
 (13, 'otro'),
-(14, 'adorno');
+(14, 'adornos');
 
 -- --------------------------------------------------------
 
@@ -114,6 +113,7 @@ INSERT INTO `categorias` (`id`, `nombre`) VALUES
 -- Estructura de tabla para la tabla `chats`
 --
 -- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 19-02-2026 a las 18:13:09
 --
 
 DROP TABLE IF EXISTS `chats`;
@@ -147,7 +147,7 @@ CREATE TABLE `chats` (
 -- Estructura de tabla para la tabla `cuentas`
 --
 -- Creación: 08-02-2026 a las 03:45:03
--- Última actualización: 08-02-2026 a las 03:49:49
+-- Última actualización: 01-03-2026 a las 15:23:35
 --
 
 DROP TABLE IF EXISTS `cuentas`;
@@ -172,16 +172,17 @@ CREATE TABLE `cuentas` (
 --
 -- Estructura de tabla para la tabla `denuncias`
 --
--- Creación: 07-02-2026 a las 18:36:02
+-- Creación: 19-02-2026 a las 16:50:17
+-- Última actualización: 28-02-2026 a las 17:29:13
 --
 
 DROP TABLE IF EXISTS `denuncias`;
 CREATE TABLE `denuncias` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `denunciante_id` bigint(20) UNSIGNED NOT NULL,
-  `producto_id` bigint(20) UNSIGNED NOT NULL,
-  `usuario_id` bigint(20) UNSIGNED NOT NULL,
-  `chat_id` bigint(20) UNSIGNED NOT NULL,
+  `producto_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `usuario_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `chat_id` bigint(20) UNSIGNED DEFAULT NULL,
   `motivo_id` bigint(20) UNSIGNED NOT NULL,
   `estado_id` bigint(20) UNSIGNED NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
@@ -209,7 +210,6 @@ CREATE TABLE `denuncias` (
 -- Estructura de tabla para la tabla `estados`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 08-02-2026 a las 04:21:06
 --
 
 DROP TABLE IF EXISTS `estados`;
@@ -269,7 +269,7 @@ CREATE TABLE `favoritos` (
 -- Estructura de tabla para la tabla `fotos`
 --
 -- Creación: 07-02-2026 a las 18:36:02
--- Última actualización: 08-02-2026 a las 03:50:59
+-- Última actualización: 01-03-2026 a las 15:30:45
 --
 
 DROP TABLE IF EXISTS `fotos`;
@@ -292,7 +292,6 @@ CREATE TABLE `fotos` (
 -- Estructura de tabla para la tabla `integridad`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `integridad`;
@@ -322,7 +321,7 @@ INSERT INTO `integridad` (`id`, `nombre`, `descripcion`) VALUES
 -- Estructura de tabla para la tabla `login_ip`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 08-02-2026 a las 03:37:34
+-- Última actualización: 28-02-2026 a las 17:13:23
 --
 
 DROP TABLE IF EXISTS `login_ip`;
@@ -369,14 +368,15 @@ CREATE TABLE `mensajes` (
 --
 -- Estructura de tabla para la tabla `motivos`
 --
--- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 07-02-2026 a las 19:06:14
+-- Creación: 19-02-2026 a las 17:19:03
+-- Última actualización: 19-02-2026 a las 17:23:07
 --
 
 DROP TABLE IF EXISTS `motivos`;
 CREATE TABLE `motivos` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
+  `tipo` enum('denuncia','pqrs','notificacion') NOT NULL,
   `descripcion` varchar(128) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -388,33 +388,33 @@ CREATE TABLE `motivos` (
 -- Volcado de datos para la tabla `motivos`
 --
 
-INSERT INTO `motivos` (`id`, `nombre`, `descripcion`) VALUES
-(1, 'pqrs_pregunta', 'mensaje de pregunta'),
-(2, 'pqrs_queja', 'mensaje de queja'),
-(3, 'pqrs_reclamo', 'mensaje de reclamo'),
-(4, 'pqrs_sugerencia', 'mensaje de sugerencia'),
-(5, 'pqrs_agradecimiento', 'mensaje de agradecimiento'),
-(6, 'notifica_denuncia', 'se ha respondido algo ante una denuncia'),
-(7, 'notifica_pqrs', 'se ha respondido algo a una PQRS'),
-(8, 'notifica_comprador', 'un comprador potencial se ha puesto en contacto'),
-(9, 'notifica_comunidad', 'ha llegado un mensaje enviado a todos los usuarios'),
-(10, 'notifica_administrativa', 'un mensaje interno de la administración, por ejemplo, puedes haber sido baneado o eliminado'),
-(11, 'notifica_bienvenida', 'mensaje de bienvenida al sistema'),
-(12, 'notifica_oferta', 'un favorito ha publicado un nuevo producto'),
-(13, 'notifica_venta', 'un vendedor ha enviado una solicitud de consolidar venta'),
-(14, 'notifica_devolver', 'un comprador ha enviado una solicitud de cancelar una transacción'),
-(15, 'notifica_exito', 'se ha llevado a cabo una compraventa exitosa'),
-(16, 'notifica_cancela', 'se ha llevado a cabo una devolución exitosa, se cancelará la compraventa del historial'),
-(17, 'notifica_califica', 'un comprador ha calificado o escrito un comentario, o lo ha modificado'),
-(18, 'denuncia_acoso', 'comportamiento de acoso sexual en un chat o imágenes o descripciónes'),
-(19, 'denuncia_bulling', 'comportamiento de burlas o insultos en un chat o imágenes o descripciónes'),
-(20, 'denuncia_violencia', 'comportamiento que incita al odio o amenzada directamente'),
-(21, 'denuncia_ilegal', 'comportamiento asociado a drogas, armas, prostitución y demás'),
-(22, 'denuncia_troll', 'comportamiento enfocado en molestar y hacer perder el tiempo, por ejemplo, con negociaciónes por mamar gallo'),
-(23, 'denuncia_fraude', 'se trata de vender algo malo o mediante trampas, tratan de tumbar al otro con fraudes'),
-(24, 'denuncia_fake', 'un producto o perfil es meme o chisto o simplemente hace perder el tiempo al no ser una propuesta real'),
-(25, 'denuncia_spam', 'un producto o perfil aparece muchas veces como si lo pusieran en demasia para llamar la atención'),
-(26, 'denuncia_sexual', 'un perfil o producto exhibe temáticas sexuales o pornográficas que incomodan a la comunidad');
+INSERT INTO `motivos` (`id`, `nombre`, `tipo`, `descripcion`) VALUES
+(1, 'pregunta', 'pqrs', 'mensaje de pregunta'),
+(2, 'queja', 'pqrs', 'mensaje de queja'),
+(3, 'reclamo', 'pqrs', 'mensaje de reclamo'),
+(4, 'sugerencia', 'pqrs', 'mensaje de sugerencia'),
+(5, 'agradecimiento', 'pqrs', 'mensaje de agradecimiento'),
+(6, 'denuncia', 'notificacion', 'se ha respondido algo ante una denuncia'),
+(7, 'pqrs', 'notificacion', 'se ha respondido algo a una PQRS'),
+(8, 'comprador', 'notificacion', 'un comprador potencial se ha puesto en contacto'),
+(9, 'comunidad', 'notificacion', 'ha llegado un mensaje enviado a todos los usuarios'),
+(10, 'administrativa', 'notificacion', 'un mensaje interno de la administración, por ejemplo, puedes haber sido baneado o eliminado'),
+(11, 'bienvenida', 'notificacion', 'mensaje de bienvenida al sistema'),
+(12, 'oferta', 'notificacion', 'un favorito ha publicado un nuevo producto'),
+(13, 'venta', 'notificacion', 'un vendedor ha enviado una solicitud de consolidar venta'),
+(14, 'devolver', 'notificacion', 'un comprador ha enviado una solicitud de cancelar una transacción'),
+(15, 'exito', 'notificacion', 'se ha llevado a cabo una compraventa exitosa'),
+(16, 'cancela', 'notificacion', 'se ha llevado a cabo una devolución exitosa, se cancelará la compraventa del historial'),
+(17, 'califica', 'notificacion', 'un comprador ha calificado o escrito un comentario, o lo ha modificado'),
+(18, 'acoso', 'denuncia', 'comportamiento de acoso sexual en un chat o imágenes o descripciónes'),
+(19, 'bulling', 'denuncia', 'comportamiento de burlas o insultos en un chat o imágenes o descripciónes'),
+(20, 'violencia', 'denuncia', 'comportamiento que incita al odio o amenzada directamente'),
+(21, 'ilegal', 'denuncia', 'comportamiento asociado a drogas, armas, prostitución y demás'),
+(22, 'troll', 'denuncia', 'comportamiento enfocado en molestar y hacer perder el tiempo, por ejemplo, con negociaciónes por mamar gallo'),
+(23, 'fraude', 'denuncia', 'se trata de vender algo malo o mediante trampas, tratan de tumbar al otro con fraudes'),
+(24, 'fake', 'denuncia', 'un producto o perfil es meme o chisto o simplemente hace perder el tiempo al no ser una propuesta real'),
+(25, 'spam', 'denuncia', 'un producto o perfil aparece muchas veces como si lo pusieran en demasia para llamar la atención'),
+(26, 'sexual', 'denuncia', 'un perfil o producto exhibe temáticas sexuales o pornográficas que incomodan a la comunidad');
 
 -- --------------------------------------------------------
 
@@ -471,6 +471,7 @@ CREATE TABLE `papelera` (
 -- Estructura de tabla para la tabla `pqrs`
 --
 -- Creación: 07-02-2026 a las 18:36:01
+-- Última actualización: 28-02-2026 a las 22:07:08
 --
 
 DROP TABLE IF EXISTS `pqrs`;
@@ -499,7 +500,7 @@ CREATE TABLE `pqrs` (
 -- Estructura de tabla para la tabla `productos`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 08-02-2026 a las 03:50:59
+-- Última actualización: 01-03-2026 a las 15:30:45
 --
 
 DROP TABLE IF EXISTS `productos`;
@@ -535,7 +536,6 @@ CREATE TABLE `productos` (
 -- Estructura de tabla para la tabla `roles`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 07-02-2026 a las 18:36:01
 --
 
 DROP TABLE IF EXISTS `roles`;
@@ -563,7 +563,6 @@ INSERT INTO `roles` (`id`, `nombre`) VALUES
 -- Estructura de tabla para la tabla `subcategorias`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `subcategorias`;
@@ -732,7 +731,6 @@ INSERT INTO `subcategorias` (`id`, `nombre`, `categoria_id`) VALUES
 -- Estructura de tabla para la tabla `sucesos`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 07-02-2026 a las 19:06:14
 --
 
 DROP TABLE IF EXISTS `sucesos`;
@@ -769,7 +767,7 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 -- Estructura de tabla para la tabla `tokens_de_sesion`
 --
 -- Creación: 07-02-2026 a las 23:33:20
--- Última actualización: 08-02-2026 a las 03:37:34
+-- Última actualización: 28-02-2026 a las 17:13:47
 --
 
 DROP TABLE IF EXISTS `tokens_de_sesion`;
@@ -795,7 +793,7 @@ CREATE TABLE `tokens_de_sesion` (
 -- Estructura de tabla para la tabla `usuarios`
 --
 -- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 08-02-2026 a las 04:41:27
+-- Última actualización: 01-03-2026 a las 20:49:56
 --
 
 DROP TABLE IF EXISTS `usuarios`;

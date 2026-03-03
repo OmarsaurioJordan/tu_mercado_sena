@@ -1,12 +1,12 @@
 # Desktop
 
-incluye un archivo check_desktop con las listas de chequeo ISO 25010
+incluye un archivo **check_desktop** con las listas de chequeo ISO 25010
 
-incluye un archivo doc_desktop con la documentación UML, casos de uso y requerimientos
+incluye un archivo **doc_desktop** con la documentación UML, casos de uso y requerimientos
 
-los arhivos de drawio es donde se pueden editar los diagramas gráficos en https://www.draw.io
+los arhivos de drawio se pueden editar en https://www.draw.io
 
-la carpeta de diagramas tiene todas las imágenes UML que están en el doc_desktop y otras referentes al sistema en general, planteadas desde el grupo Desktop para contrastar con los resultados de otros grupos, incluye:
+la carpeta de **diagramas** tiene todas las imágenes UML que están en el doc_desktop y otras referentes al sistema en general, planteadas desde el grupo Desktop para contrastar con los resultados de otros grupos, incluye:
 
 - diagrama conceptual en inglés y español
 - diagramas de casos de uso
@@ -14,4 +14,8 @@ la carpeta de diagramas tiene todas las imágenes UML que están en el doc_deskt
 - diagrama de despliegue
 - diagrama de paquetes
 
-la carpeta tms_desktop contiene todo el programa en Python con Qt
+la carpeta **app_desktop** contiene todo el programa en Python con Qt
+
+en **mockups** encuentra el diseño del desktop para ser luego montado
+
+**nota:** muchas cosas de documentación pueden estar desactualizadas respecto a la documentación general

@@ -25,6 +25,9 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $rol, $id);
 $stmt->execute();
 if ($stmt->errno === 0) {
+
+    auditar(2, "rol usuario $id -> $rol");
+
     echo json_encode(["Ok" => "1"]);
     exit;
 }

@@ -13,18 +13,21 @@ if (!isset($_GET["id"]) || !isset($_GET["estado"])) {
 $id = $_GET["id"];
 $estado = $_GET["estado"];
 
-if ($estado != 11) {
+if ($estado > 4 || $estado < 1) {
     http_response_code(400);
     echo json_encode(["error" => "estado inválido"]);
     exit;
 }
 
-$sql = "UPDATE pqrs SET estado_id = ? WHERE id = ?";
+$sql = "UPDATE productos SET estado_id = ? WHERE id = ?";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $estado, $id);
 $stmt->execute();
 if ($stmt->errno === 0) {
+
+    auditar(8, "estado producto $id -> $estado");
+
     echo json_encode(["Ok" => "1"]);
     exit;
 }
