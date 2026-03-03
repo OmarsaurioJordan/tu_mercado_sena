@@ -125,7 +125,7 @@ ALLOW_GMAIL=true
 El siguiente comando borra todos los registros que tengas en la base de datos que configuraste, si la base de datos tiene registros en las tablas hacer copia de seguridad
 
 ```CMD
-php artisan migrate:refresh
+php artisan migrate:fresh
 ```
 
 **Configurar e instalar Framework intervention Image para subir imagenes**
