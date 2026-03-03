@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Usuario;
+
+class Rol extends Model
+{
+    protected $table = 'roles';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'nombre'
+    ];
+    
+    public function usuario()
+    {
+        return $this->hasMany(Usuario::class);
+    }
+}
