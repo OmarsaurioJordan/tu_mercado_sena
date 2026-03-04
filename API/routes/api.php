@@ -207,6 +207,10 @@ Route::middleware('jwtVerify')->group(function (){
 
         Route::get('categorias', [CategoriasController::class, 'index']);
         Route::get('categorias/{categoria}/subcategorias', [SubCategoriasController::class, 'index']);
+
+        Route::get('favoritos', [UsuarioController::class, 'mostrarFavoritos']);
+        Route::post('favoritos/{usuario}', [UsuarioController::class, 'añadirAFavoritos']);
+        Route::delete('favoritos/{usuario}', [UsuarioController::class, 'eliminarDeFavoritos']);
     });
 });
 

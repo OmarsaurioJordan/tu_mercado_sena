@@ -47,6 +47,7 @@ class OutputDto implements Arrayable
             usuario_votado: [
                 'id'       => $usuarioFavorito->id,
                 'nickname' => $usuarioFavorito->nickname,
+                'imagen'   => $usuarioFavorito->imagen,
             ]
         );
     }

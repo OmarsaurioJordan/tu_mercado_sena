@@ -6,6 +6,9 @@ use App\DTOs\Usuario\Favoritos\OutputDto;
 use App\Exceptions\BusinessException;
 use App\Repositories\Usuario\FavoritoRepository;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
+use function PHPUnit\Framework\isEmpty;
 
 class FavoritoService
 {
@@ -26,15 +29,22 @@ class FavoritoService
     {
         $favoritos = $this->favoritoRepository->index($usuarioId);
 
+        $noHayFavoritos = $favoritos->isEmpty();
+
         return [
             "success" => true,
-            "message" => empty($favoritos) ? "Sin favoritos registrados." : "Favoritos obtenidos correctamente.",
-            "favoritos" => OutputDto::fromModelCollection($favoritos) ?? []
+            "message" => $noHayFavoritos ? "Sin favoritos registrados." : "Favoritos obtenidos correctamente.",
+            "favoritos" => OutputDto::fromModelCollection($favoritos)
         ];
     }
 
     public function añadirUsuarioAFavoritos(int $votanteId, int $votadoId): array
     {
+        $usuario = Auth::user()->usuario;
+
+        if ($usuario->favoritos()->where('votado_id', $votadoId)->exists()) {
+            throw new BusinessException('El usuario ya se encuentra en favoritos.', 400);
+        }
 
         return DB::transaction(function() use ($votanteId, $votadoId) {
             $usuarioFavorito = $this->favoritoRepository->store($votanteId, $votadoId);
