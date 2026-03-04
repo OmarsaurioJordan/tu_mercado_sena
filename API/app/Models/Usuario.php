@@ -91,8 +91,9 @@ class Usuario extends Model
             Usuario::class,
             'favoritos',
             'votado_id',
-            'vatante_id'
-        );
+            'votante_id'
+        )
+        ->withPivot('id', "votante_id", "votado_id"); // Si necesitas acceder a los datos del registro en la tabla pivot e
     }
 
     public function productosVistos()
