@@ -82,17 +82,7 @@ class Usuario extends Model
             'favoritos', // Nombre de la tabla pivote(Tabla intermedia entre 2 tablas)
             'votante_id', // FK en la Pivote que apunta a este modelo
             'votado_id' // FK en la Pivote que apunta al modelo destino
-        );
-    }
-
-    public function seguidores()
-    {
-        return $this->belongsToMany(
-            Usuario::class,
-            'favoritos',
-            'votado_id',
-            'vatante_id'
-        );
+        )->withPivot('id', "votante_id", "votado_id");
     }
 
     public function productosVistos()

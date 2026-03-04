@@ -10,13 +10,16 @@ use App\DTOs\Usuario\EditarPerfil\InputDto as EditarPerfilInputDto;
 use App\Contracts\Usuario\Services\IUsuarioService;
 use App\Contracts\Usuario\Services\IBloqueadoService;
 use App\DTOs\Usuario\Bloqueados\InputDto as BloqueadoInputDto;
+use App\Http\Requests\Usuario\StoreFavoritoRequest;
 use App\Models\Usuario;
+use App\Services\Usuario\FavoritoService;
 
 class UsuarioController extends Controller
 {
     public function __construct(
         private IUsuarioService $usuarioService,
-        private IBloqueadoService $bloqueadoService
+        private IBloqueadoService $bloqueadoService,
+        protected FavoritoService $favoritoService
     ) 
     {}
 
@@ -77,5 +80,32 @@ class UsuarioController extends Controller
             'message' => empty($bloqueados) ? 'No hay usuarios bloqueados.' : 'Usuarios bloqueados',
             'data' => $bloqueados
         ], 200);
+    }
+
+    public function mostrarFavoritos()
+    {
+        $usuarioId = Auth::user()->usuario->id;
+
+        $resultado = $this->favoritoService->solicitarFavoritosPorUsuario($usuarioId);
+
+        return response()->json($resultado, 200);
+    }
+
+    public function añadirAFavoritos(StoreFavoritoRequest $request, Usuario $usuario)
+    {
+        $datos = $request->validated();
+
+        $resultado = $this->favoritoService->añadirUsuarioAFavoritos($datos['votante_id'], $datos['votado_id']);
+
+        return response()->json($resultado, 201);
+    }
+
+    public function eliminarDeFavoritos(Usuario $usuario) {
+        $votanteId = Auth::user()->usuario->id;
+        $votadoId = $usuario->id;
+
+        $resultado = $this->favoritoService->eliminarUsuarioDeFavoritos($votanteId, $votadoId);
+
+        return response()->json($resultado, 200);
     }
 }
