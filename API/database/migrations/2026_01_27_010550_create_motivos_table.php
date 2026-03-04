@@ -52,7 +52,7 @@ return new class extends Migration
             ],
             [
                 // id: 6
-                'nombre' => 'notifica_denuncia',
+                'nombre' => 'denuncia',
                 'tipo' => 'notificacion',
                 'descripcion' => 'se ha respondido algo ante una denuncia'
             ],
@@ -70,7 +70,7 @@ return new class extends Migration
             ],
             [
                 // id: 9
-                'nombre' => 'notifica_comunidad',
+                'nombre' => 'comunidad',
                 'tipo' => 'notificacion',
                 'descripcion' => 'ha llegado un mensaje enviado a todos los usuarios'
             ],
