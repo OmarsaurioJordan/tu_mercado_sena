@@ -9,8 +9,7 @@ use App\models\Categoria;
 class SubCategoriasController extends Controller
 {
     public function index(Categoria $categoria) {
-        // $subcategorias = SubCategoria::where('categoria_id', $categoria->id)->get();
-        $subcategorias = SubCategoria::get();
+        $subcategorias = SubCategoria::where('categoria_id', $categoria->id)->get();
         return response()->json($subcategorias);
     }
 }
