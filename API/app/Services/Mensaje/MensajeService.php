@@ -16,6 +16,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Notificacion;
 
 
 class MensajeService implements IMensajeService
@@ -25,6 +26,8 @@ class MensajeService implements IMensajeService
         private ICuentaRepository $cuentaRepository
     )
     {}
+
+    const MOTIVO_COMPRADOR = 8;
 
     public function crearMensaje(InputDto $dto, Chat $chat): array
     {
@@ -61,13 +64,31 @@ class MensajeService implements IMensajeService
 
                 $data['imagen'] = $ruta;
             }
+
             
-            // Crear el mensaje utilizando el repositorio
             $mensaje = $this->mensajeRepository->create($data);
 
             // Validar que el mensaje se haya creado correctamente
             if (!$mensaje) {
                 throw new \Exception("No se pudo crear el mensaje, Intente nuevamente.");
+            }
+
+            $esNuevoChat = $this->mensajeRepository->esPrimerMensaje($chat);
+
+
+            Log::info("¿Es primer mensaje?: " . ($this->mensajeRepository->esPrimerMensaje($chat) ? 'SI' : 'NO'));
+            
+            // Crear el mensaje utilizando el repositorio
+
+
+            // Si el mensaje es el primero del chat, crear una notificación para el vendedor
+            if ($esNuevoChat) {
+                Notificacion::create([
+                    'usuario_id' => $chat->producto->vendedor->id,
+                    'motivo_id' => self::MOTIVO_COMPRADOR,
+                    'mensaje' => "Tienes un nuevo mensaje de {$chat->comprador->nombre} en el chat del producto {$chat->producto->nombre}",
+                    'visto' => false,
+                ]);
             }
 
             // Reactivar el chat si uno de los participantes lo había borrado
@@ -81,7 +102,7 @@ class MensajeService implements IMensajeService
             // Obtener los mensajes paginados del chat
             $mensajesPaginados = $chat
                 ->mensajes()
-                ->orderBy('fecha_registro', 'desc')
+                ->orderByDesc('fecha_registro')
                 ->paginate(20);
 
             // Validar que se hayan cargado los mensajes paginados correctamente

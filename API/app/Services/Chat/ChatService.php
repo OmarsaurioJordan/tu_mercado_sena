@@ -13,6 +13,8 @@ use App\DTOs\Chat\OutputDto;
 use App\DTOs\Chat\OutputDetailsDto;
 use App\Models\Chat;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Models\Notificacion;
+use App\Models\Papelera;
 use Carbon\Carbon;
 
 class ChatService implements IChatService
@@ -22,6 +24,15 @@ class ChatService implements IChatService
     const ESTADO_ESPERANDO = 6;
     const ESTADO_DEVOLVIENDO = 7;
     const ESTADO_DEVUELTO = 8;
+
+    const MOTIVO_VENTA = 13; 
+
+    const MOTIVO_DEVOLVER = 14;
+    const MOTIVO_EXITO = 15;
+
+    const MOTIVO_CANCELA = 16;
+
+    const MOTIVO_CALIFICA = 17;
 
     public function __construct(
         protected IChatRepository $repository
@@ -118,7 +129,7 @@ class ChatService implements IChatService
 
         
         $mensajesPaginados = $chat->mensajes()
-            ->orderByDesc('fecha_registro', 'desc') 
+            ->orderByDesc('fecha_registro') 
             ->paginate(20);
 
         return OutputDetailsDto::fromModel($chat, $bloqueo_mutuo, $mensajesPaginados);
@@ -148,6 +159,14 @@ class ChatService implements IChatService
                 throw new BusinessException('No se pudo actualizar el chat.', 500);
             }
 
+            // Crear registro en la tabla de notificación
+            Notificacion::create([
+                "usuario_id" => $chat->comprador->id,
+                "motivo_id" => self::MOTIVO_VENTA,
+                "mensaje" => "El usuario: " . $chat->producto->vendedor->nickname . " ha enviado solicitud para consolidar la venta",
+                "visto" => false,
+            ]);
+
             return [
                 'success' => true, 
                 'message' => 'Proceso iniciado, espera la confirmación del comprador'
@@ -168,6 +187,13 @@ class ChatService implements IChatService
             if (!$datos['confirmacion']) {
                 $chat->estado_id = self::ESTADO_ACTIVO;
                 $chat->save();
+
+            Notificacion::create([
+                "usuario_id" => $chat->producto->vendedor->id,
+                "motivo_id" => self::MOTIVO_DEVOLVER,
+                "mensaje" => "El usuario: " . $chat->comprador->nickname . " ha rechazado la solicitud de venta",
+                "visto" => false,
+            ]);
                 
                 return [
                     'success' => true,
@@ -181,6 +207,41 @@ class ChatService implements IChatService
             $chat->comentario = $datos['comentario'] ?? null;
             $chat->fecha_venta = Carbon::now();
             $chat->save(); // Guardar en la base de datos
+
+            Notificacion::create([
+                "usuario_id" => $chat->producto->vendedor->id,
+                "motivo_id" => self::MOTIVO_EXITO,
+                "mensaje" => "El usuario: " . $chat->comprador->nickname . " ha concretado la compraventa",
+                "visto" => false,
+            ]);
+
+            $acciones = array_filter([
+                $datos["calificacion"] !== null ? "calificado" : null,
+                $datos["comentario"] !== null ? "comentado" : null,
+            ]);
+
+            // 2. Si hay acciones, creamos el registro usando el Modelo
+            if (!empty($acciones)) {
+                // Unimos con " y " (ej: "calificado y comentado")
+                $verbo = implode(" y ", $acciones);
+
+                Notificacion::create([
+                    "usuario_id" => $chat->producto->vendedor->id,
+                    "motivo_id"  => self::MOTIVO_CALIFICA,
+                    "mensaje"    => "El usuario: {$chat->comprador->nickname} ha {$verbo} tu producto",
+                    "visto"      => false,
+                    // "fecha_registro" ya no es necesario si usas timestamps de Laravel
+                ]);
+            }
+
+            // Crear registro en la papelera si el comprador dejo un comentario o una calificación, para que el vendedor pueda verlo aunque haya borrado el chat
+            if ($datos['comentario'] !== null) {
+                Papelera::created([
+                    'usuario_id' => $chat->comprador->id,
+                    'mensaje' => $datos['comentario'],
+                    'imagen' => null,
+                ]);
+            }
 
             return [
                 'success' => true,
@@ -233,8 +294,8 @@ class ChatService implements IChatService
         // Validar que solo el vendedor pueda terminar el proceso de devolución
         if ($vendedor->id !== $usuarioId) throw new BusinessException('Solo el vendedor puede concretar la devolución', 422);
 
-        // Validar que el vendedor responda en el plazo de 3 días, si no volver al estado "vendido"
-        if ($fecha_venta->lt(Carbon::now()->subDays(3))) {
+        // Validar que el vendedor responda en el plazo de 7 días, si no volver al estado "vendido"
+        if ($fecha_venta->lt(Carbon::now()->subDays(7))) {
             $chat->estado_id = self::ESTADO_VENDIDO;
             $chat->save();
 
@@ -248,6 +309,13 @@ class ChatService implements IChatService
             $chat->estado_id = self::ESTADO_DEVUELTO;
             $chat->fecha_venta = Carbon::now();
             $chat->save();
+
+            Notificacion::create([
+                "usuario_id" => $chat->comprador->id,
+                "motivo_id" => self::MOTIVO_CANCELA,
+                "mensaje" => "El usuario: " . $chat->producto->vendedor->nickname . " ha concretado la devolución",
+                "visto" => false,
+            ]);     
 
             return [
                 'success' => true,
@@ -276,8 +344,7 @@ class ChatService implements IChatService
 
         return [
             "success" => true,
-           "data" => $transferencias->isNotEmpty() ? EstadosOutputDto:: fromModelCollection($transferencias, $usuarioId) : 'No tienes tranferencias hechas'
-
+            "data" => $transferencias->isNotEmpty() ? EstadosOutputDto:: fromModelCollection($transferencias, $usuarioId) : 'No tienes tranferencias hechas'
         ];
     }
 } 

@@ -3,6 +3,7 @@
 namespace App\Contracts\Mensaje\Repository;
 
 use App\Models\Mensaje;
+use app\Models\Chat;
 
 interface IMensajeRepository
 {
@@ -19,4 +20,11 @@ interface IMensajeRepository
      * @return bool
      */
     public function delete(int $id): bool;
+
+    /**
+     * Función para verificar si un chat no tiene mensajes asociados
+     * @param Chat $chat - El chat que se desea verificar
+     * @return bool - Retorna true si el chat no tiene mensajes, de lo contrario retorna false
+     */
+    public function esPrimerMensaje(Chat $chat):bool;
 }
