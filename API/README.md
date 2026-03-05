@@ -1548,6 +1548,101 @@ Si el usuario marca varios transferencias para su consulta. Ejemplo **?estados[]
 ```
 
 
+**Favoritos**
+
+
+**1️⃣Ver usuarios favoritos**
+
+RUTA: **http://127.0.0.1:8000/api/favoritos**
+
+MÉTODO: **GET**
+
+**Restricciones**
+
+
+**Salida Json**
+
+```Json
+{
+    "success": true,
+    "message": "Favoritos obtenidos correctamente.",
+    "favoritos": [
+        {
+            "id": 6,
+            "votante_id": 1,
+            "usuario_votado": {
+                "id": 2,
+                "nickname": "XXXXXX",
+                "imagen": null
+            }
+        }
+    ]
+}
+```
+
+**2️⃣Agregar usuario a favoritos**
+
+**👁️OJO**
+
+El usuarioId corresponde al id del usuario que se quiere agregar
+
+
+RUTA: **http://127.0.0.1:8000/api/favoritos/{usuarioId}**
+
+MÉTODO: **POST**
+
+**RESTRICCIONES**
+
+✖️ Si el usuario ya esta en la lista, saldra una excepción.
+
+**Salida Json**
+
+```Json
+{
+    "status": "error",
+    "type": "BusinessException",
+    "message": "El usuario ya se encuentra en favoritos."
+}
+```
+
+**Salida Json**
+
+```Json
+{
+    "success": true,
+    "usuarioAgregado": {
+        "id": 7,
+        "votante_id": 1,
+        "usuario_votado": {
+            "id": 2,
+            "nickname": "XXXXXXXXX",
+            "imagen": null
+        }
+    }
+}
+```
+
+
+**3️⃣Eliminar usuario a favoritos**
+
+**👁️OJO**
+
+El usuarioId corresponde al id del usuario que se quiere eliminar
+
+
+RUTA: **http://127.0.0.1:8000/api/favoritos/{usuarioId}**
+
+MÉTODO: **DELETE**
+
+**Salida Json**
+
+```Json
+{
+    "success": true,
+    "message": "Usuario eliminado de favoritos exitosamente."
+}
+```
+
 
 
 **Código	Significado**
