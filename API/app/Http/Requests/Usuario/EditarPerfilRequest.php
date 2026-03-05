@@ -5,6 +5,8 @@ namespace App\Http\Requests\Usuario;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
+
 
 class EditarPerfilRequest extends FormRequest
 {
@@ -58,6 +60,22 @@ class EditarPerfilRequest extends FormRequest
                 'sometimes',
                 'boolean',
             ],
+
+            'password-old' => [
+                'sometimes',
+                'required_with:password-new',
+                'string',
+            ],
+
+            'password' => [
+                'sometimes',
+                'required_with:password-old',
+                'string',
+                'confirmed',
+                Password::min(8)
+                    ->mixedCase()
+                    ->numbers()
+            ]
         ];
     }
 
