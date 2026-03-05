@@ -51,18 +51,18 @@ class UsuarioService implements IUsuarioService
         $proximaEdicion = $usuario->fecha_actualiza->copy()->addDay();
         $ahora = Carbon::now();
 
-        // Si ya fue editado Y aún no se cumple el plazo de 24h, bloqueamos
-        if ($yaFueEditado && $ahora->lt($proximaEdicion)) {
+        // // Si ya fue editado Y aún no se cumple el plazo de 24h, bloqueamos
+        // if ($yaFueEditado && $ahora->lt($proximaEdicion)) {
             
-            $horasRestantes = (int) $ahora->diffInHours($proximaEdicion);
-            $minutosRestantes = (int) $ahora->diffInMinutes($proximaEdicion);
+        //     $horasRestantes = (int) $ahora->diffInHours($proximaEdicion);
+        //     $minutosRestantes = (int) $ahora->diffInMinutes($proximaEdicion);
 
-            $mensaje = $horasRestantes >= 1 
-                ? "Solo puede editar una vez al día. Podrás editar tu perfil en $horasRestantes" . ($horasRestantes == 1 ? " hora" : " horas")
-                : "Solo puede editar una vez al día. Podrás editar tu perfil en $minutosRestantes" . ($minutosRestantes == 1 ? " minuto" : " minutos");
+        //     $mensaje = $horasRestantes >= 1 
+        //         ? "Solo puede editar una vez al día. Podrás editar tu perfil en $horasRestantes" . ($horasRestantes == 1 ? " hora" : " horas")
+        //         : "Solo puede editar una vez al día. Podrás editar tu perfil en $minutosRestantes" . ($minutosRestantes == 1 ? " minuto" : " minutos");
 
-            throw new BusinessException($mensaje, 422);
-        }
+        //     throw new BusinessException($mensaje, 422);
+        // }
 
 
         if (empty($dto->toArray())) {
@@ -125,6 +125,23 @@ class UsuarioService implements IUsuarioService
                 $cuentaUsuario->update([
                     'notifica_push' => $dto->notifica_push ?? $cuentaUsuario->notifica_push,
                     'notifica_correo'   => $dto->notifica_correo ?? $cuentaUsuario->notifica_correo,
+                ]);
+            }
+
+            // Si el usuario quiere cambiar su contraseña, validamos que la contraseña actual sea correcta antes de actualizarla
+            if ($dto->password_old && $dto->password) {
+                $cuenta = $this->cuentaRepository->findByUsuarioId($usuarioId);
+
+                if (!$cuenta || !password_verify($dto->password_old, $cuenta->password)) {
+                    throw new BusinessException('La contraseña actual es incorrecta.', 422);
+                }
+
+                $cuenta->update([
+                    'password' => bcrypt($dto->password),
+                ]);
+
+                Log::info("Contraseña actualizada para el usuario", [
+                    "usuario_id" => $usuarioId,
                 ]);
             }
 

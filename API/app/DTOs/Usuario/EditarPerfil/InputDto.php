@@ -15,6 +15,8 @@ class InputDto implements Arrayable
         public ?string $nickname = null,
         public ?string $descripcion = null,
         public ?string $link = null,
+        public ?string $password_old = null,
+        public ?string $password = null,
         public ?bool $notifica_push = null,
         public ?bool $notifica_correo = null
     )
@@ -30,7 +32,9 @@ class InputDto implements Arrayable
             descripcion: $data['descripcion'] ?? null,
             link: $data['link'] ?? null,
             notifica_push: $data['notifica_push'] ?? null,
-            notifica_correo: $data['notifica_correo'] ?? null
+            notifica_correo: $data['notifica_correo'] ?? null,
+            password_old: $data['password-old'] ?? null,
+            password: $data['password'] ?? null, // Contraseña nueva del usuario
         );
     }
 
