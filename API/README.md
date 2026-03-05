@@ -551,7 +551,7 @@ Ejemplo de uso:
   "notifica_push": true,
   "notifica_correo": false,
   "password-old": "ContraseñaVieja",
-  "password: "NuevaContraseña",
+  "password": "NuevaContraseña",
   "password_confirmation": "ConfirmacionNuevaContraseña"
 }
 ```
