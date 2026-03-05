@@ -19,10 +19,17 @@ if (session_status() === PHP_SESSION_NONE) {
 // CONFIGURACIÓN DE RUTAS BASE
 // =========================================================
 
-// Obtener la ruta base del proyecto (hasta /Frontend/)
+// Obtener la ruta base del proyecto (hasta /Web/ o /Frontend/)
 $script_name = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+$web_pos = strpos($script_name, '/Web/');
 $frontend_pos = strpos($script_name, '/Frontend/');
-$GLOBALS['base_url'] = $frontend_pos !== false ? substr($script_name, 0, $frontend_pos + 10) : '/Frontend/';
+if ($web_pos !== false) {
+    $GLOBALS['base_url'] = substr($script_name, 0, $web_pos + 5); // incluye "/Web/"
+} elseif ($frontend_pos !== false) {
+    $GLOBALS['base_url'] = substr($script_name, 0, $frontend_pos + 10); // incluye "/Frontend/"
+} else {
+    $GLOBALS['base_url'] = '/Web/'; // por defecto carpeta Web
+}
 
 // Función helper para obtener la URL base
 function getBaseUrl() {
