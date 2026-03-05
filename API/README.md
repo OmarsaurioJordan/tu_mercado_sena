@@ -550,7 +550,7 @@ Ejemplo de uso:
   "link": "Nueva red social"
   "notifica_push": true,
   "notifica_correo": false,
-  "password-old": "ContraseñaVieja"
+  "password-old": "ContraseñaVieja",
   "password: "NuevaContraseña"
   "password_confirmation": "ConfirmacionNuevaContraseña"
 }
