@@ -327,6 +327,16 @@ class AuthService implements IAuthService
     public function getCurrentUser(Usuario $user): Usuario
     {
         try {
+
+            $user->makeHidden('fecha_reciente', 'is_recently_active')->load(
+                'cuenta:id,notifica_push,notifica_correo', 
+                'productos:id,vendedor_id,integridad_id,estado_id,subcategoria_id,nombre,precio',
+                'productos.integridad:id,nombre',
+                'productos.estado:id,nombre',
+                'productos.subcategoria:id,nombre',
+                'productos.fotos:id,producto_id,imagen'
+            );
+
             return $user;
 
         } catch (Exception $e) {
