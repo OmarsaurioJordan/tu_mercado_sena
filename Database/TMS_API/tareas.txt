@@ -5,14 +5,14 @@ x auditorias, poner auditar()
    x 5 constante_modificada
    x 6 cambio_password
    x 7 noticia_masiva
-   11 estado_chat
+   x 11 estado_chat
 x devolver auditorias bajo demanda
 ...
 x devolver número de pqrs y denuncias no contestadas
 ...
 x enviar mensaje notificación al usuario
 ...
-- devolver chats / historiales bajo demanda
+x devolver chats / historiales bajo demanda
 x cargar mensajes de chat bajo demanda
 x devolver papelera bajo demanda
 x modificar estado del chat

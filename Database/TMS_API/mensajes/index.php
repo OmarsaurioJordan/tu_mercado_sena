@@ -26,19 +26,19 @@ if ($registro_hasta != "") {
     $vars[] = $registro_hasta;
 }
 
-$chat_id = isset($_GET["chat_id"]) ? $_GET["chat_id"] : 0;
-if ($chat_id != 0) {
+$chat_id = isset($_GET["chat_id"]) ? $_GET["chat_id"] : "0";
+if ($chat_id != "0") {
     $cond .= " AND chat_id = ?";
     $vars[] = $chat_id;
 }
 
-$con_imagen = isset($_GET["con_imagen"]) ? $_GET["con_imagen"] : 0;
-if ($con_imagen != 0 && $palabras == "") {
+$con_imagen = isset($_GET["con_imagen"]) ? $_GET["con_imagen"] : "0";
+if ($con_imagen != "0" && $palabras == "") {
     $cond .= " AND (imagen NOT NULL AND imagen != '')";
 }
 
-$id = isset($_GET["id"]) ? $_GET["id"] : 0;
-if ($id != 0) {
+$id = isset($_GET["id"]) ? $_GET["id"] : "0";
+if ($id != "0") {
     # no lleva concatenacion porque id sobreescribe a las otras condiciones
     $cond = " AND id = ?";
     $vars = [$id];

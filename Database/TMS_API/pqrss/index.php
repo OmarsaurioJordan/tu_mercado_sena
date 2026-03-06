@@ -14,7 +14,7 @@ if ($nickname != "") {
 
 $motivo_id = isset($_GET["motivo_id"]) ? $_GET["motivo_id"] : "0";
 if ($motivo_id != "0") {
-    $cond .= " AND p.motivo_id == ?";
+    $cond .= " AND p.motivo_id = ?";
     $vars[] = $motivo_id;
 }
 
@@ -49,8 +49,8 @@ if ($email != "") {
     $vars = [$email];
 }
 
-$id = isset($_GET["id"]) ? $_GET["id"] : 0;
-if ($id != 0) {
+$id = isset($_GET["id"]) ? $_GET["id"] : "0";
+if ($id != "0") {
     # no lleva concatenacion porque id sobreescribe a las otras condiciones
     $cond = " AND p.id = ?";
     $vars = [$id];
