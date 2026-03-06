@@ -75,7 +75,9 @@ class AuthService implements IAuthService
         $isGmail = str_ends_with(strtolower($email), '@gmail.com');
 
         if (!$allowGmail && $isGmail) {
-            throw new ValidationException("El acceso para cuentas Gmail está restringido globalmente");
+            throw ValidationException::withMessages([
+                'email' => ['El acceso para cuentas Gmail está restringido globalmente']
+            ]);
         }
     }
 
