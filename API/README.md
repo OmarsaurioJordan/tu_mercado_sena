@@ -509,20 +509,45 @@ Ruta: http://localhost:8000/api/auth/me
 Respuesta:
 
 ```JSON
- {
+{
   "data": {
-    "id": 1,
-    "cuenta_id": 1,
-    "nickname": "xxxxx",
-    "imagen": "Foto.jpg",
-    "descripcion": "Estudiante de desarrollo",
-    "link": "https://instagram.com/xxxx",
+    "id": 2,
+    "cuenta_id": 2,
+    "nickname": "whois_brahian",
+    "imagen": null,
+    "descripcion": null,
+    "link": null,
     "rol_id": 1,
     "estado_id": 1,
-    "fecha_registro": "2025-12-27 05:46:43",
-    "fecha_actualiza": "2025-12-27 06:10:14",
-    "fecha_reciente": "2025-12-27 01:10:14",
-    "is_recently_active": true
+    "cuenta": {
+      "id": 2,
+      "notifica_push": true,
+      "notifica_correo": false
+    },
+    "productos": [
+      {
+        "id": 1,
+        "vendedor_id": 2,
+        "integridad_id": 1,
+        "estado_id": 1,
+        "subcategoria_id": 4,
+        "nombre": "Mouse Gamer",
+        "precio": 120000,
+        "integridad": {
+          "id": 1,
+          "nombre": "nuevo"
+        },
+        "estado": {
+          "id": 1,
+          "nombre": "activo"
+        },
+        "subcategoria": {
+          "id": 4,
+          "nombre": "carne o huevos"
+        },
+        "fotos": []
+      }
+    ]
   }
 }
 ```
