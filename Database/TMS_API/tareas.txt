@@ -5,27 +5,25 @@ x auditorias, poner auditar()
    x 5 constante_modificada
    x 6 cambio_password
    x 7 noticia_masiva
-   11 estado_chat
+   x 11 estado_chat
 x devolver auditorias bajo demanda
 ...
 x devolver número de pqrs y denuncias no contestadas
 ...
 x enviar mensaje notificación al usuario
 ...
-- devolver chats bajo demanda
-- cargar mensajes de chat bajo demanda
-- devolver historial bajo demanda
-- devolver papelera bajo demanda
-- modificar estado del chat
+x devolver chats / historiales bajo demanda
+x cargar mensajes de chat bajo demanda
+x devolver papelera bajo demanda
+x modificar estado del chat
 ...
 x guardar login de administrador
 x devolver logins de administradores bajo demanda
 ...
-- devolver historia de análisis gráfico bajo demanda
+x devolver historia de análisis gráfico bajo demanda
    chats estado: activo, eliminado, compraventa, devolucion
    usuarios estado: activo, bloqueado, eliminado, invisible
-   productos estado: activo, bloqueado, eliminado, invisible
-   promedio de compras y ventas por usuario
+   productos estado: activo, bloqueado, eliminado, invisibe
 ...
 x admin logeado cambia su nickname, link, descripción, password o pin
 ...

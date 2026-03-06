@@ -14,19 +14,19 @@ if ($nombre != "") {
 
 $subcategoria_id = isset($_GET["subcategoria_id"]) ? $_GET["subcategoria_id"] : "0";
 if ($subcategoria_id != "0") {
-    $cond .= " AND p.subcategoria_id == ?";
+    $cond .= " AND p.subcategoria_id = ?";
     $vars[] = $subcategoria_id;
 }
 
 $categoria_id = isset($_GET["categoria_id"]) ? $_GET["categoria_id"] : "0";
 if ($categoria_id != "0") {
-    $cond .= " AND s.categoria_id == ?";
+    $cond .= " AND s.categoria_id = ?";
     $vars[] = $categoria_id;
 }
 
 $integridad_id = isset($_GET["integridad_id"]) ? $_GET["integridad_id"] : "0";
 if ($integridad_id != "0") {
-    $cond .= " AND p.integridad_id == ?";
+    $cond .= " AND p.integridad_id = ?";
     $vars[] = $integridad_id;
 }
 
@@ -45,14 +45,14 @@ if ($estado_id != "0") {
     }
 }
 
-$precio_min = isset($_GET["precio_min"]) ? $_GET["precio_min"] : 0;
-if ($precio_min != 0) {
+$precio_min = isset($_GET["precio_min"]) ? $_GET["precio_min"] : "0";
+if ($precio_min != "0") {
     $cond .= " AND p.precio >= ?";
     $vars[] = $precio_min;
 }
 
-$precio_max = isset($_GET["precio_max"]) ? $_GET["precio_max"] : 0;
-if ($precio_max != 0) {
+$precio_max = isset($_GET["precio_max"]) ? $_GET["precio_max"] : "0";
+if ($precio_max != "0") {
     $cond .= " AND p.precio <= ?";
     $vars[] = $precio_max;
 }
@@ -74,8 +74,8 @@ if ($registro_hasta != "") {
     $vars[] = $registro_hasta;
 }
 
-$id = isset($_GET["id"]) ? $_GET["id"] : 0;
-if ($id != 0) {
+$id = isset($_GET["id"]) ? $_GET["id"] : "0";
+if ($id != "0") {
     # no lleva concatenacion porque id sobreescribe a las otras condiciones
     $cond = " AND p.id = ?";
     $vars = [$id];
