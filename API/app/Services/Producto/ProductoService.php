@@ -5,9 +5,11 @@ use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Str;
 use App\Contracts\Producto\Services\IProductoService;
 use App\Contracts\Producto\Repositories\IProductoRepository;
+use App\Contracts\Auth\Repositories\ICuentaRepository;
 use App\DTOs\Producto\InputDto;
 use App\DTOs\Producto\OutputDto;
 use App\Models\Foto;
+use App\Exceptions\BusinessException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +19,7 @@ class ProductoService implements IProductoService
 {
     public function __construct(
         protected IProductoRepository $productoRepository,
+        protected ICuentaRepository $cuentaRepository,
     ) {}
 
     /**
@@ -33,6 +36,9 @@ class ProductoService implements IProductoService
 
     try {
         return DB::transaction(function () use ($dto, $imagenes) {
+            // Validar permisos Gmail centralizados
+            $this->validarPermisoGmail();
+
             $producto = $this->productoRepository->crear($dto->toArray());
             
             Log::info('SERVICE: Producto creado', ['id' => $producto->id]);
@@ -76,6 +82,9 @@ class ProductoService implements IProductoService
         Log::info('Actualizando producto', ['id' => $dto->id]);
 
         try {
+            // Validar permisos Gmail centralizados
+            $this->validarPermisoGmail();
+
             // Verificar que el producto existe y pertenece al usuario autenticado
             if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::id())) {
                 throw new \Exception('No tienes permiso para editar este producto.');
@@ -216,6 +225,9 @@ class ProductoService implements IProductoService
         ]);
 
         try {
+            // Validar permisos Gmail centralizados
+            $this->validarPermisoGmail();
+
             // Verificar que el producto pertenece al usuario autenticado
             if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::id())) {
                 throw new \Exception('No tienes permiso para modificar este producto.');
@@ -250,6 +262,9 @@ class ProductoService implements IProductoService
         Log::info('Eliminando producto', ['producto_id' => $productoId]);
 
         try {
+            // Validar permisos Gmail centralizados
+            $this->validarPermisoGmail();
+
             // Verificar que el producto pertenece al usuario autenticado
             if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::id())) {
                 throw new \Exception('No tienes permiso para eliminar este producto.');
@@ -358,6 +373,22 @@ class ProductoService implements IProductoService
             
             // Eliminar registro de BD
             $foto->delete();
+        }
+    }
+    /**
+     * Valida si el usuario autenticado (Gmail vs institucional)
+     * Lanza BusinessException si la configuración impide acciones para cuentas Gmail.
+     */
+    private function validarPermisoGmail(): void
+    {
+        if (!config('services.allow_gmail_products')) {
+            $esCorreoInstitucional = $this->cuentaRepository->esCorreoInstitucional(Auth::id());
+            if (!$esCorreoInstitucional) {
+                throw new BusinessException(
+                    "Los usuarios con correo Gmail no pueden realizar esta acción sobre productos.",
+                    422
+                );
+            }
         }
     }
 }

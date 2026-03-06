@@ -14,6 +14,7 @@ return [
     |
     */
     'allow_gmail' => env('ALLOW_GMAIL', false),
+    'allow_gmail_products' => env('ALLOW_GMAIL_PRODUCTS', false),
 
 
     'postmark' => [
