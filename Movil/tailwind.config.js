@@ -1,0 +1,107 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {
+      fontFamily: {
+        'Opensans-bold': ['OpenSans-Bold', 'sans-serif'],
+        'Opensans-light': ['OpenSans-Light', 'sans-serif'],
+        'Opensans-medium': ['OpenSans-Medium', 'sans-serif'],
+      },
+
+      colors: {
+        primary: {
+          DEFAULT: '#16A1B6',
+          50: "#E8FAFC",
+          100: "#BFF0F7",
+          200: "#97E6F2",
+          300: "#6EDCED",
+          400: "#45D2E8",
+          500: "#1CC8E3",
+          600: "#16A1B6",
+          700: "#128091",
+          800: "#0D5C68",
+          900: "#083840",
+          950: "#031417"
+        },
+
+        secondary: {
+          DEFAULT: '#1651B6',
+          50: "#E8F0FC",
+          100: "#BFD4F7",
+          200: "#97B8F2",
+          300: "#6E9CED",
+          400: "#4581E8",
+          500: "#1C65E3",
+          600: "#1651B6",
+          700: "#124191",
+          800: "#0D2E68",
+          900: "#081C40",
+          950: "#030A17"
+        },
+
+        tertiary: {
+          DEFAULT: '#2B16B6',
+          50: "#EBE8FC",
+          100: "#C7BFF7",
+          200: "#A397F2",
+          300: "#7F6EED",
+          400: "#5B45E8",
+          500: "#371CE3",
+          600: "#2B16B6",
+          700: "#231291",
+          800: "#190D68",
+          900: "#0F0840",
+          950: "#050317"
+        },
+
+        quaternary: {
+          DEFAULT: '#393A5D',
+          50: "#EFEFF5",
+          100: "#D3D3E4",
+          200: "#B6B7D2",
+          300: "#9A9BC1",
+          400: "#7D7FB0",
+          500: "#61639E",
+          600: "#4F5182",
+          700: "#393A5D",
+          800: "#2D2E49",
+          900: "#1B1C2C",
+          950: "#0A0A10"
+        },
+
+        quinary: {
+          DEFAULT: '#538392',
+          50: "#EFF4F6",
+          100: "#D1E1E5",
+          200: "#B4CDD5",
+          300: "#97BAC4",
+          400: "#79A6B4",
+          500: "#5C93A3",
+          600: "#538392",
+          700: "#3B5E68",
+          800: "#2A434B",
+          900: "#1A292E",
+          950: "#090F10"
+        },
+
+        sextary: {
+          DEFAULT: '#32CD32',
+          50: "#EAFAEA",
+          100: "#C6F1C6",
+          200: "#A1E8A1",
+          300: "#7CDF7C",
+          400: "#57D657",
+          500: "#32CD32",
+          600: "#29A829",
+          700: "#208320",
+          800: "#175E17",
+          900: "#0E390E",
+          950: "#051505"
+        },
+      },
+    },
+  },
+  plugins: [],
+}
