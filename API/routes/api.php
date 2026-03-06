@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\ProductoController; 
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\EstadosController;
+use App\Http\Controllers\Api\MotivoController;
 use App\Http\Controllers\Api\MensajeController;
 use App\Http\Controllers\Api\CategoriasController;
 use App\Http\Controllers\Api\SubCategoriasController;
@@ -211,6 +212,9 @@ Route::middleware('jwtVerify')->group(function (){
         Route::get('favoritos', [UsuarioController::class, 'mostrarFavoritos']);
         Route::post('favoritos/{usuario}', [UsuarioController::class, 'añadirAFavoritos']);
         Route::delete('favoritos/{usuario}', [UsuarioController::class, 'eliminarDeFavoritos']);
+        
+        Route::post('denuncias', [\App\Http\Controllers\Api\DenunciaController::class, 'store'])
+            ->middleware('CheckDenuncia');
     });
 });
 

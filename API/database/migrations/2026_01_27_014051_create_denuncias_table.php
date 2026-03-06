@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('denuncias', function (Blueprint $table) {
             $table->id();
             $table->foreignId('denunciante_id')->constrained('usuarios', 'id')->cascadeOnDelete();
-            $table->foreignId('producto_id')->constrained('productos', 'id')->cascadeOnDelete();
+            $table->foreignId('producto_id')->nullable()->constrained('productos', 'id')->cascadeOnDelete();
             $table->foreignId('usuario_id')->constrained('usuarios', 'id')->cascadeOnDelete();
-            $table->foreignId('chat_id')->constrained('chats', 'id')->cascadeOnDelete();
+            $table->foreignId('chat_id')->nullable()->constrained('chats', 'id')->cascadeOnDelete();
             $table->foreignId('motivo_id')->constrained('motivos', 'id')->cascadeOnDelete();
             $table->foreignId('estado_id')->constrained('estados', 'id')->cascadeOnDelete();
             $table->timestamp('fecha_registro')->useCurrent();
