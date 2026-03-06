@@ -513,7 +513,7 @@ Respuesta:
   "data": {
     "id": 2,
     "cuenta_id": 2,
-    "nickname": "whois_brahian",
+    "nickname": "Xxxxxxxxxx",
     "imagen": null,
     "descripcion": null,
     "link": null,
