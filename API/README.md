@@ -574,14 +574,11 @@ Ejemplo de uso:
   "descripcion": "Nueva_descripcioón",
   "link": "Nueva red social"
   "notifica_push": true,
-<<<<<<< HEAD:API/README.md
   "notifica_correo": false,
   "password-old": "ContraseñaVieja",
   "password": "NuevaContraseña",
   "password_confirmation": "ConfirmacionNuevaContraseña"
-=======
   "notifica_correo": false
->>>>>>> 58d5fca (Merge branch 'main' into main):Backend/API_Laravel/README.md
 }
 ```
 
