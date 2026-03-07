@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\CategoriasController;
 use App\Http\Controllers\Api\SubCategoriasController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\PqrsController;
+use App\Http\Controllers\Api\NotificacionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -99,7 +100,58 @@ Route::middleware('jwtVerify')->group(function (){
         Route::get('/vendedor/{vendedorId}', [ProductoController::class, 'porVendedor']);
         Route::get('/', [ProductoController::class, 'index']);
         Route::get('/{id}', [ProductoController::class, 'show']);
+
     });
+
+    // GET Index: Listar todos los chats del usuario autenticado
+    // GET Show: Ver detalles de un chat específico (incluye mensajes)
+    // PATCH: Update: api/chats/{chat} Marcar mensajes como leídos o actualizar información del chat
+    // DELETE Destroy: api/chats/{chats} Eliminar un chat (opcional, dependiendo de la lógica de negocio)
+    Route::resource('chats', ChatController::class)->only([
+        'index', 'show', 'destroy'
+    ]);
+
+    // Rutas para concretar una compraventa
+    Route::patch('chats/{chat}/iniciar-compraventas', [ChatController::class, 'iniciarCompraVenta']);
+    Route::patch('chats/{chat}/terminar-compraventas', [ChatController::class, 'terminarCompraVenta']);
+
+    // Rutas para devoluciones
+    Route::patch('chats/{chat}/iniciar-devoluciones', [ChatController::class, 'iniciarDevolucion']);
+    Route::patch('chats/{chat}/terminar-devoluciones', [ChatController::class, 'terminarDevolucion']);
+    
+    // RUTA: api/chats
+    // Crea un nuevo chat entre el usuario autenticado y otro usuario (vendedor)
+    // El middleware "CheckChatBlock" verifica si el usuario autenticado ha bloqueado al otro usuario o viceversa
+    Route::post('productos/{producto}/chats', [ChatController::class, 'store']);//->middleware('CheckChatBlock');
+    
+    //RUTA: api/chats/{chat}/mensajes
+    Route::post('chats/{chat}/mensajes', [MensajeController::class, 'store'])->middleware('CheckChatBlock');
+    // RUTA: api/mensajes/{mensaje}
+    Route::delete('mensajes/{mensaje}', [MensajeController::class, 'destroy']);
+    
+    Route::get('estados', [EstadosController::class, 'index']);
+
+    Route::get('transferencias', [ChatController::class, 'transferencias']);
+
+    Route::get('transferencias-filtros', [ChatController::class, 'filtrarTransferencias']);
+
+    Route::get('categorias', [CategoriasController::class, 'index']);
+    Route::get('categorias/{categoria}/subcategorias', [SubCategoriasController::class, 'index']);
+    Route::get('motivos', [MotivoController::class, 'index']);
+    Route::get('favoritos', [UsuarioController::class, 'mostrarFavoritos']);
+    Route::post('favoritos/{usuario}', [UsuarioController::class, 'añadirAFavoritos']);
+    Route::delete('favoritos/{usuario}', [UsuarioController::class, 'eliminarDeFavoritos']);
+    Route::post('denuncias', [\App\Http\Controllers\Api\DenunciaController::class, 'store'])
+        ->middleware('CheckDenuncia');
+    
+    Route::get('pqrs', [PqrsController::class, 'index']);
+    Route::post('pqrs', [PqrsController::class, 'store']);
+    
+    Route::get('notificaciones', [NotificacionController::class, 'index']);
+    Route::get('notificaciones/no-vistas', [NotificacionController::class, 'notificacionesNoVistas']);
+    Route::get('notificaciones/{notificacion}', [NotificacionController::class, 'show']);
+    Route::delete('notificaciones/{notificacion}', [NotificacionController::class, 'destroy']);
+
 
     Route::middleware(['CheckGmailRestriction', 'throttle:api_usuario'])->group(function () {
     
@@ -156,49 +208,6 @@ Route::middleware('jwtVerify')->group(function (){
          */
         Route::get('/mis-productos', [ProductoController::class, 'misProductos']);
     
-        // GET Index: Listar todos los chats del usuario autenticado
-        // GET Show: Ver detalles de un chat específico (incluye mensajes)
-        // PATCH: Update: api/chats/{chat} Marcar mensajes como leídos o actualizar información del chat
-        // DELETE Destroy: api/chats/{chats} Eliminar un chat (opcional, dependiendo de la lógica de negocio)
-        Route::resource('chats', ChatController::class)->only([
-            'index', 'show', 'destroy'
-        ]);
-    
-        // Rutas para concretar una compraventa
-        Route::patch('chats/{chat}/iniciar-compraventas', [ChatController::class, 'iniciarCompraVenta']);
-        Route::patch('chats/{chat}/terminar-compraventas', [ChatController::class, 'terminarCompraVenta']);
-    
-        // Rutas para devoluciones
-        Route::patch('chats/{chat}/iniciar-devoluciones', [ChatController::class, 'iniciarDevolucion']);
-        Route::patch('chats/{chat}/terminar-devoluciones', [ChatController::class, 'terminarDevolucion']);
-        
-        // RUTA: api/chats
-        // Crea un nuevo chat entre el usuario autenticado y otro usuario (vendedor)
-        // El middleware "CheckChatBlock" verifica si el usuario autenticado ha bloqueado al otro usuario o viceversa
-        Route::post('productos/{producto}/chats', [ChatController::class, 'store']);//->middleware('CheckChatBlock');
-        
-        //RUTA: api/chats/{chat}/mensajes
-        Route::post('chats/{chat}/mensajes', [MensajeController::class, 'store'])->middleware('CheckChatBlock');
-        // RUTA: api/mensajes/{mensaje}
-        Route::delete('mensajes/{mensaje}', [MensajeController::class, 'destroy']);
-        
-        Route::get('estados', [EstadosController::class, 'index']);
-
-        Route::get('transferencias', [ChatController::class, 'transferencias']);
-
-        Route::get('transferencias-filtros', [ChatController::class, 'filtrarTransferencias']);
-
-        Route::get('categorias', [CategoriasController::class, 'index']);
-        Route::get('categorias/{categoria}/subcategorias', [SubCategoriasController::class, 'index']);
-        Route::get('motivos', [MotivoController::class, 'index']);
-        Route::get('favoritos', [UsuarioController::class, 'mostrarFavoritos']);
-        Route::post('favoritos/{usuario}', [UsuarioController::class, 'añadirAFavoritos']);
-        Route::delete('favoritos/{usuario}', [UsuarioController::class, 'eliminarDeFavoritos']);
-        Route::post('denuncias', [\App\Http\Controllers\Api\DenunciaController::class, 'store'])
-            ->middleware('CheckDenuncia');
-      
-        Route::get('pqrs', [PqrsController::class, 'index']);
-        Route::post('pqrs', [PqrsController::class, 'store']);
     });
 });
 

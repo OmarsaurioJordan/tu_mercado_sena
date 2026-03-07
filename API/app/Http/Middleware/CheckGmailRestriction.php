@@ -41,10 +41,11 @@ class CheckGmailRestriction
                 'code' => 'GMAIL_RESTRICTED'
             ], 403);
         }
-        return response()->json([
-            'message' => 'Acceso denegado. Las cuentas Gmail solo pueden realizar acciones de lectura.',
-            'code' => 'GMAIL_RESTRICTED'
-        ], 403);
+
+        // return response()->json([
+        //     'message' => 'Acceso denegado. Las cuentas Gmail solo pueden realizar acciones de lectura.',
+        //     'code' => 'GMAIL_RESTRICTED'
+        // ], 403);
     }
     return $next($request); 
     }
