@@ -1577,7 +1577,7 @@ Si el usuario marca varios transferencias para su consulta. Ejemplo **?estados[]
 ```
 
 
-**Favoritos**
+**Modulo Favoritos**
 
 
 **1️⃣Ver usuarios favoritos**
@@ -1674,6 +1674,7 @@ MÉTODO: **DELETE**
 **Motivos**
 
 **1️⃣Obtener motivos**
+
 
 **👁️OJO**
 
@@ -1826,7 +1827,107 @@ Denuciar solo al usuario
 }
 ```
 
-**Código	Significado**
+
+**Modulo PQRS**
+
+**1️⃣Ver PQRS realizadas**
+
+RUTA: **http://127.0.0.1:8000/api/pqrs**
+
+MÉTODO: **GET**
+
+**Si el usuario no tiene pqrs**
+
+
+```Json
+{
+    "success":true,
+    "message":"No hay PQRS realizadas",
+    "data":[]
+}
+```
+
+
+**Salida Json**
+
+```Json
+{
+  "success": true,
+  "message": "PQRS obtenidas exitosamente",
+  "data": [
+    {
+      "id": 2,
+      "usuario_id": 1,
+      "mensaje": "El sistema es muy bueno",
+      "motivo_id": 5,
+      "estado_id": 1,
+      "fecha_registro": "2026-03-07T17:04:54.000000Z",
+      "estado": {
+        "id": 1,
+        "nombre": "activo"
+      },
+      "motivo": {
+        "id": 5,
+        "nombre": "agradecimiento"
+      }
+    }
+  ]
+}
+```
+
+
+**2️⃣Crear PQRS**
+
+RUTA: **http://127.0.0.1:8000/api/pqrs**
+
+MÉTODO: **POST**
+
+**RESTRICCIONES**
+
+✖️ La Pqrs debe estar acompañado de un mensaje obligatorio
+
+✖️ El motivo debe ser uno de los siguientes: pregunta(id=1), queja(id=2), reclamo(id=3), sugerencia(id=4) o agradecimiento(id=5).
+
+✖️ Solo se permite 5 Pqrs por usuario, para crear una más debe tener al menos una es estado resuelto(estado_id=11) 
+
+**Posibles Errores**
+
+
+```Json
+{
+  "status": "error",
+  "message": "Los datos proporcionados no son válidos.",
+  "errors": {
+    "mensaje": [
+      "El mensaje es obligatorio."
+    ],
+    "motivo_id": [
+      "El motivo debe ser uno de los siguientes: pregunta, queja, reclamo, sugerencia o agradecimiento."
+    ]
+  }
+}
+```
+
+```Json
+{
+  "status": "error",
+  "type": "BusinessException",
+  "message": "EL USUARIO HA ALCANZADO EL LÍMITE DE PQRS CREADAS"
+}
+```
+
+
+
+**Salida Json**
+
+```Json
+{
+  "sucess": true,
+  "message": "PQRS CREADA EXITOSAMENTE, ESPERA RESPUESTA DEL ADMINISTRADOR"
+}
+```
+
+**Código Significado**
 
 200	Operación exitosa
 

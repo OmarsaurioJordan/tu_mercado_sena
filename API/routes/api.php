@@ -1,44 +1,103 @@
-    <?php
+<?php
 
-    use App\Http\Controllers\Api\AuthController;
-    use App\Http\Controllers\Api\UsuarioController;
-    use App\Http\Controllers\Api\ProductoController; 
-    use App\Http\Controllers\Api\ChatController;
-    use App\Http\Controllers\Api\EstadosController;
-    use App\Http\Controllers\Api\MotivoController;
-    use App\Http\Controllers\Api\MensajeController;
-    use App\Http\Controllers\Api\CategoriasController;
-    use App\Http\Controllers\Api\SubCategoriasController;
-    use Illuminate\Http\Request;
-    use Illuminate\Support\Facades\Route;
-
-
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    })->middleware('auth:sanctum');
-
-    /**
-     * RUTAS PÚBLICAS (Sin autenticación)
-     * Cualquiera puede entrar a ellas
-     */
-    Route::prefix('auth')->group(function()  {      
-
-        // POST api/auth/iniciar-registro
-        // Inicia el proceso de registro en donde se le envia al usuario un código de verificación 
-        // A su correo electronico
-        Route::post('/iniciar-registro', [AuthController::class, 'iniciarRegistro']);
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UsuarioController;
+use App\Http\Controllers\Api\ProductoController; 
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\EstadosController;
+use App\Http\Controllers\Api\MotivoController;
+use App\Http\Controllers\Api\MensajeController;
+use App\Http\Controllers\Api\CategoriasController;
+use App\Http\Controllers\Api\SubCategoriasController;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Api\PqrsController;
+use Illuminate\Support\Facades\Route;
 
 
-        // POST /api/auth/register
-        // Valida que el código enviado sea correcto y si es asi
-        // Registra al usuario en el sistema
-        Route::post('/register', [AuthController::class, 'register']);
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
 
-        // POST /api/auth/login
-        // Inicia sesión y retornar un token
-        Route::post('/login', [AuthController::class, 'login']);
+/**
+ * RUTAS PÚBLICAS (Sin autenticación)
+ * Cualquiera puede entrar a ellas
+ */
+Route::prefix('auth')->group(function()  {      
 
-        Route::prefix('recuperar-contrasena')->group(function() {
+    // POST api/auth/iniciar-registro
+    // Inicia el proceso de registro en donde se le envia al usuario un código de verificación 
+    // A su correo electronico
+    Route::post('/iniciar-registro', [AuthController::class, 'iniciarRegistro']);
+
+
+    // POST /api/auth/register
+    // Valida que el código enviado sea correcto y si es asi
+    // Registra al usuario en el sistema
+    Route::post('/register', [AuthController::class, 'register']);
+
+    // POST /api/auth/login
+    // Inicia sesión y retornar un token
+    Route::post('/login', [AuthController::class, 'login']);
+
+    Route::prefix('recuperar-contrasena')->group(function() {
+        /**
+         * Endpoint que valida el correo del usuario en la base de datos y envia el 
+         * Código de recuperación al correo del usuario
+         * 
+         * POST
+         *  RUTA: /api/auth/recuperar-contrasena/validar-correo
+         * 
+         */
+        Route::post('/validar-correo', [AuthController::class, 'iniciarProcesoPassword']);
+    
+        /**
+         * Endpoint que valida el código que ingresa el usuario al front-end
+         * 
+         * POST
+         * RUTA: /api/auth/recuperar-contrasena/validar-clave-recuperacion
+         */
+        Route::post('/validar-clave-recuperacion', [AuthController::class, 'validarClavePassword']);
+        /**
+         * Endpoint que recibe la nueva contraseña del usuario y actualiza en la base 
+         * De datos
+         * 
+         *PATCH
+         *RUTA: /api/auth/recuperar-contrasena/reestablecer-contrasena
+         */
+        Route::patch('/reestablecer-contrasena', [AuthController::class, 'reestablecerPassword']);
+    });
+
+});
+
+/**
+ * RUTAS PROTEGIDAS (Requieren autenticación)
+ * 
+ * El middleware personalizado "jwtVerify" verifica el token.
+ * 
+ */
+Route::middleware('jwtVerify')->group(function (){
+
+    Route::middleware(['CheckGmailRestriction', 'throttle:api_usuario'])->group(function () {
+
+        Route::prefix('auth')->group(function () {
+            Route::post('/logout', [AuthController::class, 'logout']);
+            Route::post('/refresh', [AuthController::class, 'refresh']);
+            Route::get('/me', [AuthController::class, 'me']);
+        });
+    
+        // === EDITAR PERFIL ===
+        Route::patch("/editar-perfil/{usuario}", [UsuarioController::class, 'update']);
+    
+        // === BLOQUEADOS ===
+        Route::get('/bloqueados', [UsuarioController::class, 'obtenerBloqueadosPorUsuario']);
+        Route::post('/bloqueados/{usuario}', [UsuarioController::class, 'bloquearUsuario']);
+        Route::delete('/bloqueados/{usuario}', [UsuarioController::class, 'desbloquearUsuario']);
+    
+        // ========================================
+        // === PRODUCTOS (RUTAS PROTEGIDAS) ===
+        // ========================================
+        
+        Route::prefix('productos')->group(function () {
             /**
              * Endpoint que valida el correo del usuario en la base de datos y envia el 
              * Código de recuperación al correo del usuario
@@ -221,6 +280,9 @@
             Route::delete('favoritos/{usuario}', [UsuarioController::class, 'eliminarDeFavoritos']);
             Route::post('denuncias', [\App\Http\Controllers\Api\DenunciaController::class, 'store'])
                 ->middleware('CheckDenuncia');
+          
+          Route::get('pqrs', [PqrsController::class, 'index']);
+          Route::post('pqrs', [PqrsController::class, 'store']);
         });
     });
 
