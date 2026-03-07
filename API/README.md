@@ -1927,6 +1927,101 @@ MÉTODO: **POST**
 }
 ```
 
+
+**Modulo Notificaciones**
+
+**1️⃣Ver todas las notificaciones**
+
+RUTA: **http://127.0.0.1:8000/api/notificaciones**
+
+MÉTODO: **GET**
+
+**Salida Json**
+
+
+```Json
+{
+  "success": true,
+  "message": "Notificaciones obtenidas correctamente",
+  "data": [
+    {
+      "id": 5,
+      "usuario_id": 1,
+      "motivo_id": 16,
+      "mensaje": "El usuario: XXXXXX ha concretado la devolución",
+      "visto": 0,
+      "fecha_registro": "2026-03-04T02:38:49.000000Z"
+    },
+    {
+      "id": 2,
+      "usuario_id": 1,
+      "motivo_id": 13,
+      "mensaje": "El usuario: XXXX ha enviado solicitud para consolidar la venta",
+      "visto": 0,
+      "fecha_registro": "2026-03-04T02:36:19.000000Z"
+    }
+  ]
+}
+```
+
+**2️⃣Obtener el número de notificaciones no vistas**
+
+RUTA: **http://127.0.0.1:8000/api/notificaciones/no-vistas**
+
+MÉTODO: **GET**
+
+**Salida Json**
+
+
+```Json
+{
+  "success": true,
+  "message": "Número de notificaciones no vistas obtenidas correctamente",
+  "data": 2
+}
+```
+
+
+**3️⃣Marcar una notificacion como vista**
+
+RUTA: **http://127.0.0.1:8000/api/notificaciones/{notificacion_id}**
+
+MÉTODO: **GET**
+
+**Salida Json**
+
+
+```Json
+{
+  "success": true,
+  "message": "Notificación obtenida correctamente",
+  "data": {
+    "id": 2,
+    "usuario_id": 1,
+    "motivo_id": 13,
+    "mensaje": "El usuario:XXXXXXXX ha enviado solicitud para consolidar la venta",
+    "visto": true,
+    "fecha_registro": "2026-03-04T02:36:19.000000Z"
+  }
+}
+```
+
+**4️⃣Borrar una notificación**
+
+RUTA: **http://127.0.0.1:8000/api/notificaciones/{notificacion_id}**
+
+MÉTODO: **DELETE**
+
+**Salida Json**
+
+
+```Json
+{
+  "success": true,
+  "message": "Notificación eliminada correctamente"
+}
+```
+
 **Código Significado**
 
 200	Operación exitosa
