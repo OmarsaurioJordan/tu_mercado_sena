@@ -32,10 +32,10 @@ class StorePqrsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'mensaje' => 'required|string,max:512',
+            'mensaje' => 'required|string|max:512',
             'usuario_id' => 'required|integer|exists:usuarios,id',
             'estado_id' => 'required|integer|exists:estados,id',
-            'motivo_id' => 'required|integer|exists:motivos,id'
+            'motivo_id' => 'required|integer|exists:motivos,id|in:1,2,3,4,5',
         ];
     }
 
@@ -56,7 +56,8 @@ class StorePqrsRequest extends FormRequest
 
             'motivo_id.required' => 'El ID del motivo es obligatorio.',
             'motivo_id.integer' => 'El ID del motivo debe ser un número entero.',
-            'motivo_id.exists' => 'El motivo especificado no existe.'
+            'motivo_id.exists' => 'El motivo especificado no existe.',
+            'motivo_id.in' => 'El motivo debe ser uno de los siguientes: pregunta, queja, reclamo, sugerencia o agradecimiento.',
         ];
     }
 }

@@ -118,7 +118,7 @@ return new class extends Migration
             ],
             [
                 // id: 17
-                'nombre' => 'notifica_califica',
+                'nombre' => 'califica',
                 'tipo' => 'notificacion',
                 'descripcion' => 'un comprador ha calificado o escrito un comentario, o lo ha modificado'
             ],

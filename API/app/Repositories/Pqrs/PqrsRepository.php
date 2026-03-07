@@ -31,4 +31,18 @@ class PqrsRepository implements IPqrsRepository
 
         return Pqrs::where('usuario_id', $usuarioId)->count();
     }
+
+    /**
+     * Cuenta cuántas PQRS del usuario están en estado resuelto.
+     * @param int $usuarioId
+     * @return int
+     */
+    public function countResolvedPqrs(int $usuarioId): int
+    {
+        Log::info("Repository: Contando Pqrs resueltas para el usuario ID: " . $usuarioId, []);
+
+        return Pqrs::where('usuario_id', $usuarioId)
+            ->where('estado_id', 11)
+            ->count();
+    }
 }

@@ -13,4 +13,13 @@ interface IPqrsRepository
     public function create(array $data): Pqrs;
 
     public function countByUsuarioId(int $usuarioId): int;
+    
+    /**
+     * Cuenta cuántas PQRS del usuario están en estado resuelto.
+     * @param int $usuarioId
+     * @return int
+     */
+    public function countResolvedPqrs(int $usuarioId): int;
 }
+
+

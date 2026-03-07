@@ -21,13 +21,13 @@ class PqrsController extends Controller
         // Policy que valida que un usuario vea los PQRS de otro usuario
         $this->authorize('viewAny', Pqrs::class);
 
-        $pqrs = Pqrs::with(['usuario:id', 'estado:id,nombre', 'motivo:id,nombre'])
+        $pqrs = Pqrs::with(['estado:id,nombre', 'motivo:id,nombre'])
             ->Where('usuario_id', Auth::user()->usuario->id)
             ->get();
         
         return response()->json([
             'success' => true,
-            'message' => isEmpty($pqrs) ? 'No hay PQRS realizadas' : 'PQRS obtenidas exitosamente',
+            'message' => ($pqrs->isEmpty()) ? 'No hay PQRS realizadas' : 'PQRS obtenidas exitosamente',
             'data' => $pqrs,
         ]);
     }
