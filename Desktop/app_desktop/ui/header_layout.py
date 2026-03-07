@@ -1,8 +1,9 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QApplication
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
 )
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
+from core.app_config import DOMINIO_EMAIL
 from components.usuario_card import UsuarioCard
 from components.boton import Boton
 from models.usuario import Usuario
@@ -23,6 +24,8 @@ class HeaderLayout(QVBoxLayout):
             if admin is None:
                 admin_id = 0
                 admin = self.usuario_debug()
+        
+        manager.signal_notifi.connect(self.on_notifi)
 
         image = QPixmap("assets/sprites/logo.png")
         logo = QLabel()
@@ -45,8 +48,11 @@ class HeaderLayout(QVBoxLayout):
         else:
             btnMenu = QLabel()
         
-        notifica_pqrss = Boton("PQRS: 0","bell")
-        notifica_denuncias = Boton("Denuncias: 0", "bell")
+        self.notifica_pqrss = Boton("PQRS: 0","bell")
+        self.notifica_pqrss.clicked.connect(self.find_pqrss)
+        self.notifica_denuncias = Boton("Denuncias: 0", "bell")
+        self.notifica_denuncias.clicked.connect(self.find_denuncias)
+        self.hay_busqueda = [False, False]
 
         header = QWidget()
         layHorizontal = QHBoxLayout(header)
@@ -58,9 +64,9 @@ class HeaderLayout(QVBoxLayout):
         layHorizontal.addWidget(btnMenu)
         layHorizontal.addSpacing(10)
         layHorizontal.addStretch()
-        layHorizontal.addWidget(notifica_pqrss)
+        layHorizontal.addWidget(self.notifica_pqrss)
         layHorizontal.addSpacing(10)
-        layHorizontal.addWidget(notifica_denuncias)
+        layHorizontal.addWidget(self.notifica_denuncias)
         layHorizontal.addSpacing(10)
         layHorizontal.addStretch()
         layHorizontal.addWidget(UsuarioCard(admin))
@@ -73,9 +79,28 @@ class HeaderLayout(QVBoxLayout):
 
     def usuario_debug(self):
         print("HeaderLayout: usuario_debug")
-        return Usuario(0, "email_administrativo@sena.edu.co", 3, "Usuario Administrador", 0, "", "", 1, "", "", "")
+        return Usuario(0, "email_administrativo" + DOMINIO_EMAIL, 3, "Usuario Administrador", 0, "", "", 1, "", "", "")
 
     def cambiaPagina(self, pagina=""):
         print("HeaderLayout: cambiaPagina")
         manager = QApplication.instance().property("manager")
         manager.change_tool(pagina)
+
+    def on_notifi(self, denuncias, pqrss):
+        self.notifica_denuncias.set_text("Denuncias: " + str(denuncias))
+        self.notifica_pqrss.set_text("PQRS: " + str(pqrss))
+        self.hay_busqueda = [denuncias > 0, pqrss > 0]
+
+    def find_pqrss(self):
+        if self.hay_busqueda[1]:
+            self.cambiaPagina("tools")
+            manager = QApplication.instance().property("controls")
+            manager.signal_tools_cambio.emit("PQRSs")
+            manager.signal_filter_notifi.emit(True)
+    
+    def find_denuncias(self):
+        if self.hay_busqueda[0]:
+            self.cambiaPagina("tools")
+            manager = QApplication.instance().property("controls")
+            manager.signal_tools_cambio.emit("Denuncias")
+            manager.signal_filter_notifi.emit(False)

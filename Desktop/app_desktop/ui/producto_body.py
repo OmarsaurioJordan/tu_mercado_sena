@@ -6,7 +6,7 @@ from PySide6.QtGui import QPixmap
 from components.selector import Selector
 
 class ProductoBody(QWidget):
-    cambioData = Signal(int)
+    cambioData = Signal(int) # id producto
 
     def __init__(self):
         super().__init__()

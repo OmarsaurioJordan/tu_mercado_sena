@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 
 class ProductoCard(QFrame):
-    card_clic = Signal(int)
+    card_clic = Signal(int) # id producto
 
     def __init__(self, producto, parent=None):
         super().__init__(parent)

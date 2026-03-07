@@ -21,5 +21,7 @@ IMAGE_PROD_LINK = "http://localhost/Prestamo/freddy/Frontend/uploads/productos/"
 #IMAGE_PROD_LINK = "https://omwekiatl.xyz/Prestamo/ensano_chat/uploads/"
 # precio maximo de la aplicacion
 PRECIO_MAX = 10000000
-# tiempo para esperar una solicitud al servidor
-TIME_OUT = 30
+# tiempo para esperar una solicitud al servidor (segundos)
+TIME_OUT = 15
+# temporizacion para buscar notificaciones (segundos)
+TIME_NOTIFI = 7

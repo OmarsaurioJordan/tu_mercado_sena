@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import (
     QListWidget, QListWidgetItem, QAbstractItemView, QApplication
 )
-from PySide6.QtGui import QStandardItem
 from PySide6.QtCore import Signal
 from components.usuario_card import UsuarioCard
 from components.producto_card import ProductoCard
@@ -10,7 +9,7 @@ from components.denuncia_card import DenunciaCard
 
 class ResultBusqueda(QListWidget):
     scroll_at_end = Signal()
-    card_clic = Signal(int)
+    card_clic = Signal(int) # id item
 
     def __init__(self, tipo=""):
         super().__init__()

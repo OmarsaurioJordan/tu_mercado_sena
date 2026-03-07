@@ -5,6 +5,7 @@ from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QIcon
 
 class Boton(QPushButton):
+
     def __init__(self, texto="", icono="", size=32):
         super().__init__(texto)
         if icono != "":
@@ -27,3 +28,6 @@ class Boton(QPushButton):
                 border: 1px solid #aaaaaa;
             }
         """)
+    
+    def set_text(self, texto=""):
+        self.setText(texto)

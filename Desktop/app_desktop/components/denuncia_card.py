@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal
 
 class DenunciaCard(QFrame):
-    card_clic = Signal(int)
+    card_clic = Signal(int) # id denuncia
 
     def __init__(self, denuncia, parent=None):
         super().__init__(parent)

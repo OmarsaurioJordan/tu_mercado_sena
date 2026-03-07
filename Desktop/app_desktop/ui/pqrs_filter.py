@@ -10,12 +10,14 @@ from components.date_edit import DateEdit
 from components.boton import Boton
 
 class PqrsFilter(QWidget):
-    clicAplicar = Signal(dict)
+    clicAplicar = Signal(dict) # filtros
 
     def __init__(self):
         super().__init__()
 
-        ctrlData = QApplication.instance().property("controls").get_data()
+        ctrls = QApplication.instance().property("controls")
+        ctrlData = ctrls.get_data()
+        ctrls.signal_filter_notifi.connect(self.emitir_notifi)
 
         layVertical = QVBoxLayout()
         layVertical.setSpacing(10)
@@ -59,3 +61,9 @@ class PqrsFilter(QWidget):
             "registro_hasta": self.date_registro_max.get_value_utc()
         }
         return filtros
+    
+    def emitir_notifi(self, is_pqrs=True):
+        if is_pqrs:
+            print("PqrsFilter: emitir_notifi")
+            filtros = { "estado_id": 1 }
+            self.clicAplicar.emit(filtros)

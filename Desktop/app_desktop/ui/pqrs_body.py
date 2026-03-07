@@ -7,8 +7,8 @@ from components.usuario_card import UsuarioCard
 from components.boton import Boton
 
 class PqrsBody(QWidget):
-    cambioData = Signal(int)
-    card_clic = Signal(int)
+    cambioData = Signal(int) # id PQRS
+    card_clic = Signal(int) # id usuario
 
     def __init__(self):
         super().__init__()

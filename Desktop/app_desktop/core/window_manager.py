@@ -31,6 +31,9 @@ class WindowManager(QMainWindow):
             self.set_login()
         self.show()
 
+    def is_login(self):
+        return self.stack.count() > 1
+
     def set_login(self):
         print("WindowManager: set_login")
         ses = Session()

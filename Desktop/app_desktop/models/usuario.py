@@ -5,7 +5,7 @@ from core.app_config import IMAGE_USER_LINK
 from services.image_utils import circular_pixmap
 
 class UsuarioSignal(QObject):
-    ok_image = Signal(int)
+    ok_image = Signal(int) # id usuario
 
 class Usuario:
     

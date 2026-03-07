@@ -1,11 +1,11 @@
 from PySide6.QtWidgets import (
-    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
+    QFrame, QVBoxLayout, QHBoxLayout, QLabel, QApplication
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 
 class UsuarioCard(QFrame):
-    card_clic = Signal(int)
+    card_clic = Signal(int) # id usuario
 
     def __init__(self, usuario, parent=None):
         super().__init__(parent)

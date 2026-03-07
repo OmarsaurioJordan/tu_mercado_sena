@@ -4,7 +4,7 @@ from PySide6.QtGui import QImage
 from core.app_config import (TIME_OUT)
 
 class ImageWorkerSignals(QObject):
-    finished = Signal(QImage)
+    finished = Signal(QImage) # imagen
 
 class ImageWorker(QRunnable):
     def __init__(self, url=""):

@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal
 
 class PqrsCard(QFrame):
-    card_clic = Signal(int)
+    card_clic = Signal(int) # id PQRS
 
     def __init__(self, pqrs, parent=None):
         super().__init__(parent)

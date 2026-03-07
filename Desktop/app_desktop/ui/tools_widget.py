@@ -25,6 +25,8 @@ class ToolsWidget(QWidget):
         self.ctrlPqrs = manager.get_pqrss()
         self.ctrlDenuncia = manager.get_denuncias()
 
+        manager.signal_tools_cambio.connect(self.select_tab)
+
         tabsA = QTabWidget()
         productoBody = ProductoBody()
         tabsA.addTab(Scroll(productoBody), "Producto")
@@ -41,8 +43,6 @@ class ToolsWidget(QWidget):
         tabsB.addTab(Scroll(), "Catálogo")
         tabsB.addTab(Scroll(), "Papelera")
         tabsB.addTab(Scroll(), "Historial")
-
-        self.tabs = [tabsA, tabsB]
 
         # conectar otras fichas
         denunciaBody.card_usuario_clic.connect(
@@ -112,6 +112,8 @@ class ToolsWidget(QWidget):
         tabsFind.addTab(Buscador(), "Chats")
         # estructura de la busqueda de auditorias
         tabsFind.addTab(Buscador(), "Auditorías")
+
+        self.tabs = [tabsA, tabsB, tabsFind]
 
         # sombreado de fichas seleccionadas
         usuarioBody.cambioData.connect(usuarioBusqueda.set_sombrear)
