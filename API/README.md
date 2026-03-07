@@ -1767,32 +1767,12 @@ MÉTODO: **POST**
 
 ```Json
 {
-  "success": true,
-  "message": "PQRS obtenidas exitosamente",
-  "data": [
-    {
-      "id": 2,
-      "usuario_id": 1,
-      "mensaje": "El sistema es muy bueno",
-      "motivo_id": 5,
-      "estado_id": 1,
-      "fecha_registro": "2026-03-07T17:04:54.000000Z",
-      "estado": {
-        "id": 1,
-        "nombre": "activo"
-      },
-      "motivo": {
-        "id": 5,
-        "nombre": "agradecimiento"
-      }
-    }
-  ]
+  "sucess": true,
+  "message": "PQRS CREADA EXITOSAMENTE, ESPERA RESPUESTA DEL ADMINISTRADOR"
 }
 ```
 
-
-
-**Código	Significado**
+**Código Significado**
 
 200	Operación exitosa
 
