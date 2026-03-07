@@ -1765,6 +1765,7 @@ RUTA: **http://127.0.0.1:8000/api/denuncias**
 MÉTODO: **POST**
 
 **RESTRICCIONES**
+
 ✖️ No puedes denunciarte a ti mismo.
 
 ✖️ Solo puedes tener una denuncia abierta por chat.
