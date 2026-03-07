@@ -23,9 +23,9 @@ class CheckGmailRestriction
         $allowGmail = config('services.allow_gmail');
         $cuenta = Auth::user();
 
-        if (!$allowGmail && $cuenta && str_ends_with(strtolower($cuenta->email), "@gmail.com")) {
+        if ($cuenta && str_ends_with(strtolower($cuenta->email), "@gmail.com")) {
+            if (!$allowGmail) {
             $token = JWTAuth::getToken();
-
             if ($token) {
                 JWTAuth::invalidate($token);
             }
@@ -41,6 +41,12 @@ class CheckGmailRestriction
                 'code' => 'GMAIL_RESTRICTED'
             ], 403);
         }
-        return $next($request);
+        return response()->json([
+            'message' => 'Acceso denegado. Las cuentas Gmail solo pueden realizar acciones de lectura.',
+            'code' => 'GMAIL_RESTRICTED'
+        ], 403);
+    }
+    return $next($request); 
     }
 }
+

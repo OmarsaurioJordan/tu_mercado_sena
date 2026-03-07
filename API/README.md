@@ -1671,9 +1671,164 @@ MÉTODO: **DELETE**
     "message": "Usuario eliminado de favoritos exitosamente."
 }
 ```
+**Motivos**
+
+**1️⃣Obtener motivos**
+
+
+**👁️OJO**
+
+El parámetro tipo es opcional. Si no se envía, retorna todos los motivos. Los valores válidos son denuncia, pqrs y notificacion.
+
+RUTA: **http://127.0.0.1:8000/api/motivos**
+
+MÉTODO: **GET**
+
+**Ejemplos de uso**
+
+```
+GET /api/motivos
+GET /api/motivos?tipo=denuncia
+GET /api/motivos?tipo=pqrs
+GET /api/motivos?tipo=notificacion
+```
+```Json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 18,
+      "nombre": "acoso",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento de acoso sexual en un chat o imágenes"
+    },
+    {
+      "id": 19,
+      "nombre": "bulling",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento de burlas o insultos en un chat o imágenes"
+    },
+    {
+      "id": 20,
+      "nombre": "violencia",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento que incita al odio o amenzada directamente"
+    },
+    {
+      "id": 21,
+      "nombre": "ilegal",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento asociado a drogas, armas, prostitución y demás"
+    },
+    {
+      "id": 22,
+      "nombre": "troll",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento enfocado en molestar y hacer perder el tiempo"
+    },
+    {
+      "id": 23,
+      "nombre": "fraude",
+      "tipo": "denuncia",
+      "descripcion": "se trata de vender algo malo o mediante trampas, tratan de tumbar al otro con fraudes"
+    },
+    {
+      "id": 24,
+      "nombre": "fake",
+      "tipo": "denuncia",
+      "descripcion": "un producto o perfil es meme o chisto o simplemente hace perder el tiempo"
+    },
+    {
+      "id": 25,
+      "nombre": "spam",
+      "tipo": "denuncia",
+      "descripcion": "un producto o perfil aparece muchas veces como si lo pusieran en demasia para llamar la atención"
+    },
+    {
+      "id": 26,
+      "nombre": "sexual",
+      "tipo": "denuncia",
+      "descripcion": "un perfil o producto exhibe temáticas sexuales o provocativas"
+    }
+  ]
+}
+```
+**Denuncias**
+
+**1️⃣Crear denuncia**
+
+**👁️OJO**
+
+El motivo_id debe corresponder a un motivo de tipo denuncia. Usar la ruta GET /api/motivos?tipo=denuncia para obtener los motivos válidos.
+
+RUTA: **http://127.0.0.1:8000/api/denuncias**
+
+MÉTODO: **POST**
+
+**RESTRICCIONES**
+
+✖️ No puedes denunciarte a ti mismo.
+
+✖️ Solo puedes tener una denuncia abierta por chat.
+
+✖️ Solo puedes tener una denuncia abierta por producto.
+
+✖️ Solo puedes tener una denuncia abierta contra un usuario (sin chat ni producto).
+
+✖️ El producto_id debe existir en la base de datos.
+
+⚠️ Si un usuario o producto acumula 3 o más denuncias abiertas, su estado cambia automáticamente a denunciado.
+
+**Casos de uso**
+
+Denuciar dentro de un chat
+
+```Json
+{
+  "motivo_id": 23,
+  "usuario_id": 5,
+  "chat_id": 12
+}
+```
+
+Denuciar un producto específico
+
+```Json
+{
+  "motivo_id": 23,
+  "usuario_id": 5,
+  "chat_id": 12
+}
+```
+
+Denuciar solo al usuario
+
+```Json
+{
+  "motivo_id": 19,
+  "usuario_id": 5
+}
+```
+
+**Salida Json**
+
+```Json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "denunciante_id": 3,
+    "usuario_id": 5,
+    "producto_id": null,
+    "chat_id": 12,
+    "motivo_id": 23,
+    "estado_id": 1
+  }
+}
+```
+
 
 **Modulo PQRS**
-
 
 **1️⃣Ver PQRS realizadas**
 
