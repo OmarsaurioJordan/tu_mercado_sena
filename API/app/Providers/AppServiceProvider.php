@@ -37,8 +37,8 @@ class AppServiceProvider extends ServiceProvider
             // Si no hay usuario, usamos la IP (como plan B)
             $identifier = $user ? $user->id : $request->ip();
 
-            // Limitar a 65 peticiones por minuto por cada ID de usuario
-            return Limit::perMinute(65)->by($identifier)->response(function (Request $request, array $headers) {
+            // Limitar a 100 peticiones por minuto por cada ID de usuario
+            return Limit::perMinute(100)->by($identifier)->response(function (Request $request, array $headers) {
                 return response()->json([
                     'success' => 'error',
                     'message' => 'Demasiadas solicitudes. Intentalo más tarde'

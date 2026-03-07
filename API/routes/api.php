@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\MensajeController;
 use App\Http\Controllers\Api\CategoriasController;
 use App\Http\Controllers\Api\SubCategoriasController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\PqrsController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -215,6 +216,9 @@ Route::middleware('jwtVerify')->group(function (){
         
         Route::post('denuncias', [\App\Http\Controllers\Api\DenunciaController::class, 'store'])
             ->middleware('CheckDenuncia');
+
+        Route::get('pqrs', [PqrsController::class, 'index']);
+        Route::post('pqrs', [PqrsController::class, 'store']);
     });
 });
 

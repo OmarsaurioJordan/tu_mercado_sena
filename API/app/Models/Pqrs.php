@@ -10,7 +10,7 @@ class Pqrs extends Model
 
     const CREATED_AT = 'fecha_registro';
 
-    const UPDATE_AT = null;
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'usuario_id',
@@ -18,6 +18,11 @@ class Pqrs extends Model
         'motivo_id',
         'estado_id'
     ];
+
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
 
     public function motivo()
     {
