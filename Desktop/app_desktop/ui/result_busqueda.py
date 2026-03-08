@@ -7,6 +7,8 @@ from components.producto_card import ProductoCard
 from components.pqrs_card import PqrsCard
 from components.denuncia_card import DenunciaCard
 from components.mensaje_card import MensajeCard
+from components.auditoria_card import AuditoriaCard
+from components.login_card import LoginCard
 
 class ResultBusqueda(QListWidget):
     scroll_at_end = Signal()
@@ -28,6 +30,10 @@ class ResultBusqueda(QListWidget):
                 ctrl.denuncia_signal.hubo_cambio.connect(self.actualizar)
             case "mensajes":
                 ctrl.mensaje_signal.hubo_cambio.connect(self.actualizar)
+            case "auditorias":
+                ctrl.auditoria_signal.hubo_cambio.connect(self.actualizar)
+            case "logins":
+                ctrl.login_signal.hubo_cambio.connect(self.actualizar)
         
         if tipo in ["usuarios", "productos"]:
             self.setViewMode(QListWidget.IconMode)
@@ -58,6 +64,10 @@ class ResultBusqueda(QListWidget):
                 return QApplication.instance().property("controls").get_denuncias()
             case "mensajes":
                 return QApplication.instance().property("controls").get_mensajes()
+            case "auditorias":
+                return QApplication.instance().property("controls").get_auditorias()
+            case "logins":
+                return QApplication.instance().property("controls").get_logins()
         return None
 
     # signal cuando llega al fondo del scroll
@@ -97,6 +107,10 @@ class ResultBusqueda(QListWidget):
                             ficha.setData(ctrl.get_denuncia(id))
                         case "mensajes":
                             ficha.setData(ctrl.get_mensaje(id))
+                        case "auditorias":
+                            ficha.setData(ctrl.get_auditoria(id))
+                        case "logins":
+                            ficha.setData(ctrl.get_login(id))
                     break
     
     def agregar_items(self, items):
@@ -117,6 +131,10 @@ class ResultBusqueda(QListWidget):
                     ficha = DenunciaCard(it, parent=self)
                 case "mensajes":
                     ficha = MensajeCard(it, parent=self)
+                case "auditorias":
+                    ficha = AuditoriaCard(it, parent=self)
+                case "logins":
+                    ficha = LoginCard(it, parent=self)
             ficha.card_clic.connect(self._click_event)
             item = QListWidgetItem()
             item.setSizeHint(ficha.sizeHint())
@@ -143,7 +161,12 @@ class ResultBusqueda(QListWidget):
         for i in range(self.count()):
             item = self.item(i)
             widget = self.itemWidget(item)
-            if self.tipo == "mensajes":
-                widget.setPulsado(widget.chat_id == item_id)
-            else:
-                widget.setPulsado(widget.id == item_id)
+            match self.tipo:
+                case "mensajes":
+                    widget.setPulsado(widget.chat_id == item_id)
+                case "auditorias":
+                    widget.setPulsado(widget.administrador_id == item_id)
+                case "logins":
+                    widget.setPulsado(widget.usuario_id == item_id)
+                case _:
+                    widget.setPulsado(widget.id == item_id)

@@ -57,7 +57,7 @@ class ChatBody(QWidget):
         vendedorLayout = QHBoxLayout()
         vendedorLayout.addLayout(datosLayout)
         vendedorLayout.addStretch()
-        vendedorLayout.addWidget(self.portaFichas)
+        vendedorLayout.addLayout(self.portaFichas)
         
         self.portaChat = QVBoxLayout()
 
@@ -65,7 +65,7 @@ class ChatBody(QWidget):
         layVertical.addSpacing(10)
         layVertical.addLayout(compradorLayout)
         layVertical.addSpacing(10)
-        layVertical.addWidget(vendedorLayout)
+        layVertical.addLayout(vendedorLayout)
         layVertical.addSpacing(10)
         layVertical.addLayout(self.portaChat)
         layVertical.addStretch()

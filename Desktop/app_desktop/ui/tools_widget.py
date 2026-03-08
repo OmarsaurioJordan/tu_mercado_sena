@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import (
-    QWidget, QTabWidget, QHBoxLayout, QLabel, QApplication
+    QWidget, QTabWidget, QHBoxLayout, QApplication
 )
-from PySide6.QtCore import Qt
 from components.scroll import Scroll
 from components.buscador import Buscador
 from ui.result_busqueda import ResultBusqueda
@@ -39,7 +38,6 @@ class ToolsWidget(QWidget):
         tabsA.addTab(Scroll(denunciaBody), "Denuncia")
         chatBody = ChatBody()
         tabsA.addTab(Scroll(chatBody), "Chat")
-        tabsA.addTab(Scroll(), "Auditoría")
 
         tabsB = QTabWidget()
         usuarioBody = UsuarioBody()
@@ -125,8 +123,6 @@ class ToolsWidget(QWidget):
         mensajeBusqueda.card_clic.connect(
             lambda chat_id: self.buscarChat(chat_id, chatBody)
         )
-        # estructura de la busqueda de auditorias
-        tabsFind.addTab(Buscador(), "Auditorías")
 
         self.tabs = [tabsA, tabsB, tabsFind]
 

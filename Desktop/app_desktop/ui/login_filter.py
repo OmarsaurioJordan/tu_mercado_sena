@@ -3,11 +3,11 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QDate, Signal
 from components.txt_edit import TxtEdit
-from components.checkbox import Checkbox
+from components.selector import Selector
 from components.date_edit import DateEdit
 from components.boton import Boton
 
-class MensajeFilter(QWidget):
+class LoginFilter(QWidget):
     clicAplicar = Signal(dict) # filtros
 
     def __init__(self):
@@ -15,10 +15,10 @@ class MensajeFilter(QWidget):
 
         layVertical = QVBoxLayout()
         layVertical.setSpacing(10)
-        self.palabras = TxtEdit("Palabras", "palabras")
-        layVertical.addWidget(self.palabras)
-        self.chkActivos = Checkbox("Chats activos")
-        layVertical.addWidget(self.chkActivos)
+        self.txtNickname = TxtEdit("Nickname", "nickname")
+        layVertical.addWidget(self.txtNickname)
+        self.txtEmail = TxtEdit("Email", "email")
+        layVertical.addWidget(self.txtEmail)
         self.date_registro_min = DateEdit("Reg. desde", QDate(2010, 1, 1))
         layVertical.addWidget(self.date_registro_min)
         self.date_registro_max = DateEdit("Reg. hasta")
@@ -31,14 +31,14 @@ class MensajeFilter(QWidget):
         self.setLayout(layVertical)
 
     def emitir_aplicar(self):
-        print("MensajeFilter: emitir_aplicar")
+        print("LoginFilter: emitir_aplicar")
         filtros = self.obtener_filtros()
         self.clicAplicar.emit(filtros)
 
     def obtener_filtros(self):
         filtros = {
-            "palabras": self.palabras.get_value(),
-            "activos": self.chkActivos.get_bool(),
+            "nickname": self.txtNickname.get_value(),
+            "email": self.txtEmail.get_value(),
             "registro_desde": self.date_registro_min.get_value_utc(),
             "registro_hasta": self.date_registro_max.get_value_utc()
         }

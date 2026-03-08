@@ -1,17 +1,19 @@
 TAREAS:
 ...
-- 
-...
-- módulo de auditorías: búsqueda + body
-...
-- módulo de chats: búsqueda + body
+- se está congelando el primer búsqueda cíclica de notificaciónes
+- aún no disponible usuariobody recupera clave, limpia textline
+- no tratar de enviar mensaje usuario body si id = 0
+- clic ficha logins, no envía id usuario sino id login, quizá igual ficha auditorias
+- usuario body seleccionado en logins no sombrea logins, quizá igual con auditorias
+- esira mucho al buscador de logins, auditorias, comprimiendo usuario body
+- auditoria y login cards, hora seguido por dias, no abajo, y nombre con mail al lado
+- poner linea horizontal entre vendedor, comprador y mensajes en chat body
 ...
 - ver catálogo de productos de usuario
 - ver papelera del usuario
 - ver historial del usuario
 ...
 - cargar datos de análisis para gráficas
-- ver logins de administradores
 ...
 - hacer que se bloquee con pin y temporizador
 - config. cambiar pin
@@ -30,20 +32,9 @@ x API
 x entidad
 entidad_card
 x entidad_body
-ctrl_entidad
+x ctrl_entidad
 confirmaciones
-controllers_manager
-tools_widget
-
-     Auditoria
-x API
-x entidad
-entidad_card
-entidad_body
-entidad_filter
-result_busqueda
-ctrl_entidad
-controllers_manager
+x controllers_manager
 tools_widget
 
      Papelera
@@ -52,16 +43,5 @@ x entidad
 entidad_card
 result_busqueda
 ctrl_entidad
-controllers_manager
-tools_widget
-
-     Logins
-x API
-x entidad
-entidad_card
-entidad_filter
-result_busqueda
-ctrl_entidad
-confirmaciones
 controllers_manager
 tools_widget

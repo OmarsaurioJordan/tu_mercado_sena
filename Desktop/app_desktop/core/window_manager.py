@@ -7,7 +7,7 @@ from windows.menu_window import MenuWindow
 from windows.tools_window import ToolsWindow
 from windows.config_window import ConfigWindow
 from windows.lock_window import LockWindow
-from windows.sessions_window import SessionsWindow
+from windows.auditorias_window import AuditoriasWindow
 from windows.stats_window import StatsWindow
 from core.app_config import DEBUG_NO_LOGIN
 from core.session import Session
@@ -53,7 +53,7 @@ class WindowManager(QMainWindow):
             "tools": ToolsWindow(),
             "config": ConfigWindow(),
             "lock": LockWindow(),
-            "sessions": SessionsWindow(),
+            "auditorias": AuditoriasWindow(),
             "stats": StatsWindow()
         }
         self.limpiar_stack()

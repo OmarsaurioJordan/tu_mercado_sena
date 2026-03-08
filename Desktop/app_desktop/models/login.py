@@ -1,5 +1,5 @@
 class Login:
-    def __init__(self, id, usuario_id, ip_direccion, informacion, fecha_registro, nickname, email, dias):
+    def __init__(self, id, usuario_id, ip_direccion, informacion, fecha_registro, nickname, email, dias, rol_id):
         self.id = id
         self.usuario_id = usuario_id
         self.ip_direccion = ip_direccion
@@ -8,6 +8,7 @@ class Login:
         self.nickname = nickname
         self.email = email
         self.dias = dias
+        self.rol_id = rol_id
 
     @staticmethod
     def from_json(data):
@@ -19,5 +20,6 @@ class Login:
             fecha_registro = data.get('fecha_registro'),
             nickname = data.get('nickname'),
             email = data.get('email'),
-            dias = int(data.get('dias'))
+            dias = int(data.get('dias')),
+            rol_id = int(data.get('rol_id'))
         )

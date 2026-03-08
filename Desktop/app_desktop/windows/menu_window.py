@@ -17,8 +17,8 @@ class MenuWindow(QWidget):
         btnStats.clicked.connect(lambda: self.cambiaPagina("stats"))
         btnTools = Boton("  Herramientas", "tools", 44)
         btnTools.clicked.connect(lambda: self.cambiaPagina("tools"))
-        btnLogins = Boton("  Ingresos", "logins", 44)
-        btnLogins.clicked.connect(lambda: self.cambiaPagina("sessions"))
+        btnLogins = Boton("  Auditorías", "logins", 44)
+        btnLogins.clicked.connect(lambda: self.cambiaPagina("auditorias"))
         btnConfig = Boton("  Configuración", "configuracion", 44)
         btnConfig.clicked.connect(lambda: self.cambiaPagina("config"))
 

@@ -48,6 +48,16 @@ class CtrlData:
             if est["nombre"] in ["activo", "resuelto"]:
                 res.append([est["nombre"].capitalize(), est["id"]])
         return res
+
+    def get_estados_chats(self):
+        res = []
+        estados = self.get_data("estados")
+        if not estados:
+            return [["???", -1]]
+        for est in estados:
+            if est["nombre"] in ["activo", "eliminado", "vendido", "esperando", "devolviendo", "devuelto", "censurado"]:
+                res.append([est["nombre"].capitalize(), est["id"]])
+        return res
     
     def get_roles_basicos(self):
         res = []
