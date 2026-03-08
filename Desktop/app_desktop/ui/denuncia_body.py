@@ -146,7 +146,12 @@ class DenunciaBody(QWidget):
                 prod = ctrlProducto.get_producto(id)
                 ficha = ProductoCard(prod, parent=self)
                 ficha.card_clic.connect(self._click_producto_event)
-            layer_padre.addWidget(ficha)
+            contenedor = QWidget()
+            lay = QHBoxLayout(contenedor)
+            lay.addStretch()
+            lay.addWidget(ficha)
+            lay.addStretch()
+            layer_padre.addWidget(contenedor)
     
     def _click_usuario_event(self, user_id):
         print(f"DenunciaBody {self.id}: _click_usuario_event")

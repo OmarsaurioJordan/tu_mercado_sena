@@ -6,6 +6,7 @@ from controllers.ctrl_usuario import CtrlUsuario
 from controllers.ctrl_producto import CtrlProducto
 from controllers.ctrl_pqrs import CtrlPqrs
 from controllers.ctrl_denuncia import CtrlDenuncia
+from controllers.ctrl_mensaje import CtrlMensaje
 from services.notifi_worker import NotifiWorker
 from core.app_config import TIME_NOTIFI
 
@@ -21,6 +22,7 @@ class ControllersManager(QObject):
         self.productos = CtrlProducto()
         self.pqrss = CtrlPqrs()
         self.denuncias = CtrlDenuncia()
+        self.mensajes = CtrlMensaje()
 
         self.timer_notifi = QTimer()
         self.timer_notifi.timeout.connect(self.api_notificaciones)
@@ -55,9 +57,13 @@ class ControllersManager(QObject):
     def get_denuncias(self):
         return self.denuncias
 
+    def get_mensajes(self):
+        return self.mensajes
+
     def limpiar(self):
         print("ControllersManager: limpiar")
         self.usuarios.limpiar()
         self.productos.limpiar()
         self.pqrss.limpiar()
         self.denuncias.limpiar()
+        self.mensajes.limpiar()

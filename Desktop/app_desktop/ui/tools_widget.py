@@ -13,6 +13,8 @@ from ui.pqrs_body import PqrsBody
 from ui.pqrs_filter import PqrsFilter
 from ui.denuncia_body import DenunciaBody
 from ui.denuncia_filter import DenunciaFilter
+from ui.chat_body import ChatBody
+from ui.mensaje_filter import MensajeFilter
 
 class ToolsWidget(QWidget):
 
@@ -24,6 +26,7 @@ class ToolsWidget(QWidget):
         self.ctrlProducto = manager.get_productos()
         self.ctrlPqrs = manager.get_pqrss()
         self.ctrlDenuncia = manager.get_denuncias()
+        self.ctrlMensaje = manager.get_mensajes()
 
         manager.signal_tools_cambio.connect(self.select_tab)
 
@@ -34,7 +37,8 @@ class ToolsWidget(QWidget):
         tabsA.addTab(Scroll(pqrsBody), "PQRS")
         denunciaBody = DenunciaBody()
         tabsA.addTab(Scroll(denunciaBody), "Denuncia")
-        tabsA.addTab(Scroll(), "Chat")
+        chatBody = ChatBody()
+        tabsA.addTab(Scroll(chatBody), "Chat")
         tabsA.addTab(Scroll(), "Auditoría")
 
         tabsB = QTabWidget()
@@ -109,7 +113,18 @@ class ToolsWidget(QWidget):
             lambda den_id: self.buscarDenuncia(den_id, denunciaBody)
         )
         # estructura de la busqueda de chats
-        tabsFind.addTab(Buscador(), "Chats")
+        mensajeFilter = MensajeFilter()
+        mensajeBusqueda = ResultBusqueda("mensajes")
+        tabsFind.addTab(Buscador(mensajeFilter, mensajeBusqueda), "Chats")
+        mensajeFilter.clicAplicar.connect(
+            lambda filtros: self.buscarMensajes(filtros, mensajeBusqueda, chatBody)
+        )
+        mensajeBusqueda.scroll_at_end.connect(
+            lambda: self.rebuscarMensajes()
+        )
+        mensajeBusqueda.card_clic.connect(
+            lambda chat_id: self.buscarChat(chat_id, chatBody)
+        )
         # estructura de la busqueda de auditorias
         tabsFind.addTab(Buscador(), "Auditorías")
 
@@ -120,6 +135,7 @@ class ToolsWidget(QWidget):
         productoBody.cambioData.connect(productoBusqueda.set_sombrear)
         pqrsBody.cambioData.connect(pqrsBusqueda.set_sombrear)
         denunciaBody.cambioData.connect(denunciaBusqueda.set_sombrear)
+        chatBody.cambioData.connect(mensajeBusqueda.set_sombrear)
 
         # cuando cambia usuario
         usuarioBody.cambioData.connect(productoBody.set_is_seleccionado)
@@ -145,15 +161,19 @@ class ToolsWidget(QWidget):
         layFondoTres.setStretch(2, 3)
         self.setLayout(layFondoTres)
 
+    # herramientas de interfaz
+
     def select_tab(self, target=""):
         print(f"ToolsWidget: select_tab {target}")
-        for tabs in (self.tabs[0], self.tabs[1]):
+        for tabs in (self.tabs[0], self.tabs[1], self.tabs[2]):
             for idx in range(tabs.count()):
                 text = tabs.tabText(idx)
                 if text == target:
                     tabs.setCurrentIndex(idx)
                     return True
         return False
+
+    # usuarios
 
     def buscarUsuarios(self, filtros, widgetResultado, widgetReset):
         print("ToolsWidget: buscarUsuarios")
@@ -171,6 +191,8 @@ class ToolsWidget(QWidget):
         widgetResultado.setData(usuario)
         self.select_tab("Usuario")
     
+    # productos
+
     def buscarProductos(self, filtros, widgetResultado, widgetReset):
         print("ToolsWidget: buscarProductos")
         widgetResultado.eliminar_items()
@@ -187,6 +209,8 @@ class ToolsWidget(QWidget):
         widgetResultado.setData(producto)
         self.select_tab("Producto")
     
+    # PQRSs
+
     def buscarPqrss(self, filtros, widgetResultado, widgetReset):
         print("ToolsWidget: buscarPqrss")
         widgetResultado.eliminar_items()
@@ -204,6 +228,8 @@ class ToolsWidget(QWidget):
             self.ctrlUsuario.get_usuario(pqrs.usuario_id)
         widgetResultado.setData(pqrs)
         self.select_tab("PQRS")
+
+    # denuncias
 
     def buscarDenuncias(self, filtros, widgetResultado, widgetReset):
         print("ToolsWidget: buscarDenuncias")
@@ -225,3 +251,21 @@ class ToolsWidget(QWidget):
                 self.ctrlProducto.get_producto(denuncia.producto_id)
         widgetResultado.setData(denuncia)
         self.select_tab("Denuncia")
+    
+    # mensajes
+
+    def buscarMensajes(self, filtros, widgetResultado, widgetReset):
+        print("ToolsWidget: buscarMensajes")
+        widgetResultado.eliminar_items()
+        widgetReset.resetData()
+        self.ctrlMensaje.do_busqueda(filtros=filtros)
+    
+    def rebuscarMensajes(self):
+        print("ToolsWidget: rebuscarMensajes")
+        self.ctrlMensaje.do_busqueda(rebusqueda=True)
+
+    def buscarChat(self, chat_id, widgetResultado):
+        print(f"ToolsWidget {chat_id}: buscarChat")
+        chat = self.ctrlChat.get_chat(chat_id)
+        widgetResultado.setData(chat)
+        self.select_tab("Chat")

@@ -4,8 +4,6 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import QDate, Signal
 from components.txt_edit import TxtEdit
 from components.selector import Selector
-from components.checkbox import Checkbox
-from components.spinbox import SpinBox
 from components.date_edit import DateEdit
 from components.boton import Boton
 

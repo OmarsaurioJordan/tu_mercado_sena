@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
-from core.app_config import DOMINIO_EMAIL
+from core.app_config import (DOMINIO_EMAIL, MSJ_MAX, DB_NOTIFI_MSJ_MAX)
 from components.selector import Selector
 from components.boton import Boton
 from components.alerta import Alerta
@@ -96,6 +96,7 @@ class UsuarioBody(QWidget):
         self.mensaje = QTextEdit()
         self.mensaje.setAlignment(Qt.AlignJustify)
         self.mensaje.setPlaceholderText("escribe un texto que será enviado al email del usuario, se agregarán automáticamente un pie de página con información del administrador remitente y contexto a Tu Mercado Sena")
+        self.mensaje.textChanged.connect(self.limitar_mensaje)
         layMsj.addWidget(self.mensaje)
         layMsj.addSpacing(10)
         self.btnMensaje = Boton("Enviar Mensaje")
@@ -232,4 +233,16 @@ class UsuarioBody(QWidget):
             if resp == QMessageBox.Yes:
                 print("UsuarioBody: enviarMensaje")
                 self.mensaje.setText("")
+                if len(self.texto_msg) > DB_NOTIFI_MSJ_MAX:
+                    self.texto_msg = self.texto_msg[:DB_NOTIFI_MSJ_MAX]
                 ctrlUsuario.send_message(self.id, self.texto_msg, 10) # msj administrativo
+
+    def limitar_mensaje(self):
+        text = self.mensaje.toPlainText()
+        if len(text) > MSJ_MAX:
+            self.mensaje.blockSignals(True)
+            self.mensaje.setPlainText(text[:MSJ_MAX])
+            self.mensaje.blockSignals(False)
+            cursor = self.mensaje.textCursor()
+            cursor.movePosition(cursor.End)
+            self.mensaje.setTextCursor(cursor)
