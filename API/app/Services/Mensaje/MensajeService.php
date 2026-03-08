@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Notificacion;
-
+use App\Models\Papelera;
 
 class MensajeService implements IMensajeService
 {
@@ -174,6 +174,13 @@ class MensajeService implements IMensajeService
         }
 
         return DB::transaction(function () use ($mensaje) {
+
+            Papelera::create([
+                'usuario_id' => Auth::user()->usuario->id,
+                'mensaje' => $mensaje->mensaje ?? null,
+                'imagen' => $mensaje->imagen ?? null,
+            ]);
+
            $mensajeBorrado = $this->mensajeRepository->delete($mensaje->id);
 
             if (!$mensajeBorrado) {
