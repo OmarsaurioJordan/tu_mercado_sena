@@ -4,7 +4,7 @@ from services.load_image import ImageWorker
 from core.app_config import IMAGE_PROD_LINK
 
 class ProductoSignal(QObject):
-    ok_image = Signal(int)
+    ok_image = Signal(int) # id producto
 
 class Producto:
     

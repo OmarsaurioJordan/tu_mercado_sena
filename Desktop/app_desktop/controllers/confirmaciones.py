@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import (QApplication, QMessageBox)
 
 def confirma_ejecucion(tipo="", id=0, value=0):
     print(f"confirma_ejecucion: confirma_ejecucion-{tipo}")
@@ -23,8 +23,11 @@ def confirma_ejecucion(tipo="", id=0, value=0):
             ctrlProducto = manager.get_productos()
             return ctrlProducto.set_subcategoria(id, value)
         case "pqrs_estado":
-            ctrlPqrs = manager.get_pqrss()
-            return ctrlPqrs.set_estado(id, value)
+            manager = QApplication.instance().property("manager")
+            resp = QMessageBox.question(manager, "Confirmación", "¿Desea dar por cerrada la PQRS sin enviar respuesta al usuario? Se recomienda escribir y enviar algun mensaje")
+            if resp == QMessageBox.Yes:
+                ctrlPqrs = manager.get_pqrss()
+                return ctrlPqrs.set_estado(id, value)
         case "pqrs_motivo":
             ctrlPqrs = manager.get_pqrss()
             return ctrlPqrs.set_motivo(id, value)

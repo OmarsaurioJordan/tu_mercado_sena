@@ -5,7 +5,7 @@ from core.app_config import IMAGE_USER_LINK
 from services.image_utils import circular_pixmap
 
 class UsuarioSignal(QObject):
-    ok_image = Signal(int)
+    ok_image = Signal(int) # id usuario
 
 class Usuario:
     
@@ -54,7 +54,7 @@ class Usuario:
         QThreadPool.globalInstance().start(self.worker)
 
     def set_image(self, image):
-        if hasattr(image, 'isNull') and not image.isNull():
+        if not image.isNull():
             pix = QPixmap.fromImage(image)
         else:
             pix = QPixmap()

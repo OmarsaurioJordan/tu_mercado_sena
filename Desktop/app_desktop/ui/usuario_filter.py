@@ -10,7 +10,7 @@ from components.date_edit import DateEdit
 from components.boton import Boton
 
 class UsuarioFilter(QWidget):
-    clicAplicar = Signal(dict)
+    clicAplicar = Signal(dict) # filtros
 
     def __init__(self):
         super().__init__()

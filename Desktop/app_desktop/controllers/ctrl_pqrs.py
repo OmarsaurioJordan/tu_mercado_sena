@@ -7,7 +7,7 @@ from models.pqrs import Pqrs
 from core.session import Session
 
 class CtrlPqrsSignal(QObject):
-    hubo_cambio = Signal(int)
+    hubo_cambio = Signal(int) # id PQRS
 
 class CtrlPqrs:
 

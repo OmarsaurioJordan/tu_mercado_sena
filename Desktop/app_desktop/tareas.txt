@@ -1,14 +1,7 @@
 TAREAS:
 ...
-- fichas de body denuncias se alargan horizontalmente
-- cuando se envía mensaje desde el body de una pqrs debe adjuntarse una parte automática y resolverse la pqrs
-- enviar mensaje al usuario con cuadro de confirmación, quedé en: send_message Tarea
-- crear admin master si no existe en la DB al inicio, solo si debug
+- 
 ...
-- cargar pqrs y denuncias num total cada 5s
-- ver pqrs y denuncias al pulsar botones de notificación
-...
-- API colocar auditorias
 - módulo de auditorías: búsqueda + body
 ...
 - módulo de chats: búsqueda + body
@@ -31,3 +24,44 @@ PRUEBAS:
 - quitar imágen en TMS y ver si al refrescar en Desktop se quita
 - revisar todos los filtros, sospecha fallan los de productos
 ...
+
+     Chats-Historial
+x API
+x entidad
+entidad_card
+x entidad_body
+ctrl_entidad
+confirmaciones
+controllers_manager
+tools_widget
+
+     Auditoria
+x API
+x entidad
+entidad_card
+entidad_body
+entidad_filter
+result_busqueda
+ctrl_entidad
+controllers_manager
+tools_widget
+
+     Papelera
+x API
+x entidad
+entidad_card
+result_busqueda
+ctrl_entidad
+controllers_manager
+tools_widget
+
+     Logins
+x API
+x entidad
+entidad_card
+entidad_filter
+result_busqueda
+ctrl_entidad
+confirmaciones
+controllers_manager
+tools_widget

@@ -3,13 +3,14 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
-from core.app_config import DOMINIO_EMAIL
+from core.app_config import (DOMINIO_EMAIL, MSJ_MAX, DB_NOTIFI_MSJ_MAX)
 from components.selector import Selector
 from components.boton import Boton
 from components.alerta import Alerta
+from core.session import Session
 
 class UsuarioBody(QWidget):
-    cambioData = Signal(int)
+    cambioData = Signal(int) # id usuario
 
     def __init__(self):
         super().__init__()
@@ -94,7 +95,8 @@ class UsuarioBody(QWidget):
         layMsj = QVBoxLayout()
         self.mensaje = QTextEdit()
         self.mensaje.setAlignment(Qt.AlignJustify)
-        self.mensaje.setPlaceholderText("escribe un texto que será enviado al email del usuario, se agregarán automáticamente cabecera y pie de página con saludo e información del administrador remitente")
+        self.mensaje.setPlaceholderText("escribe un texto que será enviado al email del usuario, se agregarán automáticamente un pie de página con información del administrador remitente y contexto a Tu Mercado Sena")
+        self.mensaje.textChanged.connect(self.limitar_mensaje)
         layMsj.addWidget(self.mensaje)
         layMsj.addSpacing(10)
         self.btnMensaje = Boton("Enviar Mensaje")
@@ -219,9 +221,28 @@ class UsuarioBody(QWidget):
     def enviarMensaje(self):
         self.texto_msg = self.mensaje.toPlainText()
         if self.texto_msg != "":
+            ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+            ses = Session()
+            admindata = ses.get_login()
+            admin = ctrlUsuario.get_usuario(admindata["id"])
+            admin_info = "Usuario Administrador - email_administrativo" + DOMINIO_EMAIL
+            if admin is not None:
+                admin_info = admin.nickname + " - " + admin.email
+            self.texto_msg += "\n\n*** Tu Mercado Sena ***\n\nEste es un mensaje administrativo enviado por: " + admin_info
             resp = QMessageBox.question(self, "Confirmación", "¿Desea enviar el mensaje al usuario?")
             if resp == QMessageBox.Yes:
                 print("UsuarioBody: enviarMensaje")
                 self.mensaje.setText("")
-                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-                ctrlUsuario.send_message(self.id, self.texto_msg)
+                if len(self.texto_msg) > DB_NOTIFI_MSJ_MAX:
+                    self.texto_msg = self.texto_msg[:DB_NOTIFI_MSJ_MAX]
+                ctrlUsuario.send_message(self.id, self.texto_msg, 10) # msj administrativo
+
+    def limitar_mensaje(self):
+        text = self.mensaje.toPlainText()
+        if len(text) > MSJ_MAX:
+            self.mensaje.blockSignals(True)
+            self.mensaje.setPlainText(text[:MSJ_MAX])
+            self.mensaje.blockSignals(False)
+            cursor = self.mensaje.textCursor()
+            cursor.movePosition(cursor.End)
+            self.mensaje.setTextCursor(cursor)

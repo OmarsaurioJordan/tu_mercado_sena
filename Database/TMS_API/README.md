@@ -1,6 +1,6 @@
 # API para Tu Mercado Sena - Desktop
 
-autogenerado con IA
+Autogenerado con IA de Copilot...
 
 ## Descripción general
 
@@ -40,6 +40,7 @@ Más allá de estos, cada módulo define sus propios parámetros de consulta.
 | `informacion.php` | GET | Estadísticas generales de usuarios, productos y chats | ninguno | Objeto con varios contadores según estado |
 | `responder.php` | GET | Inserta una notificación para un usuario | **requeridos**: `id`, `mensaje`, `motivo_id`; además `admin_email`, `admin_token` | `{ "Ok": "1" }` o `{ "Ok": "0" }` |
 
+También está el endpoint `api/tools/master` sin argumentos, que crea un usuario administrador si no existe ninguno aún, usar esto con precaución para debug
 
 ### Usuarios (`api/usuarios`)
 

@@ -1,14 +1,18 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGroupBox, QTextEdit, QApplication, QMessageBox
 )
+from PySide6.QtGui import QTextCursor
 from PySide6.QtCore import Qt, Signal
+from core.app_config import (DOMINIO_EMAIL, MSJ_MAX, DB_NOTIFI_MSJ_MAX)
 from components.selector import Selector
 from components.usuario_card import UsuarioCard
 from components.boton import Boton
+from components.alerta import Alerta
+from core.session import Session
 
 class PqrsBody(QWidget):
-    cambioData = Signal(int)
-    card_clic = Signal(int)
+    cambioData = Signal(int) # id PQRS
+    card_clic = Signal(int) # id usuario
 
     def __init__(self):
         super().__init__()
@@ -60,12 +64,15 @@ class PqrsBody(QWidget):
         layMsj = QVBoxLayout()
         self.mensaje = QTextEdit()
         self.mensaje.setAlignment(Qt.AlignJustify)
-        self.mensaje.setPlaceholderText("escribe un texto que será enviado al email del usuario, se agregarán automáticamente cabecera y pie de página con saludo e información del administrador remitente")
+        self.mensaje.setPlaceholderText("escribe un texto que será enviado al email del usuario, se agregarán automáticamente un pie de página con información del administrador remitente y contexto a Tu Mercado Sena")
+        self.mensaje.textChanged.connect(self.limitar_mensaje)
         layMsj.addWidget(self.mensaje)
         layMsj.addSpacing(10)
         self.btnMensaje = Boton("Enviar Mensaje")
+        self.btnMensaje.clicked.connect(self.enviarMensaje)
         layMsj.addWidget(self.btnMensaje)
         groupMensaje.setLayout(layMsj)
+        self.texto_msg = ""
 
         layVertical = QVBoxLayout()
         layVertical.addSpacing(10)
@@ -150,7 +157,12 @@ class PqrsBody(QWidget):
             usr = ctrlUsuario.get_usuario(id)
             ficha = UsuarioCard(usr, parent=self)
             ficha.card_clic.connect(self._click_event)
-            self.portaFicha.addWidget(ficha)
+            contenedor = QWidget()
+            lay = QHBoxLayout(contenedor)
+            lay.addStretch()
+            lay.addWidget(ficha)
+            lay.addStretch()
+            self.portaFicha.addWidget(contenedor)
     
     def _click_event(self, user_id):
         print(f"PqrsBody {user_id}: _click_event")
@@ -168,3 +180,53 @@ class PqrsBody(QWidget):
             if seleccionado_id != self.usuario_id:
                 print(f"PqrsBody {self.id} - {seleccionado_id}: set_is_seleccionado")
                 self.resetData()
+
+    def enviarMensaje(self):
+        # verificar que hay texto que enviar
+        self.texto_msg = self.mensaje.toPlainText()
+        if self.texto_msg != "":
+            # verificar que la PQRS no ha sido puesta como resuelta
+            ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
+            pqrs = ctrlPqrs.api_pqrs(self.id)
+            if pqrs is None:
+                return
+            if pqrs.estado_id == 11:
+                Alerta("Alerta", "La PQRS está cerrada, ya fué atendida", 1)
+                return
+            # obtener informacion del administrador para ponerla en el mensaje
+            ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+            ses = Session()
+            admindata = ses.get_login()
+            admin = ctrlUsuario.get_usuario(admindata["id"])
+            if admin is None:
+                return
+            admin_info = "email_administrativo" + DOMINIO_EMAIL + " (Usuario Administrador)"
+            if admin is not None:
+                admin_info = admin.email + f" ({admin.nickname})"
+            self.texto_msg += f"\n\n*** Tu Mercado Sena ***\n\nRespuesta administrativa a su PQRS ({self.sel_motivo.get_text().lower()}) por: " + admin_info
+            # preguntar si desea enviar el mensaje
+            resp = QMessageBox.question(self, "Confirmación", "¿Desea enviar el mensaje al usuario dando cierre a la PQRS?")
+            if resp == QMessageBox.Yes:
+                print("PqrsBody: enviarMensaje")
+                # limpiar el campo de texto y verificar talla del mensaje para la DB
+                self.mensaje.setText("")
+                if len(self.texto_msg) > DB_NOTIFI_MSJ_MAX:
+                    self.texto_msg = self.texto_msg[:DB_NOTIFI_MSJ_MAX]
+                # enviar el mensaje por la API
+                ctrlUsuario.send_message(self.usuario_id, self.texto_msg, 7) # respuesta PQRS
+                # cambiar estado PQRS
+                ctrlPqrs.set_estado(self.id, 11) # resuelto
+
+    def limitar_mensaje(self):
+        if self.sel_estado.get_text().lower() == "resuelto" and self.mensaje.toPlainText() != "":
+            self.mensaje.setPlainText("")
+            Alerta("Alerta", "La PQRS está cerrada, ya fué atendida", 1)
+            return
+        text = self.mensaje.toPlainText()
+        if len(text) > MSJ_MAX:
+            self.mensaje.blockSignals(True)
+            self.mensaje.setPlainText(text[:MSJ_MAX])
+            self.mensaje.blockSignals(False)
+            cursor = self.mensaje.textCursor()
+            cursor.movePosition(QTextCursor.End)
+            self.mensaje.setTextCursor(cursor)

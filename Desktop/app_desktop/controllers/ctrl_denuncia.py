@@ -7,7 +7,7 @@ from models.denuncia import Denuncia
 from core.session import Session
 
 class CtrlDenunciaSignal(QObject):
-    hubo_cambio = Signal(int)
+    hubo_cambio = Signal(int) # id denuncia
 
 class CtrlDenuncia:
 

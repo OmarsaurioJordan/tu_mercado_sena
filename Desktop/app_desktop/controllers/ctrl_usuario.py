@@ -7,7 +7,7 @@ from models.usuario import Usuario
 from core.session import Session
 
 class CtrlUsuarioSignal(QObject):
-    hubo_cambio = Signal(int)
+    hubo_cambio = Signal(int) # id usuario
 
 class CtrlUsuario:
 
@@ -192,24 +192,19 @@ class CtrlUsuario:
     
     # envio de mensajes y notificaciones
 
-    def send_message(self, id=0, texto=""):
+    def send_message(self, id=0, mensaje="", motivo_id=0):
         print("CtrlUsuario: send_message-init")
-        # Tarea
-        """
         ses = Session()
         admindata = ses.get_login()
-        params = {"id": id, "texto": texto,
+        params = {"id": id, "mensaje": mensaje, "motivo_id": motivo_id,
             "admin_email": admindata["email"], "admin_token": admindata["token"]
         }
-        response = requests.get(API_BASE_URL + "usuarios/set_estado.php", params=params, timeout=TIME_OUT)
+        response = requests.get(API_BASE_URL + "tools/responder.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             print("CtrlUsuario: set_estado-ok")
             res = response.json()["Ok"] == "1"
-            if res:
-                self.api_usuario(id)
             return res
         return False
-        """
 
     # metodos de apoyo
 

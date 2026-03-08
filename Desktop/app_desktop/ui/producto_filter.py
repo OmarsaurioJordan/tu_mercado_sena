@@ -11,7 +11,7 @@ from components.boton import Boton
 from core.app_config import PRECIO_MAX
 
 class ProductoFilter(QWidget):
-    clicAplicar = Signal(dict)
+    clicAplicar = Signal(dict) # filtros
 
     def __init__(self):
         super().__init__()

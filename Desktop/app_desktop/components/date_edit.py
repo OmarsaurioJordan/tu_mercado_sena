@@ -14,7 +14,7 @@ class DateEdit(QWidget):
         if fecha_por_defecto:
             self.dateedit.setDate(fecha_por_defecto)
         else:
-            self.dateedit.setDate(QDate.currentDate())
+            self.dateedit.setDate(QDate.currentDate().addDays(1))
         layout = QHBoxLayout()
         layout.addWidget(label)
         layout.addWidget(self.dateedit)

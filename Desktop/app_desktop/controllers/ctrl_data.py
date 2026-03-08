@@ -131,7 +131,7 @@ class CtrlData:
     def api_data(self, tabla=""):
         print(f"CtrlData: api_data-{tabla}-init")
         params = {"tabla": tabla}
-        response = requests.get(API_BASE_URL + "get_data.php", params=params, timeout=TIME_OUT)
+        response = requests.get(API_BASE_URL + "tools/get_data.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             print(f"CtrlData: api_data-{tabla}-ok")
             data = response.json()

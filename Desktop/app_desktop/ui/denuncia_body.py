@@ -7,9 +7,9 @@ from components.usuario_card import UsuarioCard
 from components.producto_card import ProductoCard
 
 class DenunciaBody(QWidget):
-    cambioData = Signal(int)
-    card_usuario_clic = Signal(int)
-    card_producto_clic = Signal(int)
+    cambioData = Signal(int) # id denuncia
+    card_usuario_clic = Signal(int) # id usuario
+    card_producto_clic = Signal(int) # id producto
 
     def __init__(self):
         super().__init__()
@@ -146,7 +146,12 @@ class DenunciaBody(QWidget):
                 prod = ctrlProducto.get_producto(id)
                 ficha = ProductoCard(prod, parent=self)
                 ficha.card_clic.connect(self._click_producto_event)
-            layer_padre.addWidget(ficha)
+            contenedor = QWidget()
+            lay = QHBoxLayout(contenedor)
+            lay.addStretch()
+            lay.addWidget(ficha)
+            lay.addStretch()
+            layer_padre.addWidget(contenedor)
     
     def _click_usuario_event(self, user_id):
         print(f"DenunciaBody {self.id}: _click_usuario_event")

@@ -1,11 +1,11 @@
 from PySide6.QtWidgets import (
-    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
+    QFrame, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 
 class ProductoCard(QFrame):
-    card_clic = Signal(int)
+    card_clic = Signal(int) # id producto
 
     def __init__(self, producto, parent=None):
         super().__init__(parent)
@@ -18,6 +18,7 @@ class ProductoCard(QFrame):
         self.setFrameShape(QFrame.Shape.StyledPanel)
         self.setFrameShadow(QFrame.Shadow.Raised)
         self.setMaximumWidth(500)
+        self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
 
         self.imagen = QLabel(self)
         self.imagen.setScaledContents(True)

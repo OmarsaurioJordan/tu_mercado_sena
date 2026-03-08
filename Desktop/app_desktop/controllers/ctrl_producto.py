@@ -7,7 +7,7 @@ from models.producto import Producto
 from core.session import Session
 
 class CtrlProductoSignal(QObject):
-    hubo_cambio = Signal(int)
+    hubo_cambio = Signal(int) # id producto
 
 class CtrlProducto:
 

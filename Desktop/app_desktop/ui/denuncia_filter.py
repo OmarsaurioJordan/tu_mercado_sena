@@ -4,18 +4,18 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import QDate, Signal
 from components.txt_edit import TxtEdit
 from components.selector import Selector
-from components.checkbox import Checkbox
-from components.spinbox import SpinBox
 from components.date_edit import DateEdit
 from components.boton import Boton
 
 class DenunciaFilter(QWidget):
-    clicAplicar = Signal(dict)
+    clicAplicar = Signal(dict) # filtros
 
     def __init__(self):
         super().__init__()
 
-        ctrlData = QApplication.instance().property("controls").get_data()
+        ctrl = QApplication.instance().property("controls")
+        ctrlData = ctrl.get_data()
+        ctrl.signal_filter_notifi.connect(self.emitir_notifi)
 
         layVertical = QVBoxLayout()
         layVertical.setSpacing(10)
@@ -65,3 +65,9 @@ class DenunciaFilter(QWidget):
             "registro_hasta": self.date_registro_max.get_value_utc()
         }
         return filtros
+    
+    def emitir_notifi(self, is_pqrs=False):
+        if not is_pqrs:
+            print("DenunciaFilter: emitir_notifi")
+            filtros = { "estado_id": 1 }
+            self.clicAplicar.emit(filtros)

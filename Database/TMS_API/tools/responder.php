@@ -20,7 +20,7 @@ $stmt->bind_param("iis", $id, $motivo_id, $mensaje);
 $stmt->execute();
 if ($stmt->errno === 0) {
 
-    auditar(4, "enviar mail $id -> $estado");
+    auditar(4, "enviar mail $id");
 
     echo json_encode(["Ok" => "1"]);
     exit;
