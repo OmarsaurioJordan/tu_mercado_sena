@@ -65,7 +65,7 @@ class MensajeService implements IMensajeService
                 $data['imagen'] = $ruta;
             }
 
-            
+            // Crear el mensaje utilizando el repositorio
             $mensaje = $this->mensajeRepository->create($data);
 
             // Validar que el mensaje se haya creado correctamente
@@ -78,7 +78,7 @@ class MensajeService implements IMensajeService
 
             Log::info("¿Es primer mensaje?: " . ($this->mensajeRepository->esPrimerMensaje($chat) ? 'SI' : 'NO'));
             
-            // Crear el mensaje utilizando el repositorio
+           
 
 
             // Si el mensaje es el primero del chat, crear una notificación para el vendedor
