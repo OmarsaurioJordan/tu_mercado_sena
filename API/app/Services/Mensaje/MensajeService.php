@@ -175,24 +175,11 @@ class MensajeService implements IMensajeService
 
         return DB::transaction(function () use ($mensaje) {
 
-            // Mover la imagen del mensaje a la papelera si existe
-            // Para tener regitro del mensaje eliminado y su imagen en la papelera.
-            $rutaPapelera = null;
-
-            if ($mensaje->imagen) {
-                $rutaPapelera = "papelera/chats/{$mensaje->chat_id}/" . basename($mensaje->imagen);
-
-                // Mover la imagen a la papelera
-                if (Storage::disk('public')->exists($mensaje->imagen)) {
-                    Storage::disk('public')->move($mensaje->imagen, $rutaPapelera);
-                }
-            }
-
             // Crear el registro en la papelera para el mensaje eliminado
             Papelera::create([
                 'usuario_id' => Auth::user()->usuario->id,
                 'mensaje' => $mensaje->mensaje ?? null,
-                'imagen' => $rutaPapelera ?? null,
+                'imagen' => null,
             ]);
 
            // Eliminar el mensaje utilizando el repositorio
