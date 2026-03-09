@@ -175,10 +175,21 @@ class MensajeService implements IMensajeService
 
         return DB::transaction(function () use ($mensaje) {
 
+            $rutaPapelera = null;
+
+            if ($mensaje->imagen) {
+                $rutaPapelera = "papelera/chats/{$mensaje->chat_id}/" . basename($mensaje->imagen);
+
+                // Mover la imagen a la papelera
+                if (Storage::disk('public')->exists($mensaje->imagen)) {
+                    Storage::disk('public')->move($mensaje->imagen, $rutaPapelera);
+                }
+            }
+
             Papelera::create([
                 'usuario_id' => Auth::user()->usuario->id,
                 'mensaje' => $mensaje->mensaje ?? null,
-                'imagen' => $mensaje->imagen ?? null,
+                'imagen' => $rutaPapelera ?? null,
             ]);
 
            $mensajeBorrado = $this->mensajeRepository->delete($mensaje->id);
