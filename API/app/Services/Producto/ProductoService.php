@@ -353,6 +353,7 @@ class ProductoService implements IProductoService
                 'imagen' => $nombreArchivo,
             ]);
 
+            // Guardar en la papelera para tener registro de las imágenes eliminadas
             Papelera::create([
                 "usuario_id" => Auth::user()->usuario->id,
                 "mensaje" => "Producto ID: {$productoId}",
