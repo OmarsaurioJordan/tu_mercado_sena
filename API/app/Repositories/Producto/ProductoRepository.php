@@ -95,8 +95,11 @@ class ProductoRepository implements IProductoRepository
         }
 
         // Excluir mis propios productos en el listado general si no se filtra por vendedor
-        if (Auth::check() && !isset($filtros['vendedor_id'])) {
-            $query->where('vendedor_id', '<>', Auth::id());
+        // if (Auth::check() && !isset($filtros['vendedor_id'])) {
+        //     $query->where('vendedor_id', '<>', Auth::id());
+        // }
+        if (Auth::check() && !isset($filtros["vendedor_id"]) && Auth::user()->usuario){
+            $query->where("vendedor_id", "<>", Auth::user()->usuario->id);
         }
 
         // Ordenamiento
@@ -115,8 +118,16 @@ class ProductoRepository implements IProductoRepository
         $query = Producto::porVendedor($vendedorId);
 
         // Si el usuario autenticado no es el vendedor, aplicar filtro de bloqueados
-        if (Auth::check() && Auth::id() !== $vendedorId) {
-            $query = $this->aplicarFiltroBloqueados($query);
+        // if (Auth::check() && Auth::id() !== $vendedorId) {
+        //     $query = $this->aplicarFiltroBloqueados($query);
+        // }
+
+        if (Auth::check() && Auth::user()->usuario->id !== $vendedorId){
+            $usuarioId = Auth::check() && Auth::user()->usuario ? Auth::user()->usuario->id : null;
+
+            if ($usuarioId !== null && $usuarioId !== $vendedorId) {
+                $query = $this->aplicarFiltroBloqueados($query);
+            }
         }
 
         if (!empty($relaciones)) {
@@ -181,8 +192,8 @@ class ProductoRepository implements IProductoRepository
         }
 
         // Excluir mis propios productos en la búsqueda general
-        if (Auth::check()) {
-            $query->where('vendedor_id', '<>', Auth::id());
+        if (Auth::check() && Auth::user()->usuario) {
+            $query->where('vendedor_id', '<>', Auth::user()->usuario->id);
         }
 
         return $query->orderBy('fecha_registro', 'desc')->paginate($perPage);
@@ -195,7 +206,7 @@ class ProductoRepository implements IProductoRepository
      */
     protected function aplicarFiltroBloqueados($query)
     {
-        $usuarioId = Auth::id();
+        $usuarioId = Auth::user()->usuario->id;
 
         return $query->whereNotIn('vendedor_id', function ($subQuery) use ($usuarioId) {
             $subQuery->select('bloqueado_id')
