@@ -122,7 +122,7 @@ class MensajeService implements IMensajeService
 
                     DB::table('papelera')->insert([
                         'usuario_id' => $compradorId,
-                        'mensaje' => $data['mensaje'] ?? null,
+                        'mensaje' => "Mensaje: " . $data['mensaje'] ?? null,
                         'imagen' => $rutaPapelera,
                         'fecha_registro' => Carbon::now()
                     ]);
@@ -178,7 +178,7 @@ class MensajeService implements IMensajeService
             // Crear el registro en la papelera para el mensaje eliminado
             Papelera::create([
                 'usuario_id' => Auth::user()->usuario->id,
-                'mensaje' => $mensaje->mensaje ?? null,
+                'mensaje' => "Mensaje: " . $mensaje->mensaje ?? null,
                 'imagen' => null,
             ]);
 
