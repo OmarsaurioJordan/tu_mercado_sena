@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import (
-    QWidget, QTabWidget, QHBoxLayout, QLabel, QApplication
+    QWidget, QTabWidget, QHBoxLayout, QApplication
 )
-from PySide6.QtCore import Qt
 from components.scroll import Scroll
 from components.buscador import Buscador
 from ui.result_busqueda import ResultBusqueda
@@ -27,6 +26,7 @@ class ToolsWidget(QWidget):
         self.ctrlPqrs = manager.get_pqrss()
         self.ctrlDenuncia = manager.get_denuncias()
         self.ctrlMensaje = manager.get_mensajes()
+        self.ctrlChat = manager.get_chats()
 
         manager.signal_tools_cambio.connect(self.select_tab)
 
@@ -39,7 +39,6 @@ class ToolsWidget(QWidget):
         tabsA.addTab(Scroll(denunciaBody), "Denuncia")
         chatBody = ChatBody()
         tabsA.addTab(Scroll(chatBody), "Chat")
-        tabsA.addTab(Scroll(), "Auditoría")
 
         tabsB = QTabWidget()
         usuarioBody = UsuarioBody()
@@ -48,15 +47,24 @@ class ToolsWidget(QWidget):
         tabsB.addTab(Scroll(), "Papelera")
         tabsB.addTab(Scroll(), "Historial")
 
-        # conectar otras fichas
+        # conectar fichas internas de bodys
         denunciaBody.card_usuario_clic.connect(
             lambda user_id: self.buscarUsuario(user_id, usuarioBody)
         )
         denunciaBody.card_producto_clic.connect(
             lambda prod_id: self.buscarProducto(prod_id, productoBody)
         )
+        denunciaBody.card_chat_clic.connect(
+            lambda chat_id: self.buscarChat(chat_id, chatBody)
+        )
         pqrsBody.card_clic.connect(
             lambda user_id: self.buscarUsuario(user_id, usuarioBody)
+        )
+        chatBody.card_usuario_clic.connect(
+            lambda user_id: self.buscarUsuario(user_id, usuarioBody)
+        )
+        chatBody.card_producto_clic.connect(
+            lambda prod_id: self.buscarProducto(prod_id, productoBody)
         )
 
         tabsFind = QTabWidget()
@@ -125,8 +133,6 @@ class ToolsWidget(QWidget):
         mensajeBusqueda.card_clic.connect(
             lambda chat_id: self.buscarChat(chat_id, chatBody)
         )
-        # estructura de la busqueda de auditorias
-        tabsFind.addTab(Buscador(), "Auditorías")
 
         self.tabs = [tabsA, tabsB, tabsFind]
 
@@ -141,13 +147,17 @@ class ToolsWidget(QWidget):
         usuarioBody.cambioData.connect(productoBody.set_is_seleccionado)
         usuarioBody.cambioData.connect(pqrsBody.set_is_seleccionado)
         usuarioBody.cambioData.connect(denunciaBody.set_is_seleccionado)
+        usuarioBody.cambioData.connect(chatBody.set_is_seleccionado)
         # cuando cambia producto
         productoBody.cambioData.connect(usuarioBody.set_from_producto)
         productoBody.cambioData.connect(denunciaBody.set_is_producto)
+        productoBody.cambioData.connect(chatBody.set_is_producto)
         # cuando cambia PQRS
         pqrsBody.cambioData.connect(usuarioBody.set_from_pqrs)
         # cuando cambia denuncia
         denunciaBody.cambioData.connect(usuarioBody.set_from_denuncia)
+        # cuando cambia chat
+        chatBody.cambioData.connect(usuarioBody.set_from_chat)
 
         # colocar todo en layout principal
         layFondoTres = QHBoxLayout()

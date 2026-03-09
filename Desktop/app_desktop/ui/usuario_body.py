@@ -87,7 +87,7 @@ class UsuarioBody(QWidget):
         layRecup.addWidget(self.email_recup)
         layRecup.addSpacing(10)
         self.btnRecup = Boton("Recuperar clave")
-        self.btnRecup.clicked.connect(lambda: Alerta("Información", "Esta funcionalidad aún no está disponible", 2))
+        self.btnRecup.clicked.connect(self.enviaRecuperacion)
         layRecup.addWidget(self.btnRecup)
         groupRecuperacion.setLayout(layRecup)
 
@@ -136,6 +136,10 @@ class UsuarioBody(QWidget):
         )
         return label
 
+    def enviaRecuperacion(self):
+        self.email_recup.setText("")
+        Alerta("Información", "Esta funcionalidad aún no está disponible", 2)
+
     def resetData(self):
         print(f"UsuarioBody {self.id}: resetData")
         self.id = 0
@@ -179,6 +183,8 @@ class UsuarioBody(QWidget):
         self.sel_rol.set_ente_id(usuario.id)
         self.sel_estado.set_ente_id(usuario.id)
         self.imagen.setPixmap(usuario.img_pix)
+        self.mensaje.setText("")
+        self.email_recup.setText("")
         self.cambioData.emit(usuario.id)
 
     def actualizar(self, id=0):
@@ -194,9 +200,10 @@ class UsuarioBody(QWidget):
             ctrlProducto = QApplication.instance().property("controls").get_productos()
             producto = ctrlProducto.get_producto(producto_id)
             if producto is not None:
-                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-                usuario = ctrlUsuario.get_usuario(producto.vendedor_id)
-                self.setData(usuario)
+                if self.id != producto.vendedor_id:
+                    ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                    usuario = ctrlUsuario.get_usuario(producto.vendedor_id)
+                    self.setData(usuario)
     
     def set_from_pqrs(self, pqrs_id=0):
         if pqrs_id != 0:
@@ -204,9 +211,10 @@ class UsuarioBody(QWidget):
             ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
             pqrs = ctrlPqrs.get_pqrs(pqrs_id)
             if pqrs is not None:
-                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-                usuario = ctrlUsuario.get_usuario(pqrs.usuario_id)
-                self.setData(usuario)
+                if self.id != pqrs.usuario_id:
+                    ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                    usuario = ctrlUsuario.get_usuario(pqrs.usuario_id)
+                    self.setData(usuario)
     
     def set_from_denuncia(self, denu_id=0):
         if denu_id != 0:
@@ -214,13 +222,25 @@ class UsuarioBody(QWidget):
             ctrlPqrs = QApplication.instance().property("controls").get_denuncias()
             denuncia = ctrlPqrs.get_denuncia(denu_id)
             if denuncia is not None:
-                ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
-                usuario = ctrlUsuario.get_usuario(denuncia.denunciante_id)
-                self.setData(usuario)
+                if self.id != denuncia.denunciante_id and self.id != denuncia.usuario_id:
+                    ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                    usuario = ctrlUsuario.get_usuario(denuncia.denunciante_id)
+                    self.setData(usuario)
+    
+    def set_from_chat(self, chat_id=0):
+        if chat_id != 0:
+            print(f"UsuarioBody {self.id} - {chat_id}: set_from_chat")
+            ctrlChat = QApplication.instance().property("controls").get_chats()
+            chat = ctrlChat.get_chat(chat_id)
+            if chat is not None:
+                if self.id != chat.comprador_id and self.id != chat.vendedor_id:
+                    ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
+                    usuario = ctrlUsuario.get_usuario(chat.comprador_id)
+                    self.setData(usuario)
 
     def enviarMensaje(self):
         self.texto_msg = self.mensaje.toPlainText()
-        if self.texto_msg != "":
+        if self.texto_msg != "" and self.id != 0:
             ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
             ses = Session()
             admindata = ses.get_login()

@@ -54,9 +54,13 @@ function auditar($suceso_id, $descripcion) {
         }
         $admin_email = $_GET["admin_email"];
 
-        $sql = "INSERT INTO auditorias (administrador_id, suceso_id, descripcion, fecha_registro) SELECT id, '$suceso_id', '$descripcion', NOW() FROM usuarios LEFt JOIN cuentas ON cuentas.id = usuarios.cuenta_id WHERE cuentas.email = $admin_email";
-
+        $sql = "INSERT INTO auditorias (administrador_id, suceso_id, descripcion, fecha_registro)
+            SELECT usuarios.id, ?, ?, NOW()
+            FROM usuarios
+            JOIN cuentas ON cuentas.id = usuarios.cuenta_id
+            WHERE cuentas.email = ?";
         $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $suceso_id, $descripcion, $admin_email);
         $stmt->execute();
     }
 }

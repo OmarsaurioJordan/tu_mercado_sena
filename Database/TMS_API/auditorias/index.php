@@ -61,7 +61,7 @@ if ($cursor_id != "") {
 }
 array_unshift($vars, $cursor_fecha);
 
-$sql = "SELECT a.id AS id, a.administrador_id AS administrador_id, a.descripcion AS descripcion, a.suceso_id AS suceso_id, a.fecha_registro AS fecha_registro, u.nickname AS nickname, c.email AS email, DATEDIFF(NOW(), a.fecha_registro) AS dias
+$sql = "SELECT a.id AS id, a.administrador_id AS administrador_id, a.descripcion AS descripcion, a.suceso_id AS suceso_id, a.fecha_registro AS fecha_registro, u.nickname AS nickname, c.email AS email, DATEDIFF(NOW(), a.fecha_registro) AS dias, u.rol_id AS rol_id
     FROM auditorias a
     LEFT JOIN usuarios u ON a.administrador_id = u.id
     LEFT JOIN cuentas c ON u.cuenta_id = c.id

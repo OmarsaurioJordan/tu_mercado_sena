@@ -2,16 +2,11 @@ TAREAS:
 ...
 - 
 ...
-- módulo de auditorías: búsqueda + body
-...
-- módulo de chats: búsqueda + body
-...
 - ver catálogo de productos de usuario
 - ver papelera del usuario
-- ver historial del usuario
+- ver historial del usuario, card de tipo chat
 ...
 - cargar datos de análisis para gráficas
-- ver logins de administradores
 ...
 - hacer que se bloquee con pin y temporizador
 - config. cambiar pin
@@ -25,43 +20,11 @@ PRUEBAS:
 - revisar todos los filtros, sospecha fallan los de productos
 ...
 
-     Chats-Historial
-x API
-x entidad
-entidad_card
-x entidad_body
-ctrl_entidad
-confirmaciones
-controllers_manager
-tools_widget
-
-     Auditoria
-x API
-x entidad
-entidad_card
-entidad_body
-entidad_filter
-result_busqueda
-ctrl_entidad
-controllers_manager
-tools_widget
-
      Papelera
 x API
 x entidad
 entidad_card
 result_busqueda
 ctrl_entidad
-controllers_manager
-tools_widget
-
-     Logins
-x API
-x entidad
-entidad_card
-entidad_filter
-result_busqueda
-ctrl_entidad
-confirmaciones
 controllers_manager
 tools_widget

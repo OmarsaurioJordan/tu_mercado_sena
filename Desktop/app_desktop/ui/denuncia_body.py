@@ -5,11 +5,13 @@ from PySide6.QtCore import Qt, Signal
 from components.selector import Selector
 from components.usuario_card import UsuarioCard
 from components.producto_card import ProductoCard
+from components.boton import Boton
 
 class DenunciaBody(QWidget):
     cambioData = Signal(int) # id denuncia
     card_usuario_clic = Signal(int) # id usuario
     card_producto_clic = Signal(int) # id producto
+    card_chat_clic = Signal(int) # id chat
 
     def __init__(self):
         super().__init__()
@@ -56,6 +58,13 @@ class DenunciaBody(QWidget):
 
         self.registro = self.labelFechas("Registro")
 
+        self.botonChat = Boton("Chat Denunciado")
+        self.botonChat.clicked.connect(self.goToChat)
+        botonLayout = QHBoxLayout()
+        botonLayout.addStretch()
+        botonLayout.addWidget(self.botonChat)
+        botonLayout.addStretch()
+
         layVertical = QVBoxLayout()
         layVertical.addSpacing(10)
         layVertical.addLayout(self.portaFicha)
@@ -67,6 +76,8 @@ class DenunciaBody(QWidget):
         layVertical.addLayout(laySelectores)
         layVertical.addSpacing(20)
         layVertical.addLayout(self.portaFichas)
+        layVertical.addSpacing(5)
+        layVertical.addLayout(botonLayout)
         layVertical.addSpacing(20)
         layVertical.addWidget(self.registro)
         layVertical.addStretch()
@@ -106,6 +117,7 @@ class DenunciaBody(QWidget):
         self.sel_motivo.set_ente_id(0)
         self.sel_estado.set_ente_id(0)
         self.limpiarFichas()
+        self.botonChat.setEnabled(False)
         self.cambioData.emit(0)
 
     def setData(self, denuncia):
@@ -131,7 +143,7 @@ class DenunciaBody(QWidget):
         self.newFicha(denuncia.denunciante_id, True, self.portaFicha)
         self.newFicha(denuncia.usuario_id, True, self.portaFichas)
         self.newFicha(denuncia.producto_id, False, self.portaFichas)
-        # Tarea falta chat
+        self.botonChat.setEnabled(denuncia.chat_id != 0)
 
     def newFicha(self, id=0, is_usuario=True, layer_padre=None):
         if id != 0:
@@ -160,6 +172,10 @@ class DenunciaBody(QWidget):
     def _click_producto_event(self, prod_id):
         print(f"DenunciaBody {self.id}: _click_producto_event")
         self.card_producto_clic.emit(prod_id)
+    
+    def goToChat(self):
+        print(f"DenunciaBody {self.id}: goToChat")
+        self.card_chat_clic.emit(self.chat_id)
 
     def actualizar(self, id=0):
         if self.id == 0 or id != self.id:

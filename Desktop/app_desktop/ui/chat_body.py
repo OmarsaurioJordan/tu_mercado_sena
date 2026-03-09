@@ -1,10 +1,11 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QFrame
 )
 from PySide6.QtCore import Qt, Signal
 from components.selector import Selector
 from components.usuario_card import UsuarioCard
 from components.producto_card import ProductoCard
+from ui.result_busqueda import ResultBusqueda
 from core.app_config import CALIFICACION_MAX
 
 class ChatBody(QWidget):
@@ -19,6 +20,9 @@ class ChatBody(QWidget):
         self.producto_id = 0
         self.vendedor_id = 0
 
+        manager = QApplication.instance().property("controls")
+        self.ctrlDialogo = manager.get_dialogo()
+
         ctrlChat = QApplication.instance().property("controls").get_chats()
         ctrlChat.chat_signal.hubo_cambio.connect(self.actualizar)
 
@@ -30,9 +34,11 @@ class ChatBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
         compradorLayout = QHBoxLayout()
+        compradorLayout.addStretch()
         compradorLayout.addLayout(self.portaFicha)
         compradorLayout.addStretch()
         compradorLayout.addWidget(self.calificacion)
+        compradorLayout.addStretch()
 
         self.sel_estado = Selector(ctrlData.get_estados_chats(),
             "estado...", "Estado", 0, "chat_estado")
@@ -55,22 +61,45 @@ class ChatBody(QWidget):
 
         self.portaFichas = QVBoxLayout()
         vendedorLayout = QHBoxLayout()
+        vendedorLayout.addStretch()
         vendedorLayout.addLayout(datosLayout)
         vendedorLayout.addStretch()
-        vendedorLayout.addWidget(self.portaFichas)
+        vendedorLayout.addLayout(self.portaFichas)
+        vendedorLayout.addStretch()
         
-        self.portaChat = QVBoxLayout()
+        self.portaChat = ResultBusqueda("dialogo")
+        self.portaChat.scroll_at_end.connect(self.rebuscarMensajes)
+
+        linea1 = QFrame()
+        linea1.setFrameShape(QFrame.Shape.HLine)
+        linea1.setFrameShadow(QFrame.Shadow.Sunken)
+        linea2 = QFrame()
+        linea2.setFrameShape(QFrame.Shape.HLine)
+        linea2.setFrameShadow(QFrame.Shadow.Sunken)
 
         layVertical = QVBoxLayout()
         layVertical.addSpacing(10)
         layVertical.addLayout(compradorLayout)
-        layVertical.addSpacing(10)
-        layVertical.addWidget(vendedorLayout)
-        layVertical.addSpacing(10)
-        layVertical.addLayout(self.portaChat)
-        layVertical.addStretch()
+        layVertical.addSpacing(5)
+        layVertical.addWidget(linea1)
+        layVertical.addSpacing(5)
+        layVertical.addLayout(vendedorLayout)
+        layVertical.addSpacing(5)
+        layVertical.addWidget(linea2)
+        layVertical.addSpacing(5)
+        layVertical.addWidget(self.portaChat)
+        layVertical.addSpacing(5)
         self.setLayout(layVertical)
         self.resetData()
+    
+    def buscarMensajes(self):
+        print("ChatBody: buscarMensajes")
+        filtros = { "chat_id": self.id }
+        self.ctrlDialogo.do_busqueda(filtros=filtros)
+
+    def rebuscarMensajes(self):
+        print("ChatBody: rebuscarMensajes")
+        self.ctrlDialogo.do_busqueda(rebusqueda=True)
     
     def limpiarFichas(self):
         print(f"ChatBody {self.id}: limpiarFichas")
@@ -81,9 +110,6 @@ class ChatBody(QWidget):
                 if widget is not None:
                     widget.deleteLater()
         self.update()
-
-    def limpiarMensajes(self):
-        pass
 
     def setCalificacion(self, numero=0):
         # coloca 🌑🌕 hasta alcanzar limite CALIFICACION_MAX
@@ -102,7 +128,8 @@ class ChatBody(QWidget):
         self.sel_estado.set_index(0)
         self.sel_estado.set_ente_id(0)
         self.limpiarFichas()
-        self.limpiarMensajes()
+        self.ctrlDialogo.limpiar()
+        self.portaChat.eliminar_items()
         self.cambioData.emit(0)
 
     def setData(self, chat):
@@ -124,6 +151,9 @@ class ChatBody(QWidget):
         self.newFicha(chat.comprador_id, True, self.portaFicha)
         self.newFicha(chat.vendedor_id, True, self.portaFichas)
         self.newFicha(chat.producto_id, False, self.portaFichas)
+        self.ctrlDialogo.limpiar()
+        self.portaChat.eliminar_items()
+        self.buscarMensajes()
 
     def newFicha(self, id=0, is_usuario=True, layer_padre=None):
         if id != 0:

@@ -8,5 +8,5 @@ class ConfigWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        header = HeaderLayout()
+        header = HeaderLayout() # Tarea
         self.setLayout(header)

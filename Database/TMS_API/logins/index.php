@@ -55,7 +55,7 @@ if ($cursor_id != "") {
 }
 array_unshift($vars, $cursor_fecha);
 
-$sql = "SELECT li.id AS id, li.usuario_id AS usuario_id, li.ip_direccion AS ip_direccion, li.informacion AS informacion, li.fecha_registro AS fecha_registro, u.nickname AS nickname, c.email AS email, DATEDIFF(NOW(), li.fecha_registro) AS dias
+$sql = "SELECT li.id AS id, li.usuario_id AS usuario_id, li.ip_direccion AS ip_direccion, li.informacion AS informacion, li.fecha_registro AS fecha_registro, u.nickname AS nickname, c.email AS email, DATEDIFF(NOW(), li.fecha_registro) AS dias, u.rol_id AS rol_id
     FROM login_ip li
     LEFT JOIN usuarios u ON li.usuario_id = u.id
     LEFT JOIN cuentas c ON u.cuenta_id = c.id

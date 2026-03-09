@@ -1,5 +1,5 @@
 class Auditoria:
-    def __init__(self, id, administrador_id, suceso_id, descripcion, fecha_registro, nickname, email, dias):
+    def __init__(self, id, administrador_id, suceso_id, descripcion, fecha_registro, nickname, email, dias, rol_id):
         self.id = id
         self.administrador_id = administrador_id
         self.suceso_id = suceso_id
@@ -8,6 +8,7 @@ class Auditoria:
         self.nickname = nickname
         self.email = email
         self.dias = dias
+        self.rol_id = rol_id
 
     @staticmethod
     def from_json(data):
@@ -18,6 +19,7 @@ class Auditoria:
             descripcion = data.get('descripcion'),
             fecha_registro = data.get('fecha_registro'),
             nickname = data.get('nickname'),
-            email = data.get('nemailickname'),
-            dias = int(data.get('dias'))
+            email = data.get('email'),
+            dias = int(data.get('dias')),
+            rol_id = int(data.get('rol_id'))
         )

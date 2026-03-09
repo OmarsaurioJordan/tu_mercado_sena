@@ -147,6 +147,7 @@ class PqrsBody(QWidget):
         self.sel_motivo.set_ente_id(pqrs.id)
         self.sel_estado.set_ente_id(pqrs.id)
         self.sel_estado.set_disabled(pqrs.estado_id != 1)
+        self.mensaje.setText("")
         self.limpiarFicha()
         self.newFicha(pqrs.usuario_id)
 
@@ -184,7 +185,7 @@ class PqrsBody(QWidget):
     def enviarMensaje(self):
         # verificar que hay texto que enviar
         self.texto_msg = self.mensaje.toPlainText()
-        if self.texto_msg != "":
+        if self.texto_msg != "" and self.id != 0:
             # verificar que la PQRS no ha sido puesta como resuelta
             ctrlPqrs = QApplication.instance().property("controls").get_pqrss()
             pqrs = ctrlPqrs.api_pqrs(self.id)

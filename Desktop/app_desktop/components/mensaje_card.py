@@ -7,16 +7,19 @@ from PySide6.QtGui import QPixmap
 class MensajeCard(QFrame):
     card_clic = Signal(int) # id mensaje
 
-    def __init__(self, mensaje, parent=None, is_clic=True):
+    def __init__(self, mensaje, parent=None, is_dialogo=False):
         super().__init__(parent)
         self.id = mensaje.id
         self.chat_id = mensaje.chat_id
         self.miItem = None
+        self.is_dialogo = is_dialogo
         self.es_comprador = mensaje.es_comprador != 0
         self.con_imagen = mensaje.mensaje == "" and mensaje.imagen != ""
-        self.is_clic = is_clic
 
-        ctrlMensaje = QApplication.instance().property("controls").get_mensajes()
+        if self.is_dialogo:
+            ctrlMensaje = QApplication.instance().property("controls").get_dialogo()
+        else:
+            ctrlMensaje = QApplication.instance().property("controls").get_mensajes()
         ctrlMensaje.mensaje_signal.hubo_cambio.connect(self.actualizar)
 
         self.setFrameShape(QFrame.Shape.StyledPanel)
@@ -68,6 +71,7 @@ class MensajeCard(QFrame):
         if mensaje is None:
             return
         print(f"MensajeCard {mensaje.id}: setData")
+        self.chat_id = mensaje.chat_id
         self.fecha_registro.setText(mensaje.fecha_registro)
         if self.con_imagen:
             self.datos.setPixmap(mensaje.img_pix)
@@ -79,7 +83,10 @@ class MensajeCard(QFrame):
     def actualizar(self, id=0):
         if id != 0 and id == self.id:
             print(f"MensajeCard {id}: actualizar")
-            ctrlMensaje = QApplication.instance().property("controls").get_mensajes()
+            if self.is_dialogo:
+                ctrlMensaje = QApplication.instance().property("controls").get_dialogo()
+            else:
+                ctrlMensaje = QApplication.instance().property("controls").get_mensajes()
             self.setData(ctrlMensaje.get_mensaje(id))
 
     def setPulsado(self, is_pulsado=False):
@@ -103,6 +110,5 @@ class MensajeCard(QFrame):
 
     def mousePressEvent(self, event):
         print(f"MensajeCard {self.id}: mousePressEvent")
-        if self.is_clic:
-            self.card_clic.emit(self.chat_id)
-            super().mousePressEvent(event)
+        self.card_clic.emit(self.chat_id)
+        super().mousePressEvent(event)

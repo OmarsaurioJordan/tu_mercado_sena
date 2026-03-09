@@ -1,4 +1,3 @@
-import requests
 from PySide6.QtCore import (QTimer, Signal, QObject, QThread)
 from PySide6.QtWidgets import (QApplication)
 from controllers.ctrl_data import CtrlData
@@ -7,6 +6,9 @@ from controllers.ctrl_producto import CtrlProducto
 from controllers.ctrl_pqrs import CtrlPqrs
 from controllers.ctrl_denuncia import CtrlDenuncia
 from controllers.ctrl_mensaje import CtrlMensaje
+from controllers.ctrl_auditoria import CtrlAuditoria
+from controllers.ctrl_login import CtrlLogin
+from controllers.ctrl_chat import CtrlChat
 from services.notifi_worker import NotifiWorker
 from core.app_config import TIME_NOTIFI
 
@@ -23,6 +25,11 @@ class ControllersManager(QObject):
         self.pqrss = CtrlPqrs()
         self.denuncias = CtrlDenuncia()
         self.mensajes = CtrlMensaje()
+        self.chats = CtrlChat()
+        self.logins = CtrlLogin()
+        self.auditorias = CtrlAuditoria()
+        self.catalogo = CtrlProducto()
+        self.dialogo = CtrlMensaje()
 
         self.timer_notifi = QTimer()
         self.timer_notifi.timeout.connect(self.api_notificaciones)
@@ -60,6 +67,21 @@ class ControllersManager(QObject):
     def get_mensajes(self):
         return self.mensajes
 
+    def get_chats(self):
+        return self.chats
+    
+    def get_logins(self):
+        return self.logins
+    
+    def get_auditorias(self):
+        return self.auditorias
+
+    def get_catalogo(self):
+        return self.catalogo
+    
+    def get_dialogo(self):
+        return self.dialogo
+
     def limpiar(self):
         print("ControllersManager: limpiar")
         self.usuarios.limpiar()
@@ -67,3 +89,8 @@ class ControllersManager(QObject):
         self.pqrss.limpiar()
         self.denuncias.limpiar()
         self.mensajes.limpiar()
+        self.chats.limpiar()
+        self.logins.limpiar()
+        self.auditorias.limpiar()
+        self.catalogo.limpiar()
+        self.dialogo.limpiar()
