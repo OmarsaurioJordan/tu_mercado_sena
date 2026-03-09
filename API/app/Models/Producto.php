@@ -61,7 +61,7 @@ class Producto extends Model
     */
     public function scopePorCategoria($query, int $categoriaId)
     {
-        return $query->whereHas('subcategoria', function ($q) use ($categoriaId     ) {
+        return $query->whereHas('subcategoria', function ($q) use ($categoriaId) {
             $q->where('categoria_id', $categoriaId);
         });
     }
