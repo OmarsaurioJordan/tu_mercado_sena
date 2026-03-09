@@ -37,6 +37,9 @@ def confirma_ejecucion(tipo="", id=0, value=0):
         case "denuncia_motivo":
             ctrlDenuncia = manager.get_denuncias()
             return ctrlDenuncia.set_motivo(id, value)
+        case "chat_estado":
+            ctrlChat = manager.get_chats()
+            return ctrlChat.set_estado(id, value)
     return False
 
 def confirma_pregunta(tipo=""):
@@ -61,4 +64,6 @@ def confirma_pregunta(tipo=""):
             return "¿Desea cambiar el estado de la denuncia por "
         case "denuncia_motivo":
             return "¿Desea cambiar el motivo de la denuncia por "
+        case "chat_estado":
+            return "¿Desea cambiar el estado del chat por "
     return ""

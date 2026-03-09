@@ -91,7 +91,8 @@ class HeaderLayout(QVBoxLayout):
         self.notifica_pqrss.set_text("PQRS: " + str(pqrss))
         ant = self.hay_busqueda
         if (not ant[0] and denuncias > 0) or (not ant[1] and pqrss > 0):
-            QApplication.instance().property("sound_notifi").play()
+            if not QApplication.instance().property("sound_notifi").isPlaying():
+                QApplication.instance().property("sound_notifi").play()
         self.hay_busqueda = [denuncias > 0, pqrss > 0]
 
     def find_pqrss(self):

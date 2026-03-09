@@ -28,7 +28,7 @@ class ResultBusqueda(QListWidget):
                 ctrl.pqrs_signal.hubo_cambio.connect(self.actualizar)
             case "denuncias":
                 ctrl.denuncia_signal.hubo_cambio.connect(self.actualizar)
-            case "mensajes":
+            case "mensajes" | "dialogo":
                 ctrl.mensaje_signal.hubo_cambio.connect(self.actualizar)
             case "auditorias":
                 ctrl.auditoria_signal.hubo_cambio.connect(self.actualizar)
@@ -68,6 +68,8 @@ class ResultBusqueda(QListWidget):
                 return QApplication.instance().property("controls").get_auditorias()
             case "logins":
                 return QApplication.instance().property("controls").get_logins()
+            case "dialogo":
+                return QApplication.instance().property("controls").get_dialogo()
         return None
 
     # signal cuando llega al fondo del scroll
@@ -105,7 +107,7 @@ class ResultBusqueda(QListWidget):
                             ficha.setData(ctrl.get_pqrs(id))
                         case "denuncias":
                             ficha.setData(ctrl.get_denuncia(id))
-                        case "mensajes":
+                        case "mensajes" | "dialogo":
                             ficha.setData(ctrl.get_mensaje(id))
                         case "auditorias":
                             ficha.setData(ctrl.get_auditoria(id))
@@ -130,7 +132,9 @@ class ResultBusqueda(QListWidget):
                 case "denuncias":
                     ficha = DenunciaCard(it, parent=self)
                 case "mensajes":
-                    ficha = MensajeCard(it, parent=self)
+                    ficha = MensajeCard(it, parent=self, is_dialogo=False)
+                case "dialogo":
+                    ficha = MensajeCard(it, parent=self, is_dialogo=True)
                 case "auditorias":
                     ficha = AuditoriaCard(it, parent=self)
                 case "logins":
@@ -162,7 +166,7 @@ class ResultBusqueda(QListWidget):
             item = self.item(i)
             widget = self.itemWidget(item)
             match self.tipo:
-                case "mensajes":
+                case "mensajes" | "dialogo":
                     widget.setPulsado(widget.chat_id == item_id)
                 case "auditorias":
                     widget.setPulsado(widget.administrador_id == item_id)

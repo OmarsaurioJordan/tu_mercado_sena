@@ -26,6 +26,7 @@ class ToolsWidget(QWidget):
         self.ctrlPqrs = manager.get_pqrss()
         self.ctrlDenuncia = manager.get_denuncias()
         self.ctrlMensaje = manager.get_mensajes()
+        self.ctrlChat = manager.get_chats()
 
         manager.signal_tools_cambio.connect(self.select_tab)
 
@@ -46,15 +47,24 @@ class ToolsWidget(QWidget):
         tabsB.addTab(Scroll(), "Papelera")
         tabsB.addTab(Scroll(), "Historial")
 
-        # conectar otras fichas
+        # conectar fichas internas de bodys
         denunciaBody.card_usuario_clic.connect(
             lambda user_id: self.buscarUsuario(user_id, usuarioBody)
         )
         denunciaBody.card_producto_clic.connect(
             lambda prod_id: self.buscarProducto(prod_id, productoBody)
         )
+        denunciaBody.card_chat_clic.connect(
+            lambda chat_id: self.buscarChat(chat_id, chatBody)
+        )
         pqrsBody.card_clic.connect(
             lambda user_id: self.buscarUsuario(user_id, usuarioBody)
+        )
+        chatBody.card_usuario_clic.connect(
+            lambda user_id: self.buscarUsuario(user_id, usuarioBody)
+        )
+        chatBody.card_producto_clic.connect(
+            lambda prod_id: self.buscarProducto(prod_id, productoBody)
         )
 
         tabsFind = QTabWidget()
@@ -137,13 +147,17 @@ class ToolsWidget(QWidget):
         usuarioBody.cambioData.connect(productoBody.set_is_seleccionado)
         usuarioBody.cambioData.connect(pqrsBody.set_is_seleccionado)
         usuarioBody.cambioData.connect(denunciaBody.set_is_seleccionado)
+        usuarioBody.cambioData.connect(chatBody.set_is_seleccionado)
         # cuando cambia producto
         productoBody.cambioData.connect(usuarioBody.set_from_producto)
         productoBody.cambioData.connect(denunciaBody.set_is_producto)
+        productoBody.cambioData.connect(chatBody.set_is_producto)
         # cuando cambia PQRS
         pqrsBody.cambioData.connect(usuarioBody.set_from_pqrs)
         # cuando cambia denuncia
         denunciaBody.cambioData.connect(usuarioBody.set_from_denuncia)
+        # cuando cambia chat
+        chatBody.cambioData.connect(usuarioBody.set_from_chat)
 
         # colocar todo en layout principal
         layFondoTres = QHBoxLayout()

@@ -30,6 +30,7 @@ class WindowManager(QMainWindow):
         else:
             self.set_login()
         self.show()
+        self.showMaximized()
 
     def is_login(self):
         return self.stack.count() > 1

@@ -60,7 +60,7 @@ if ($cursor_id != "") {
 }
 array_unshift($vars, $cursor_fecha);
 
-$sql = "SELECT ch.id AS id, ch.comprador_id AS comprador_id, ch.producto_id AS producto_id, ch.estado_id AS estado_id, ch.precio AS precio, ch.fecha_venta AS fecha_venta, ch.comentario AS comentario, ch.calificacion AS calificacion, ch.cantidad AS cantidad, uv.nickname AS vendedor_name, uc.nickname AS comprador_name, p.nombre AS producto_name
+$sql = "SELECT ch.id AS id, ch.comprador_id AS comprador_id, ch.producto_id AS producto_id, ch.estado_id AS estado_id, ch.precio AS precio, ch.fecha_venta AS fecha_venta, ch.comentario AS comentario, ch.calificacion AS calificacion, ch.cantidad AS cantidad, uv.nickname AS vendedor_name, uc.nickname AS comprador_name, p.nombre AS producto_name, uv.id AS vendedor_id
     FROM chats ch
     LEFT JOIN productos p ON ch.producto_id = p.id
     LEFT JOIN usuarios uv ON p.vendedor_id = uv.id

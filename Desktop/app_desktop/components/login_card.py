@@ -9,6 +9,7 @@ class LoginCard(QFrame):
     def __init__(self, login, parent=None):
         super().__init__(parent)
         self.id = login.id
+        self.usuario_id = login.usuario_id
         self.miItem = None
 
         ctrlLogin = QApplication.instance().property("controls").get_logins()
@@ -33,14 +34,14 @@ class LoginCard(QFrame):
         font.setBold(True)
         self.nickname.setFont(font)
         self.nickname.setAlignment(
-            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         )
 
         self.email = QLabel("", self)
         self.email.setStyleSheet("color: #777777;")
         self.email.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         self.email.setAlignment(
-            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         )
 
         self.mensaje = QLabel("", self)
@@ -49,9 +50,13 @@ class LoginCard(QFrame):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
 
+        layTitulo = QHBoxLayout()
+        layTitulo.addWidget(self.nickname)
+        layTitulo.addSpacing(10)
+        layTitulo.addWidget(self.email)
+
         layBody = QVBoxLayout()
-        layBody.addWidget(self.nickname)
-        layBody.addWidget(self.email)
+        layBody.addLayout(layTitulo)
         layBody.addWidget(self.mensaje)
 
         layHorizontal = QHBoxLayout()
@@ -66,7 +71,8 @@ class LoginCard(QFrame):
         if login is None:
             return
         print(f"LoginCard {login.id}: setData")
-        self.cuando.setText(login.fecha_registro.replace(" ", "\n") + "\n" + str(login.dias) + " días")
+        self.usuario_id = login.usuario_id
+        self.cuando.setText(login.fecha_registro.replace(" ", "\n") + " - " + str(login.dias) + " días")
         self.nickname.setText(login.nickname)
         self.email.setText(login.email + (" (Admin)" if login.rol_id != 1 else ""))
         self.mensaje.setText(login.ip_direccion + " - " + login.informacion)
@@ -99,5 +105,5 @@ class LoginCard(QFrame):
 
     def mousePressEvent(self, event):
         print(f"LoginCard {self.id}: mousePressEvent")
-        self.card_clic.emit(self.id)
+        self.card_clic.emit(self.usuario_id)
         super().mousePressEvent(event)

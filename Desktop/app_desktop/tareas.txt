@@ -1,17 +1,10 @@
 TAREAS:
 ...
-- se está congelando el primer búsqueda cíclica de notificaciónes
-- aún no disponible usuariobody recupera clave, limpia textline
-- no tratar de enviar mensaje usuario body si id = 0
-- clic ficha logins, no envía id usuario sino id login, quizá igual ficha auditorias
-- usuario body seleccionado en logins no sombrea logins, quizá igual con auditorias
-- esira mucho al buscador de logins, auditorias, comprimiendo usuario body
-- auditoria y login cards, hora seguido por dias, no abajo, y nombre con mail al lado
-- poner linea horizontal entre vendedor, comprador y mensajes en chat body
+- 
 ...
 - ver catálogo de productos de usuario
 - ver papelera del usuario
-- ver historial del usuario
+- ver historial del usuario, card de tipo chat
 ...
 - cargar datos de análisis para gráficas
 ...
@@ -26,16 +19,6 @@ PRUEBAS:
 - quitar imágen en TMS y ver si al refrescar en Desktop se quita
 - revisar todos los filtros, sospecha fallan los de productos
 ...
-
-     Chats-Historial
-x API
-x entidad
-entidad_card
-x entidad_body
-x ctrl_entidad
-confirmaciones
-x controllers_manager
-tools_widget
 
      Papelera
 x API

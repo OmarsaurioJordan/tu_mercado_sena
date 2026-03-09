@@ -60,8 +60,8 @@ class AuditoriasWidget(QWidget):
         layFondoTres.setContentsMargins(10, 10, 10, 10)
         layFondoTres.addWidget(tabsFind)
         layFondoTres.addWidget(tabs)
-        layFondoTres.setStretch(0, 5)
-        layFondoTres.setStretch(2, 3)
+        layFondoTres.setStretch(0, 3)
+        layFondoTres.setStretch(1, 1)
         self.setLayout(layFondoTres)
 
     # usuarios

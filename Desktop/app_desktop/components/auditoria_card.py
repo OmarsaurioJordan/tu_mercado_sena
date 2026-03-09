@@ -9,6 +9,7 @@ class AuditoriaCard(QFrame):
     def __init__(self, auditoria, parent=None):
         super().__init__(parent)
         self.id = auditoria.id
+        self.administrador_id = auditoria.administrador_id
         self.miItem = None
 
         ctrlAuditoria = QApplication.instance().property("controls").get_auditorias()
@@ -33,14 +34,14 @@ class AuditoriaCard(QFrame):
         font.setBold(True)
         self.nickname.setFont(font)
         self.nickname.setAlignment(
-            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop
         )
 
         self.email = QLabel("", self)
         self.email.setStyleSheet("color: #777777;")
         self.email.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         self.email.setAlignment(
-            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         )
 
         self.mensaje = QLabel("", self)
@@ -49,9 +50,13 @@ class AuditoriaCard(QFrame):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
 
+        layTitulo = QHBoxLayout()
+        layTitulo.addWidget(self.nickname)
+        layTitulo.addSpacing(10)
+        layTitulo.addWidget(self.email)
+
         layBody = QVBoxLayout()
-        layBody.addWidget(self.nickname)
-        layBody.addWidget(self.email)
+        layBody.addLayout(layTitulo)
         layBody.addWidget(self.mensaje)
 
         layHorizontal = QHBoxLayout()
@@ -66,7 +71,8 @@ class AuditoriaCard(QFrame):
         if auditoria is None:
             return
         print(f"AuditoriaCard {auditoria.id}: setData")
-        self.cuando.setText(auditoria.fecha_registro.replace(" ", "\n") + "\n" + str(auditoria.dias) + " días")
+        self.administrador_id = auditoria.administrador_id
+        self.cuando.setText(auditoria.fecha_registro.replace(" ", "\n") + " - " + str(auditoria.dias) + " días")
         self.nickname.setText(auditoria.nickname)
         self.email.setText(auditoria.email + (" (Admin)" if auditoria.rol_id != 1 else ""))
         ctrlData = QApplication.instance().property("controls").get_data()
@@ -105,5 +111,5 @@ class AuditoriaCard(QFrame):
 
     def mousePressEvent(self, event):
         print(f"AuditoriaCard {self.id}: mousePressEvent")
-        self.card_clic.emit(self.id)
+        self.card_clic.emit(self.administrador_id)
         super().mousePressEvent(event)

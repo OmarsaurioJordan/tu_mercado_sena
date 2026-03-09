@@ -1,4 +1,3 @@
-import requests
 from PySide6.QtCore import (QTimer, Signal, QObject, QThread)
 from PySide6.QtWidgets import (QApplication)
 from controllers.ctrl_data import CtrlData
@@ -29,6 +28,8 @@ class ControllersManager(QObject):
         self.chats = CtrlChat()
         self.logins = CtrlLogin()
         self.auditorias = CtrlAuditoria()
+        self.catalogo = CtrlProducto()
+        self.dialogo = CtrlMensaje()
 
         self.timer_notifi = QTimer()
         self.timer_notifi.timeout.connect(self.api_notificaciones)
@@ -75,6 +76,12 @@ class ControllersManager(QObject):
     def get_auditorias(self):
         return self.auditorias
 
+    def get_catalogo(self):
+        return self.catalogo
+    
+    def get_dialogo(self):
+        return self.dialogo
+
     def limpiar(self):
         print("ControllersManager: limpiar")
         self.usuarios.limpiar()
@@ -85,3 +92,5 @@ class ControllersManager(QObject):
         self.chats.limpiar()
         self.logins.limpiar()
         self.auditorias.limpiar()
+        self.catalogo.limpiar()
+        self.dialogo.limpiar()
