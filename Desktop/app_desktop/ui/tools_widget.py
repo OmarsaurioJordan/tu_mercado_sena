@@ -20,6 +20,7 @@ class ToolsWidget(QWidget):
     def __init__(self):
         super().__init__()
 
+        # obtener los controladores
         manager = QApplication.instance().property("controls")
         self.ctrlUsuario = manager.get_usuarios()
         self.ctrlProducto = manager.get_productos()
@@ -27,9 +28,13 @@ class ToolsWidget(QWidget):
         self.ctrlDenuncia = manager.get_denuncias()
         self.ctrlMensaje = manager.get_mensajes()
         self.ctrlChat = manager.get_chats()
+        self.ctrlCatalogo = manager.get_catalogo()
+        self.ctrlPapelera = manager.get_papelera()
 
+        # conectar la signal que cambia tabs
         manager.signal_tools_cambio.connect(self.select_tab)
 
+        # bloque de tabs A
         tabsA = QTabWidget()
         productoBody = ProductoBody()
         tabsA.addTab(Scroll(productoBody), "Producto")
@@ -40,12 +45,33 @@ class ToolsWidget(QWidget):
         chatBody = ChatBody()
         tabsA.addTab(Scroll(chatBody), "Chat")
 
+        # bloque de tabs B
         tabsB = QTabWidget()
         usuarioBody = UsuarioBody()
         tabsB.addTab(Scroll(usuarioBody), "Usuario")
-        tabsB.addTab(Scroll(), "Catálogo")
-        tabsB.addTab(Scroll(), "Papelera")
-        tabsB.addTab(Scroll(), "Historial")
+        usuarioBody.catalogo = ResultBusqueda("items")
+        tabsB.addTab(Scroll(usuarioBody.catalogo), "Catálogo")
+        usuarioBody.papelera = ResultBusqueda("papelera")
+        tabsB.addTab(Scroll(usuarioBody.papelera), "Papelera")
+        usuarioBody.chats = ResultBusqueda("chats")
+        tabsB.addTab(Scroll(usuarioBody.chats), "Historial")
+
+        # conectar result_buqueda internos de bodys
+        usuarioBody.catalogo.scroll_at_end.connect(
+            lambda: self.rebuscarCatalogo()
+        )
+        usuarioBody.catalogo.card_clic.connect(
+            lambda prod_id: self.buscarProducto(prod_id, productoBody)
+        )
+        usuarioBody.chats.scroll_at_end.connect(
+            lambda: self.rebuscarChats()
+        )
+        usuarioBody.chats.card_clic.connect(
+            lambda chat_id: self.buscarChat(chat_id, chatBody)
+        )
+        usuarioBody.papelera.scroll_at_end.connect(
+            lambda: self.rebuscarPapelera()
+        )
 
         # conectar fichas internas de bodys
         denunciaBody.card_usuario_clic.connect(
@@ -134,14 +160,17 @@ class ToolsWidget(QWidget):
             lambda chat_id: self.buscarChat(chat_id, chatBody)
         )
 
+        # agrupar todos los tabs
         self.tabs = [tabsA, tabsB, tabsFind]
 
         # sombreado de fichas seleccionadas
         usuarioBody.cambioData.connect(usuarioBusqueda.set_sombrear)
         productoBody.cambioData.connect(productoBusqueda.set_sombrear)
+        productoBody.cambioData.connect(usuarioBody.set_sombrear_catalogo)
         pqrsBody.cambioData.connect(pqrsBusqueda.set_sombrear)
         denunciaBody.cambioData.connect(denunciaBusqueda.set_sombrear)
         chatBody.cambioData.connect(mensajeBusqueda.set_sombrear)
+        chatBody.cambioData.connect(usuarioBody.set_sombrear_chats)
 
         # cuando cambia usuario
         usuarioBody.cambioData.connect(productoBody.set_is_seleccionado)
@@ -199,7 +228,6 @@ class ToolsWidget(QWidget):
         print(f"ToolsWidget {user_id}: buscarUsuario")
         usuario = self.ctrlUsuario.get_usuario(user_id)
         widgetResultado.setData(usuario)
-        self.select_tab("Usuario")
     
     # productos
 
@@ -218,6 +246,10 @@ class ToolsWidget(QWidget):
         producto = self.ctrlProducto.get_producto(prod_id)
         widgetResultado.setData(producto)
         self.select_tab("Producto")
+    
+    def rebuscarCatalogo(self):
+        print("ToolsWidget: rebuscarCatalogo")
+        self.ctrlCatalogo.do_busqueda(rebusqueda=True)
     
     # PQRSs
 
@@ -279,3 +311,13 @@ class ToolsWidget(QWidget):
         chat = self.ctrlChat.get_chat(chat_id)
         widgetResultado.setData(chat)
         self.select_tab("Chat")
+    
+    def rebuscarChats(self):
+        print("ToolsWidget: rebuscarChats")
+        self.ctrlChat.do_busqueda(rebusqueda=True)
+
+    # papelera
+
+    def rebuscarPapelera(self):
+        print("ToolsWidget: rebuscarPapelera")
+        self.ctrlPapelera.do_busqueda(rebusqueda=True)

@@ -70,7 +70,6 @@ class AuditoriasWidget(QWidget):
         print(f"AuditoriasWidget {user_id}: buscarUsuario")
         usuario = self.ctrlUsuario.get_usuario(user_id)
         widgetResultado.setData(usuario)
-        self.select_tab("Usuario")
     
     # auditorias
 

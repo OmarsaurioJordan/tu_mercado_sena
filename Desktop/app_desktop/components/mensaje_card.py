@@ -77,7 +77,15 @@ class MensajeCard(QFrame):
             self.datos.setPixmap(mensaje.img_pix)
         else:
             self.datos.setText(mensaje.mensaje)
-        self.estado_color = "#e6e5e5"
+        self.estado_color = {
+            1: "#e6e5e5", # activo
+            6: "#e6e5e5", # esperando
+            5: "#d2edf8", # vendido
+            7: "#d2edf8", # devolviendo
+            3: "#B9B9B9", # eliminado
+            8: "#f7d9ac", # devuelto
+            9: "#f4f7ac" # censurado
+        }.get(mensaje.estado_id, "#f88eef") # error
         self.setPulsado()
 
     def actualizar(self, id=0):

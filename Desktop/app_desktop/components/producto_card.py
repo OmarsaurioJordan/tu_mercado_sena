@@ -7,12 +7,16 @@ from PySide6.QtGui import QPixmap
 class ProductoCard(QFrame):
     card_clic = Signal(int) # id producto
 
-    def __init__(self, producto, parent=None):
+    def __init__(self, producto, parent=None, is_catalogo=False):
         super().__init__(parent)
         self.id = producto.id
         self.miItem = None
+        self.is_catalogo = is_catalogo
 
-        ctrlProducto = QApplication.instance().property("controls").get_productos()
+        if self.is_catalogo:
+            ctrlProducto = QApplication.instance().property("controls").get_catalogo()
+        else:
+            ctrlProducto = QApplication.instance().property("controls").get_productos()
         ctrlProducto.producto_signal.hubo_cambio.connect(self.actualizar)
 
         self.setFrameShape(QFrame.Shape.StyledPanel)
@@ -71,7 +75,10 @@ class ProductoCard(QFrame):
     def actualizar(self, id=0):
         if id != 0 and id == self.id:
             print(f"ProductoCard {id}: actualizar")
-            ctrlProducto = QApplication.instance().property("controls").get_productos()
+            if self.is_catalogo:
+                ctrlProducto = QApplication.instance().property("controls").get_catalogo()
+            else:
+                ctrlProducto = QApplication.instance().property("controls").get_productos()
             self.setData(ctrlProducto.get_producto(id))
 
     def setPulsado(self, is_pulsado=False):

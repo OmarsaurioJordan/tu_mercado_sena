@@ -15,6 +15,13 @@ class UsuarioBody(QWidget):
     def __init__(self):
         super().__init__()
         self.id = 0
+        self.catalogo = None
+        self.chats = None
+        self.papelera = None
+
+        self.ctrlCatalogo = QApplication.instance().property("controls").get_catalogo()
+        self.ctrlChat = QApplication.instance().property("controls").get_chats()
+        self.ctrlPapelera = QApplication.instance().property("controls").get_papelera()
 
         ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
         ctrlUsuario.usuario_signal.hubo_cambio.connect(self.actualizar)
@@ -135,6 +142,21 @@ class UsuarioBody(QWidget):
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
         )
         return label
+    
+    def buscarCatalogo(self):
+        print("UsuarioBody: buscarCatalogo")
+        filtros = { "vendedor_id": self.id }
+        self.ctrlCatalogo.do_busqueda(filtros=filtros)
+    
+    def buscarChats(self):
+        print("UsuarioBody: buscarChats")
+        filtros = { "comprador_id": self.id, "vendedor_id": self.id }
+        self.ctrlChat.do_busqueda(filtros=filtros)
+    
+    def buscarPapelera(self):
+        print("UsuarioBody: buscarPapelera")
+        filtros = { "usuario_id": self.id }
+        self.ctrlPapelera.do_busqueda(filtros=filtros)
 
     def enviaRecuperacion(self):
         self.email_recup.setText("")
@@ -157,6 +179,17 @@ class UsuarioBody(QWidget):
         self.sel_rol.set_ente_id(0)
         self.sel_estado.set_ente_id(0)
         self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
+        # eliminar estructuras internas
+        if self.catalogo:
+            self.ctrlCatalogo.limpiar()
+            self.catalogo.eliminar_items()
+        if self.chats:
+            self.ctrlChat.limpiar()
+            self.chats.eliminar_items()
+        if self.papelera:
+            self.ctrlPapelera.limpiar()
+            self.papelera.eliminar_items()
+        # llamar a la signal
         self.cambioData.emit(0)
 
     def setData(self, usuario):
@@ -167,6 +200,7 @@ class UsuarioBody(QWidget):
         self.id = usuario.id
         self.email.setText(usuario.email)
         self.nickname.setText(usuario.nickname)
+        self.cambioData.emit(usuario.id)
         if usuario.descripcion == "":
             self.descripcion.setText("*** descripción vacía ***")
         else:
@@ -185,7 +219,19 @@ class UsuarioBody(QWidget):
         self.imagen.setPixmap(usuario.img_pix)
         self.mensaje.setText("")
         self.email_recup.setText("")
-        self.cambioData.emit(usuario.id)
+        # crear estructuras internas
+        if self.catalogo:
+            self.ctrlCatalogo.limpiar()
+            self.catalogo.eliminar_items()
+            self.buscarCatalogo()
+        if self.chats:
+            self.ctrlChat.limpiar()
+            self.chats.eliminar_items()
+            self.buscarChats()
+        if self.papelera:
+            self.ctrlPapelera.limpiar()
+            self.papelera.eliminar_items()
+            self.buscarPapelera()
 
     def actualizar(self, id=0):
         if self.id == 0 or id != self.id:
@@ -193,6 +239,18 @@ class UsuarioBody(QWidget):
         print(f"UsuarioBody {id}: actualizar")
         ctrlUsuario = QApplication.instance().property("controls").get_usuarios()
         self.setData(ctrlUsuario.get_usuario(id))
+    
+    def set_sombrear_catalogo(self, item_id=0):
+        if self.catalogo:
+            self.catalogo.set_sombrear(item_id)
+    
+    def set_sombrear_chats(self, item_id=0):
+        if self.chats:
+            self.chats.set_sombrear(item_id)
+    
+    def set_sombrear_papelera(self, item_id=0):
+        if self.papelera:
+            self.papelera.set_sombrear(item_id)
 
     def set_from_producto(self, producto_id=0):
         if producto_id != 0:

@@ -12,6 +12,8 @@ if (!isset($_GET["id"])) {
 }
 $id = $_GET["id"];
 
+valida_edit_admin();
+
 $cond = "";
 $vars = [];
 

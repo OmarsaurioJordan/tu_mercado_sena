@@ -8,12 +8,13 @@ class MensajeSignal(QObject):
 
 class Mensaje:
     
-    def __init__(self, id, es_comprador, chat_id, mensaje, imagen, fecha_registro):
+    def __init__(self, id, es_comprador, chat_id, mensaje, imagen, fecha_registro, estado_id):
         self.id = id
         self.es_comprador = es_comprador
         self.chat_id = chat_id
         self.mensaje = mensaje
         self.fecha_registro = fecha_registro
+        self.estado_id = estado_id
         # carga de imagenes
         self.imagen = imagen
         self.img_signal = MensajeSignal()
@@ -29,7 +30,8 @@ class Mensaje:
             imagen = data.get('imagen'),
             mensaje = data.get('mensaje'),
             chat_id = int(data.get('chat_id')),
-            fecha_registro = data.get('fecha_registro')
+            fecha_registro = data.get('fecha_registro'),
+            estado_id = int(data.get('estado_id'))
         )
 
     def load_image(self):
@@ -46,7 +48,7 @@ class Mensaje:
         if not image.isNull():
             pix = QPixmap.fromImage(image)
         else:
-            pix = QPixmap()
+            pix = QPixmap("assets/sprites/img_null.png")
         self.img_pix = pix
         self.is_img_load = True
         self.img_signal.ok_image.emit(self.id)

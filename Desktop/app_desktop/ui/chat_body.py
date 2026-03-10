@@ -73,9 +73,6 @@ class ChatBody(QWidget):
         linea1 = QFrame()
         linea1.setFrameShape(QFrame.Shape.HLine)
         linea1.setFrameShadow(QFrame.Shadow.Sunken)
-        linea2 = QFrame()
-        linea2.setFrameShape(QFrame.Shape.HLine)
-        linea2.setFrameShadow(QFrame.Shadow.Sunken)
 
         layVertical = QVBoxLayout()
         layVertical.addSpacing(10)
@@ -84,8 +81,6 @@ class ChatBody(QWidget):
         layVertical.addWidget(linea1)
         layVertical.addSpacing(5)
         layVertical.addLayout(vendedorLayout)
-        layVertical.addSpacing(5)
-        layVertical.addWidget(linea2)
         layVertical.addSpacing(5)
         layVertical.addWidget(self.portaChat)
         layVertical.addSpacing(5)
@@ -127,9 +122,11 @@ class ChatBody(QWidget):
         self.cantidad.setText("???")
         self.sel_estado.set_index(0)
         self.sel_estado.set_ente_id(0)
+        # eliminar estructuras internas
         self.limpiarFichas()
         self.ctrlDialogo.limpiar()
         self.portaChat.eliminar_items()
+        # llamar a la signal
         self.cambioData.emit(0)
 
     def setData(self, chat):
@@ -143,10 +140,11 @@ class ChatBody(QWidget):
         self.vendedor_id = chat.vendedor_id
         self.cambioData.emit(chat.id)
         self.calificacion.setText(self.setCalificacion(chat.calificacion) + "\n\n" + chat.comentario)
-        self.precio.setText("$ " + str(chat.precio))
+        self.precio.setText("$ " + str(int(chat.precio)))
         self.cantidad.setText(str(chat.cantidad))
         self.sel_estado.set_index_from_data(chat.estado_id)
         self.sel_estado.set_ente_id(chat.id)
+        # crear estructuras internas
         self.limpiarFichas()
         self.newFicha(chat.comprador_id, True, self.portaFicha)
         self.newFicha(chat.vendedor_id, True, self.portaFichas)
@@ -187,7 +185,7 @@ class ChatBody(QWidget):
         if self.id == 0 or id != self.id:
             return
         print(f"ChatBody {id}: actualizar")
-        ctrlChat = QApplication.instance().property("controls").getchats()
+        ctrlChat = QApplication.instance().property("controls").get_chats()
         self.setData(ctrlChat.get_chat(id))
 
     def set_is_seleccionado(self, usuario_id=0):

@@ -57,7 +57,7 @@ class Usuario:
         if not image.isNull():
             pix = QPixmap.fromImage(image)
         else:
-            pix = QPixmap()
+            pix = QPixmap("assets/sprites/avatar.png")
         self.img_pix = circular_pixmap(pix, 128)
         self.is_img_load = True
         self.img_signal.ok_image.emit(self.id)

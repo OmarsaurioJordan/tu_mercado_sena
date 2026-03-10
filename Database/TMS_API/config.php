@@ -64,4 +64,26 @@ function auditar($suceso_id, $descripcion) {
         $stmt->execute();
     }
 }
+
+function valida_edit_admin() {
+    // llamado siempre despues de validation() y de obtencion de id
+    global $debug, $conn;
+    if (!$debug) {
+
+        $admin_email = $_GET["admin_email"];
+        $id = $_GET["id"];
+
+        $sql = "SELECT 1 FROM usuarios u LEFT JOIN cuentas c
+            ON c.id = u.cuenta_id WHERE c.email = ? AND u.id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("si", $admin_email, $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows == 0) {
+            http_response_code(404);
+            echo json_encode(["error" => "Credenciales inválidas"]);
+            exit;
+        }
+    }
+}
 ?>

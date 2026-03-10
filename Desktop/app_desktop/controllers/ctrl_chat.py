@@ -61,7 +61,7 @@ class CtrlChat:
                     chat = self.new_chat(item)
                     chats.append(chat)
                 if len(chats) > 0:
-                    self.cursor_busqueda["cursor_fecha"] = chats[-1].fecha_registro
+                    self.cursor_busqueda["cursor_fecha"] = chats[-1].fecha_venta
                     self.cursor_busqueda["cursor_id"] = chats[-1].id
                     self.add_chats(chats, True)
                     self.chat_signal.hubo_cambio.emit(0)
