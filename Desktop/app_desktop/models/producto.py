@@ -79,7 +79,7 @@ class Producto:
         if not image.isNull():
             pix = QPixmap.fromImage(image)
         else:
-            pix = QPixmap()
+            pix = QPixmap("assets/sprites/img_null.png")
         self.img_pix[img_ind] = pix
         self.is_img_load[img_ind] = True
         self.img_signal.ok_image.emit(self.id)

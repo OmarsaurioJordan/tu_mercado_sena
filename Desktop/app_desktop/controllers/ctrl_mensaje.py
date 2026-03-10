@@ -112,6 +112,11 @@ class CtrlMensaje:
 
     # metodos de apoyo
     
+    def set_image(self, id=0):
+        self.mensaje_signal.hubo_cambio.emit(id)
+    
     def new_mensaje(self, data_json):
         mensaje = Mensaje.from_json(data_json)
+        mensaje.img_signal.ok_image.connect(self.set_image)
+        mensaje.load_image()
         return mensaje

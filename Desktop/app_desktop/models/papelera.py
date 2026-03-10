@@ -43,7 +43,7 @@ class Papelera:
         if not image.isNull():
             pix = QPixmap.fromImage(image)
         else:
-            pix = QPixmap()
+            pix = QPixmap("assets/sprites/img_null.png")
         self.img_pix = pix
         self.is_img_load = True
         self.img_signal.ok_image.emit(self.id)

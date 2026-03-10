@@ -7,7 +7,12 @@ class NotifiWorker(QObject):
 
     @Slot()
     def run(self):
-        response = requests.get(API_BASE_URL + "/tools/get_help.php", timeout=TIME_OUT)
-        if response.status_code == 200:
-            data = response.json()[0]
-            self.finished.emit(data["denuncias"], data["pqrss"])
+        try:
+            response = requests.get(API_BASE_URL + "/tools/get_help.php", timeout=TIME_OUT)
+            if response.status_code == 200:
+                data = response.json()[0]
+                self.finished.emit(data["denuncias"], data["pqrss"])
+            else:
+                self.finished.emit(-1, -1)
+        except Exception as e:
+            self.finished.emit(-1, -1)

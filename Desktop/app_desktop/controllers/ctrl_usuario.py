@@ -34,6 +34,7 @@ class CtrlUsuario:
         print("CtrlUsuario: api_usuario-init")
         params = {"id": id}
         response = requests.get(API_BASE_URL + "usuarios", params=params, timeout=TIME_OUT)
+        print("..."+response.url)
         if response.status_code == 200:
             print("CtrlUsuario: api_usuario-ok")
             data = response.json()

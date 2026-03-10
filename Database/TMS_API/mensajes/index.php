@@ -66,7 +66,7 @@ if ($cursor_id != "") {
 }
 array_unshift($vars, $cursor_fecha);
 
-$sql = "SELECT m.id AS id, m.es_comprador AS es_comprador, m.chat_id AS chat_id, m.mensaje AS mensaje, m.imagen AS imagen, m.fecha_registro AS fecha_registro
+$sql = "SELECT m.id AS id, m.es_comprador AS es_comprador, m.chat_id AS chat_id, m.mensaje AS mensaje, m.imagen AS imagen, m.fecha_registro AS fecha_registro, ch.estado_id AS estado_id
     FROM mensajes m
     LEFT JOIN chats ch ON ch.id = m.chat_id
     WHERE (m.fecha_registro < ? OR $curs) $cond 

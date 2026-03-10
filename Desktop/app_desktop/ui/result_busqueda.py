@@ -9,6 +9,8 @@ from components.denuncia_card import DenunciaCard
 from components.mensaje_card import MensajeCard
 from components.auditoria_card import AuditoriaCard
 from components.login_card import LoginCard
+from components.papelera_card import PapeleraCard
+from components.historial_card import HistorialCard
 
 class ResultBusqueda(QListWidget):
     scroll_at_end = Signal()
@@ -22,7 +24,7 @@ class ResultBusqueda(QListWidget):
         match tipo:
             case "usuarios":
                 ctrl.usuario_signal.hubo_cambio.connect(self.actualizar)
-            case "productos":
+            case "productos" | "items":
                 ctrl.producto_signal.hubo_cambio.connect(self.actualizar)
             case "pqrss":
                 ctrl.pqrs_signal.hubo_cambio.connect(self.actualizar)
@@ -34,8 +36,12 @@ class ResultBusqueda(QListWidget):
                 ctrl.auditoria_signal.hubo_cambio.connect(self.actualizar)
             case "logins":
                 ctrl.login_signal.hubo_cambio.connect(self.actualizar)
+            case "chats":
+                ctrl.chat_signal.hubo_cambio.connect(self.actualizar)
+            case "papelera":
+                ctrl.papelera_signal.hubo_cambio.connect(self.actualizar)
         
-        if tipo in ["usuarios", "productos"]:
+        if tipo in ["usuarios", "productos", "items"]:
             self.setViewMode(QListWidget.IconMode)
             self.setWrapping(True)
             self.setFlow(QListWidget.LeftToRight)
@@ -70,6 +76,12 @@ class ResultBusqueda(QListWidget):
                 return QApplication.instance().property("controls").get_logins()
             case "dialogo":
                 return QApplication.instance().property("controls").get_dialogo()
+            case "items":
+                return QApplication.instance().property("controls").get_catalogo()
+            case "chats":
+                return QApplication.instance().property("controls").get_chats()
+            case "papelera":
+                return QApplication.instance().property("controls").get_papelera()
         return None
 
     # signal cuando llega al fondo del scroll
@@ -101,7 +113,7 @@ class ResultBusqueda(QListWidget):
                     match self.tipo:
                         case "usuarios":
                             ficha.setData(ctrl.get_usuario(id))
-                        case "productos":
+                        case "productos" | "items":
                             ficha.setData(ctrl.get_producto(id))
                         case "pqrss":
                             ficha.setData(ctrl.get_pqrs(id))
@@ -113,6 +125,10 @@ class ResultBusqueda(QListWidget):
                             ficha.setData(ctrl.get_auditoria(id))
                         case "logins":
                             ficha.setData(ctrl.get_login(id))
+                        case "chats":
+                            ficha.setData(ctrl.get_chat(id))
+                        case "papelera":
+                            ficha.setData(ctrl.get_papelera(id))
                     break
     
     def agregar_items(self, items):
@@ -126,7 +142,9 @@ class ResultBusqueda(QListWidget):
                 case "usuarios":
                     ficha = UsuarioCard(it, parent=self)
                 case "productos":
-                    ficha = ProductoCard(it, parent=self)
+                    ficha = ProductoCard(it, parent=self, is_catalogo=False)
+                case "items":
+                    ficha = ProductoCard(it, parent=self, is_catalogo=True)
                 case "pqrss":
                     ficha = PqrsCard(it, parent=self)
                 case "denuncias":
@@ -139,6 +157,10 @@ class ResultBusqueda(QListWidget):
                     ficha = AuditoriaCard(it, parent=self)
                 case "logins":
                     ficha = LoginCard(it, parent=self)
+                case "chats":
+                    ficha = HistorialCard(it, parent=self)
+                case "papelera":
+                    ficha = PapeleraCard(it, parent=self)
             ficha.card_clic.connect(self._click_event)
             item = QListWidgetItem()
             item.setSizeHint(ficha.sizeHint())

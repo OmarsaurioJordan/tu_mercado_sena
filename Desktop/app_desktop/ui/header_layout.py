@@ -87,6 +87,8 @@ class HeaderLayout(QVBoxLayout):
         manager.change_tool(pagina)
 
     def on_notifi(self, denuncias, pqrss):
+        if denuncias == -1 or pqrss == -1:
+            return
         self.notifica_denuncias.set_text("Denuncias: " + str(denuncias))
         self.notifica_pqrss.set_text("PQRS: " + str(pqrss))
         ant = self.hay_busqueda

@@ -74,6 +74,12 @@ if ($registro_hasta != "") {
     $vars[] = $registro_hasta;
 }
 
+$vendedor_id = isset($_GET["vendedor_id"]) ? $_GET["vendedor_id"] : "0";
+if ($vendedor_id != "0") {
+    $cond .= " AND p.vendedor_id = ?";
+    $vars[] = $vendedor_id;
+}
+
 $id = isset($_GET["id"]) ? $_GET["id"] : "0";
 if ($id != "0") {
     # no lleva concatenacion porque id sobreescribe a las otras condiciones

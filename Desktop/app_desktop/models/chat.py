@@ -1,5 +1,5 @@
 class Chat:
-    def __init__(self, id, comprador_id, vendedor_id, producto_id, estado_id, precio, cantidad, calificacion, comentario, fecha_venta, comprador_name, producto_name, vendedor_name):
+    def __init__(self, id, comprador_id, vendedor_id, producto_id, estado_id, precio, cantidad, calificacion, comentario, fecha_venta, comprador_name, producto_name, vendedor_name, dias):
         self.id = id
         self.comprador_id = comprador_id
         self.vendedor_id = vendedor_id
@@ -13,6 +13,7 @@ class Chat:
         self.comprador_name = comprador_name
         self.producto_name = producto_name
         self.vendedor_name = vendedor_name
+        self.dias = dias
 
     @staticmethod
     def from_json(data):
@@ -29,5 +30,6 @@ class Chat:
             fecha_venta = data.get('fecha_venta'),
             comprador_name = data.get('comprador_name'),
             producto_name = data.get('producto_name'),
-            vendedor_name = data.get('vendedor_name')
+            vendedor_name = data.get('vendedor_name'),
+            dias = int(data.get('dias'))
         )

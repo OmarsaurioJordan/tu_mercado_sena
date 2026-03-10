@@ -15,10 +15,10 @@ if ($usuario_id != "0") {
 }
 
 $con_imagen = isset($_GET["con_imagen"]) ? $_GET["con_imagen"] : "0";
-if ($con_imagen != "0") {
+if ($con_imagen == "1") {
     $cond .= " AND (imagen NOT NULL AND imagen != '')";
 }
-else {
+else if ($con_imagen == "2") {
     $cond .= " AND (imagen IS NULL OR imagen = '')";
 }
 

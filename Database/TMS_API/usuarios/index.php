@@ -14,7 +14,8 @@ if ($nickname != "") {
 
 $rol_id = isset($_GET["rol_id"]) ? $_GET["rol_id"] : "0";
 if ($rol_id != "0") {
-    $cond .= " AND u.rol_id = $rol_id";
+    $cond .= " AND u.rol_id = ?";
+    $vars[] = $rol_id;
 }
 
 $estado_id = isset($_GET["estado_id"]) ? $_GET["estado_id"] : "0";
@@ -44,7 +45,7 @@ if ($con_descripcion != "0") {
 
 $con_productos = isset($_GET["con_productos"]) ? $_GET["con_productos"] : "0";
 if ($con_productos != "0") {
-    $cond .= " AND EXISTS (SELECT 1 FROM productos p WHERE p.vendedor_id = u.id LIMIT 1)";
+    $cond .= " AND EXISTS (SELECT 1 FROM productos p WHERE p.vendedor_id = u.id)";
 }
 
 $dias_activo = isset($_GET["dias_activo"]) ? $_GET["dias_activo"] : "0";

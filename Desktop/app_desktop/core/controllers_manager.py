@@ -9,6 +9,7 @@ from controllers.ctrl_mensaje import CtrlMensaje
 from controllers.ctrl_auditoria import CtrlAuditoria
 from controllers.ctrl_login import CtrlLogin
 from controllers.ctrl_chat import CtrlChat
+from controllers.ctrl_papelera import CtrlPapelera
 from services.notifi_worker import NotifiWorker
 from core.app_config import TIME_NOTIFI
 
@@ -30,15 +31,18 @@ class ControllersManager(QObject):
         self.auditorias = CtrlAuditoria()
         self.catalogo = CtrlProducto()
         self.dialogo = CtrlMensaje()
+        self.papelera = CtrlPapelera()
 
         self.timer_notifi = QTimer()
         self.timer_notifi.timeout.connect(self.api_notificaciones)
         self.timer_notifi.start(TIME_NOTIFI * 1000)
+        self.notifi_running = False
 
     def api_notificaciones(self):
         manager = QApplication.instance().property("manager")
-        if not manager.is_login():
+        if not manager.is_login() or self.notifi_running:
             return
+        self.notifi_running = True
         self.thread = QThread()
         self.worker = NotifiWorker()
         self.worker.moveToThread(self.thread)
@@ -46,6 +50,7 @@ class ControllersManager(QObject):
         self.worker.finished.connect(self.signal_notifi)
         self.worker.finished.connect(self.thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
+        self.worker.finished.connect(lambda: setattr(self, 'notifi_running', False))
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
@@ -82,6 +87,9 @@ class ControllersManager(QObject):
     def get_dialogo(self):
         return self.dialogo
 
+    def get_papelera(self):
+        return self.papelera
+
     def limpiar(self):
         print("ControllersManager: limpiar")
         self.usuarios.limpiar()
@@ -94,3 +102,4 @@ class ControllersManager(QObject):
         self.auditorias.limpiar()
         self.catalogo.limpiar()
         self.dialogo.limpiar()
+        self.papelera.limpiar()
