@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Notificacion;
-
+use App\Models\Papelera;
 
 class MensajeService implements IMensajeService
 {
@@ -65,7 +65,7 @@ class MensajeService implements IMensajeService
                 $data['imagen'] = $ruta;
             }
 
-            
+            // Crear el mensaje utilizando el repositorio
             $mensaje = $this->mensajeRepository->create($data);
 
             // Validar que el mensaje se haya creado correctamente
@@ -78,7 +78,7 @@ class MensajeService implements IMensajeService
 
             Log::info("¿Es primer mensaje?: " . ($this->mensajeRepository->esPrimerMensaje($chat) ? 'SI' : 'NO'));
             
-            // Crear el mensaje utilizando el repositorio
+           
 
 
             // Si el mensaje es el primero del chat, crear una notificación para el vendedor
@@ -122,7 +122,7 @@ class MensajeService implements IMensajeService
 
                     DB::table('papelera')->insert([
                         'usuario_id' => $compradorId,
-                        'mensaje' => $data['mensaje'] ?? null,
+                        'mensaje' => "Mensaje: " . $data['mensaje'] ?? null,
                         'imagen' => $rutaPapelera,
                         'fecha_registro' => Carbon::now()
                     ]);
@@ -174,8 +174,18 @@ class MensajeService implements IMensajeService
         }
 
         return DB::transaction(function () use ($mensaje) {
+
+            // Crear el registro en la papelera para el mensaje eliminado
+            Papelera::create([
+                'usuario_id' => Auth::user()->usuario->id,
+                'mensaje' => "Mensaje: " . $mensaje->mensaje ?? null,
+                'imagen' => null,
+            ]);
+
+           // Eliminar el mensaje utilizando el repositorio
            $mensajeBorrado = $this->mensajeRepository->delete($mensaje->id);
 
+            // Validar que el mensaje se haya eliminado correctamente
             if (!$mensajeBorrado) {
                 throw new \Exception("No se pudo eliminar el mensaje, Intente nuevamente.", 500);
             }

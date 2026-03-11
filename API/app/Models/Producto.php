@@ -57,6 +57,16 @@ class Producto extends Model
     }
 
     /**
+     * Scope: Por categoría específica
+    */
+    public function scopePorCategoria($query, int $categoriaId)
+    {
+        return $query->whereHas('subcategoria', function ($q) use ($categoriaId) {
+            $q->where('categoria_id', $categoriaId);
+        });
+    }
+
+    /**
      * Scope: excluir productos de un vendedor específico (no aparecen en el general)
      */
     public function scopeExcluirVendedor($query, int $vendedorId)

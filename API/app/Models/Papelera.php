@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Papelera extends Model
 {
+
+    protected $table = 'papelera';
     public $timestamps = true;
 
     const CREATED_AT = 'fecha_registro';

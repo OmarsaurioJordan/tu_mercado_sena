@@ -8,6 +8,7 @@ use App\Contracts\Producto\Repositories\IProductoRepository;
 use App\DTOs\Producto\InputDto;
 use App\DTOs\Producto\OutputDto;
 use App\Models\Foto;
+use App\Models\Papelera;
 use App\Exceptions\BusinessException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -341,12 +342,22 @@ class ProductoService implements IProductoService
                 ->toString();
 
             // Guardar imagen en storage - Laravel crea las carpetas automáticamente
-            Storage::disk('public')->put('productos/' . $nombreArchivo, $imageContent);
+            Storage::disk('public')->put("productos/{$productoId}/" . $nombreArchivo, $imageContent);
+
+            // Guardar en la papelera para poder tener registro de las imágenes eliminadas
+            Storage::disk('public')->put("papelera/productos/{$productoId}/" . $nombreArchivo, $imageContent);
 
             // Guardar en base de datos
             Foto::create([
                 'producto_id' => $productoId,
                 'imagen' => $nombreArchivo,
+            ]);
+
+            // Guardar en la papelera para tener registro de las imágenes eliminadas
+            Papelera::create([
+                "usuario_id" => Auth::user()->usuario->id,
+                "mensaje" => "Producto ID: {$productoId}",
+                "imagen" => $nombreArchivo,
             ]);
         }
     }

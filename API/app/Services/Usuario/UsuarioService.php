@@ -9,14 +9,14 @@ use App\DTOs\Usuario\EditarPerfil\InputDto;
 use App\Exceptions\BusinessException;
 use App\Models\Usuario;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Auth\Access\AuthorizationException;
+use App\Models\Papelera;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Auth\Access\AuthorizationException;
 
 
 
@@ -51,33 +51,32 @@ class UsuarioService implements IUsuarioService
         $proximaEdicion = $usuario->fecha_actualiza->copy()->addDay();
         $ahora = Carbon::now();
 
-        // // Si ya fue editado Y aún no se cumple el plazo de 24h, bloqueamos
-        // if ($yaFueEditado && $ahora->lt($proximaEdicion)) {
+        // Si ya fue editado Y aún no se cumple el plazo de 24h, bloqueamos
+        if ($yaFueEditado && $ahora->lt($proximaEdicion)) {
             
-        //     $horasRestantes = (int) $ahora->diffInHours($proximaEdicion);
-        //     $minutosRestantes = (int) $ahora->diffInMinutes($proximaEdicion);
+            $horasRestantes = (int) $ahora->diffInHours($proximaEdicion);
+            $minutosRestantes = (int) $ahora->diffInMinutes($proximaEdicion);
 
-        //     $mensaje = $horasRestantes >= 1 
-        //         ? "Solo puede editar una vez al día. Podrás editar tu perfil en $horasRestantes" . ($horasRestantes == 1 ? " hora" : " horas")
-        //         : "Solo puede editar una vez al día. Podrás editar tu perfil en $minutosRestantes" . ($minutosRestantes == 1 ? " minuto" : " minutos");
+            $mensaje = $horasRestantes >= 1 
+                ? "Solo puede editar una vez al día. Podrás editar tu perfil en $horasRestantes" . ($horasRestantes == 1 ? " hora" : " horas")
+                : "Solo puede editar una vez al día. Podrás editar tu perfil en $minutosRestantes" . ($minutosRestantes == 1 ? " minuto" : " minutos");
 
-        //     throw new BusinessException($mensaje, 422);
-        // }
+            throw new BusinessException($mensaje, 422);
+        }
 
 
         if (empty($dto->toArray())) {
             throw new BusinessException('No hay datos para actualizar', 422);
         }
 
+        // Validar que el usuario tenga un correo institucional
+        if (!$this->cuentaRepository->esCorreoInstitucional($usuarioId)) {
+            throw new BusinessException("Solo los que cuentan con correo institucional pueden cambiar su avatar", 422);
+        }
+        
         return DB::transaction(function () use ($usuarioId, $dto) {
             if ($dto->imagen){
-                // Validar que el usuario tenga un correo institucional
-                if (!$this->cuentaRepository->esCorreoInstitucional($usuarioId)) {
-                    throw new BusinessException(
-                        "Solo los que cuentan con correo institucional pueden cambiar su avatar",
-                        422
-                    );
-                }
+
                 // Validar que haya llegado la ruta de la imagen del mapeado de los datos
                 $file = request()->file('imagen');
 
@@ -142,6 +141,15 @@ class UsuarioService implements IUsuarioService
 
                 Log::info("Contraseña actualizada para el usuario", [
                     "usuario_id" => $usuarioId,
+                ]);
+            }
+
+            // Si el usuario quiere cambiar su descripción, validamos que no sea la misma que la actual para agregar la descripción anterior a la papelera
+            if ($dto->descripcion && $dto->descripcion !== Auth::user()->usuario->descripcion) {
+                Papelera::create([
+                    'usuario_id' => $usuarioId,
+                    'mensaje' => Auth::user()->usuario->descripcion,
+                    'imagen' => null,
                 ]);
             }
 
