@@ -258,7 +258,7 @@ class ProductoService implements IProductoService
         try {
 
             // Verificar que el producto pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::id())) {
+            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
                 throw new \Exception('No tienes permiso para eliminar este producto.');
             }
 
@@ -268,6 +268,16 @@ class ProductoService implements IProductoService
 
                 // Eliminar el producto de la BD 
                 $producto = \App\Models\Producto::findOrFail($productoId);
+
+                foreach ($producto->fotos as $foto) {
+                    // Guardar en la papelera para tener registro de las imágenes eliminadas
+                    Papelera::create([
+                        "usuario_id" => Auth::user()->usuario->id,
+                        "mensaje" => "Producto ID: {$productoId}",
+                        "imagen" => $foto->imagen,
+                    ]);
+                }
+
                 $producto->delete();
 
                 Log::info('Producto eliminado', ['producto_id' => $productoId]);
@@ -351,13 +361,6 @@ class ProductoService implements IProductoService
             Foto::create([
                 'producto_id' => $productoId,
                 'imagen' => $nombreArchivo,
-            ]);
-
-            // Guardar en la papelera para tener registro de las imágenes eliminadas
-            Papelera::create([
-                "usuario_id" => Auth::user()->usuario->id,
-                "mensaje" => "Producto ID: {$productoId}",
-                "imagen" => $nombreArchivo,
             ]);
         }
     }
