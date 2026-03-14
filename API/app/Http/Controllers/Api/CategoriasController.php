@@ -9,7 +9,7 @@ class CategoriasController extends Controller
 {
     public function index()
     {
-        $categorias = Categoria::all();
+        $categorias = Categoria::with('subcategorias')->get();
         return response()->json($categorias);
     }
 }

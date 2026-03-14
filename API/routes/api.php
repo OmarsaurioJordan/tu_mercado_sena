@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\EstadosController;
 use App\Http\Controllers\Api\MotivoController;
 use App\Http\Controllers\Api\MensajeController;
 use App\Http\Controllers\Api\CategoriasController;
-use App\Http\Controllers\Api\SubCategoriasController;
+use App\Http\Controllers\Api\IntegridadController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\PqrsController;
 use App\Http\Controllers\Api\NotificacionController;
@@ -151,6 +151,9 @@ Route::middleware('jwtVerify')->group(function (){
     Route::get('notificaciones/no-vistas', [NotificacionController::class, 'notificacionesNoVistas']);
     Route::get('notificaciones/{notificacion}', [NotificacionController::class, 'show']);
     Route::delete('notificaciones/{notificacion}', [NotificacionController::class, 'destroy']);
+
+    Route::get('categorias', [CategoriasController::class, 'index']);
+    Route::get('integridades', [IntegridadController::class, 'index']);
 
 
     Route::middleware(['CheckGmailRestriction', 'throttle:api_usuario'])->group(function () {
