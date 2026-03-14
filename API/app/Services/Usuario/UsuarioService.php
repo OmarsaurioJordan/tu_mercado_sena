@@ -41,27 +41,30 @@ class UsuarioService implements IUsuarioService
             );
         }
 
-        // ======== QUE SOLO SE PUEDA EDITAR EL PERFIL EN UN PLAZO DE 24 HORAS =======
-        $usuario = Auth::user()->usuario;
-
-        // Verificamos si ya ha sido editado antes
-        $yaFueEditado = $usuario->fecha_registro->ne($usuario->fecha_actualiza);
-
-        // Usamos copy() para no alterar el objeto original del modelo
-        $proximaEdicion = $usuario->fecha_actualiza->copy()->addDay();
-        $ahora = Carbon::now();
-
-        // Si ya fue editado Y aún no se cumple el plazo de 24h, bloqueamos
-        if ($yaFueEditado && $ahora->lt($proximaEdicion)) {
-            
-            $horasRestantes = (int) $ahora->diffInHours($proximaEdicion);
-            $minutosRestantes = (int) $ahora->diffInMinutes($proximaEdicion);
-
-            $mensaje = $horasRestantes >= 1 
-                ? "Solo puede editar una vez al día. Podrás editar tu perfil en $horasRestantes" . ($horasRestantes == 1 ? " hora" : " horas")
-                : "Solo puede editar una vez al día. Podrás editar tu perfil en $minutosRestantes" . ($minutosRestantes == 1 ? " minuto" : " minutos");
-
-            throw new BusinessException($mensaje, 422);
+        // Permitir editar el perfil en un plazo de 24 horas
+        if (config('services.allow_time_edit_profile')) {
+            // ======== QUE SOLO SE PUEDA EDITAR EL PERFIL EN UN PLAZO DE 24 HORAS =======
+            $usuario = Auth::user()->usuario;
+    
+            // Verificamos si ya ha sido editado antes
+            $yaFueEditado = $usuario->fecha_registro->ne($usuario->fecha_actualiza);
+    
+            // Usamos copy() para no alterar el objeto original del modelo
+            $proximaEdicion = $usuario->fecha_actualiza->copy()->addDay();
+            $ahora = Carbon::now();
+    
+            // Si ya fue editado Y aún no se cumple el plazo de 24h, bloqueamos
+            if ($yaFueEditado && $ahora->lt($proximaEdicion)) {
+                
+                $horasRestantes = (int) $ahora->diffInHours($proximaEdicion);
+                $minutosRestantes = (int) $ahora->diffInMinutes($proximaEdicion);
+    
+                $mensaje = $horasRestantes >= 1 
+                    ? "Solo puede editar una vez al día. Podrás editar tu perfil en $horasRestantes" . ($horasRestantes == 1 ? " hora" : " horas")
+                    : "Solo puede editar una vez al día. Podrás editar tu perfil en $minutosRestantes" . ($minutosRestantes == 1 ? " minuto" : " minutos");
+    
+                throw new BusinessException($mensaje, 422);
+            }
         }
 
 
