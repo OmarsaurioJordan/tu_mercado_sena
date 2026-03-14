@@ -269,15 +269,6 @@ class ProductoService implements IProductoService
                 // Eliminar el producto de la BD 
                 $producto = \App\Models\Producto::findOrFail($productoId);
 
-                foreach ($producto->fotos as $foto) {
-                    // Guardar en la papelera para tener registro de las imágenes eliminadas
-                    Papelera::create([
-                        "usuario_id" => Auth::user()->usuario->id,
-                        "mensaje" => "Producto ID: {$productoId}",
-                        "imagen" => $foto->imagen,
-                    ]);
-                }
-
                 $producto->delete();
 
                 Log::info('Producto eliminado', ['producto_id' => $productoId]);
@@ -370,7 +361,6 @@ class ProductoService implements IProductoService
      */
     protected function eliminarImagenesProducto(int $productoId): void
     {
-
         $fotos = Foto::where('producto_id', $productoId)->get();
         
         // Log confirmando que use la papelera
@@ -379,7 +369,13 @@ class ProductoService implements IProductoService
         foreach ($fotos as $foto) {
             // Eliminar archivo del storage
             Storage::disk('public')->move("productos/{$productoId}" . $foto->imagen, "papelera/productos/{$productoId}/" . $foto->imagen);
-            
+
+            Papelera::create([
+                "usuario_id" => Auth::user()->usuario->id,
+                "mensaje" => "Producto ID: {$productoId}",
+                "imagen" => "papelera/productos/{$productoId}/" . $foto->imagen,
+            ]);
+                
             // Eliminar registro de BD
             $foto->delete();
         }
