@@ -370,11 +370,15 @@ class ProductoService implements IProductoService
      */
     protected function eliminarImagenesProducto(int $productoId): void
     {
+
         $fotos = Foto::where('producto_id', $productoId)->get();
+        
+        // Log confirmando que use la papelera
+        Log::info("Moviendo imagenes hacia la papelera");
 
         foreach ($fotos as $foto) {
             // Eliminar archivo del storage
-            Storage::disk('public')->delete('productos/' . $foto->imagen);
+            Storage::disk('public')->move("productos/{$productoId}" . $foto->imagen, "papelera/productos/{$productoId}/" . $foto->imagen);
             
             // Eliminar registro de BD
             $foto->delete();
