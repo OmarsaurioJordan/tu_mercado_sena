@@ -45,6 +45,7 @@ class EditarPerfilRequest extends FormRequest
             ],
             'link' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'url',
                 'max:128',

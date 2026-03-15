@@ -1,14 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use App\Models\Integridad;
+use Illuminate\Http\JsonResponse;
 
 class IntegridadController extends Controller
 {
-    public function index()
+    /**
+     * Listar todas las integridades
+     * GET /api/integridad
+     */
+    public function index(): JsonResponse
     {
-        return response()->json(Integridad::all(), 200);
+        try {
+            $integridades = Integridad::all();
+            return response()->json($integridades, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener integridades.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

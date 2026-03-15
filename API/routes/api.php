@@ -145,7 +145,6 @@ Route::middleware('jwtVerify')->group(function (){
     
     Route::get('pqrs', [PqrsController::class, 'index']);
     Route::post('pqrs', [PqrsController::class, 'store']);
-    
     Route::get('notificaciones', [NotificacionController::class, 'index']);
     Route::get('notificaciones/no-vistas', [NotificacionController::class, 'notificacionesNoVistas']);
     Route::get('notificaciones/{notificacion}', [NotificacionController::class, 'show']);
@@ -221,6 +220,7 @@ Route::middleware('jwtVerify')->group(function (){
     Route::get('/ping', function () {
         return response()->json([
             'message' => 'pong',
+	        'message_2' => 'Brahian estuvo aqui',
             'timestamp' => now()->toIso8601String()
         ]);
     });

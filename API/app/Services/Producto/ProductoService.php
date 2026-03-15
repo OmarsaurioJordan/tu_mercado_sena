@@ -81,7 +81,7 @@ class ProductoService implements IProductoService
 
         try {
             // Verificar que el producto existe y pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::id())) {
+            if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::user()->usuario->id)) {
                 throw new \Exception('No tienes permiso para editar este producto.');
             }
 
@@ -223,7 +223,7 @@ class ProductoService implements IProductoService
 
 
             // Verificar que el producto pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::id())) {
+            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
                 throw new \Exception('No tienes permiso para modificar este producto.');
             }
 
@@ -253,40 +253,44 @@ class ProductoService implements IProductoService
      */
     public function eliminarProducto(int $productoId): array
     {
-        Log::info('Eliminando producto', ['producto_id' => $productoId]);
+    Log::info('Eliminando producto', ['producto_id' => $productoId]);
 
-        try {
+    try {
 
-            // Verificar que el producto pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
-                throw new \Exception('No tienes permiso para eliminar este producto.');
-            }
-
-            return DB::transaction(function () use ($productoId) {
-                // Eliminar las imágenes del storage
-                $this->eliminarImagenesProducto($productoId);
-
-                // Eliminar el producto de la BD 
-                $producto = \App\Models\Producto::findOrFail($productoId);
-
-                $producto->delete();
-
-                Log::info('Producto eliminado', ['producto_id' => $productoId]);
-
-                return [
-                    'success' => true,
-                    'message' => 'Producto eliminado exitosamente.',
-                ];
-            });
-
-        } catch (\Exception $e) {
-            Log::error('Error al eliminar producto', [
-                'error' => $e->getMessage(),
-                'producto_id' => $productoId,
-            ]);
-            throw $e;
+        if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
+            throw new \Exception('No tienes permiso para eliminar este producto.');
         }
+
+        return DB::transaction(function () use ($productoId) {
+
+            // mover imágenes
+            $this->eliminarImagenesProducto($productoId);
+
+            // marcar producto como eliminado
+            $producto = \App\Models\Producto::findOrFail($productoId);
+            $producto->estado_id = 3;
+            $producto->save();
+
+            Log::info('Producto marcado como eliminado', [
+                'producto_id' => $productoId
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Producto eliminado exitosamente.',
+            ];
+        });
+
+    } catch (\Exception $e) {
+
+        Log::error('Error al eliminar producto', [
+            'error' => $e->getMessage(),
+            'producto_id' => $productoId,
+        ]);
+
+        throw $e;
     }
+}
 
     /**
      * Busca productos por texto
@@ -368,7 +372,8 @@ class ProductoService implements IProductoService
 
         foreach ($fotos as $foto) {
             // Eliminar archivo del storage
-            Storage::disk('public')->move("productos/{$productoId}" . $foto->imagen, "papelera/productos/{$productoId}/" . $foto->imagen);
+            Storage::disk('public')->move("productos/{$productoId}/" . $foto->imagen,"papelera/productos/{$productoId}/" . $foto->imagen
+        );
 
             Papelera::create([
                 "usuario_id" => Auth::user()->usuario->id,

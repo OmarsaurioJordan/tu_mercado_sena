@@ -73,15 +73,21 @@ class UsuarioService implements IUsuarioService
         }
 
         // Validar que el usuario tenga un correo institucional
-        if (!$this->cuentaRepository->esCorreoInstitucional($usuarioId)) {
-            throw new BusinessException("Solo los que cuentan con correo institucional pueden cambiar su avatar", 422);
+        $cuenta = $this->cuentaRepository->findByUsuarioId($usuarioId);
+
+        if (!$cuenta || !$this->cuentaRepository->esCorreoInstitucional($cuenta->id)) {
+            throw new BusinessException(
+                "Solo los que cuentan con correo institucional pueden cambiar su avatar",
+                422
+            );
         }
         
         return DB::transaction(function () use ($usuarioId, $dto) {
+            $data = $dto->toArray();
             if ($dto->imagen){
 
                 // Validar que haya llegado la ruta de la imagen del mapeado de los datos
-                $file = request()->file('imagen');
+                $file = $dto->imagen;
 
                 // Inicializar la ruta
                 $ruta = null;
@@ -104,6 +110,7 @@ class UsuarioService implements IUsuarioService
                     // Enviar la imagen a una ruta temporal
                     Storage::disk('public')->put($ruta, $image->toString());             
                     Storage::disk('public')->put($rutaPapelera, $image->toString());
+                    $data['imagen'] = $ruta;
                 }
 
                 Log::info("Creando el registro en la base de datos", [
@@ -122,7 +129,7 @@ class UsuarioService implements IUsuarioService
 
             // Cambiar las opciones de las notificaciones
             if ($dto->notifica_push !== null || $dto->notifica_correo !== null) {
-                $cuentaUsuario = Auth::user();
+                $cuentaUsuario = Auth::user()->usuario->cuenta;
 
                 $cuentaUsuario->update([
                     'notifica_push' => $dto->notifica_push ?? $cuentaUsuario->notifica_push,
@@ -156,7 +163,7 @@ class UsuarioService implements IUsuarioService
                 ]);
             }
 
-            $usuario_actualizado = $this->usuarioRepository->update($usuarioId, $dto->toArray());
+            $usuario_actualizado = $this->usuarioRepository->update($usuarioId, $data);
         
             if (!$usuario_actualizado) {
                 throw new BusinessException('No se pudo actualizar el perfil del usuario.', 500);
@@ -167,7 +174,6 @@ class UsuarioService implements IUsuarioService
             $usuario_actualizado->notifica_push = $usuario_actualizado->cuenta->notifica_push;
             $usuario_actualizado->notifica_correo = $usuario_actualizado->cuenta->notifica_correo;
 
-            // Eliminamos la relación cargada para que no ensucie el JSON de salida
             $usuario_actualizado->unsetRelation('cuenta');
 
             return $usuario_actualizado;

@@ -124,4 +124,12 @@ class Usuario extends Model
             'denunciante_id'
         )->using(Denuncia::class)->withPivot('producto_id', 'chat_id', 'motivo_id', 'estado_id');
     }
+    public function getImagenAttribute($value)
+    {
+        if (!$value) {
+            return null;
+        }
+
+        return asset("storage/".$value);
+    }
 }

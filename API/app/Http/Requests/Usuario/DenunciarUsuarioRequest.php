@@ -18,7 +18,7 @@ class DenunciarUsuarioRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'denunciante_id' => Auth::id(),
+            'denunciante_id' => Auth::user()->usuario->id,
             'denunciado_id'  => $this->route('denunciado_id'),
         ]);
     }
@@ -38,7 +38,7 @@ class DenunciarUsuarioRequest extends FormRequest
                 'integer',
                 'exists:usuarios,id',
                 function ($attribute, $value, $fail) {
-                    if ($value !== Auth::id()) {
+                    if ($value !== Auth::user()->usuario->id) {
                         $fail('El denunciante debe ser el usuario autenticado.');
                     }
                 },

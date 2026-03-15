@@ -111,8 +111,7 @@ readonly class OutputDto implements Arrayable
             fotos: $producto->relationLoaded('fotos') ? 
                 $producto->fotos->map(fn($foto) => [
                     'id' => $foto->id,
-                    'url' => asset("storage/productos/{$foto->imagen}"),
-                   
+                    'url' => asset("storage/productos/{$producto->id}/{$foto->imagen}"),
                     'actualiza' => $foto->actualiza?->format('Y-m-d H:i:s') ?? now()->format('Y-m-d H:i:s'),
                 ])->toArray() 
             : null,

@@ -217,7 +217,7 @@ class ProductoController extends Controller
     public function misProductos(): JsonResponse
     {
         try {
-            $resultado = $this->productoService->obtenerProductosDeVendedor(Auth::id());
+            $resultado = $this->productoService->obtenerProductosDeVendedor(Auth::user()->usuario->id);
 
             return response()->json($resultado, 200);
 
