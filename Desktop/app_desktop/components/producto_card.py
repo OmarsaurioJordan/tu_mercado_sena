@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
+from services.recursos import newSprit
 
 class ProductoCard(QFrame):
     card_clic = Signal(int) # id producto
@@ -25,7 +26,7 @@ class ProductoCard(QFrame):
         self.imagen = QLabel(self)
         self.imagen.setScaledContents(True)
         self.imagen.setFixedSize(48, 48)
-        self.imagen.setPixmap(QPixmap("assets/sprites/img_null.png"))
+        self.imagen.setPixmap(QPixmap(newSprit("img_null.png")))
 
         self.nombre = QLabel("", self)
         self.nombre.setWordWrap(True)

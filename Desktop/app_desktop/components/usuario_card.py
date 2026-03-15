@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QApplica
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 
+from services.recursos import newSprit
 class UsuarioCard(QFrame):
     card_clic = Signal(int) # id usuario
 
@@ -21,7 +22,7 @@ class UsuarioCard(QFrame):
         self.imagen = QLabel(self)
         self.imagen.setScaledContents(True)
         self.imagen.setFixedSize(48, 48)
-        self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
+        self.imagen.setPixmap(QPixmap(newSprit("avatar.png")))
 
         self.nickname = QLabel("", self)
         self.nickname.setWordWrap(True)

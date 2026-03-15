@@ -6,6 +6,7 @@ from components.selector import Selector
 from components.boton import Boton
 from services.alerta import Alerta
 from core.session import Session
+from services.recursos import newSprit
 
 class UsuarioBody(QWidget):
     cambioData = Signal(int) # id usuario
@@ -27,7 +28,7 @@ class UsuarioBody(QWidget):
         ctrlData = QApplication.instance().property("controls").get_data()
 
         self.imagen = QLabel(self)
-        self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
+        self.imagen.setPixmap(QPixmap(newSprit("avatar.png")))
         self.imagen.setScaledContents(True)
         self.imagen.setFixedSize(192, 192)
         self.imagen.setAlignment(
@@ -176,7 +177,7 @@ class UsuarioBody(QWidget):
         self.sel_estado.set_index(0)
         self.sel_rol.set_ente_id(0)
         self.sel_estado.set_ente_id(0)
-        self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
+        self.imagen.setPixmap(QPixmap(newSprit("avatar.png")))
         # eliminar estructuras internas
         if self.catalogo:
             self.ctrlCatalogo.limpiar()

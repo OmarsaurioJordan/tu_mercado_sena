@@ -3,6 +3,7 @@ from PySide6.QtGui import QPixmap
 from services.load_image import ImageWorker
 from core.app_config import IMAGE_USER_LINK
 from services.image_utils import circular_pixmap
+from services.recursos import newSprit
 
 class UsuarioSignal(QObject):
     ok_image = Signal(int) # id usuario
@@ -23,7 +24,7 @@ class Usuario:
         # carga de imagenes
         self.imagen = imagen
         self.img_signal = UsuarioSignal()
-        self.img_pix = QPixmap("assets/sprites/avatar.png")
+        self.img_pix = QPixmap(newSprit("avatar.png"))
         self.is_img_load = False
         self.worker = None
 
@@ -57,7 +58,7 @@ class Usuario:
         if not image.isNull():
             pix = QPixmap.fromImage(image)
         else:
-            pix = QPixmap("assets/sprites/avatar.png")
+            pix = QPixmap(newSprit("avatar.png"))
         self.img_pix = circular_pixmap(pix, 128)
         self.is_img_load = True
         self.img_signal.ok_image.emit(self.id)

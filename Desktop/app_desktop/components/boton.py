@@ -1,13 +1,14 @@
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QIcon
+from services.recursos import newSprit
 
 class Boton(QPushButton):
 
     def __init__(self, texto="", icono="", size=32):
         super().__init__(texto)
         if icono != "":
-            self.setIcon(QIcon("assets/sprites/" + icono + ".png"))
+            self.setIcon(QIcon(newSprit(icono + ".png")))
             self.setIconSize(QSize(size, size))
         self.setFocusPolicy(Qt.NoFocus)
         self.setStyleSheet("""

@@ -6,13 +6,14 @@ from ui.info_menus import InfoMenus
 from components.txt_edit import TxtEdit
 from components.boton import Boton
 from services.alerta import Alerta
+from services.recursos import newSprit
 
 class LoginWindow(QWidget):
 
     def __init__(self):
         super().__init__()
 
-        image = QPixmap("assets/sprites/logo.png")
+        image = QPixmap(newSprit("logo.png"))
         logo = QLabel()
         logo.setPixmap(image)
         logo.setScaledContents(True)

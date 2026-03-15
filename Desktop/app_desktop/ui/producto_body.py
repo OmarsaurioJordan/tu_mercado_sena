@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplic
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 from components.selector import Selector
+from services.recursos import newSprit
 
 class ProductoBody(QWidget):
     cambioData = Signal(int) # id producto
@@ -102,7 +103,7 @@ class ProductoBody(QWidget):
         if pixmap:
             imagen.setPixmap(pixmap)
         else:
-            imagen.setPixmap(QPixmap("assets/sprites/img_null.png"))
+            imagen.setPixmap(QPixmap(newSprit("img_null.png")))
         imagen.setScaledContents(True)
         imagen.setFixedSize(256, 256)
         imagen.setAlignment(
@@ -144,7 +145,7 @@ class ProductoBody(QWidget):
         self.sel_subcategoria.set_ente_id(0)
         self.sel_integridad.set_ente_id(0)
         self.sel_estado.set_ente_id(0)
-        self.imagen.setPixmap(QPixmap("assets/sprites/img_null.png"))
+        self.imagen.setPixmap(QPixmap(newSprit("img_null.png")))
         self.limpiarImagenes()
         self.cambioData.emit(0)
 

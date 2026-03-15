@@ -68,6 +68,9 @@ class ToolsConfig(QWidget):
         layPanel4.addWidget(self.selBloqueo)
         panelWatchdog.setLayout(layPanel4)
         
+        interfacez = QApplication.instance().property("manager")
+        interfacez.setTiempoBloqueo(self.selBloqueo.get_data())
+        
         layFuncionamiento = QVBoxLayout()
         layFuncionamiento.addWidget(panelNotifi)
         layFuncionamiento.addSpacing(20)

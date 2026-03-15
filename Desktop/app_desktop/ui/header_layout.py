@@ -6,6 +6,7 @@ from components.usuario_card import UsuarioCard
 from components.boton import Boton
 from models.usuario import Usuario
 from core.session import Session
+from services.recursos import newSprit
 
 class HeaderLayout(QVBoxLayout):
 
@@ -25,7 +26,7 @@ class HeaderLayout(QVBoxLayout):
         
         manager.signal_notifi.connect(self.on_notifi)
 
-        image = QPixmap("assets/sprites/logo.png")
+        image = QPixmap(newSprit("logo.png"))
         logo = QLabel()
         logo.setPixmap(image)
         logo.setScaledContents(True)

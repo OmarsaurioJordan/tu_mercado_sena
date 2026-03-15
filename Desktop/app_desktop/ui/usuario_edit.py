@@ -6,6 +6,7 @@ from components.boton import Boton
 from components.txt_edit import TxtEdit
 from services.alerta import Alerta
 from core.session import Session
+from services.recursos import newSprit
 
 class UsuarioEdit(QWidget):
 
@@ -17,7 +18,7 @@ class UsuarioEdit(QWidget):
         ctrlUsuario.usuario_signal.hubo_cambio.connect(self.actualizar)
 
         self.imagen = QLabel(self)
-        self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
+        self.imagen.setPixmap(QPixmap(newSprit("avatar.png")))
         self.imagen.setScaledContents(True)
         self.imagen.setFixedSize(192, 192)
         self.imagen.setAlignment(
@@ -116,7 +117,7 @@ class UsuarioEdit(QWidget):
         self.edicion.setText("Edición")
         self.actividad.setText("Actividad")
         self.passOld.set_value("")
-        self.imagen.setPixmap(QPixmap("assets/sprites/avatar.png"))
+        self.imagen.setPixmap(QPixmap(newSprit("avatar.png")))
 
     def setData(self, usuario):
         if usuario is None:

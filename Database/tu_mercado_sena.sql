@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 15-03-2026 a las 03:31:45
--- Versión del servidor: 11.8.3-MariaDB-log
--- Versión de PHP: 7.2.34
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 15-03-2026 a las 16:16:51
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `u630689278_tms`
+-- Base de datos: `tms_ensayo`
 --
 
 -- --------------------------------------------------------
@@ -409,21 +409,137 @@ INSERT INTO `subcategorias` (`id`, `nombre`, `categoria_id`) VALUES
 (8, 'chatarra industrial', 2),
 (9, 'pan o pastel', 2),
 (10, 'bebidas', 2),
-(11, 'otro', 5),
-(12, 'cuidado de la piel', 5),
-(13, 'cuidado del pelo', 5),
-(14, 'labial', 5),
-(15, 'sombra', 5),
-(16, 'delineador', 5),
-(17, 'piercing', 5),
-(18, 'tatuaje', 5),
-(19, 'maniquiur', 5),
-(20, 'peluqueria', 5),
-(21, 'otro', 6),
-(22, 'balón', 6),
-(23, 'pesas', 6),
-(24, 'suplemento alimenticio', 6),
-(25, 'patineta o patines', 6);
+(21, 'otro', 5),
+(22, 'cuidado de la piel', 5),
+(23, 'cuidado del pelo', 5),
+(24, 'labial', 5),
+(25, 'sombra', 5),
+(26, 'delineador', 5),
+(27, 'piercing', 5),
+(28, 'tatuaje', 5),
+(29, 'maniquiur', 5),
+(30, 'peluqueria', 5),
+(31, 'otro', 6),
+(32, 'balón', 6),
+(33, 'pesas', 6),
+(34, 'suplemento alimenticio', 6),
+(35, 'patineta o patines', 6),
+(36, 'implementos acuaticos', 6),
+(37, 'implementos terrestres', 6),
+(38, 'implementos extremos', 6),
+(39, 'arte marcial o lucha', 6),
+(40, 'aseo deportivo', 6),
+(41, 'otro', 7),
+(42, 'computador de escritorio', 7),
+(43, 'computador portátil', 7),
+(44, 'periféricos para computador', 7),
+(45, 'celular', 7),
+(46, 'cámara fotográfica', 7),
+(47, 'calculadora o mediciónes', 7),
+(48, 'tableta para arte', 7),
+(49, 'audifónos, reloj o corporales', 7),
+(50, 'sistema de seguridad', 7),
+(51, 'otro', 4),
+(52, 'taladro, pulidora o similar', 4),
+(53, 'martillo, alicate o similar', 4),
+(54, 'licuadora, microondas o similar', 4),
+(55, 'seguridad para ajustar bicicleta', 4),
+(56, 'escuadra o regla para dibujo', 4),
+(57, 'metro o medidores', 4),
+(58, 'tijera, visturí o similar', 4),
+(59, 'ventilador o aire acondicionado', 4),
+(60, 'kit de mecánico', 4),
+(61, 'otro', 4),
+(62, 'taladro, pulidora o similar', 4),
+(63, 'martillo, alicate o similar', 4),
+(64, 'licuadora, microondas o similar', 4),
+(65, 'seguridad para ajustar bicicleta', 4),
+(66, 'escuadra o regla para dibujo', 4),
+(67, 'metro o medidores', 4),
+(68, 'tijera, visturí o similar', 4),
+(69, 'ventilador o aire acondicionado', 4),
+(70, 'kit de mecánico', 4),
+(71, 'otro', 12),
+(72, 'perro', 12),
+(73, 'gato', 12),
+(74, 'pez', 12),
+(75, 'alimento', 12),
+(76, 'correa', 12),
+(77, 'juguete', 12),
+(78, 'roedor', 12),
+(79, 'tapete', 12),
+(80, 'ropa', 12),
+(81, 'otro', 10),
+(82, 'silla regulable', 10),
+(83, 'silla estática', 10),
+(84, 'sillón grande', 10),
+(85, 'mesa', 10),
+(86, 'cama o colchón', 10),
+(87, 'matera', 10),
+(88, 'armario o nochero', 10),
+(89, 'escritorio', 10),
+(90, 'tapete', 10),
+(91, 'otro', 13),
+(92, 'otro', 3),
+(93, 'cartónes o cajas', 3),
+(94, 'telas y costura', 3),
+(95, 'pegamentos', 3),
+(96, 'cuadernos, carpetas', 3),
+(97, 'colores, pinturas, pinceles', 3),
+(98, 'libros', 3),
+(99, 'lápices, marcadores, lapiceros', 3),
+(100, 'borradores, sacapuntas', 3),
+(101, 'papel, fomi, cartulina', 3),
+(102, 'otro', 8),
+(103, 'entrenamiento deportivo', 8),
+(104, 'eseñanza artística', 8),
+(105, 'enseñanza tecnológica', 8),
+(106, 'mantenimiento computadora', 8),
+(107, 'reparación dispositivos', 8),
+(108, 'preparación de comidas', 8),
+(109, 'documentación', 8),
+(110, 'creación de arte o manualidades', 8),
+(111, 'cuidado y aseo', 8),
+(112, 'otro', 9),
+(113, 'juego deportivo', 9),
+(114, 'juego videojuegos', 9),
+(115, 'practicar idiomas', 9),
+(116, 'fiesta y baile', 9),
+(117, 'charlar', 9),
+(118, 'emprendimiento', 9),
+(119, 'paseos y viajes', 9),
+(120, 'seguir en redes', 9),
+(121, 'religión e ideologías', 9),
+(122, 'otro', 11),
+(123, 'bicicleta', 11),
+(124, 'moto de gasolina', 11),
+(125, 'casco de moto', 11),
+(126, 'moto eléctrica', 11),
+(127, 'bici o patín eléctricos', 11),
+(128, 'carro', 11),
+(129, 'chaleco, guantes o vestimenta', 11),
+(130, 'repuesto', 11),
+(131, 'parrillas o implementos', 11),
+(132, 'otro', 1),
+(133, 'calzado', 1),
+(134, 'sombrero', 1),
+(135, 'pantalón', 1),
+(136, 'camisa', 1),
+(137, 'vestido', 1),
+(138, 'falda', 1),
+(139, 'medias o guantes', 1),
+(140, 'chaleco o buzo', 1),
+(141, 'colgandijas', 1),
+(142, 'colgantes', 14),
+(143, 'figurillas', 14),
+(144, 'materas o jardín', 14),
+(145, 'de metal', 14),
+(146, 'de plástico', 14),
+(147, 'de madera', 14),
+(148, 'de porcelana', 14),
+(149, 'afiches o pinturas', 14),
+(150, 'peluches', 14),
+(151, 'otro', 14);
 
 -- --------------------------------------------------------
 
@@ -812,7 +928,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `subcategorias`
 --
 ALTER TABLE `subcategorias`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
 
 --
 -- AUTO_INCREMENT de la tabla `sucesos`

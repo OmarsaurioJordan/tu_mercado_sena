@@ -39,8 +39,7 @@ Más allá de estos, cada módulo define sus propios parámetros de consulta.
 | `get_help.php` | GET | Valores contados de denuncias y PQRS activas | ninguno | `[ { "denuncias": <n>, "pqrss": <n> } ]` |
 | `informacion.php` | GET | Estadísticas generales de usuarios, productos y chats | ninguno | Objeto con varios contadores según estado |
 | `responder.php` | GET | Inserta una notificación para un usuario | **requeridos**: `id`, `mensaje`, `motivo_id`; además `admin_email`, `admin_token` | `{ "Ok": "1" }` o `{ "Ok": "0" }` |
-
-También está el endpoint `api/tools/master` sin argumentos, que crea un usuario administrador si no existe ninguno aún, usar esto con precaución para debug
+| `master.php` | GET | Crea un usuario administrador si no existe ninguno aún | ninguno | (sin respuesta específica, para debug) |
 
 ### Usuarios (`api/usuarios`)
 
@@ -59,17 +58,10 @@ Filtra y devuelve usuarios.
 
 **Respuesta**: lista de usuarios con campos `id`, `email`, `rol_id`, `nickname`, `imagen`, `descripcion`, `link`, `estado_id`, `fecha_registro`, `fecha_actualiza`, `fecha_reciente`.
 
-#### `set_data.php` (actualización)
-Modifica nickname, descripción, link, PIN o contraseña de un usuario.
-**Parámetros requeridos**: `id` más al menos uno de (`nickname`, `descripcion`, `link`, `pin`, `password`).
-Requiere `admin_email` y `admin_token`. Realiza hashing automático para la contraseña.
-**Respuesta**: `{ "Ok": "1" }` en caso de éxito.
-
 #### `set_rol.php` y `set_estado.php` (administración)
 - `set_rol.php`: cambia el `rol_id` a 1 o 2. Requiere `id` y `rol`.
 - `set_estado.php`: cambia el `estado_id` entre 1 y 4. Requiere `id` y `estado`.
 Ambos endpoints requieren credenciales administrativas y devuelven `{ "Ok": "1" }` en caso de éxito; además registran una auditoría.
-
 
 ### Productos (`api/productos`)
 
@@ -81,13 +73,13 @@ Opciones de filtrado:
 - `precio_min`, `precio_max`.
 - `con_descripcion` (1 para exigir descripción).
 - Rangos de registro y `id` específico.
+- `vendedor_id` (filtra por vendedor).
 - Paginación: `cursor_fecha`, `cursor_id`, `limite`.
 
 Respuesta: array de productos con sus metadatos y un subcampo `imagenes` que contiene una lista de URLs.
 
 #### `set_estado.php`
 Actualiza el estado de un producto (1‑4). Parámetros `id` y `estado`. Credenciales administrativas obligatorias.
-
 
 ### PQRS (`api/pqrss`)
 
@@ -104,7 +96,6 @@ Respuesta: objetos con información básica del PQRS y del usuario, incluyendo d
 #### `set_estado.php`
 Cambia el estado a 11 (resuelto). Requiere `id` y `estado`. Credenciales administrativas.
 
-
 ### Denuncias (`api/denuncias`)
 
 #### `index.php` (consulta)
@@ -114,7 +105,6 @@ Criterios similares a los de PQRS, con adiciones:
 - `tipo` 1=usuario, 2=producto, 3=chat (determinado según presencia de `chat_id` o `producto_id`).
 
 Respuesta: información ampliada que incluye nombres de afectados y objetos relacionados.
-
 
 ### Chats (`api/chats`)
 
@@ -126,7 +116,6 @@ Respuesta: datos de la venta, calificación, nombres de comprador/vendedor, etc.
 #### `set_estado.php`
 Modifica el estado a uno de los valores permitidos (1,3,5,8,9). Requiere credenciales de administrador.
 
-
 ### Mensajes (`api/mensajes`)
 
 Enumera los mensajes de un chat. Parámetros de filtrado:
@@ -137,7 +126,6 @@ Enumera los mensajes de un chat. Parámetros de filtrado:
 
 Nota: este endpoint invoca `validation()` porque los mensajes son considerados sensibles.
 
-
 ### Papelera (`api/papelera`)
 
 Recupera los elementos de la tabla `papelera` (mensajes borrados). Filtros:
@@ -146,42 +134,20 @@ Recupera los elementos de la tabla `papelera` (mensajes borrados). Filtros:
 - rangos de fecha, `id`, `limite`, paginación.
 Requiere validación administrativa.
 
-
 ### Auditorías (`api/auditorias`)
 
 Listado de registros de acciones administrativas. Filtros:
 - `nickname`, `suceso_id`
 - intervalo de fechas, `email`, `id`, `limite`, paginación.
 
-
 ### Logins (`api/logins`)
 
 Historial de intentos de inicio de sesión. Parámetros:
 - `nickname`, `email`, intervalos de fecha, `id`, `limite`, paginación.
 
-
 ### Rutas públicas de administración
 
 - `admin/admin_login.php`: obtiene un token de sesión. Parámetros `email` y `password`. Devuelve `{ "token": "<jti>", "id": <usuario_id> }` en caso de autenticación exitosa.
-- `admin/admin_pin.php`: verifica el PIN de un administrador. Requiere `email` y `pin`. No necesita token.
+- `admin/admin_pin.php`: verifica el PIN de un administrador. Requiere `email`, `pin`, `admin_email` y `admin_token`.
 - `admin/master_info.php`: devuelve la descripción y enlace del usuario con rol "master".
-
-
-## Uso típico
-
-1. **Obtener token**: solicitar `admin/admin_login.php` con credenciales. El token (`jti`) se utiliza como `admin_token` en llamadas subsecuentes.
-2. **Ejecutar consultas**: llamar a los endpoints de consulta con filtros adecuados.
-3. **Modificar recursos**: incluir `admin_email` y `admin_token` en la URL y acceder a los scripts `set_*`.
-
-> **Importante:** cuando `$debug` en `config.php` está en `true`, los métodos `validation()` y `auditar()` no realizan ninguna comprobación ni registro. Esta configuración sólo debe emplearse en entornos de prueba.
-
-## Consideraciones adicionales
-
-- Todas las búsquedas se retornan ordenadas por fecha descendente y, en caso de empate, por identificador.
-- Los estados numéricos se documentan en tablas de referencia (`estados`, `motivos`, etc.), accesibles mediante `tools/get_data.php`.
-- Los endpoints de escritura devuelven `Ok` con valor `0` o `1`; los lectores devuelven listas o un error 404 cuando no se encuentra nada.
-
----
-
-Esta documentación debería abarcar el conjunto de funcionalidades disponibles en la API. Para ampliar o modificar comportamientos, consulte los archivos PHP correspondientes.
-
+- `admin/set_data.php`: actualiza datos de un usuario (nickname, descripcion, link, pin, password). Requiere `id`, `old_password` (para verificación), y al menos uno de los campos a actualizar, además de credenciales administrativas.

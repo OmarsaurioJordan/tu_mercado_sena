@@ -17,6 +17,7 @@ https://www.pythonguis.com/pyside6-tutorial/
 
 ## Notas
 
+- **export.txt** continee los comandos para crear un .EXE vía línea de comandos
 - **requeriments.txt** lista las librerias necesarias para Python
 - **tareas.txt** lista de cosas por hacer y anotación de bugs por corregir
 - **app_config.py** ahí están las variables / constantes globales del sistema, para configurarlo
@@ -27,7 +28,7 @@ https://www.pythonguis.com/pyside6-tutorial/
 
 ## Elementos para que cada entidad pueda hacer acciónes administrativas
 
--   **API/** no es parte de la App, es un archivo a parte con los SQL para la DB que retorna JSON
+-   **TMS_API/** no es parte de la App, es un archivo a parte con los SQL para la DB que retorna JSON
 -   **entidad.py** modelo, la estructura de la entidad, sus variables, creación a partir de JSON y carga de imágenes asincronas
 -   **entidad_card.py** ficha de la entidad para ser mostrada en búsquedas o referenciada desde otros elementos de la UI
 -   **entidad_body.py** información ampliada de la entidad, con acciónes administrativas, se instancia una vez en la UI

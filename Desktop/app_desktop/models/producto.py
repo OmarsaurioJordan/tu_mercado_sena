@@ -2,6 +2,7 @@ from PySide6.QtCore import QThreadPool, Signal, QObject
 from PySide6.QtGui import QPixmap
 from services.load_image import ImageWorker
 from core.app_config import IMAGE_PROD_LINK
+from services.recursos import newSprit
 
 class ProductoSignal(QObject):
     ok_image = Signal(int) # id producto
@@ -48,7 +49,7 @@ class Producto:
             imagenes = data.get("imagenes", [])
         )
         for i in range(len(pro.imagenes)):
-            pro.img_pix.append(QPixmap("assets/sprites/img_null.png"))
+            pro.img_pix.append(QPixmap(newSprit("img_null.png")))
             pro.is_img_load.append(False)
         return pro
 
@@ -79,7 +80,7 @@ class Producto:
         if not image.isNull():
             pix = QPixmap.fromImage(image)
         else:
-            pix = QPixmap("assets/sprites/img_null.png")
+            pix = QPixmap(newSprit("img_null.png"))
         self.img_pix[img_ind] = pix
         self.is_img_load[img_ind] = True
         self.img_signal.ok_image.emit(self.id)
@@ -88,7 +89,7 @@ class Producto:
         for i in range(len(self.imagenes)):
             if self.is_img_load[i]:
                 return self.img_pix[i]
-        return QPixmap("assets/sprites/img_null.png")
+        return QPixmap(newSprit("img_null.png"))
     
     def get_no_portada(self):
         imgs = []

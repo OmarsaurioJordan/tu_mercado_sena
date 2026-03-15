@@ -37,7 +37,5 @@ MSJ_MAX = 155
 DB_NOTIFI_MSJ_MAX = 255
 # cantidad de puntos que se le puede poner a un producto comprado
 CALIFICACION_MAX = 5
-# segundos para bloquear la interfaz
-DEFAULT_WATCHDOG_S = 180
 # talla maxima de la descripcion de usuario en la DB
 DESCRIPCION_MAX = 512

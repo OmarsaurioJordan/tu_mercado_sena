@@ -2,6 +2,7 @@ from PySide6.QtCore import QThreadPool, Signal, QObject
 from PySide6.QtGui import QPixmap
 from services.load_image import ImageWorker
 from core.app_config import IMAGE_PAPELERA_LINK
+from services.recursos import newSprit
 
 class PapeleraSignal(QObject):
     ok_image = Signal(int) # id papelera
@@ -15,7 +16,7 @@ class Papelera:
         # carga de imagenes
         self.imagen = imagen
         self.img_signal = PapeleraSignal()
-        self.img_pix = QPixmap("assets/sprites/img_null.png")
+        self.img_pix = QPixmap(newSprit("img_null.png"))
         self.is_img_load = False
         self.worker = None
 
@@ -43,7 +44,7 @@ class Papelera:
         if not image.isNull():
             pix = QPixmap.fromImage(image)
         else:
-            pix = QPixmap("assets/sprites/img_null.png")
+            pix = QPixmap(newSprit("img_null.png"))
         self.img_pix = pix
         self.is_img_load = True
         self.img_signal.ok_image.emit(self.id)

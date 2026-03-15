@@ -20,7 +20,7 @@ if __name__ == "__main__":
     app.setProperty("manager", manager)
     # agregar sonido de notificacion
     sound = QSoundEffect()
-    sound.setSource(QUrl.fromLocalFile(newSound("notificacion.wav")))#"assets/sounds/notificacion.wav"))
+    sound.setSource(QUrl.fromLocalFile(newSound("notificacion.wav")))
     sound.setVolume(1.0)
     app.setProperty("sound_notifi", sound)
     # lanzar la App

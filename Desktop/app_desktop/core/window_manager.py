@@ -8,7 +8,7 @@ from windows.lock_window import LockWindow
 from windows.auditorias_window import AuditoriasWindow
 from windows.stats_window import StatsWindow
 from services.watchdog import Watchdog
-from core.app_config import DEBUG_NO_LOGIN, DEFAULT_WATCHDOG_S
+from core.app_config import DEBUG_NO_LOGIN
 from core.session import Session
 
 class WindowManager(QMainWindow):
@@ -19,7 +19,6 @@ class WindowManager(QMainWindow):
         self.resize(800, 600)
 
         self.watchdog = Watchdog()
-        self.watchdog.setSegundos(DEFAULT_WATCHDOG_S)
         self.watchdog.shot.connect(self.bloqueo_time)
 
         shortcut = QShortcut(QKeySequence("F2"), self)

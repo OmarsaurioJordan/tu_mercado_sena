@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
+from services.recursos import newSprit
 
 class PapeleraCard(QFrame):
     card_clic = Signal(int) # id papelera
@@ -23,7 +24,7 @@ class PapeleraCard(QFrame):
             self.datos = QLabel(self)
             self.datos.setScaledContents(True)
             self.datos.setFixedSize(120, 120)
-            self.datos.setPixmap(QPixmap("assets/sprites/img_null.png"))
+            self.datos.setPixmap(QPixmap(newSprit("img_null.png")))
         else:
             self.datos = QLabel("", self)
             self.datos.setWordWrap(True)
