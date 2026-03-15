@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 03-03-2026 a las 04:33:32
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Servidor: 127.0.0.1:3306
+-- Tiempo de generación: 15-03-2026 a las 03:31:45
+-- Versión del servidor: 11.8.3-MariaDB-log
+-- Versión de PHP: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `api_tms`
+-- Base de datos: `u630689278_tms`
 --
 
 -- --------------------------------------------------------
@@ -26,10 +26,7 @@ SET time_zone = "+00:00";
 --
 -- Estructura de tabla para la tabla `auditorias`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `auditorias`;
 CREATE TABLE `auditorias` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `administrador_id` bigint(20) UNSIGNED NOT NULL,
@@ -38,54 +35,28 @@ CREATE TABLE `auditorias` (
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `auditorias`:
---   `administrador_id`
---       `usuarios` -> `id`
---   `suceso_id`
---       `sucesos` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `bloqueados`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `bloqueados`;
 CREATE TABLE `bloqueados` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `bloqueador_id` bigint(20) UNSIGNED NOT NULL,
   `bloqueado_id` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `bloqueados`:
---   `bloqueado_id`
---       `usuarios` -> `id`
---   `bloqueador_id`
---       `usuarios` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `categorias`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `categorias`;
 CREATE TABLE `categorias` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `categorias`:
---
 
 --
 -- Volcado de datos para la tabla `categorias`
@@ -112,45 +83,27 @@ INSERT INTO `categorias` (`id`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `chats`
 --
--- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 19-02-2026 a las 18:13:09
---
 
-DROP TABLE IF EXISTS `chats`;
 CREATE TABLE `chats` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `comprador_id` bigint(20) UNSIGNED NOT NULL,
   `producto_id` bigint(20) UNSIGNED NOT NULL,
   `estado_id` bigint(20) UNSIGNED NOT NULL,
-  `visto_comprador` tinyint(1) NOT NULL DEFAULT 1,
+  `visto_comprador` tinyint(1) NOT NULL DEFAULT 0,
   `visto_vendedor` tinyint(1) NOT NULL DEFAULT 0,
-  `precio` double NOT NULL,
-  `cantidad` smallint(5) UNSIGNED NOT NULL,
-  `calificacion` tinyint(3) UNSIGNED DEFAULT NULL,
-  `comentario` varchar(512) DEFAULT NULL,
-  `fecha_venta` timestamp NULL DEFAULT NULL
+  `precio` double DEFAULT NULL,
+  `cantidad` smallint(6) NOT NULL DEFAULT 1,
+  `calificacion` tinyint(4) DEFAULT NULL,
+  `comentario` text DEFAULT NULL,
+  `fecha_venta` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `chats`:
---   `comprador_id`
---       `usuarios` -> `id`
---   `estado_id`
---       `estados` -> `id`
---   `producto_id`
---       `productos` -> `id`
---
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `cuentas`
 --
--- Creación: 08-02-2026 a las 03:45:03
--- Última actualización: 01-03-2026 a las 15:23:35
---
 
-DROP TABLE IF EXISTS `cuentas`;
 CREATE TABLE `cuentas` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -159,60 +112,33 @@ CREATE TABLE `cuentas` (
   `notifica_correo` tinyint(1) NOT NULL DEFAULT 0,
   `notifica_push` tinyint(1) NOT NULL DEFAULT 1,
   `uso_datos` tinyint(1) NOT NULL DEFAULT 0,
-  `pin` varchar(4) DEFAULT '',
+  `pin` varchar(4) DEFAULT NULL,
   `fecha_clave` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `cuentas`:
---
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `denuncias`
 --
--- Creación: 19-02-2026 a las 16:50:17
--- Última actualización: 28-02-2026 a las 17:29:13
---
 
-DROP TABLE IF EXISTS `denuncias`;
 CREATE TABLE `denuncias` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `denunciante_id` bigint(20) UNSIGNED NOT NULL,
   `producto_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `usuario_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `usuario_id` bigint(20) UNSIGNED NOT NULL,
   `chat_id` bigint(20) UNSIGNED DEFAULT NULL,
   `motivo_id` bigint(20) UNSIGNED NOT NULL,
   `estado_id` bigint(20) UNSIGNED NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `denuncias`:
---   `chat_id`
---       `chats` -> `id`
---   `denunciante_id`
---       `usuarios` -> `id`
---   `estado_id`
---       `estados` -> `id`
---   `motivo_id`
---       `motivos` -> `id`
---   `producto_id`
---       `productos` -> `id`
---   `usuario_id`
---       `usuarios` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `estados`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `estados`;
 CREATE TABLE `estados` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
@@ -220,59 +146,43 @@ CREATE TABLE `estados` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- RELACIONES PARA LA TABLA `estados`:
---
-
---
 -- Volcado de datos para la tabla `estados`
 --
 
 INSERT INTO `estados` (`id`, `nombre`, `descripcion`) VALUES
-(1, 'activo', 'usuario, producto o etc activos'),
-(2, 'invisible', 'usuario, producto o etc que se ha ocultado por su propietario'),
-(3, 'eliminado', 'usuario, producto o etc eliminado'),
-(4, 'bloqueado', 'usuario baneado momentáneamente'),
+(1, 'activo', 'Cuando funciona con completa normalidad'),
+(2, 'invisible', 'cuando un producto es sacado temporalmente del mercado'),
+(3, 'eliminado', 'ya no puede ser alcanzado por los usuarios nunca más'),
+(4, 'bloqueado', 'se ha aplicado una censura a usuario o producto por parte del sistema'),
 (5, 'vendido', 'aplicado a un chat cuando se hizo la transacción'),
 (6, 'esperando', 'la transacción del chat espera el visto bueno del comprador'),
 (7, 'devolviendo', 'el historial abre una solicitud de devolución, a espera de respuesta del vendedor'),
 (8, 'devuelto', 'el chat finalizó con una transacción que fué cancelada'),
 (9, 'censurado', 'el estado del chat era vendido, pero la administración baneó la calificación y comentario'),
-(10, 'denunciado', 'cuando un usuario o producto ha sido denunciado repetidas veces, mientras se revisa el caso, no será listado públicamente'),
-(11, 'resuelto', 'para decir que una PQRS o denuncia ya fué tratada');
+(10, 'denunciado', 'cuando un usuario o producto ha sido denunciado repetidas veces, mientras, no será listado públicamente, pero '),
+(11, 'resuelto', 'para decir que una PQRS o denuncia ya fué tratada'),
+(12, 'chat_eliminado_vendedor', 'cuando el vendedor elimina un chat, el comprador aún puede acceder a él'),
+(13, 'chat_eliminado_comprador', 'cuando el comprador elimina un chat,  el vendedor aún puede acceder a él'),
+(14, 'chat_eliminado_ambos', 'cuando ambos eliminan un chat, se le asigna este estado para que no aparezca en el historial de ninguno de los dos');
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `favoritos`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `favoritos`;
 CREATE TABLE `favoritos` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `votante_id` bigint(20) UNSIGNED NOT NULL,
   `votado_id` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `favoritos`:
---   `votado_id`
---       `usuarios` -> `id`
---   `votante_id`
---       `usuarios` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `fotos`
 --
--- Creación: 07-02-2026 a las 18:36:02
--- Última actualización: 01-03-2026 a las 15:30:45
---
 
-DROP TABLE IF EXISTS `fotos`;
 CREATE TABLE `fotos` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `producto_id` bigint(20) UNSIGNED NOT NULL,
@@ -280,30 +190,17 @@ CREATE TABLE `fotos` (
   `actualiza` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `fotos`:
---   `producto_id`
---       `productos` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `integridad`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `integridad`;
 CREATE TABLE `integridad` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
   `descripcion` varchar(128) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `integridad`:
---
 
 --
 -- Volcado de datos para la tabla `integridad`
@@ -320,11 +217,7 @@ INSERT INTO `integridad` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `login_ip`
 --
--- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 28-02-2026 a las 17:13:23
---
 
-DROP TABLE IF EXISTS `login_ip`;
 CREATE TABLE `login_ip` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `usuario_id` bigint(20) UNSIGNED NOT NULL,
@@ -333,56 +226,45 @@ CREATE TABLE `login_ip` (
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `login_ip`:
---   `usuario_id`
---       `usuarios` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `mensajes`
 --
--- Creación: 07-02-2026 a las 18:36:02
---
 
-DROP TABLE IF EXISTS `mensajes`;
 CREATE TABLE `mensajes` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `es_comprador` tinyint(1) NOT NULL DEFAULT 1,
+  `es_comprador` tinyint(1) NOT NULL DEFAULT 0,
   `chat_id` bigint(20) UNSIGNED NOT NULL,
   `mensaje` varchar(512) NOT NULL,
-  `imagen` varchar(255) DEFAULT NULL,
+  `imagen` varchar(80) DEFAULT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
 --
--- RELACIONES PARA LA TABLA `mensajes`:
---   `chat_id`
---       `chats` -> `id`
+-- Estructura de tabla para la tabla `migrations`
 --
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `motivos`
 --
--- Creación: 19-02-2026 a las 17:19:03
--- Última actualización: 19-02-2026 a las 17:23:07
---
 
-DROP TABLE IF EXISTS `motivos`;
 CREATE TABLE `motivos` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
-  `tipo` enum('denuncia','pqrs','notificacion') NOT NULL,
+  `tipo` varchar(32) NOT NULL,
   `descripcion` varchar(128) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `motivos`:
---
 
 --
 -- Volcado de datos para la tabla `motivos`
@@ -414,17 +296,14 @@ INSERT INTO `motivos` (`id`, `nombre`, `tipo`, `descripcion`) VALUES
 (23, 'fraude', 'denuncia', 'se trata de vender algo malo o mediante trampas, tratan de tumbar al otro con fraudes'),
 (24, 'fake', 'denuncia', 'un producto o perfil es meme o chisto o simplemente hace perder el tiempo al no ser una propuesta real'),
 (25, 'spam', 'denuncia', 'un producto o perfil aparece muchas veces como si lo pusieran en demasia para llamar la atención'),
-(26, 'sexual', 'denuncia', 'un perfil o producto exhibe temáticas sexuales o pornográficas que incomodan a la comunidad');
+(26, 'sexual', 'denuncia', 'un perfil o producto exhibe temáticas sexuales o provocativas');
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `notificaciones`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `notificaciones`;
 CREATE TABLE `notificaciones` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `usuario_id` bigint(20) UNSIGNED NOT NULL,
@@ -434,47 +313,26 @@ CREATE TABLE `notificaciones` (
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `notificaciones`:
---   `motivo_id`
---       `motivos` -> `id`
---   `usuario_id`
---       `usuarios` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `papelera`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `papelera`;
 CREATE TABLE `papelera` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `usuario_id` bigint(20) UNSIGNED NOT NULL,
-  `mensaje` varchar(512) NOT NULL,
-  `imagen` varchar(80) NOT NULL,
+  `mensaje` varchar(512) DEFAULT NULL,
+  `imagen` varchar(80) DEFAULT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `papelera`:
---   `usuario_id`
---       `usuarios` -> `id`
---
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `pqrs`
 --
--- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 28-02-2026 a las 22:07:08
---
 
-DROP TABLE IF EXISTS `pqrs`;
 CREATE TABLE `pqrs` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `usuario_id` bigint(20) UNSIGNED NOT NULL,
@@ -484,26 +342,12 @@ CREATE TABLE `pqrs` (
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `pqrs`:
---   `estado_id`
---       `estados` -> `id`
---   `motivo_id`
---       `motivos` -> `id`
---   `usuario_id`
---       `usuarios` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `productos`
 --
--- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 01-03-2026 a las 15:30:45
---
 
-DROP TABLE IF EXISTS `productos`;
 CREATE TABLE `productos` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(64) NOT NULL,
@@ -518,35 +362,16 @@ CREATE TABLE `productos` (
   `fecha_actualiza` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `productos`:
---   `estado_id`
---       `estados` -> `id`
---   `integridad_id`
---       `integridad` -> `id`
---   `subcategoria_id`
---       `subcategorias` -> `id`
---   `vendedor_id`
---       `usuarios` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `roles`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `roles`:
---
 
 --
 -- Volcado de datos para la tabla `roles`
@@ -562,21 +387,12 @@ INSERT INTO `roles` (`id`, `nombre`) VALUES
 --
 -- Estructura de tabla para la tabla `subcategorias`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `subcategorias`;
 CREATE TABLE `subcategorias` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
   `categoria_id` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `subcategorias`:
---   `categoria_id`
---       `categorias` -> `id`
---
 
 --
 -- Volcado de datos para la tabla `subcategorias`
@@ -593,156 +409,33 @@ INSERT INTO `subcategorias` (`id`, `nombre`, `categoria_id`) VALUES
 (8, 'chatarra industrial', 2),
 (9, 'pan o pastel', 2),
 (10, 'bebidas', 2),
-(21, 'otro', 5),
-(22, 'cuidado de la piel', 5),
-(23, 'cuidado del pelo', 5),
-(24, 'labial', 5),
-(25, 'sombra', 5),
-(26, 'delineador', 5),
-(27, 'piercing', 5),
-(28, 'tatuaje', 5),
-(29, 'maniquiur', 5),
-(30, 'peluqueria', 5),
-(31, 'otro', 6),
-(32, 'balón', 6),
-(33, 'pesas', 6),
-(34, 'suplemento alimenticio', 6),
-(35, 'patineta o patines', 6),
-(36, 'implementos acuaticos', 6),
-(37, 'implementos terrestres', 6),
-(38, 'implementos extremos', 6),
-(39, 'arte marcial o lucha', 6),
-(40, 'aseo deportivo', 6),
-(41, 'otro', 7),
-(42, 'computador de escritorio', 7),
-(43, 'computador portátil', 7),
-(44, 'periféricos para computador', 7),
-(45, 'celular', 7),
-(46, 'cámara fotográfica', 7),
-(47, 'calculadora o mediciónes', 7),
-(48, 'tableta para arte', 7),
-(49, 'audifónos, reloj o corporales', 7),
-(50, 'sistema de seguridad', 7),
-(51, 'otro', 4),
-(52, 'taladro, pulidora o similar', 4),
-(53, 'martillo, alicate o similar', 4),
-(54, 'licuadora, microondas o similar', 4),
-(55, 'seguridad para ajustar bicicleta', 4),
-(56, 'escuadra o regla para dibujo', 4),
-(57, 'metro o medidores', 4),
-(58, 'tijera, visturí o similar', 4),
-(59, 'ventilador o aire acondicionado', 4),
-(60, 'kit de mecánico', 4),
-(61, 'otro', 4),
-(62, 'taladro, pulidora o similar', 4),
-(63, 'martillo, alicate o similar', 4),
-(64, 'licuadora, microondas o similar', 4),
-(65, 'seguridad para ajustar bicicleta', 4),
-(66, 'escuadra o regla para dibujo', 4),
-(67, 'metro o medidores', 4),
-(68, 'tijera, visturí o similar', 4),
-(69, 'ventilador o aire acondicionado', 4),
-(70, 'kit de mecánico', 4),
-(71, 'otro', 12),
-(72, 'perro', 12),
-(73, 'gato', 12),
-(74, 'pez', 12),
-(75, 'alimento', 12),
-(76, 'correa', 12),
-(77, 'juguete', 12),
-(78, 'roedor', 12),
-(79, 'tapete', 12),
-(80, 'ropa', 12),
-(81, 'otro', 10),
-(82, 'silla regulable', 10),
-(83, 'silla estática', 10),
-(84, 'sillón grande', 10),
-(85, 'mesa', 10),
-(86, 'cama o colchón', 10),
-(87, 'matera', 10),
-(88, 'armario o nochero', 10),
-(89, 'escritorio', 10),
-(90, 'tapete', 10),
-(91, 'otro', 13),
-(92, 'otro', 3),
-(93, 'cartónes o cajas', 3),
-(94, 'telas y costura', 3),
-(95, 'pegamentos', 3),
-(96, 'cuadernos, carpetas', 3),
-(97, 'colores, pinturas, pinceles', 3),
-(98, 'libros', 3),
-(99, 'lápices, marcadores, lapiceros', 3),
-(100, 'borradores, sacapuntas', 3),
-(101, 'papel, fomi, cartulina', 3),
-(102, 'otro', 8),
-(103, 'entrenamiento deportivo', 8),
-(104, 'eseñanza artística', 8),
-(105, 'enseñanza tecnológica', 8),
-(106, 'mantenimiento computadora', 8),
-(107, 'reparación dispositivos', 8),
-(108, 'preparación de comidas', 8),
-(109, 'documentación', 8),
-(110, 'creación de arte o manualidades', 8),
-(111, 'cuidado y aseo', 8),
-(112, 'otro', 9),
-(113, 'juego deportivo', 9),
-(114, 'juego videojuegos', 9),
-(115, 'practicar idiomas', 9),
-(116, 'fiesta y baile', 9),
-(117, 'charlar', 9),
-(118, 'emprendimiento', 9),
-(119, 'paseos y viajes', 9),
-(120, 'seguir en redes', 9),
-(121, 'religión e ideologías', 9),
-(122, 'otro', 11),
-(123, 'bicicleta', 11),
-(124, 'moto de gasolina', 11),
-(125, 'casco de moto', 11),
-(126, 'moto eléctrica', 11),
-(127, 'bici o patín eléctricos', 11),
-(128, 'carro', 11),
-(129, 'chaleco, guantes o vestimenta', 11),
-(130, 'repuesto', 11),
-(131, 'parrillas o implementos', 11),
-(132, 'otro', 1),
-(133, 'calzado', 1),
-(134, 'sombrero', 1),
-(135, 'pantalón', 1),
-(136, 'camisa', 1),
-(137, 'vestido', 1),
-(138, 'falda', 1),
-(139, 'medias o guantes', 1),
-(140, 'chaleco o buzo', 1),
-(141, 'colgandijas', 1),
-(142, 'colgantes', 14),
-(143, 'figurillas', 14),
-(144, 'materas o jardín', 14),
-(145, 'de metal', 14),
-(146, 'de plástico', 14),
-(147, 'de madera', 14),
-(148, 'de porcelana', 14),
-(149, 'afiches o pinturas', 14),
-(150, 'peluches', 14),
-(151, 'otro', 14);
+(11, 'otro', 5),
+(12, 'cuidado de la piel', 5),
+(13, 'cuidado del pelo', 5),
+(14, 'labial', 5),
+(15, 'sombra', 5),
+(16, 'delineador', 5),
+(17, 'piercing', 5),
+(18, 'tatuaje', 5),
+(19, 'maniquiur', 5),
+(20, 'peluqueria', 5),
+(21, 'otro', 6),
+(22, 'balón', 6),
+(23, 'pesas', 6),
+(24, 'suplemento alimenticio', 6),
+(25, 'patineta o patines', 6);
 
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `sucesos`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `sucesos`;
 CREATE TABLE `sucesos` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nombre` varchar(32) NOT NULL,
   `descripcion` varchar(128) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `sucesos`:
---
 
 --
 -- Volcado de datos para la tabla `sucesos`
@@ -766,11 +459,7 @@ INSERT INTO `sucesos` (`id`, `nombre`, `descripcion`) VALUES
 --
 -- Estructura de tabla para la tabla `tokens_de_sesion`
 --
--- Creación: 07-02-2026 a las 23:33:20
--- Última actualización: 28-02-2026 a las 17:13:47
---
 
-DROP TABLE IF EXISTS `tokens_de_sesion`;
 CREATE TABLE `tokens_de_sesion` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `cuenta_id` bigint(20) UNSIGNED NOT NULL,
@@ -781,28 +470,18 @@ CREATE TABLE `tokens_de_sesion` (
   `fecha_actualiza` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `tokens_de_sesion`:
---   `cuenta_id`
---       `cuentas` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `usuarios`
 --
--- Creación: 07-02-2026 a las 18:36:01
--- Última actualización: 01-03-2026 a las 20:49:56
---
 
-DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `cuenta_id` bigint(20) UNSIGNED NOT NULL,
   `nickname` varchar(32) NOT NULL,
-  `imagen` varchar(80) NOT NULL,
-  `descripcion` varchar(512) NOT NULL,
+  `imagen` varchar(80) DEFAULT NULL,
+  `descripcion` varchar(512) DEFAULT NULL,
   `link` varchar(128) DEFAULT NULL,
   `rol_id` bigint(20) UNSIGNED NOT NULL,
   `estado_id` bigint(20) UNSIGNED NOT NULL,
@@ -811,38 +490,17 @@ CREATE TABLE `usuarios` (
   `fecha_reciente` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- RELACIONES PARA LA TABLA `usuarios`:
---   `cuenta_id`
---       `cuentas` -> `id`
---   `estado_id`
---       `estados` -> `id`
---   `rol_id`
---       `roles` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `vistos`
 --
--- Creación: 07-02-2026 a las 18:36:01
---
 
-DROP TABLE IF EXISTS `vistos`;
 CREATE TABLE `vistos` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `usuario_id` bigint(20) UNSIGNED NOT NULL,
   `producto_id` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- RELACIONES PARA LA TABLA `vistos`:
---   `producto_id`
---       `productos` -> `id`
---   `usuario_id`
---       `usuarios` -> `id`
---
 
 --
 -- Índices para tablas volcadas
@@ -939,6 +597,12 @@ ALTER TABLE `login_ip`
 ALTER TABLE `mensajes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `mensajes_chat_id_foreign` (`chat_id`);
+
+--
+-- Indices de la tabla `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `motivos`
@@ -1070,7 +734,7 @@ ALTER TABLE `denuncias`
 -- AUTO_INCREMENT de la tabla `estados`
 --
 ALTER TABLE `estados`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `favoritos`
@@ -1101,6 +765,12 @@ ALTER TABLE `login_ip`
 --
 ALTER TABLE `mensajes`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `motivos`
@@ -1142,7 +812,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `subcategorias`
 --
 ALTER TABLE `subcategorias`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `sucesos`
