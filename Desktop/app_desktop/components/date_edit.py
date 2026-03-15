@@ -1,7 +1,5 @@
-from datetime import datetime, time, timezone
-from PySide6.QtWidgets import (
-    QWidget, QDateEdit, QLabel, QHBoxLayout
-)
+from datetime import datetime, timezone
+from PySide6.QtWidgets import QWidget, QDateEdit, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt, QDate
 
 class DateEdit(QWidget):

@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QScrollArea, QHBoxLayout, QLabel
-)
+from PySide6.QtWidgets import QWidget, QScrollArea, QHBoxLayout, QLabel
 from PySide6.QtCore import Qt
 
 class Scroll(QWidget):

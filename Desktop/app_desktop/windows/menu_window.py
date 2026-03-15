@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QApplication
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QApplication
 from ui.header_layout import HeaderLayout
 from components.boton import Boton
 from ui.info_menus import InfoMenus

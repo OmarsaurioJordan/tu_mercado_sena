@@ -1,7 +1,7 @@
 import requests
 from PySide6.QtCore import QRunnable, Slot, Signal, QObject
 from PySide6.QtGui import QImage
-from core.app_config import (TIME_OUT)
+from core.app_config import TIME_OUT
 
 class ImageWorkerSignals(QObject):
     finished = Signal(QImage) # imagen

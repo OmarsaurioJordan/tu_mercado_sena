@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget
-)
+from PySide6.QtWidgets import QWidget
 from ui.header_layout import HeaderLayout
 from ui.tools_widget import ToolsWidget
 

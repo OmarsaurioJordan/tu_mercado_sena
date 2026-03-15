@@ -5,14 +5,15 @@ require_once("../config.php");
 
 validation();
 
-if (!isset($_GET["id"])) {
+if (!isset($_GET["id"]) || !isset($_GET["old_password"])) {
     http_response_code(400);
-    echo json_encode(["error" => "Falta id"]);
+    echo json_encode(["error" => "Faltan credenciales"]);
     exit;
 }
 $id = $_GET["id"];
+$old_password = $_GET["old_password"];
 
-valida_edit_admin();
+valida_password($id, $old_password);
 
 $cond = "";
 $vars = [];
@@ -44,7 +45,7 @@ if ($pin != "") {
 $password = isset($_GET["password"]) ? $_GET["password"] : "";
 if ($password != "") {
     $cond .= ", c.password = ?";
-    $vars[] = password_hash($password, PASSWORD_BCRYPT);
+    $vars[] = encriptar($password);
 }
 
 if (empty($vars)) {
@@ -59,7 +60,7 @@ $vars[] = $id;
 $sql = "UPDATE usuarios AS u
     INNER JOIN cuentas AS c ON u.cuenta_id = c.id
     SET $cond
-    WHERE id = ?";
+    WHERE u.id = ?";
 
 $stmt = $conn->prepare($sql);
 $types = str_repeat("s", count($vars));

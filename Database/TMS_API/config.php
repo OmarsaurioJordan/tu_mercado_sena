@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db = "api_tms";
+$db = "tms_api";
 $debug = true; // habilita o inhabilita validacion con token
 
 $conn = new mysqli($host, $user, $pass, $db);
@@ -11,6 +11,10 @@ if ($conn->connect_error) {
     die(json_encode(["error" => "Error conexión DB"]));
 }
 $conn->set_charset("utf8");
+
+function encriptar($pass) {
+    return password_hash($pass, PASSWORD_BCRYPT);
+}
 
 function validation() {
     global $debug, $conn;
@@ -65,21 +69,28 @@ function auditar($suceso_id, $descripcion) {
     }
 }
 
-function valida_edit_admin() {
-    // llamado siempre despues de validation() y de obtencion de id
+function valida_password($id, $pass) {
     global $debug, $conn;
     if (!$debug) {
 
-        $admin_email = $_GET["admin_email"];
-        $id = $_GET["id"];
+        $sql = "SELECT c.password AS pass
+        FROM usuarios u
+        LEFT JOIN cuentas c ON c.id = u.cuenta_id
+        WHERE u.id = ?";
 
-        $sql = "SELECT 1 FROM usuarios u LEFT JOIN cuentas c
-            ON c.id = u.cuenta_id WHERE c.email = ? AND u.id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("si", $admin_email, $id);
+        $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
-        if ($result->num_rows == 0) {
+        $info = $result->fetch_assoc();
+
+        if (!$info) {
+            http_response_code(404);
+            echo json_encode(["error" => "Credenciales inválidas"]);
+            exit;
+        }
+
+        if (!password_verify($password, $info["pass"])) {
             http_response_code(404);
             echo json_encode(["error" => "Credenciales inválidas"]);
             exit;

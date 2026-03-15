@@ -147,7 +147,14 @@ class CtrlData:
         if not estados:
             return [["???", -1]]
         for est in estados:
-            if est["nombre"] in ["activo", "eliminado", "vendido", "esperando", "devolviendo", "devuelto", "censurado"]:
+            if est["nombre"] in ["activo", "vendido", "esperando", "devolviendo", "devuelto", "censurado", "chat_eliminado_vendedor", "chat_eliminado_comprador", "chat_eliminado_ambos"]:
+                match est["id"]:
+                    case 12:
+                        est["nombre"] = "elim.Vend."
+                    case 13:
+                        est["nombre"] = "elim.Comp."
+                    case 14:
+                        est["nombre"] = "eliminado"
                 res.append([est["nombre"].capitalize(), est["id"]])
         return res
     
@@ -181,3 +188,14 @@ class CtrlData:
         for sub in subcategorias:
             res.append([sub["nombre"].capitalize(), sub["id"]])
         return res
+
+    # obtener info de analitica
+
+    def api_informacion(self):
+        print(f"CtrlData: api_informacion-init")
+        response = requests.get(API_BASE_URL + "tools/informacion.php", timeout=TIME_OUT)
+        if response.status_code == 200:
+            print(f"CtrlData: api_informacion-ok")
+            data = response.json()
+            return data
+        return None

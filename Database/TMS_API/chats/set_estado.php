@@ -13,7 +13,7 @@ if (!isset($_GET["id"]) || !isset($_GET["estado"])) {
 $id = $_GET["id"];
 $estado = $_GET["estado"];
 
-if ($estado != 1 && $estado != 3 && $estado != 5 && $estado != 8 && $estado != 9) {
+if ($estado != 1 && $estado != 14 && $estado != 5 && $estado != 8 && $estado != 9) {
     http_response_code(400);
     echo json_encode(["error" => "estado inválido"]);
     exit;

@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QHBoxLayout, QLabel, QSpinBox
-)
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QSpinBox
 from PySide6.QtCore import Qt
 
 class SpinBox(QWidget):

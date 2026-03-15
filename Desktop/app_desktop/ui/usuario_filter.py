@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QApplication
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QApplication
 from PySide6.QtCore import QDate, Signal
 from components.txt_edit import TxtEdit
 from components.selector import Selector

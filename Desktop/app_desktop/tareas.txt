@@ -1,19 +1,11 @@
 TAREAS:
 ...
-- evitar busqueda mensajes con imagen, para que no aparezcan en result busqueda
-- mensaje card con imagen debe estar a uno de los dos extremos
-- no está cargando imágenes de mensajes ni papelera
+- se está congelando la interfaz, quizá por el buscador cíclico de notificaciónes
 ...
-- cargar datos de análisis para gráficas
-- hacer que se bloquee con pin mediante temporizador
-- config. cambiar contraseña
-- config. cambiar pin
-- config. cambiar tiempo de bloqueo
-- config. cambiar volúmen de notificaciónes
-- config. editar nombre, link y descripción del perfil
+- guardar volumen y tiempo de bloqueo en archivo
 ...
 PRUEBAS:
 ...
 - quitar imágen en TMS y ver si al refrescar en Desktop se quita
-- revisar todos los filtros, sospecha fallan los de productos
+- verificar todos los filtros
 ...

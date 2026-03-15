@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QFrame, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
-)
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 
@@ -54,7 +52,17 @@ class MensajeCard(QFrame):
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
 
         layParte = QVBoxLayout()
-        layParte.addWidget(self.datos)
+        if self.con_imagen:
+            correImagen = QHBoxLayout()
+            if self.es_comprador:
+                correImagen.addWidget(self.datos)
+                correImagen.addStretch()
+            else:
+                correImagen.addStretch()
+                correImagen.addWidget(self.datos)
+            layParte.addLayout(correImagen)
+        else:
+            layParte.addWidget(self.datos)
         layParte.addWidget(self.fecha_registro)
 
         layHorizontal = QHBoxLayout()

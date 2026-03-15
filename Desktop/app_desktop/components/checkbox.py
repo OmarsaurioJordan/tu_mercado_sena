@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QHBoxLayout, QCheckBox, QLabel
-)
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QCheckBox, QLabel
 
 class Checkbox(QWidget):
     def __init__(self, texto=""):

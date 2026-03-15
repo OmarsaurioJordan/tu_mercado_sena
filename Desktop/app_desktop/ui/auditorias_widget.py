@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QTabWidget, QHBoxLayout, QApplication
-)
+from PySide6.QtWidgets import QWidget, QTabWidget, QHBoxLayout, QApplication
 from components.scroll import Scroll
 from components.buscador import Buscador
 from ui.result_busqueda import ResultBusqueda

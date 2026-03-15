@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QComboBox, QLabel, QVBoxLayout, QStyledItemDelegate, QMessageBox
-)
+from PySide6.QtWidgets import QWidget, QComboBox, QLabel, QVBoxLayout, QStyledItemDelegate, QMessageBox
 from PySide6.QtCore import Qt, Signal
 from controllers.confirmaciones import confirma_ejecucion, confirma_pregunta
 

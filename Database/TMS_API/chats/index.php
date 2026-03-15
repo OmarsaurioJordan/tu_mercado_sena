@@ -8,8 +8,13 @@ $vars = [];
 
 $estado_id = isset($_GET["estado_id"]) ? $_GET["estado_id"] : "0";
 if ($estado_id != "0") {
-    $cond .= " AND ch.estado_id = ?";
-    $vars[] = $estado_id;
+    if ($estado_id == "100") {
+        $cond .= " AND ch.estado_id IN ('12', '13', '14')";
+    }
+    else {
+        $cond .= " AND ch.estado_id = ?";
+        $vars[] = $estado_id;
+    }
 }
 
 $comprador_id = isset($_GET["comprador_id"]) ? $_GET["comprador_id"] : "0";

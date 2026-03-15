@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 from components.selector import Selector

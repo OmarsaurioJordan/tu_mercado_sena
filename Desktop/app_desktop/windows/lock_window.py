@@ -1,12 +1,10 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QApplication
 from PySide6.QtCore import Qt
 from ui.header_layout import HeaderLayout
 from components.txt_edit import TxtEdit
 from components.boton import Boton
 from ui.info_menus import InfoMenus
-from components.alerta import Alerta
+from services.alerta import Alerta
 from core.session import Session
 
 class LockWindow(QWidget):

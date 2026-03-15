@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QHBoxLayout, QLabel
-)
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel
 from components.scroll import Scroll
 
 class Buscador(QWidget):

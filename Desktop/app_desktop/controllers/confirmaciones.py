@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import (QApplication, QMessageBox)
+from PySide6.QtWidgets import QApplication, QMessageBox
 
 def confirma_ejecucion(tipo="", id=0, value=0):
     print(f"confirma_ejecucion: confirma_ejecucion-{tipo}")
@@ -40,6 +40,9 @@ def confirma_ejecucion(tipo="", id=0, value=0):
         case "chat_estado":
             ctrlChat = manager.get_chats()
             return ctrlChat.set_estado(id, value)
+        case "tiempo_bloqueo":
+            interfacez = QApplication.instance().property("manager")
+            interfacez.setTiempoBloqueo(value)
     return False
 
 def confirma_pregunta(tipo=""):
@@ -66,4 +69,6 @@ def confirma_pregunta(tipo=""):
             return "¿Desea cambiar el motivo de la denuncia por "
         case "chat_estado":
             return "¿Desea cambiar el estado del chat por "
+        case "tiempo_bloqueo":
+            return "¿Cambiar tiempo para bloquear a "
     return ""

@@ -1,10 +1,7 @@
 import requests
 from PySide6.QtCore import Signal, QObject
-from core.app_config import (
-    API_LIMIT_ITEMS, API_BASE_URL, TIME_OUT
-)
+from core.app_config import API_LIMIT_ITEMS, API_BASE_URL, TIME_OUT
 from models.auditoria import Auditoria
-from core.session import Session
 
 class CtrlAuditoriaSignal(QObject):
     hubo_cambio = Signal(int) # id auditoria

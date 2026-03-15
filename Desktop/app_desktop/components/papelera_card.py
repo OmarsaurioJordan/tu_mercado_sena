@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QFrame, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
-)
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QLabel, QApplication, QSizePolicy
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
 

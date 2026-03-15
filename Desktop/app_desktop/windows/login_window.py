@@ -1,15 +1,11 @@
-from PySide6.QtWidgets import (
-    QWidget, QHBoxLayout, QVBoxLayout, QLabel, QApplication
-)
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QApplication
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
-from core.app_config import (
-    DOMINIO_EMAIL
-)
+from core.app_config import DOMINIO_EMAIL
 from ui.info_menus import InfoMenus
 from components.txt_edit import TxtEdit
 from components.boton import Boton
-from components.alerta import Alerta
+from services.alerta import Alerta
 
 class LoginWindow(QWidget):
 
@@ -39,7 +35,7 @@ class LoginWindow(QWidget):
         descripcion.setFont(font)
         descripcion.setAlignment(Qt.AlignCenter)
 
-        self.textEmail = TxtEdit("Email Institucional", "email_administrador" + DOMINIO_EMAIL)
+        self.textEmail = TxtEdit("Email Institucional", "email_administrador" + DOMINIO_EMAIL[0])
         
         self.textPassword = TxtEdit("Contraseña", "******")
         self.textPassword.passwordMode()

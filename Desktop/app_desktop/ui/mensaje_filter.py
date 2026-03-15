@@ -1,9 +1,7 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QApplication
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import QDate, Signal
 from components.txt_edit import TxtEdit
-from components.checkbox import Checkbox
+from components.selector import Selector
 from components.date_edit import DateEdit
 from components.boton import Boton
 
@@ -17,8 +15,10 @@ class MensajeFilter(QWidget):
         layVertical.setSpacing(10)
         self.palabras = TxtEdit("Palabras", "palabras")
         layVertical.addWidget(self.palabras)
-        self.chkActivos = Checkbox("Chats activos")
-        layVertical.addWidget(self.chkActivos)
+        self.selEstado = Selector(
+            [["Todos", 0], ["Activos", 100], ["Historicos", 101], ["Eliminados", 102]],
+            "estado...", "Estado", 1
+        )
         self.date_registro_min = DateEdit("Reg. desde", QDate(2010, 1, 1))
         layVertical.addWidget(self.date_registro_min)
         self.date_registro_max = DateEdit("Reg. hasta")
@@ -38,7 +38,8 @@ class MensajeFilter(QWidget):
     def obtener_filtros(self):
         filtros = {
             "palabras": self.palabras.get_value(),
-            "activos": self.chkActivos.get_bool(),
+            "estado": self.selEstado.get_data(),
+            "con_imagen": "2", # sin imagenes
             "registro_desde": self.date_registro_min.get_value_utc(),
             "registro_hasta": self.date_registro_max.get_value_utc()
         }

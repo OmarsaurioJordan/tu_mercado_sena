@@ -1,6 +1,6 @@
 import requests
-from PySide6.QtCore import (QObject, Signal, Slot)
-from core.app_config import (API_BASE_URL, TIME_OUT)
+from PySide6.QtCore import QObject, Signal, Slot
+from core.app_config import API_BASE_URL, TIME_OUT
 
 class NotifiWorker(QObject):
     finished = Signal(int, int) # tot denuncias, tot PQRSs

@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtCore import QUrl
 from core.app_config import VERSION

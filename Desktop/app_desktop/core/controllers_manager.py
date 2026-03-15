@@ -1,5 +1,5 @@
-from PySide6.QtCore import (QTimer, Signal, QObject, QThread)
-from PySide6.QtWidgets import (QApplication)
+from PySide6.QtCore import QTimer, Signal, QObject, QThread
+from PySide6.QtWidgets import QApplication
 from controllers.ctrl_data import CtrlData
 from controllers.ctrl_usuario import CtrlUsuario
 from controllers.ctrl_producto import CtrlProducto

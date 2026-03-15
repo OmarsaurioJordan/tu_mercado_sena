@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QListWidget, QListWidgetItem, QAbstractItemView, QApplication
-)
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QAbstractItemView, QApplication
 from PySide6.QtCore import Signal
 from components.usuario_card import UsuarioCard
 from components.producto_card import ProductoCard

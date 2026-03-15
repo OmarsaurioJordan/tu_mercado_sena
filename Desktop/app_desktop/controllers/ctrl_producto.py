@@ -1,8 +1,6 @@
 import requests
 from PySide6.QtCore import Signal, QObject
-from core.app_config import (
-    API_LIMIT_ITEMS, API_BASE_URL, TIME_OUT
-)
+from core.app_config import API_LIMIT_ITEMS, API_BASE_URL, TIME_OUT
 from models.producto import Producto
 from core.session import Session
 

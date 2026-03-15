@@ -1,12 +1,10 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication, QMessageBox
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QGroupBox, QTextEdit, QApplication, QMessageBox
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
-from core.app_config import (DOMINIO_EMAIL, MSJ_MAX, DB_NOTIFI_MSJ_MAX)
+from core.app_config import DOMINIO_EMAIL, MSJ_MAX, DB_NOTIFI_MSJ_MAX
 from components.selector import Selector
 from components.boton import Boton
-from components.alerta import Alerta
+from services.alerta import Alerta
 from core.session import Session
 
 class UsuarioBody(QWidget):
@@ -90,7 +88,7 @@ class UsuarioBody(QWidget):
         layRecup = QVBoxLayout()
         self.email_recup = QLineEdit()
         self.email_recup.setAlignment(Qt.AlignCenter)
-        self.email_recup.setPlaceholderText("email_usuario" + DOMINIO_EMAIL)
+        self.email_recup.setPlaceholderText("email_usuario" + DOMINIO_EMAIL[0])
         layRecup.addWidget(self.email_recup)
         layRecup.addSpacing(10)
         self.btnRecup = Boton("Recuperar clave")
@@ -303,7 +301,7 @@ class UsuarioBody(QWidget):
             ses = Session()
             admindata = ses.get_login()
             admin = ctrlUsuario.get_usuario(admindata["id"])
-            admin_info = "Usuario Administrador - email_administrativo" + DOMINIO_EMAIL
+            admin_info = "Usuario Administrador - email_administrativo" + DOMINIO_EMAIL[0]
             if admin is not None:
                 admin_info = admin.nickname + " - " + admin.email
             self.texto_msg += "\n\n*** Tu Mercado Sena ***\n\nEste es un mensaje administrativo enviado por: " + admin_info

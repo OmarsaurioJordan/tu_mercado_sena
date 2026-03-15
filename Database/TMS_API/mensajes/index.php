@@ -14,9 +14,19 @@ if ($palabras != "") {
     $vars[] = "%$palabras%";
 }
 
-$activos = isset($_GET["activos"]) ? $_GET["activos"] : "0";
-if ($activos != "0") {
-    $cond .= " AND ch.estado_id IN ('1', '6', '7')";
+$estado = isset($_GET["estado"]) ? $_GET["estado"] : "0";
+if ($estado != "0") {
+    switch ($estado) {
+        case "100": // activo
+            $cond .= " AND ch.estado_id IN ('1', '6', '7')";
+            break;
+        case "101": // historial
+            $cond .= " AND ch.estado_id IN ('5', '8', '9')";
+            break;
+        case "102": // eliminado
+            $cond .= " AND ch.estado_id IN ('12', '13', '14')";
+            break;
+    }
 }
 
 $registro_desde = isset($_GET["registro_desde"]) ? $_GET["registro_desde"] : "";
@@ -38,8 +48,13 @@ if ($chat_id != "0") {
 }
 
 $con_imagen = isset($_GET["con_imagen"]) ? $_GET["con_imagen"] : "0";
-if ($con_imagen != "0" && $palabras == "") {
-    $cond .= " AND (m.imagen NOT NULL AND m.imagen != '')";
+if ($palabras == "" && $con_imagen != "0") {
+    if ($con_imagen == "1") {
+        $cond .= " AND (m.imagen NOT NULL AND m.imagen != '')";
+    }
+    else {
+        $cond .= " AND (m.imagen IS NULL OR m.imagen = '')";
+    }
 }
 
 $id = isset($_GET["id"]) ? $_GET["id"] : "0";

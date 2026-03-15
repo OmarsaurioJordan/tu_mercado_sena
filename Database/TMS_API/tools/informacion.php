@@ -5,7 +5,7 @@ require_once("../config.php");
 
 $sql = "SELECT 
     (SELECT COUNT(*) FROM chats WHERE estado_id IN (1, 6, 7)) AS cht_activos,
-    (SELECT COUNT(*) FROM chats WHERE estado_id = 2) AS cht_eliminados,
+    (SELECT COUNT(*) FROM chats WHERE estado_id IN (12, 13, 14)) AS cht_eliminados,
     (SELECT COUNT(*) FROM chats WHERE estado_id = 5) AS cht_vendidos,
     (SELECT COUNT(*) FROM chats WHERE estado_id = 8) AS cht_devueltos,
     (SELECT COUNT(*) FROM chats WHERE estado_id = 9) AS cht_censurados,
@@ -20,7 +20,7 @@ $sql = "SELECT
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $result = $stmt->get_result();
-$res = $result->fetch_all(MYSQLI_ASSOC);
+$res = $result->fetch_assoc();
 
 if (!$res) {
     http_response_code(404);

@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QMainWindow, QStackedWidget, QApplication
-)
+from PySide6.QtWidgets import QMainWindow, QStackedWidget, QApplication
 from PySide6.QtGui import QShortcut, QKeySequence
 from windows.login_window import LoginWindow
 from windows.menu_window import MenuWindow
@@ -9,7 +7,8 @@ from windows.config_window import ConfigWindow
 from windows.lock_window import LockWindow
 from windows.auditorias_window import AuditoriasWindow
 from windows.stats_window import StatsWindow
-from core.app_config import DEBUG_NO_LOGIN
+from services.watchdog import Watchdog
+from core.app_config import DEBUG_NO_LOGIN, DEFAULT_WATCHDOG_S
 from core.session import Session
 
 class WindowManager(QMainWindow):
@@ -18,6 +17,10 @@ class WindowManager(QMainWindow):
         super().__init__()
         self.setWindowTitle("TMS-Administración")
         self.resize(800, 600)
+
+        self.watchdog = Watchdog()
+        self.watchdog.setSegundos(DEFAULT_WATCHDOG_S)
+        self.watchdog.shot.connect(self.bloqueo_time)
 
         shortcut = QShortcut(QKeySequence("F2"), self)
         shortcut.activated.connect(lambda: print("..."))
@@ -31,6 +34,10 @@ class WindowManager(QMainWindow):
             self.set_login()
         self.show()
         self.showMaximized()
+
+    def setTiempoBloqueo(self, segundos):
+        self.watchdog.setSegundos(segundos)
+        self.watchdog.reiniciar()
 
     def is_login(self):
         return self.stack.count() > 1
@@ -65,6 +72,17 @@ class WindowManager(QMainWindow):
     def change_tool(self, tool_name):
         print(f"WindowManager: change_tool-{tool_name}")
         self.stack.setCurrentWidget(self.views[tool_name])
+        # si es el current stats, actualizar datos
+        if tool_name == "stats":
+            self.views["stats"].actualizar()
+        # si es una ventana no bloqueante, activar watchdog
+        if not tool_name in ["login", "lock"]:
+            self.watchdog.activar()
+        else:
+            self.watchdog.desactivar()
+        # colocar datos de edicion de admin
+        if tool_name == "config":
+            self.views["config"].setAdministrador()
 
     def limpiar_stack(self):
         print("WindowManager: limpiar_stack")
@@ -73,3 +91,8 @@ class WindowManager(QMainWindow):
             widget = self.stack.widget(0)
             self.stack.removeWidget(widget)
             widget.deleteLater()
+
+    def bloqueo_time(self):
+        if self.is_login():
+            if self.stack.currentWidget() != self.views["lock"]:
+                self.change_tool("lock")

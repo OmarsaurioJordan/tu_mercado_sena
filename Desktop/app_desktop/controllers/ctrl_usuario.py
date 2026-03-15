@@ -1,8 +1,6 @@
 import requests
 from PySide6.QtCore import Signal, QObject
-from core.app_config import (
-    API_LIMIT_ITEMS, DEFAULT_INFO, DEFAUL_LINK, API_BASE_URL, TIME_OUT
-)
+from core.app_config import API_LIMIT_ITEMS, DEFAULT_INFO, DEFAUL_LINK, API_BASE_URL, TIME_OUT
 from models.usuario import Usuario
 from core.session import Session
 
@@ -185,6 +183,24 @@ class CtrlUsuario:
         response = requests.get(API_BASE_URL + "usuarios/set_estado.php", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             print("CtrlUsuario: set_estado-ok")
+            res = response.json()["Ok"] == "1"
+            if res:
+                self.api_usuario(id)
+            return res
+        return False
+    
+    def set_data(self, id=0, old_password="", data={}):
+        print("CtrlUsuario: set_data-init")
+        ses = Session()
+        admindata = ses.get_login()
+        params = {"id": id, "old_password": old_password,
+            "admin_email": admindata["email"], "admin_token": admindata["token"]
+        }
+        params.update(data)
+        response = requests.get(API_BASE_URL + "admin/set_data.php", params=params, timeout=TIME_OUT)
+        print(response.url)
+        if response.status_code == 200:
+            print("CtrlUsuario: set_data-ok")
             res = response.json()["Ok"] == "1"
             if res:
                 self.api_usuario(id)

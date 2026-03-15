@@ -1,6 +1,4 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QApplication
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 from core.app_config import DOMINIO_EMAIL
@@ -79,7 +77,7 @@ class HeaderLayout(QVBoxLayout):
 
     def usuario_debug(self):
         print("HeaderLayout: usuario_debug")
-        return Usuario(0, "email_administrativo" + DOMINIO_EMAIL, 3, "Usuario Administrador", 0, "", "", 1, "", "", "")
+        return Usuario(0, "email_administrativo" + DOMINIO_EMAIL[0], 3, "Usuario Administrador", 0, "", "", 1, "", "", "")
 
     def cambiaPagina(self, pagina=""):
         print("HeaderLayout: cambiaPagina")

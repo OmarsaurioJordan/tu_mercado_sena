@@ -1,13 +1,11 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGroupBox, QTextEdit, QApplication, QMessageBox
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGroupBox, QTextEdit, QApplication, QMessageBox
 from PySide6.QtGui import QTextCursor
 from PySide6.QtCore import Qt, Signal
-from core.app_config import (DOMINIO_EMAIL, MSJ_MAX, DB_NOTIFI_MSJ_MAX)
+from core.app_config import DOMINIO_EMAIL, MSJ_MAX, DB_NOTIFI_MSJ_MAX
 from components.selector import Selector
 from components.usuario_card import UsuarioCard
 from components.boton import Boton
-from components.alerta import Alerta
+from services.alerta import Alerta
 from core.session import Session
 
 class PqrsBody(QWidget):
@@ -201,7 +199,7 @@ class PqrsBody(QWidget):
             admin = ctrlUsuario.get_usuario(admindata["id"])
             if admin is None:
                 return
-            admin_info = "email_administrativo" + DOMINIO_EMAIL + " (Usuario Administrador)"
+            admin_info = "email_administrativo" + DOMINIO_EMAIL[0] + " (Usuario Administrador)"
             if admin is not None:
                 admin_info = admin.email + f" ({admin.nickname})"
             self.texto_msg += f"\n\n*** Tu Mercado Sena ***\n\nRespuesta administrativa a su PQRS ({self.sel_motivo.get_text().lower()}) por: " + admin_info
