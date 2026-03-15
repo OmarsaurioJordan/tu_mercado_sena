@@ -12,11 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subcategorias', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre', 32);
-            $table->foreignId('categoria_id')->constrained('categorias', 'id')->cascadeOnDelete();
-        });
+        if(!Schema::hasTable('subcategorias')) {
+            Schema::create('subcategorias', function (Blueprint $table) {
+                $table->id();
+                $table->string('nombre', 32);
+                $table->foreignId('categoria_id')->constrained('categorias', 'id')->cascadeOnDelete();
+            });
+        }
+    
 
         $subcategorias = [
             ['id' => 1, 'nombre' => 'otro', 'categoria_id' => 2],
@@ -171,6 +174,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('subcategorias');
+        Schema::enableForeignKeyConstraints();
+
     }
 };
