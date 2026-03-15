@@ -139,7 +139,8 @@ class PqrsBody(QWidget):
             self.descripcion.setText("*** mensaje vacío ***")
         else:
             self.descripcion.setText(pqrs.mensaje)
-        self.registro.setText("Registro\n" + pqrs.fecha_registro.replace(" ", "\n") + "\n" + str(pqrs.dias) + " días")
+        fecha = pqrs.fecha_registro or ""
+        self.registro.setText("Registro\n" + fecha.replace(" ", "\n") + "\n" + str(pqrs.dias) + " días")
         self.sel_motivo.set_index_from_data(pqrs.motivo_id)
         self.sel_estado.set_index_from_data(pqrs.estado_id)
         self.sel_motivo.set_ente_id(pqrs.id)

@@ -131,7 +131,8 @@ class DenunciaBody(QWidget):
         self.cambioData.emit(denuncia.id)
         self.email.setText(denuncia.email)
         self.nickname.setText(denuncia.denunciante_name)
-        self.registro.setText("Registro\n" + denuncia.fecha_registro.replace(" ", "\n") + "\n" + str(denuncia.dias) + " días")
+        fecha = denuncia.fecha_registro or ""
+        self.registro.setText("Registro\n" + fecha.replace(" ", "\n") + "\n" + str(denuncia.dias) + " días")
         self.sel_motivo.set_index_from_data(denuncia.motivo_id)
         self.sel_estado.set_index_from_data(denuncia.estado_id)
         self.sel_motivo.set_ente_id(denuncia.id)

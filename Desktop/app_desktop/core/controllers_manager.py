@@ -1,4 +1,4 @@
-from PySide6.QtCore import QTimer, Signal, QObject, QThread
+from PySide6.QtCore import QTimer, Signal, QObject, QThreadPool
 from PySide6.QtWidgets import QApplication
 from controllers.ctrl_data import CtrlData
 from controllers.ctrl_usuario import CtrlUsuario
@@ -43,16 +43,10 @@ class ControllersManager(QObject):
         if not manager.is_login() or self.notifi_running:
             return
         self.notifi_running = True
-        self.thread = QThread()
         self.worker = NotifiWorker()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
-        self.worker.finished.connect(self.signal_notifi)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.worker.finished.connect(lambda: setattr(self, 'notifi_running', False))
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.worker.signals.finished.connect(self.signal_notifi)
+        self.worker.signals.finished.connect(lambda: setattr(self, "notifi_running", False))
+        QThreadPool.globalInstance().start(self.worker)
 
     def get_data(self):
         return self.data

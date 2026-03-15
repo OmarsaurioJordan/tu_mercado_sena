@@ -70,7 +70,8 @@ class AuditoriaCard(QFrame):
             return
         print(f"AuditoriaCard {auditoria.id}: setData")
         self.administrador_id = auditoria.administrador_id
-        self.cuando.setText(auditoria.fecha_registro.replace(" ", "\n") + " - " + str(auditoria.dias) + " días")
+        fecha = auditoria.fecha_registro or ""
+        self.cuando.setText(fecha.replace(" ", "\n") + " - " + str(auditoria.dias) + " días")
         self.nickname.setText(auditoria.nickname)
         self.email.setText(auditoria.email + (" (Admin)" if auditoria.rol_id != 1 else ""))
         ctrlData = QApplication.instance().property("controls").get_data()

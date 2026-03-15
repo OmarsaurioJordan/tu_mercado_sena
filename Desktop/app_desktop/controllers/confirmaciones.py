@@ -23,7 +23,6 @@ def confirma_ejecucion(tipo="", id=0, value=0):
             ctrlProducto = manager.get_productos()
             return ctrlProducto.set_subcategoria(id, value)
         case "pqrs_estado":
-            manager = QApplication.instance().property("manager")
             resp = QMessageBox.question(manager, "Confirmación", "¿Desea dar por cerrada la PQRS sin enviar respuesta al usuario? Se recomienda escribir y enviar algun mensaje")
             if resp == QMessageBox.Yes:
                 ctrlPqrs = manager.get_pqrss()

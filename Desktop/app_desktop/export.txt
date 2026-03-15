@@ -1,0 +1,5 @@
+para crear un EXE primero tener instalado:
+pip install pyinstaller
+
+luego correr este comando en la carpeta raíz del proyecto:
+pyinstaller --onefile --windowed --icon=icono.ico --collect-all PySide6 --add-data "assets;assets" main.py

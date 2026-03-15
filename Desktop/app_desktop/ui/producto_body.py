@@ -175,9 +175,10 @@ class ProductoBody(QWidget):
             self.descripcion.setText(producto.descripcion)
         self.precio.setText("Precio\n$ " + str(int(producto.precio)))
         self.disponibles.setText("Disponibles\n" + str(producto.disponibles))
-        self.registro.setText("Registro\n" + producto.fecha_registro.replace(" ", "\n"))
-        fecha_actualiza = producto.fecha_actualiza or ""
-        self.edicion.setText("Edición\n" + fecha_actualiza.replace(" ", "\n"))
+        fecha = producto.fecha_registro or ""
+        self.registro.setText("Registro\n" + fecha.replace(" ", "\n"))
+        fecha = producto.fecha_actualiza or ""
+        self.edicion.setText("Edición\n" + fecha.replace(" ", "\n"))
         ctrlData = QApplication.instance().property("controls").get_data()
         self.sel_categoria.set_items(ctrlData.get_to_selector("categorias"))
         self.sel_subcategoria.set_items(ctrlData.get_subcategorias_to_selector(producto.categoria_id))

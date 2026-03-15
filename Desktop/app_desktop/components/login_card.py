@@ -70,7 +70,8 @@ class LoginCard(QFrame):
             return
         print(f"LoginCard {login.id}: setData")
         self.usuario_id = login.usuario_id
-        self.cuando.setText(login.fecha_registro.replace(" ", "\n") + " - " + str(login.dias) + " días")
+        fecha = login.fecha_registro or ""
+        self.cuando.setText(fecha.replace(" ", "\n") + " - " + str(login.dias) + " días")
         self.nickname.setText(login.nickname)
         self.email.setText(login.email + (" (Admin)" if login.rol_id != 1 else ""))
         self.mensaje.setText(login.ip_direccion + " - " + login.informacion)

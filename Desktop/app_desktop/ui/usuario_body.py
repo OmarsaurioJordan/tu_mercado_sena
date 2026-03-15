@@ -207,9 +207,12 @@ class UsuarioBody(QWidget):
             self.link.setText("*** link ***")
         else:
             self.link.setText(f'<a href="{usuario.link}">{usuario.link}</a>')
-        self.registro.setText("Registro\n" + usuario.fecha_registro.replace(" ", "\n"))
-        self.edicion.setText("Edición\n" + usuario.fecha_actualiza.replace(" ", "\n"))
-        self.actividad.setText("Actividad\n" + usuario.fecha_reciente.replace(" ", "\n"))
+        fecha = usuario.fecha_registro or ""
+        self.registro.setText("Registro\n" + fecha.replace(" ", "\n"))
+        fecha = usuario.fecha_actualiza or ""
+        self.edicion.setText("Edición\n" + fecha.replace(" ", "\n"))
+        fecha = usuario.fecha_reciente or ""
+        self.actividad.setText("Actividad\n" + fecha.replace(" ", "\n"))
         self.sel_rol.set_index_from_data(usuario.rol_id)
         self.sel_estado.set_index_from_data(usuario.estado_id)
         self.sel_rol.set_ente_id(usuario.id)

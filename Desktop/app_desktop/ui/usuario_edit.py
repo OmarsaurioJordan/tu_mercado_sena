@@ -128,9 +128,12 @@ class UsuarioEdit(QWidget):
         self.nickname.setPlaceholder(usuario.nickname, True)
         self.descripcion.setText(usuario.descripcion)
         self.link.setPlaceholder(usuario.link, True)
-        self.registro.setText("Registro\n" + usuario.fecha_registro.replace(" ", "\n"))
-        self.edicion.setText("Edición\n" + usuario.fecha_actualiza.replace(" ", "\n"))
-        self.actividad.setText("Actividad\n" + usuario.fecha_reciente.replace(" ", "\n"))
+        fecha = usuario.fecha_registro or ""
+        self.registro.setText("Registro\n" + fecha.replace(" ", "\n"))
+        fecha = usuario.fecha_actualiza or ""
+        self.edicion.setText("Edición\n" + fecha.replace(" ", "\n"))
+        fecha = usuario.fecha_reciente or ""
+        self.actividad.setText("Actividad\n" + fecha.replace(" ", "\n"))
         self.passOld.set_value("")
         self.imagen.setPixmap(usuario.img_pix)
 
