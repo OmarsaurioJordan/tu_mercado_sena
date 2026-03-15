@@ -69,7 +69,7 @@ function auditar($suceso_id, $descripcion) {
     }
 }
 
-function valida_password($id, $pass) {
+function valida_password($id, $password) {
     global $debug, $conn;
     if (!$debug) {
 
