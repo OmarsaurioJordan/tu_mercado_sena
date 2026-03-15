@@ -253,40 +253,44 @@ class ProductoService implements IProductoService
      */
     public function eliminarProducto(int $productoId): array
     {
-        Log::info('Eliminando producto', ['producto_id' => $productoId]);
+    Log::info('Eliminando producto', ['producto_id' => $productoId]);
 
-        try {
+    try {
 
-            // Verificar que el producto pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
-                throw new \Exception('No tienes permiso para eliminar este producto.');
-            }
-
-            return DB::transaction(function () use ($productoId) {
-                // Eliminar las imágenes del storage
-                $this->eliminarImagenesProducto($productoId);
-
-                // Eliminar el producto de la BD 
-                $producto = \App\Models\Producto::findOrFail($productoId);
-
-                $producto->delete();
-
-                Log::info('Producto eliminado', ['producto_id' => $productoId]);
-
-                return [
-                    'success' => true,
-                    'message' => 'Producto eliminado exitosamente.',
-                ];
-            });
-
-        } catch (\Exception $e) {
-            Log::error('Error al eliminar producto', [
-                'error' => $e->getMessage(),
-                'producto_id' => $productoId,
-            ]);
-            throw $e;
+        if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
+            throw new \Exception('No tienes permiso para eliminar este producto.');
         }
+
+        return DB::transaction(function () use ($productoId) {
+
+            // mover imágenes
+            $this->eliminarImagenesProducto($productoId);
+
+            // marcar producto como eliminado
+            $producto = \App\Models\Producto::findOrFail($productoId);
+            $producto->estado_id = 3;
+            $producto->save();
+
+            Log::info('Producto marcado como eliminado', [
+                'producto_id' => $productoId
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Producto eliminado exitosamente.',
+            ];
+        });
+
+    } catch (\Exception $e) {
+
+        Log::error('Error al eliminar producto', [
+            'error' => $e->getMessage(),
+            'producto_id' => $productoId,
+        ]);
+
+        throw $e;
     }
+}
 
     /**
      * Busca productos por texto
