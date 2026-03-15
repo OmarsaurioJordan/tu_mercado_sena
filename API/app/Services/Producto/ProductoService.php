@@ -81,7 +81,7 @@ class ProductoService implements IProductoService
 
         try {
             // Verificar que el producto existe y pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::id())) {
+            if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::user()->usuario->id)) {
                 throw new \Exception('No tienes permiso para editar este producto.');
             }
 
@@ -223,7 +223,7 @@ class ProductoService implements IProductoService
 
 
             // Verificar que el producto pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::id())) {
+            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
                 throw new \Exception('No tienes permiso para modificar este producto.');
             }
 
@@ -368,7 +368,8 @@ class ProductoService implements IProductoService
 
         foreach ($fotos as $foto) {
             // Eliminar archivo del storage
-            Storage::disk('public')->move("productos/{$productoId}" . $foto->imagen, "papelera/productos/{$productoId}/" . $foto->imagen);
+            Storage::disk('public')->move("productos/{$productoId}/" . $foto->imagen,"papelera/productos/{$productoId}/" . $foto->imagen
+        );
 
             Papelera::create([
                 "usuario_id" => Auth::user()->usuario->id,

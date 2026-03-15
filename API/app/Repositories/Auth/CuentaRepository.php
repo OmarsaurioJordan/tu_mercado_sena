@@ -83,12 +83,10 @@ class CuentaRepository implements ICuentaRepository
     {
         $cuentaUsuario = $this->findById($cuentaId);
 
-        $correoUsuario = $cuentaUsuario->email;
+        if (!$cuentaUsuario?->email) {
+        return false;
+    }
 
-        if (str_ends_with(strtolower($correoUsuario), '@gmail.com')) {
-            return false;
-        }
-
-        return true;
+        return !str_ends_with(strtolower($cuentaUsuario->email), '@gmail.com');
     }
 }

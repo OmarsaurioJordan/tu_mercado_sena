@@ -77,7 +77,7 @@ readonly class OutputDetailsDto implements Arrayable
                             'mensaje' => $m->mensaje,
                             'es_comprador' => (bool) $m->es_comprador,
                             'imagen' => $m->imagen
-                                ? asset('storage/' . ltrim($m->imagen, '/'))
+                                ? asset("storage/mensajes/{$chat->id}/" . ltrim($m->imagen, '/'))
                                 : null,                            
                             'fecha_registro' => $m->fecha_registro->toDateTimeString(),
                         ])->toArray()

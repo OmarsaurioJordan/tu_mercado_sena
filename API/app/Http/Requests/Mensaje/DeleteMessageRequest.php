@@ -13,7 +13,7 @@ class DeleteMessageRequest extends FormRequest
     public function authorize(): bool
     {
         $mensaje = $this->route('mensaje');
-        $usuario_id = Auth::id();
+        $usuario_id = Auth::user()->usuario->id;
 
         $chat = $mensaje->chat;
         $esDelChat = $chat->comprador_id === $usuario_id || $chat->producto->usuario_id === $usuario_id;

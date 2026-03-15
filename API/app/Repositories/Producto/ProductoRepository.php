@@ -96,7 +96,7 @@ class ProductoRepository implements IProductoRepository
 
         // Excluir mis propios productos en el listado general si no se filtra por vendedor
         // if (Auth::check() && !isset($filtros['vendedor_id'])) {
-        //     $query->where('vendedor_id', '<>', Auth::id());
+        //     $query->where('vendedor_id', '<>', Auth::user()->usuario->id);
         // }
         if (Auth::check() && !isset($filtros["vendedor_id"]) && Auth::user()->usuario){
             $query->where("vendedor_id", "<>", Auth::user()->usuario->id);
@@ -118,7 +118,7 @@ class ProductoRepository implements IProductoRepository
         $query = Producto::porVendedor($vendedorId);
 
         // Si el usuario autenticado no es el vendedor, aplicar filtro de bloqueados
-        // if (Auth::check() && Auth::id() !== $vendedorId) {
+        // if (Auth::check() && Auth::user()->usuario->id !== $vendedorId) {
         //     $query = $this->aplicarFiltroBloqueados($query);
         // }
 
