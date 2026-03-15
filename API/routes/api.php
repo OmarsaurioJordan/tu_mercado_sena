@@ -136,7 +136,6 @@ Route::middleware('jwtVerify')->group(function (){
     Route::get('transferencias-filtros', [ChatController::class, 'filtrarTransferencias']);
 
     Route::get('categorias', [CategoriasController::class, 'index']);
-    Route::get('categorias/{categoria}/subcategorias', [SubCategoriasController::class, 'index']);
     Route::get('motivos', [MotivoController::class, 'index']);
     Route::get('favoritos', [UsuarioController::class, 'mostrarFavoritos']);
     Route::post('favoritos/{usuario}', [UsuarioController::class, 'añadirAFavoritos']);
@@ -146,14 +145,13 @@ Route::middleware('jwtVerify')->group(function (){
     
     Route::get('pqrs', [PqrsController::class, 'index']);
     Route::post('pqrs', [PqrsController::class, 'store']);
-    
+    Roote::get
     Route::get('notificaciones', [NotificacionController::class, 'index']);
     Route::get('notificaciones/no-vistas', [NotificacionController::class, 'notificacionesNoVistas']);
     Route::get('notificaciones/{notificacion}', [NotificacionController::class, 'show']);
     Route::delete('notificaciones/{notificacion}', [NotificacionController::class, 'destroy']);
-    Route::get('integridades', [IntegridadController::class, 'index']);
-    Route::get('categorias', [CategoriasController::class, 'index']);
 
+    Route::get('integridades', [IntegridadController::class, 'index']);
 
 
     Route::middleware(['CheckGmailRestriction', 'throttle:api_usuario'])->group(function () {
