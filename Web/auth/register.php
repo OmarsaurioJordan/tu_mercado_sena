@@ -232,7 +232,7 @@ if (isLoggedIn()) {
     <script>
         window.BASE_URL = <?= json_encode(getBaseUrl()) ?>;
         var regCuentaId = null, regDatosEncriptados = null;
-        var apiBase = typeof API_CONFIG !== 'undefined' ? API_CONFIG.LARAVEL_URL : <?= json_encode(defined('LARAVEL_API_URL') ? LARAVEL_API_URL : 'https://tumercadosena.shop/api/') ?>;
+        var apiBase = typeof API_CONFIG !== 'undefined' ? API_CONFIG.LARAVEL_URL : <?= json_encode(defined('LARAVEL_API_URL') ? LARAVEL_API_URL : 'https://tumercadosena.shop/api/api') ?>;
         var setSessionUrl = (window.BASE_URL || '') + 'auth/set_session.php';
 
         document.getElementById('regLaravelForm1').addEventListener('submit', async function(e) {

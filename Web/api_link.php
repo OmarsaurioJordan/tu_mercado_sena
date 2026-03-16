@@ -6,7 +6,7 @@
  */
 
 if (!defined('API_BASE_URL')) {
-    define('API_BASE_URL', 'https://tumercadosena.shop/api/');
+    define('API_BASE_URL', 'https://tumercadosena.shop/api/api');
 }
 
 if (!defined('API_STORAGE_URL')) {

@@ -47,6 +47,7 @@ $formData = [
     'integridad_id' => '1',
 ];
 
+
 /* =============================
    Cargar catálogos desde API
 ============================= */
@@ -59,20 +60,49 @@ if (defined('USE_LARAVEL_API') && USE_LARAVEL_API) {
         debugLog("RAW API /integridades", $rawIntegridades);
     }
 
-    $categorias = apiGetCategorias();
+    $categoriasResponse = apiGetCategorias();
 
     if (!empty($_GET['debug_api'])) {
-        debugLog("Categorias recibidas", $categorias);
+        debugLog("Categorias recibidas RAW", $categoriasResponse);
     }
 
-    foreach (is_array($categorias) ? $categorias : [] as $cat) {
-        $subs = isset($cat['subcategorias']) && is_array($cat['subcategorias'])
-            ? $cat['subcategorias']
-            : [];
+    if (is_array($categoriasResponse)) {
+        if (isset($categoriasResponse['data']) && is_array($categoriasResponse['data'])) {
+            $categorias = $categoriasResponse['data'];
+
+            if (isset($categorias['items']) && is_array($categorias['items'])) {
+                $categorias = $categorias['items'];
+            }
+        } else {
+            $categorias = $categoriasResponse;
+        }
+    } else {
+        $categorias = [];
+    }
+
+    if (!empty($_GET['debug_api'])) {
+        debugLog("Categorias normalizadas", $categorias);
+    }
+
+    $subcategorias = [];
+
+    foreach ($categorias as $cat) {
+        $subs = [];
+
+        if (isset($cat['subcategorias']) && is_array($cat['subcategorias'])) {
+            $subs = $cat['subcategorias'];
+        } elseif (isset($cat['subcategoria']) && is_array($cat['subcategoria'])) {
+            $subs = $cat['subcategoria'];
+        } elseif (isset($cat['children']) && is_array($cat['children'])) {
+            $subs = $cat['children'];
+        }
 
         foreach ($subs as $sub) {
-            $sub['categoria_nombre'] = $cat['nombre'] ?? '';
-            $subcategorias[] = $sub;
+            $subcategorias[] = [
+                'id' => $sub['id'] ?? '',
+                'nombre' => $sub['nombre'] ?? ($sub['descripcion'] ?? 'Sin nombre'),
+                'categoria_nombre' => $cat['nombre'] ?? ($cat['descripcion'] ?? 'Sin categoría'),
+            ];
         }
     }
 
