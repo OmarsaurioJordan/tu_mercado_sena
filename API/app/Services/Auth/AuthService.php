@@ -327,11 +327,11 @@ class AuthService implements IAuthService
      * @return Usuario - Mismo usuario pero con relaciones cargadas si es necesario
      */
     public function getCurrentUser(Usuario $user): Usuario
-    {
+        {   
         try {
 
             $user->makeHidden('fecha_reciente', 'is_recently_active')->load(
-                'cuenta:id,notifica_push,notifica_correo', 'uso_datos','email',
+                'cuenta:id,email,notifica_push,notifica_correo,uso_datos',
                 'productos:id,vendedor_id,integridad_id,estado_id,subcategoria_id,nombre,precio',
                 'productos.integridad:id,nombre',
                 'productos.estado:id,nombre',
@@ -343,9 +343,9 @@ class AuthService implements IAuthService
 
         } catch (Exception $e) {
             Log::error('Error al obtener información del usuario', [
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
                 'archivo' => $e->getFile(),
-                'linea' => $e->getLine()
+                'linea'   => $e->getLine()
             ]);
             throw $e;
         }

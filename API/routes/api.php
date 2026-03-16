@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\MotivoController;
 use App\Http\Controllers\Api\MensajeController;
 use App\Http\Controllers\Api\CategoriasController;
 use App\Http\Controllers\Api\IntegridadController;
+use App\Http\Controllers\Api\DenunciaController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\PqrsController;
 use App\Http\Controllers\Api\NotificacionController;

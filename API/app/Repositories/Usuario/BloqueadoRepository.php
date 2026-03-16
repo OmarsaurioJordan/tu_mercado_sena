@@ -76,9 +76,9 @@ class BloqueadoRepository implements IBloqueadoRepository
      */
     public function obtenerBloqueadosPorUsuario(int $bloqueadorId): Collection
     {
-        $usuario = Usuario::findOrFail($bloqueadorId);
-
-        return $usuario->usuariosQueHeBloqueado()->get();
-
+    $usuario = Usuario::findOrFail($bloqueadorId);
+    return $usuario->usuariosQueHeBloqueado()
+        ->select('usuarios.id', 'usuarios.nickname', 'usuarios.imagen') 
+        ->get();
     }
 }

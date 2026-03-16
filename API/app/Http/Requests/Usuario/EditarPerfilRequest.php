@@ -40,6 +40,7 @@ class EditarPerfilRequest extends FormRequest
             ],
             'descripcion' => [
                 'sometimes',
+                'nullable',
                 'string',
                 'max:300'
             ],
