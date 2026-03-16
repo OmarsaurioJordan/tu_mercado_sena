@@ -115,20 +115,19 @@ class ProductoRepository implements IProductoRepository
      */
     public function obtenerPorVendedor(int $vendedorId, array $relaciones = []): Collection
     {
-        $query = Producto::porVendedor($vendedorId);
+    $query = Producto::porVendedor($vendedorId)
+        ->whereIn('estado_id', [1, 2]); // activos e invisibles
 
-        // Si el usuario autenticado no es el vendedor, aplicar filtro de bloqueados
-        // if (Auth::check() && Auth::user()->usuario->id !== $vendedorId) {
-        //     $query = $this->aplicarFiltroBloqueados($query);
-        // }
+    if (Auth::check() && Auth::user()->usuario->id !== $vendedorId){
 
-        if (Auth::check() && Auth::user()->usuario->id !== $vendedorId){
-            $usuarioId = Auth::check() && Auth::user()->usuario ? Auth::user()->usuario->id : null;
+        $usuarioId = Auth::check() && Auth::user()->usuario 
+            ? Auth::user()->usuario->id 
+            : null;
 
-            if ($usuarioId !== null && $usuarioId !== $vendedorId) {
-                $query = $this->aplicarFiltroBloqueados($query);
-            }
+        if ($usuarioId !== null && $usuarioId !== $vendedorId) {
+            $query = $this->aplicarFiltroBloqueados($query);
         }
+    }
 
         if (!empty($relaciones)) {
             $query->with($relaciones);
@@ -142,9 +141,15 @@ class ProductoRepository implements IProductoRepository
      */
     public function cambiarEstado(int $id, int $estadoId): bool
     {
-        return Producto::where('id', $id)->update([
-            'estado_id' => $estadoId,
-        ]) > 0;
+        $producto = Producto::find($id);
+
+        if (!$producto) {
+            return false;
+        }
+
+        $producto->estado_id = $estadoId;
+
+        return $producto->save();
     }
 
     /**

@@ -15,10 +15,6 @@ use App\Http\Controllers\Api\NotificacionController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
 /**
  * RUTAS PÚBLICAS (Sin autenticación)
  * Cualquiera puede entrar a ellas
@@ -76,6 +72,8 @@ Route::prefix('auth')->group(function()  {
  * El middleware personalizado "jwtVerify" verifica el token.
  * 
  */
+    Route::get('integridades', [IntegridadController::class, 'index']);
+
 Route::middleware('jwtVerify')->group(function (){
 
     Route::middleware(['CheckGmailRestriction', 'throttle:api_usuario'])->group(function () {
@@ -84,6 +82,7 @@ Route::middleware('jwtVerify')->group(function (){
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::get('/me', [AuthController::class, 'me']);
+            Route::patch('/cambiar-password', [AuthController::class, 'cambiarPassword']);
         });
     
         // === EDITAR PERFIL ===
@@ -139,6 +138,7 @@ Route::middleware('jwtVerify')->group(function (){
     Route::get('motivos', [MotivoController::class, 'index']);
     Route::get('favoritos', [UsuarioController::class, 'mostrarFavoritos']);
     Route::post('favoritos/{usuario}', [UsuarioController::class, 'añadirAFavoritos']);
+    Route::get('vendedores/{id}', [UsuarioController::class, 'perfilVendedor']);
     Route::delete('favoritos/{usuario}', [UsuarioController::class, 'eliminarDeFavoritos']);
     Route::post('denuncias', [\App\Http\Controllers\Api\DenunciaController::class, 'store'])
         ->middleware('CheckDenuncia');
@@ -150,7 +150,6 @@ Route::middleware('jwtVerify')->group(function (){
     Route::get('notificaciones/{notificacion}', [NotificacionController::class, 'show']);
     Route::delete('notificaciones/{notificacion}', [NotificacionController::class, 'destroy']);
 
-    Route::get('integridades', [IntegridadController::class, 'index']);
 
 
     Route::middleware(['CheckGmailRestriction', 'throttle:api_usuario'])->group(function () {

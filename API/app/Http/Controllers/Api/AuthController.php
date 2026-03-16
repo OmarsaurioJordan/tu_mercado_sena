@@ -303,4 +303,66 @@ class AuthController extends Controller
             ], 500);
         }
     }
+    /**
+ * Cambiar contraseña estando autenticado
+ * 
+ * RUTA: PATCH /api/auth/cambiar-password
+ * AUTENTICACIÓN: Requerida (middleware jwtVerify)
+ * 
+ * Body:
+ *   - password_actual: string (contraseña que el usuario ya tiene)
+ *   - password: string (nueva contraseña)
+ *   - password_confirmation: string (confirmación de la nueva)
+ */
+public function cambiarPassword(Request $request): JsonResponse
+{
+    try {
+        $validated = $request->validate([
+            'password_actual'       => ['required', 'string'],
+            'password'              => [
+                'required',
+                'string',
+                'confirmed',
+                \Illuminate\Validation\Rules\Password::min(8)
+                    ->mixedCase()
+                    ->numbers()
+            ],
+            'password_confirmation' => ['required', 'string'],
+        ]);
+
+        // Obtener la cuenta autenticada desde el JWTGuard
+        $cuenta = $request->user();
+
+        // Verificar que la contraseña actual sea correcta
+        if (!\Illuminate\Support\Facades\Hash::check($validated['password_actual'], $cuenta->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La contraseña actual es incorrecta.',
+            ], 422);
+        }
+
+        // Actualizar la contraseña
+        $cuenta->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($validated['password'])
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contraseña actualizada correctamente.',
+        ], 200);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error de validación.',
+            'errors'  => $e->errors(),
+        ], 422);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al cambiar la contraseña.',
+        ], 500);
+    }
+}
 }

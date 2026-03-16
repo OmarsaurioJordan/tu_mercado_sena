@@ -75,43 +75,82 @@ class ProductoService implements IProductoService
     /**
      * Actualiza un producto existente
      */
-    public function actualizarProducto(InputDto $dto, ?array $imagenes = null): array
-    {
-        Log::info('Actualizando producto', ['id' => $dto->id]);
+    public function actualizarProducto(InputDto $dto, ?array $imagenes = null, array $fotosExistentes = []): array
+{
+    Log::info('Actualizando producto', ['id' => $dto->id]);
 
-        try {
-            // Verificar que el producto existe y pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::user()->usuario->id)) {
-                throw new \Exception('No tienes permiso para editar este producto.');
+    try {
+
+        if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::user()->usuario->id)) {
+            throw new \Exception('No tienes permiso para editar este producto.');
+        }
+
+        return DB::transaction(function () use ($dto, $imagenes, $fotosExistentes) {
+
+            $producto = $this->productoRepository->actualizar($dto->id, $dto->toArray());
+
+            /*
+            =====================================
+            ELIMINAR FOTOS QUE YA NO EXISTEN
+            =====================================
+            */
+
+            $fotos = Foto::where('producto_id', $producto->id)->get();
+
+            foreach ($fotos as $foto) {
+
+                if (!in_array($foto->id, $fotosExistentes)) {
+
+                    Storage::disk('public')->move(
+                        "productos/{$producto->id}/{$foto->imagen}",
+                        "papelera/productos/{$producto->id}/{$foto->imagen}"
+                    );
+
+                    Papelera::create([
+                        "usuario_id" => Auth::user()->usuario->id,
+                        "mensaje" => "Producto editado ID: {$producto->id}",
+                        "imagen" => "papelera/productos/{$producto->id}/{$foto->imagen}",
+                    ]);
+
+                    $foto->delete();
+                }
             }
 
-            return DB::transaction(function () use ($dto, $imagenes) {
-                // Actualizar el producto
-                $producto = $this->productoRepository->actualizar($dto->id, $dto->toArray());
+            /*
+            =====================================
+            SUBIR NUEVAS IMÁGENES
+            =====================================
+            */
 
-                // Procesar nuevas imágenes si existen
-                if ($imagenes && count($imagenes) > 0) {
-                    $this->procesarImagenes($producto->id, $imagenes);
-                }
+            if ($imagenes && count($imagenes) > 0) {
+                $this->procesarImagenes($producto->id, $imagenes);
+            }
 
-                // Cargar relaciones
-                $producto->load(['vendedor', 'subcategoria.categoria', 'integridad', 'estado', 'fotos']);
-
-                return [
-                    'success' => true,
-                    'message' => 'Producto actualizado exitosamente.',
-                    'data' => OutputDto::fromModel($producto)->toArray()
-                ];
-            });
-
-        } catch (\Exception $e) {
-            Log::error('Error al actualizar producto', [
-                'error' => $e->getMessage(),
-                'id' => $dto->id,
+            $producto->load([
+                'vendedor',
+                'subcategoria.categoria',
+                'integridad',
+                'estado',
+                'fotos'
             ]);
-            throw $e;
-        }
+
+            return [
+                'success' => true,
+                'message' => 'Producto actualizado exitosamente.',
+                'data' => OutputDto::fromModel($producto)->toArray()
+            ];
+        });
+
+    } catch (\Exception $e) {
+
+        Log::error('Error al actualizar producto', [
+            'error' => $e->getMessage(),
+            'id' => $dto->id,
+        ]);
+
+        throw $e;
     }
+}
 
     /**
      * Obtiene un producto por su ID
@@ -372,7 +411,9 @@ class ProductoService implements IProductoService
 
         foreach ($fotos as $foto) {
             // Eliminar archivo del storage
-            Storage::disk('public')->move("productos/{$productoId}/" . $foto->imagen,"papelera/productos/{$productoId}/" . $foto->imagen
+            Storage::disk('public')->move(
+            "productos/{$productoId}/{$foto->imagen}",
+            "papelera/productos/{$productoId}/{$foto->imagen}"
         );
 
             Papelera::create([

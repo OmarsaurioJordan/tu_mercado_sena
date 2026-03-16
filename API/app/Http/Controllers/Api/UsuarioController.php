@@ -108,4 +108,14 @@ class UsuarioController extends Controller
 
         return response()->json($resultado, 200);
     }
+    public function perfilVendedor($id)
+    {
+    $usuario = Usuario::with(['productos.fotos'])
+        ->findOrFail($id);
+
+    return response()->json([
+        'success' => true,
+        'data' => $usuario
+        ]);
+    }
 }

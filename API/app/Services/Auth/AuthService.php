@@ -331,7 +331,7 @@ class AuthService implements IAuthService
         try {
 
             $user->makeHidden('fecha_reciente', 'is_recently_active')->load(
-                'cuenta:id,notifica_push,notifica_correo', 
+                'cuenta:id,notifica_push,notifica_correo', 'uso_datos','email',
                 'productos:id,vendedor_id,integridad_id,estado_id,subcategoria_id,nombre,precio',
                 'productos.integridad:id,nombre',
                 'productos.estado:id,nombre',
