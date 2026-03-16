@@ -486,6 +486,58 @@ body {
     font-size: 14px;
 }
 
+/* Listado: cabecera (tu búsqueda + filtros) + contenido con padding inferior */
+.list-header {
+    padding-top: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+}
+.filter-group-search {
+    flex: 1;
+    min-width: 120px;
+}
+.filter-group-refresh {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+.btn-icon-refresh {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    background: var(--color-bg);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.btn-icon-refresh:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+.btn-icon-refresh:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+.btn-icon-refresh .ri-refresh-line {
+    font-size: 1.35rem;
+}
+.btn-icon-refresh.refreshing .ri-refresh-line {
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.products-list-content {
+    padding-bottom: 120px;
+}
+
 /* Products Grid */
 .products-grid {
     display: grid;

@@ -1,89 +1,100 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-// Usuario autenticado
-
 $user = getCurrentUser();
 $chat_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($chat_id <= 0) {
-    header('Location: index.php');
+    header('Location: mis_chats.php');
     exit;
 }
 
-$conn = getDBConnection();
-
-// Obtener información del chat
-$stmt = $conn->prepare("SELECT c.*, 
-       p.nombre AS producto_nombre, 
-       p.precio AS producto_precio, 
-       p.disponibles AS producto_disponibles,
-       p.id AS producto_id,
-       u_comprador.nickname AS comprador_nombre, 
-       u_comprador.id AS comprador_id,
-       u_comprador.imagen AS comprador_avatar,
-       u_vendedor.nickname AS vendedor_nombre, 
-       u_vendedor.id AS vendedor_id,
-       u_vendedor.imagen AS vendedor_avatar
-FROM chats c
-INNER JOIN productos p ON c.producto_id = p.id
-INNER JOIN usuarios u_comprador ON c.comprador_id = u_comprador.id
-INNER JOIN usuarios u_vendedor ON p.vendedor_id = u_vendedor.id
-WHERE c.id = ?");
-
-if (!$stmt) {
-    die("Error en prepare: " . $conn->error);
+$chat_raw = apiGetChat($chat_id);
+if (!$chat_raw) {
+    // Si la API no tiene GET /chats/{id}, intentar obtener el chat desde la lista
+    $chats_list = apiGetChats();
+    foreach (is_array($chats_list) ? $chats_list : [] as $c) {
+        $cid = (int)($c['id'] ?? $c['chat_id'] ?? 0);
+        if ($cid === $chat_id) {
+            $chat_raw = $c;
+            break;
+        }
+    }
 }
-    
-
-$stmt->bind_param("i", $chat_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$chat = $result->fetch_assoc();
-$stmt->close();
-
-if (!$chat) {
-    header('Location: index.php');
+$cid_from_raw = (int)($chat_raw['id'] ?? $chat_raw['chat_id'] ?? 0);
+if (!$chat_raw || $cid_from_raw === 0) {
+    header('Location: mis_chats.php');
     exit;
 }
 
-// Verificar que el usuario es parte del chat
+$p = $chat_raw['producto'] ?? $chat_raw['product'] ?? [];
+if (!is_array($p)) $p = [];
+$comp = $chat_raw['comprador'] ?? $chat_raw['buyer'] ?? [];
+$vend = $chat_raw['vendedor'] ?? $chat_raw['seller'] ?? $p['vendedor'] ?? [];
+if (!is_array($comp)) $comp = [];
+if (!is_array($vend)) $vend = [];
+$chat = [
+    'id' => (int)($chat_raw['id'] ?? $chat_raw['chat_id'] ?? 0),
+    'comprador_id' => (int)($chat_raw['comprador_id'] ?? $comp['id'] ?? 0),
+    'vendedor_id' => (int)($chat_raw['vendedor_id'] ?? $vend['id'] ?? 0),
+    'comprador_nombre' => $comp['nickname'] ?? $comp['name'] ?? $comp['nombre'] ?? '',
+    'comprador_avatar' => $comp['imagen'] ?? $comp['avatar'] ?? $comp['image'] ?? '',
+    'vendedor_nombre' => $vend['nickname'] ?? $vend['name'] ?? $vend['nombre'] ?? '',
+    'vendedor_avatar' => $vend['imagen'] ?? $vend['avatar'] ?? $vend['image'] ?? '',
+    'producto_id' => (int)($chat_raw['producto_id'] ?? $p['id'] ?? 0),
+    'producto_nombre' => $p['nombre'] ?? $p['name'] ?? $p['title'] ?? $chat_raw['producto_nombre'] ?? '',
+    'producto_precio' => (float)($p['precio'] ?? $p['price'] ?? $chat_raw['producto_precio'] ?? 0),
+    'producto_disponibles' => (int)($p['disponibles'] ?? $p['stock'] ?? 1),
+    'producto_imagen' => $p['imagen'] ?? $p['image'] ?? (isset($p['imagenes'][0]) ? ($p['imagenes'][0]['imagen'] ?? $p['imagenes'][0]['url'] ?? '') : ''),
+    'estado_id' => (int)($chat_raw['estado_id'] ?? 1),
+    'fecha_venta' => $chat_raw['fecha_venta'] ?? null,
+];
+
+// Si la API no devolvió datos del producto, obtenerlos por producto_id para mostrar precio e imagen real
+if ($chat['producto_id'] > 0 && (empty($chat['producto_nombre']) || $chat['producto_precio'] <= 0)) {
+    $producto = apiGetProducto($chat['producto_id']);
+    if ($producto && is_array($producto)) {
+        $chat['producto_nombre'] = $producto['nombre'] ?? $producto['name'] ?? $chat['producto_nombre'];
+        $chat['producto_precio'] = (float)($producto['precio'] ?? $producto['price'] ?? $chat['producto_precio']);
+        $chat['producto_disponibles'] = (int)($producto['disponibles'] ?? $producto['stock'] ?? $chat['producto_disponibles']);
+        if (empty($chat['producto_imagen']) && !empty($producto['imagenes'][0])) {
+            $first = $producto['imagenes'][0];
+            $chat['producto_imagen'] = is_array($first) ? ($first['imagen'] ?? $first['url'] ?? '') : (string)$first;
+        } elseif (empty($chat['producto_imagen'])) {
+            $chat['producto_imagen'] = $producto['imagen'] ?? $producto['image'] ?? '';
+        }
+        if (empty($chat['vendedor_nombre']) && !empty($producto['vendedor'])) {
+            $v = $producto['vendedor'];
+            $chat['vendedor_nombre'] = $v['nickname'] ?? $v['name'] ?? $v['nombre'] ?? $chat['vendedor_nombre'];
+            $chat['vendedor_avatar'] = $v['imagen'] ?? $v['avatar'] ?? $chat['vendedor_avatar'];
+        }
+    }
+}
+
 $es_comprador = $user['id'] == $chat['comprador_id'];
 $es_vendedor = $user['id'] == $chat['vendedor_id'];
 
 if (!$es_comprador && !$es_vendedor) {
-    header('Location: index.php');
+    header('Location: mis_chats.php');
     exit;
 }
-if ($es_comprador) {
-    $stmt = $conn->prepare("UPDATE chats SET visto_comprador = 1 WHERE id = ?");
-} else {
-    $stmt = $conn->prepare("UPDATE chats SET visto_vendedor = 1 WHERE id = ?");
-}
-$stmt->bind_param("i", $chat_id);
-$stmt->execute();
-$stmt->close();
 
-// Obtener mensajes (los nuevos se cargan vía AJAX)
-$stmt = $conn->prepare("SELECT * FROM mensajes WHERE chat_id = ? ORDER BY fecha_registro ASC");
-$stmt->bind_param("i", $chat_id);
-$stmt->execute();
-$mensajes_result = $stmt->get_result();
-$stmt->close();
+apiMarcarVistoChat($chat_id);
 
-// Verificar si hay compra confirmada: estado_id 5 = vendido (API no crea mensajes en chat)
+$mensajes_raw = apiGetMensajes($chat_id);
+$mensajes_result = is_array($mensajes_raw) ? $mensajes_raw : [];
+
 $compra_confirmada = (($chat['estado_id'] ?? 0) == 5);
+$chat_bloqueado = ($chat['estado_id'] == 8);
 
-// Verificar si el chat está bloqueado (devuelto)
-$chat_bloqueado = ($chat['estado_id'] == 8); // estado_id = 8 es "devuelto"
-
-// Calcular días restantes para cierre automático
-require_once '../api/config_cierre_automatico.php';
+require_once __DIR__ . '/../api/config_cierre_automatico.php';
 $dias_espera = defined('DIAS_ESPERA_CIERRE') ? DIAS_ESPERA_CIERRE : 7;
 $dias_restantes = null;
 $fecha_cierre = null;
@@ -93,14 +104,10 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
     $fecha_actual = new DateTime();
     $dias_transcurridos = $fecha_actual->diff($fecha_venta_obj)->days;
     $dias_restantes = $dias_espera - $dias_transcurridos;
-    
-    // Calcular fecha de cierre
     $fecha_cierre_obj = clone $fecha_venta_obj;
     $fecha_cierre_obj->modify("+{$dias_espera} days");
     $fecha_cierre = $fecha_cierre_obj->format('d/m/Y');
 }
-
-// NO cerrar la conexión aquí, la necesitamos para verificar respuestas
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -183,15 +190,30 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
     <main class="main">
         <div class="container">
             <div class="chat-container">
+                <?php
+                $chat_producto_img_url = '';
+                if (!empty($chat['producto_imagen'])) {
+                    $chat_producto_img_url = (strpos($chat['producto_imagen'], 'http') === 0)
+                        ? (function_exists('getProductImageUrlPHP') ? getProductImageUrlPHP($chat['producto_imagen']) : $chat['producto_imagen'])
+                        : (defined('LARAVEL_STORAGE_URL') ? rtrim(LARAVEL_STORAGE_URL, '/') . '/' . ltrim(str_replace('uploads/productos/', 'productos/', $chat['producto_imagen']), '/') : getBaseUrl() . 'uploads/productos/' . $chat['producto_imagen']);
+                } else {
+                    $chat_producto_img_url = getBaseUrl() . 'assets/images/default-product.jpg';
+                }
+                ?>
                 <div class="chat-header" style="position: relative;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <img src="<?= getAvatarUrl($es_comprador ? $chat['vendedor_avatar'] : $chat['comprador_avatar']) ?>" 
                                  alt="<?= htmlspecialchars($es_comprador ? $chat['vendedor_nombre'] : $chat['comprador_nombre']) ?>"
                                  style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--color-primary);">
+                            <?php if ($chat_producto_img_url): ?>
+                            <a href="<?= getBaseUrl() ?>productos/producto.php?id=<?= (int)$chat['producto_id'] ?>" style="flex-shrink: 0;" title="Ver producto">
+                                <img src="<?= htmlspecialchars($chat_producto_img_url) ?>" alt="<?= htmlspecialchars($chat['producto_nombre'] ?: 'Producto') ?>" style="width: 56px; height: 56px; border-radius: 10px; object-fit: cover; border: 2px solid rgba(255,255,255,0.5);">
+                            </a>
+                            <?php endif; ?>
                             <div>
                                 <h2>
-                                <?php echo htmlspecialchars($chat['producto_nombre']); ?> — 
+                                <?php echo htmlspecialchars($chat['producto_nombre'] ?: 'Producto'); ?> — 
                                  <?php echo htmlspecialchars($es_comprador ? $chat['vendedor_nombre'] : $chat['comprador_nombre']); ?>
                                 </h2>
                                 <p>Precio: <?php echo formatPrice($chat['producto_precio']); ?></p>
@@ -287,7 +309,7 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
                                     <button type="button" class="chat-menu-item chat-menu-item-danger" onclick="document.getElementById('chatMenuDropdown').classList.remove('show'); if(confirm('¿Eliminar esta conversación?')) eliminarChat(<?= $chat_id ?>);">
                                         <i class="ri-delete-bin-line"></i> Eliminar chat
                                     </button>
-                                    <a href="../perfil/perfil_publico.php?id=<?= $otro_usuario_id ?>" class="chat-menu-item" style="color: var(--color-primary);">
+                                    <a href="<?= getBasePath() ?>perfil/perfil_publico.php?id=<?= (int)$otro_usuario_id ?>" class="chat-menu-item" style="color: var(--color-primary);">
                                         <i class="ri-user-line"></i> Ver perfil
                                     </a>
                                 </div>
@@ -315,35 +337,27 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
                 <div class="chat-messages" id="chatMessages">
                     <?php 
                     $last_message_id = 0;
-                    while ($mensaje = $mensajes_result->fetch_assoc()): 
-                        $last_message_id = max($last_message_id, $mensaje['id']);
-                        $message_class = ($mensaje['es_comprador'] == 1 && $es_comprador) || 
-                                         ($mensaje['es_comprador'] == 0 && $es_vendedor) ? 'message-sent' : 'message-received';
-                        // Verificar si es solicitud de devolución o confirmación
-                        $es_solicitud_devolucion = strpos($mensaje['mensaje'], 'SOLICITUD DE DEVOLUCIÓN') !== false;
-                        $es_solicitud_confirmacion = strpos($mensaje['mensaje'], 'SOLICITUD DE CONFIRMACIÓN') !== false;
+                    foreach ($mensajes_result as $mensaje):
+                        $mid = (int)($mensaje['id'] ?? 0);
+                        $msg_text = $mensaje['mensaje'] ?? $mensaje['content'] ?? $mensaje['text'] ?? '';
+                        $es_comprador_msg = (int)($mensaje['es_comprador'] ?? $mensaje['from_buyer'] ?? 0);
+                        $last_message_id = max($last_message_id, $mid);
+                        $message_class = ($es_comprador_msg == 1 && $es_comprador) || 
+                                         ($es_comprador_msg == 0 && $es_vendedor) ? 'message-sent' : 'message-received';
+                        $es_solicitud_devolucion = strpos($msg_text, 'SOLICITUD DE DEVOLUCIÓN') !== false;
+                        $es_solicitud_confirmacion = strpos($msg_text, 'SOLICITUD DE CONFIRMACIÓN') !== false;
                         
-                        // Verificar si ya tiene respuesta
                         $tiene_respuesta = false;
                         if ($es_solicitud_devolucion || $es_solicitud_confirmacion) {
-                            $patron_respuesta = $es_solicitud_devolucion ? 
-                                '%✅ DEVOLUCIÓN ACEPTADA%' : '%✅ COMPRA CONFIRMADA%';
-                            $patron_rechazo = $es_solicitud_devolucion ? 
-                                '%❌ DEVOLUCIÓN RECHAZADA%' : '%❌ COMPRA RECHAZADA%';
-                            
-                            $stmt_check = $conn->prepare("
-                                SELECT COUNT(*) as tiene_respuesta
-                                FROM mensajes 
-                                WHERE chat_id = ? 
-                                AND id > ?
-                                AND (mensaje LIKE ? OR mensaje LIKE ?)
-                            ");
-                            $stmt_check->bind_param("iiss", $chat_id, $mensaje['id'], $patron_respuesta, $patron_rechazo);
-                            $stmt_check->execute();
-                            $result_check = $stmt_check->get_result();
-                            $row_check = $result_check->fetch_assoc();
-                            $tiene_respuesta = ($row_check['tiene_respuesta'] > 0);
-                            $stmt_check->close();
+                            foreach ($mensajes_result as $m2) {
+                                $id2 = (int)($m2['id'] ?? 0);
+                                if ($id2 <= $mid) continue;
+                                $t = $m2['mensaje'] ?? $m2['content'] ?? '';
+                                if (strpos($t, '✅') !== false || strpos($t, '❌') !== false) {
+                                    $tiene_respuesta = true;
+                                    break;
+                                }
+                            }
                         }
                         
                         // Mostrar botones según quién recibe el mensaje
@@ -356,20 +370,20 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
                         // Mostrar botones de devolución si es solicitud de devolución y no tiene respuesta
                         $mostrar_botones_devolucion = $es_solicitud_devolucion && !$tiene_respuesta;
                     ?>
-                        <div id="message-<?php echo $mensaje['id']; ?>" class="message <?php echo $message_class; ?>">
-                            <p><?php echo nl2br(htmlspecialchars($mensaje['mensaje'])); ?></p>
+                        <div id="message-<?php echo $mid; ?>" class="message <?php echo $message_class; ?>">
+                            <p><?php echo nl2br(htmlspecialchars($msg_text)); ?></p>
                             <?php
 
 ?>
-<span class="message-time"><?php echo formato_tiempo_relativo($mensaje['fecha_registro']); ?></span>
+<span class="message-time"><?php echo formato_tiempo_relativo($mensaje['fecha_registro'] ?? $mensaje['created_at'] ?? ''); ?></span>
                             
                             <?php if ($mostrar_botones_devolucion): ?>
-                                <div id="buttons-<?php echo $mensaje['id']; ?>" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                    <button onclick="responderDevolucion('aceptar', <?php echo $mensaje['id']; ?>)" 
+                                <div id="buttons-<?php echo $mid; ?>" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                    <button onclick="responderDevolucion('aceptar', <?php echo $mid; ?>)" 
                                             style="flex: 1; padding: 0.75rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                                         <i class="ri-check-line"></i> Aceptar
                                     </button>
-                                    <button onclick="responderDevolucion('rechazar', <?php echo $mensaje['id']; ?>)" 
+                                    <button onclick="responderDevolucion('rechazar', <?php echo $mid; ?>)" 
                                             style="flex: 1; padding: 0.75rem; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                                         <i class="ri-close-line"></i> Rechazar
                                     </button>
@@ -377,22 +391,21 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
                             <?php endif; ?>
                             
                             <?php if ($mostrar_botones_confirmacion): ?>
-                                <div id="buttons-<?php echo $mensaje['id']; ?>" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                                    <button onclick="responderConfirmacion('confirmar', <?php echo $mensaje['id']; ?>)" 
+                                <div id="buttons-<?php echo $mid; ?>" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                                    <button onclick="responderConfirmacion('confirmar', <?php echo $mid; ?>)" 
                                             style="flex: 1; padding: 0.75rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                                         <i class="ri-check-line"></i> Confirmar
                                     </button>
-                                    <button onclick="responderConfirmacion('rechazar', <?php echo $mensaje['id']; ?>)" 
+                                    <button onclick="responderConfirmacion('rechazar', <?php echo $mid; ?>)" 
                                             style="flex: 1; padding: 0.75rem; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                                         <i class="ri-close-line"></i> Rechazar
                                     </button>
                                 </div>
                             <?php endif; ?>
                         </div>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </div>
                 
-                <?php $conn->close(); // Cerrar conexión después de procesar mensajes ?>
                 
                 <?php if ($chat_bloqueado): ?>
                     <!-- Chat cerrado: no se muestra caja de mensaje ni panel de aviso -->
@@ -624,7 +637,7 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
         const formData = new FormData();
         formData.append('chat_id', window.chatId);
         formData.append('detalles', detalles);
-        fetch((typeof getApiUrl === 'function' ? getApiUrl('api/solicitar_confirmacion.php') : '../api/solicitar_confirmacion.php'), {
+        fetch(getApiUrl('api/solicitar_confirmacion.php'), {
             method: 'POST',
             headers: (window.getApiHeaders && window.getApiHeaders()) || {},
             body: formData
@@ -684,7 +697,7 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
         formData.append('chat_id', window.chatId);
         formData.append('accion', accion);
         formData.append('mensaje_id', mensajeId);
-        fetch((typeof getApiUrl === 'function' ? getApiUrl('api/responder_confirmacion.php') : '../api/responder_confirmacion.php'), {
+        fetch(getApiUrl('api/responder_confirmacion.php'), {
             method: 'POST',
             headers: (window.getApiHeaders && window.getApiHeaders()) || {},
             body: formData
@@ -756,7 +769,7 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
         const formData = new FormData();
         formData.append('chat_id', window.chatId);
         formData.append('motivo', motivo);
-        fetch((typeof getApiUrl === 'function' ? getApiUrl('api/solicitar_devolucion.php') : '../api/solicitar_devolucion.php'), {
+        fetch(getApiUrl('api/solicitar_devolucion.php'), {
             method: 'POST',
             headers: (window.getApiHeaders && window.getApiHeaders()) || {},
             body: formData
@@ -848,7 +861,7 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
         formData.append('chat_id', window.chatId);
         formData.append('accion', accion);
         formData.append('mensaje_id', mensajeId);
-        fetch((typeof getApiUrl === 'function' ? getApiUrl('api/responder_devolucion.php') : '../api/responder_devolucion.php'), {
+        fetch(getApiUrl('api/responder_devolucion.php'), {
             method: 'POST',
             headers: (window.getApiHeaders && window.getApiHeaders()) || {},
             body: formData
@@ -889,7 +902,7 @@ if ($chat['fecha_venta'] && !$chat_bloqueado) {
         formData.append('chat_id', window.chatId);
         formData.append('motivo', motivo);
         
-        fetch((typeof getApiUrl === 'function' ? getApiUrl('api/denunciar_usuario.php') : '../api/denunciar_usuario.php'), {
+        fetch(getApiUrl('api/denunciar_usuario.php'), {
             method: 'POST',
             headers: (window.getApiHeaders && window.getApiHeaders()) || {},
             body: formData

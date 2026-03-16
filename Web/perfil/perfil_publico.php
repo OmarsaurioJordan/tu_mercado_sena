@@ -1,58 +1,30 @@
 <?php
 require_once '../config.php';
-if (!defined('USE_LARAVEL_API')) require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id <= 0) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
-// Obtener información del usuario desde la base de datos
-$conn = getDBConnection();
-$stmt = $conn->prepare("
-    SELECT u.id, u.nickname, u.descripcion, u.link, u.imagen
-    FROM usuarios u
-    WHERE u.id = ? AND u.estado_id = 1
-    LIMIT 1
-");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$result = $stmt->get_result();
-$usuario = $result->fetch_assoc();
-$stmt->close();
-
-if (!$usuario) {
-    $conn->close();
-    header('Location: index.php');
+$r = apiGetPerfilPublico($id);
+$usuario = null;
+if ($r['success'] && !empty($r['data'])) {
+    $d = $r['data']['data'] ?? $r['data'];
+    $usuario = is_array($d) ? $d : null;
+}
+if (!$usuario || empty($usuario['id'])) {
+    header('Location: ../index.php');
     exit;
 }
 
 $user = isLoggedIn() ? getCurrentUser() : null;
-
-// Obtener productos del vendedor
-$stmt = $conn->prepare("
-    SELECT p.*, sc.nombre as subcategoria_nombre, c.nombre as categoria_nombre
-    FROM productos p
-    INNER JOIN subcategorias sc ON p.subcategoria_id = sc.id
-    INNER JOIN categorias c ON sc.categoria_id = c.id
-    WHERE p.vendedor_id = ? AND p.estado_id = 1
-    ORDER BY p.fecha_registro DESC
-");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$productos_vendedor = $stmt->get_result();
-$stmt->close();
-
-$isFavorite = false;
-if ($user) {
-    $isFavorite = isSellerFavorite($user['id'], $id);
-}
-
-$avatar = getAvatarUrl($usuario['imagen']);
-
-$conn->close();
+$isFavorite = $user ? in_array($id, apiGetFavoritos(), true) : false;
+$productos_vendedor = apiGetProductosVendedor($id);
+$avatar = getAvatarUrl($usuario['imagen'] ?? '');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -257,38 +229,8 @@ $conn->close();
             <div class="seller-products">
                 <h3 class="section-title">Productos en venta</h3>
 
-                <?php if (defined('USE_LARAVEL_API') && USE_LARAVEL_API): ?>
-                    <div class="products-grid" data-productos-vendedor data-vendedor-id="<?php echo (int)$usuario['id']; ?>"></div>
-                    <div class="no-products" style="display:none"><p>Este vendedor no tiene productos publicados actualmente.</p></div>
-                <?php else: ?>
-                <div class="products-grid">
-                    <?php if ($productos_vendedor->num_rows > 0): ?>
-                        <?php while ($p = $productos_vendedor->fetch_assoc()): ?>
-                            <?php 
-                            $p_img = getProductMainImage($p['id']);
-                            ?>
-                            <div class="product-card">
-                                <a href="../productos/producto.php?id=<?php echo $p['id']; ?>">
-                                    <img src="<?php echo htmlspecialchars($p_img); ?>" alt="<?php echo htmlspecialchars($p['nombre']); ?>" class="product-image">
-                                </a>
-                                <div class="product-info">
-                                    <h3 class="product-name">
-<a href="../productos/producto.php?id=<?php echo $p['id']; ?>">
-                                        <?php echo htmlspecialchars($p['nombre']); ?>
-                                        </a>
-                                    </h3>
-                                    <p class="product-price"><?php echo formatPrice($p['precio']); ?></p>
-                                    <p class="product-category"><?php echo htmlspecialchars($p['categoria_nombre']); ?></p>
-                                </div>
-                            </div>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <div class="no-products">
-                            <p>Este vendedor no tiene productos publicados actualmente.</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                <?php endif; ?>
+                <div class="products-grid" data-productos-vendedor data-vendedor-id="<?= (int)$usuario['id'] ?>"></div>
+                <div class="no-products" style="display:none"><p>Este vendedor no tiene productos publicados actualmente.</p></div>
             </div>
         </div>
     </main>

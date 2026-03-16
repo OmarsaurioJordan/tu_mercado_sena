@@ -1,14 +1,16 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-// Usuario autenticado
-
 $user = getCurrentUser();
+$user = $user ?? [];
+
 $producto_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($producto_id <= 0) {
@@ -16,17 +18,65 @@ if ($producto_id <= 0) {
     exit;
 }
 
-$conn = getDBConnection();
+function apiBaseHost() {
+    if (!defined('API_BASE_URL')) {
+        return '';
+    }
+    return preg_replace('#/api/?$#', '', rtrim(API_BASE_URL, '/'));
+}
+
+function normalizarImagenProducto($producto) {
+    $apiHost = apiBaseHost();
+
+    if (empty($producto['fotos']) || !is_array($producto['fotos'])) {
+        return '';
+    }
+
+    $foto = $producto['fotos'][0] ?? null;
+    if (!$foto || !is_array($foto)) {
+        return '';
+    }
+
+    $url = $foto['url'] ?? $foto['imagen_url'] ?? $foto['path'] ?? $foto['imagen'] ?? null;
+    if (!$url || !is_string($url)) {
+        return '';
+    }
+
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+
+    if (preg_match('#^https?://#i', $url)) {
+        return $url;
+    }
+
+    if (strpos($url, '/storage/') === 0 || strpos($url, '/uploads/') === 0) {
+        return $apiHost . $url;
+    }
+
+    if (strpos($url, 'storage/') === 0 || strpos($url, 'uploads/') === 0) {
+        return $apiHost . '/' . ltrim($url, '/');
+    }
+
+    return $apiHost . '/storage/' . ltrim($url, '/');
+}
+
+function apiGetEstadosEditarProducto() {
+    return [
+        ['id' => 1, 'nombre' => 'activo'],
+        ['id' => 2, 'nombre' => 'invisible'],
+        ['id' => 3, 'nombre' => 'agotado'],
+    ];
+}
+
+$error = '';
+$success = '';
 
 /* ===============================
-   1. Verificar que el producto es del usuario
+   1. Obtener producto vía API
 ================================= */
-$stmt_check = $conn->prepare("SELECT * FROM productos WHERE id = ? AND vendedor_id = ?");
-$stmt_check->bind_param("ii", $producto_id, $user['id']);
-$stmt_check->execute();
-$result = $stmt_check->get_result();
-$producto = $result->fetch_assoc();
-$stmt_check->close();
+$producto = apiGetProducto($producto_id);
 
 if (!$producto) {
     header('Location: mis_productos.php');
@@ -34,42 +84,44 @@ if (!$producto) {
 }
 
 /* ===============================
-   2. Obtener imagen actual del producto
+   2. Verificar que el producto es del usuario
 ================================= */
-$stmt_img = $conn->prepare("SELECT imagen FROM fotos WHERE producto_id = ? ORDER BY id ASC LIMIT 1");
-$stmt_img->bind_param("i", $producto_id);
-$stmt_img->execute();
-$result_img = $stmt_img->get_result();
-$foto_actual = $result_img->fetch_assoc();
-$stmt_img->close();
+$vendedorId = (int)($producto['vendedor_id'] ?? $producto['vendedor']['id'] ?? 0);
+$userId = (int)($user['id'] ?? 0);
 
-$error = '';
-$success = '';
-
-/* ===============================
-   3. Obtener cat, subcat, integridad
-================================= */
-$categorias_result = $conn->query("SELECT * FROM categorias ORDER BY nombre");
-
-$subcategorias_result = $conn->query("
-    SELECT sc.*, c.nombre AS categoria_nombre 
-    FROM subcategorias sc 
-    INNER JOIN categorias c ON sc.categoria_id = c.id 
-    ORDER BY c.nombre, sc.nombre
-");
-
-$subcategorias = [];
-while ($row = $subcategorias_result->fetch_assoc()) {
-    $subcategorias[] = $row;
+if ($vendedorId !== $userId) {
+    header('Location: mis_productos.php');
+    exit;
 }
 
-$integridad_result = $conn->query("SELECT * FROM integridad ORDER BY id");
+/* ===============================
+   3. Obtener imagen actual del producto
+================================= */
+$foto_actual = normalizarImagenProducto($producto);
 
 /* ===============================
-   4. Procesar el formulario POST
+   4. Obtener categorías, subcategorías, integridad
+================================= */
+$categorias = apiGetCategorias();
+$integridad_list = apiGetIntegridad();
+$estados_list = apiGetEstadosEditarProducto();
+
+$subcategorias = [];
+foreach (is_array($categorias) ? $categorias : [] as $cat) {
+    $subs = isset($cat['subcategorias']) && is_array($cat['subcategorias'])
+        ? $cat['subcategorias']
+        : [];
+
+    foreach ($subs as $sub) {
+        $sub['categoria_nombre'] = $cat['nombre'] ?? '';
+        $subcategorias[] = $sub;
+    }
+}
+
+/* ===============================
+   5. Procesar el formulario POST
 ================================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $nombre = sanitize($_POST['nombre'] ?? '');
     $descripcion = sanitize($_POST['descripcion'] ?? '');
     $precio = floatval($_POST['precio'] ?? 0);
@@ -81,98 +133,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nombre) || empty($descripcion) || $precio <= 0 || $subcategoria_id <= 0) {
         $error = 'Por favor completa todos los campos correctamente';
     } else {
+        $payload = [
+            'nombre' => $nombre,
+            'descripcion' => $descripcion,
+            'precio' => $precio,
+            'disponibles' => $disponibles,
+            'subcategoria_id' => $subcategoria_id,
+            'integridad_id' => $integridad_id,
+            'estado_id' => $estado_id,
+        ];
 
-        /* ===============================
-           4.1 Actualizar datos del producto
-        ================================= */
-        $stmt_update = $conn->prepare("
-            UPDATE productos 
-            SET nombre = ?, subcategoria_id = ?, integridad_id = ?, estado_id = ?, descripcion = ?, 
-                precio = ?, disponibles = ? 
-            WHERE id = ? AND vendedor_id = ?
-        ");
+        $imagenesParaEnviar = null;
 
-        $stmt_update->bind_param(
-            "siiisidii",
-            $nombre,
-            $subcategoria_id,
-            $integridad_id,
-            $estado_id,
-            $descripcion,
-            $precio,
-            $disponibles,
-            $producto_id,
-            $user['id']
-        );
+        if (isset($_FILES['imagen']) && ($_FILES['imagen']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+            $mime = mime_content_type($_FILES['imagen']['tmp_name']);
+            $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
 
-        if ($stmt_update->execute()) {
-
-            /* ===============================
-               4.2 Manejar nueva imagen subida
-            ================================= */
-            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-
-                $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'];
-                $mime = mime_content_type($_FILES['imagen']['tmp_name']);
-
-                if (in_array($mime, $allowed)) {
-
-                    // obtener imagen anterior
-                    $stmt_old = $conn->prepare("SELECT imagen FROM fotos WHERE producto_id = ? ORDER BY id ASC LIMIT 1");
-                    $stmt_old->bind_param("i", $producto_id);
-                    $stmt_old->execute();
-                    $res_old = $stmt_old->get_result()->fetch_assoc();
-                    $stmt_old->close();
-
-                    if ($res_old && file_exists("../uploads/productos/" . $res_old['imagen'])) {
-                        unlink("../uploads/productos/" . $res_old['imagen']);
-                    }
-
-                    // borrar registros antiguos
-                    $stmt_delete = $conn->prepare("DELETE FROM fotos WHERE producto_id = ?");
-                    $stmt_delete->bind_param("i", $producto_id);
-                    $stmt_delete->execute();
-                    $stmt_delete->close();
-
-                    // procesar nueva imagen
-                    $ext = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
-                    $filename = uniqid("img_", true) . "." . $ext;
-
-                    if (move_uploaded_file($_FILES['imagen']['tmp_name'], "../uploads/productos/" . $filename)) {
-                        // guardar nueva imagen
-                        $stmt_insert = $conn->prepare("INSERT INTO fotos (producto_id, imagen) VALUES (?, ?)");
-                        $stmt_insert->bind_param("is", $producto_id, $filename);
-                        $stmt_insert->execute();
-                        $stmt_insert->close();
-
-                        // ðŸ”„ RECARGAR FOTO ACTUAL DESPUÃ‰S DE ACTUALIZAR
-                        $stmt_reload = $conn->prepare("SELECT imagen FROM fotos WHERE producto_id = ? ORDER BY id ASC LIMIT 1");
-                        $stmt_reload->bind_param("i", $producto_id);
-                        $stmt_reload->execute();
-                        $foto_actual = $stmt_reload->get_result()->fetch_assoc();
-                        $stmt_reload->close();
-                    } else {
-                        $error = 'Error al guardar la imagen en el servidor';
-                    }
-                }
+            if (!in_array($mime, $allowed, true)) {
+                $error = 'Formato de imagen no permitido';
+            } else {
+                $imagenesParaEnviar = [
+                    'name' => [$_FILES['imagen']['name']],
+                    'type' => [$_FILES['imagen']['type']],
+                    'tmp_name' => [$_FILES['imagen']['tmp_name']],
+                    'error' => [$_FILES['imagen']['error']],
+                    'size' => [$_FILES['imagen']['size']],
+                ];
             }
-
-            $success = 'Producto actualizado exitosamente';
-
-        } else {
-            $error = 'Error al actualizar producto: ' . $conn->error;
         }
 
-        $stmt_update->close();
+        if ($error === '') {
+            $response = apiActualizarProducto($producto_id, $payload, $imagenesParaEnviar);
+
+            if (!empty($response['success'])) {
+                $success = 'Producto actualizado exitosamente';
+
+                $producto = apiGetProducto($producto_id);
+                if ($producto) {
+                    $foto_actual = normalizarImagenProducto($producto);
+                }
+            } else {
+                $apiMessage = $response['message'] ?? '';
+                $apiErrors = $response['errors'] ?? null;
+
+                if (is_array($apiErrors) && !empty($apiErrors)) {
+                    $mensajes = [];
+                    foreach ($apiErrors as $campo => $erroresCampo) {
+                        if (is_array($erroresCampo)) {
+                            foreach ($erroresCampo as $msg) {
+                                $mensajes[] = $msg;
+                            }
+                        } elseif (is_string($erroresCampo)) {
+                            $mensajes[] = $erroresCampo;
+                        }
+                    }
+
+                    $error = !empty($mensajes)
+                        ? implode('<br>', array_map('htmlspecialchars', $mensajes))
+                        : 'No se pudo actualizar el producto.';
+                } else {
+                    $error = $apiMessage !== ''
+                        ? htmlspecialchars($apiMessage)
+                        : 'No se pudo actualizar el producto.';
+                }
+            }
+        }
     }
 }
-
-/* ===============================
-   5. Obtener estados
-================================= */
-$estados_result = $conn->query("SELECT * FROM estados WHERE id IN (1, 2, 3) ORDER BY id");
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -185,110 +212,146 @@ $conn->close();
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
-    
     <?php include '../includes/bottom_nav.php'; ?>
 
     <main class="main">
         <div class="container">
             <div class="form-container">
                 <h1>Editar Producto</h1>
-                
+
                 <?php if ($error): ?>
                     <div class="error-message"><?php echo $error; ?></div>
                 <?php endif; ?>
-                
+
                 <?php if ($success): ?>
                     <div class="success-message"><?php echo $success; ?></div>
                 <?php endif; ?>
-                
+
                 <form method="POST" action="editar_producto.php?id=<?php echo $producto_id; ?>" enctype="multipart/form-data" class="product-form">
                     <div class="form-group">
                         <label for="nombre">Nombre del Producto *</label>
-                        <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($producto['nombre']); ?>" required maxlength="64">
+                        <input
+                            type="text"
+                            id="nombre"
+                            name="nombre"
+                            value="<?php echo htmlspecialchars($producto['nombre'] ?? ''); ?>"
+                            required
+                            maxlength="64"
+                        >
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="descripcion">DescripciÃ³n *</label>
-                        <textarea id="descripcion" name="descripcion" rows="5" required maxlength="512"><?php echo htmlspecialchars($producto['descripcion']); ?></textarea>
+                        <label for="descripcion">Descripción *</label>
+                        <textarea
+                            id="descripcion"
+                            name="descripcion"
+                            rows="5"
+                            required
+                            maxlength="512"
+                        ><?php echo htmlspecialchars($producto['descripcion'] ?? ''); ?></textarea>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="precio">Precio (COP) *</label>
-                            <input type="number" id="precio" name="precio" step="0.01" min="0" 
-                                   value="<?php echo $producto['precio']; ?>" required>
+                            <input
+                                type="number"
+                                id="precio"
+                                name="precio"
+                                step="0.01"
+                                min="0"
+                                value="<?php echo htmlspecialchars((string)($producto['precio'] ?? '0')); ?>"
+                                required
+                            >
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="disponibles">Cantidad Disponible *</label>
-                            <input type="number" id="disponibles" name="disponibles" min="1" 
-                                   value="<?php echo $producto['disponibles']; ?>" required>
+                            <input
+                                type="number"
+                                id="disponibles"
+                                name="disponibles"
+                                min="1"
+                                value="<?php echo htmlspecialchars((string)($producto['disponibles'] ?? '1')); ?>"
+                                required
+                            >
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="subcategoria_id">CategorÃ­a *</label>
+                        <label for="subcategoria_id">Categoría *</label>
                         <select id="subcategoria_id" name="subcategoria_id" required>
-                            <option value="">Selecciona una categorÃ­a</option>
+                            <option value="">Selecciona una categoría</option>
                             <?php
                             $current_categoria = '';
                             foreach ($subcategorias as $subcat):
-                                if ($current_categoria != $subcat['categoria_nombre']):
+                                if ($current_categoria != ($subcat['categoria_nombre'] ?? '')):
                                     if ($current_categoria != '') echo '</optgroup>';
-                                    echo '<optgroup label="' . htmlspecialchars($subcat['categoria_nombre']) . '">';
-                                    $current_categoria = $subcat['categoria_nombre'];
+                                    echo '<optgroup label="' . htmlspecialchars($subcat['categoria_nombre'] ?? '') . '">';
+                                    $current_categoria = $subcat['categoria_nombre'] ?? '';
                                 endif;
                             ?>
-                                <option value="<?php echo $subcat['id']; ?>" 
-                                        <?php echo $producto['subcategoria_id'] == $subcat['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($subcat['nombre']); ?>
+                                <option
+                                    value="<?php echo $subcat['id']; ?>"
+                                    <?php echo ((int)($producto['subcategoria_id'] ?? $producto['subcategoria']['id'] ?? 0) === (int)$subcat['id']) ? 'selected' : ''; ?>
+                                >
+                                    <?php echo htmlspecialchars($subcat['nombre'] ?? ''); ?>
                                 </option>
                             <?php endforeach; ?>
                             <?php if ($current_categoria != '') echo '</optgroup>'; ?>
                         </select>
                     </div>
-                    
-                   <div class="form-group">
-    <label for="integridad_id">CondiciÃ³n *</label>
-    <select id="integridad_id" name="integridad_id" required>
-        <?php 
-        $integridad_result->data_seek(0);
-        while ($int = $integridad_result->fetch_assoc()): ?>
-            <option value="<?php echo $int['id']; ?>" 
-                    <?php echo $producto['integridad_id'] == $int['id'] ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($int['nombre']); ?> - 
-                <?php echo htmlspecialchars($int['descripcion']); ?>
-            </option>
-        <?php endwhile; ?>
-    </select>
-</div>
 
-<!-- Estado (Debajo de CondiciÃ³n) -->
-<div class="form-group">
-    <label for="estado_id">Estado *</label>
-    <select id="estado_id" name="estado_id" required>
-        <?php while ($estado = $estados_result->fetch_assoc()): ?>
-            <option value="<?php echo $estado['id']; ?>" 
-                    <?php echo $producto['estado_id'] == $estado['id'] ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($estado['nombre']); ?>
-            </option>
-        <?php endwhile; ?>
-    </select>
-</div>
+                    <div class="form-group">
+                        <label for="integridad_id">Condición *</label>
+                        <select id="integridad_id" name="integridad_id" required>
+                            <?php foreach (is_array($integridad_list) ? $integridad_list : [] as $int): ?>
+                                <option
+                                    value="<?php echo $int['id']; ?>"
+                                    <?php echo ((int)($producto['integridad_id'] ?? $producto['integridad']['id'] ?? 0) === (int)$int['id']) ? 'selected' : ''; ?>
+                                >
+                                    <?php echo htmlspecialchars($int['nombre'] ?? ''); ?> -
+                                    <?php echo htmlspecialchars($int['descripcion'] ?? ''); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                    
+                    <div class="form-group">
+                        <label for="estado_id">Estado *</label>
+                        <select id="estado_id" name="estado_id" required>
+                            <?php foreach ($estados_list as $estado): ?>
+                                <option
+                                    value="<?php echo $estado['id']; ?>"
+                                    <?php echo ((int)($producto['estado_id'] ?? $producto['estado']['id'] ?? 0) === (int)$estado['id']) ? 'selected' : ''; ?>
+                                >
+                                    <?php echo htmlspecialchars($estado['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label for="imagen">Nueva Imagen del Producto (opcional)</label>
-                        <?php if (!empty($foto_actual['imagen'])): ?>
-<p>Imagen actual:</p>
-<img src="<?= getBaseUrl() ?>uploads/productos/<?php echo htmlspecialchars($foto_actual['imagen']); ?>" style="max-width:200px;">
-<?php endif; ?>
-                        <input type="file" id="imagen" name="imagen" accept="image/jpeg,image/jpg,image/png,image/gif">
-                        <small>Formatos aceptados: JPG, PNG, GIF. Deja vacÃ­o para mantener la imagen actual.</small>
+                        <?php if (!empty($foto_actual)): ?>
+                            <p>Imagen actual:</p>
+                            <img
+                                src="<?= htmlspecialchars($foto_actual) ?>"
+                                style="max-width:200px;"
+                                alt="Imagen actual del producto"
+                            >
+                        <?php endif; ?>
+                        <input
+                            type="file"
+                            id="imagen"
+                            name="imagen"
+                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/avif"
+                        >
+                        <small>Formatos aceptados: JPG, PNG, GIF, WEBP, AVIF. Deja vacío para mantener la imagen actual.</small>
                     </div>
-                    
+
                     <button type="submit" class="btn-primary">Guardar Cambios</button>
-                    <a href="index.php" class="btn-secondary">Cancelar</a>
+                    <a href="mis_productos.php" class="btn-secondary">Cancelar</a>
                 </form>
             </div>
         </div>
@@ -299,11 +362,8 @@ $conn->close();
             <p>&copy; 2025 Tu Mercado SENA. Todos los derechos reservados.</p>
         </div>
     </footer>
+
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
     <script src="<?= getBaseUrl() ?>script.js"></script>
 </body>
 </html>
-
-
-
-

@@ -2,94 +2,61 @@
 
 require_once '../config.php';
 require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 forceLightTheme();
 
 $error = '';
 
-// Si ya tiene sesión, redirigir
 if (isLoggedIn()) {
     header("Location: ../index.php");
     exit();
 }
 
+// Login solo vía API (tumercadosena.shop); sin SQL
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
-    
-    if (!empty($email) && !empty($password)) {
-        
-        $conn = getDBConnection();
-        
-        // Buscar cuenta por email
-        $stmt = $conn->prepare("
-            SELECT c.id AS cuenta_id, c.password, c.email,
-            u.id AS usuario_id, u.nickname, u.imagen, u.rol_id, u.estado_id
-            FROM cuentas c
-            INNER JOIN usuarios u ON u.cuenta_id = c.id
-            WHERE c.email = ?
-            LIMIT 1
-        ");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
-        
-        if ($user && password_verify($password, $user['password'])) {
-            // Verificar estado del usuario
-            if ($user['estado_id'] == 4) { // bloqueado
+
+    if (empty($email) || empty($password)) {
+        $error = 'Por favor completa todos los campos';
+    } else {
+        $result = apiLogin($email, $password);
+        $data = $result['data'] ?? [];
+        $user = $data['data']['user'] ?? $data['user'] ?? [];
+        $token = $data['data']['token'] ?? $data['token'] ?? '';
+
+        if ($result['success'] && !empty($token) && !empty($user['id'])) {
+            $uid = (int)$user['id'];
+            $estado_id = (int)($user['estado_id'] ?? 1);
+            if ($estado_id == 4) {
                 $error = 'Tu cuenta ha sido bloqueada. Contacta al administrador.';
-            } elseif ($user['estado_id'] == 3) { // eliminado
+            } elseif ($estado_id == 3) {
                 $error = 'Esta cuenta ya no existe.';
             } else {
-                // Login exitoso - Guardar datos en sesión
-                $_SESSION['usuario_id'] = $user['usuario_id'];
-                $_SESSION['usuario_nombre'] = $user['nickname'];
-                $_SESSION['usuario_rol'] = $user['rol_id'];
-                $_SESSION['usuario_imagen'] = $user['imagen'];
-                $_SESSION['cuenta_id'] = $user['cuenta_id'];
-
-                // Si la web usa API Laravel, obtener token para que productos/chats no devuelvan 401
-                if (defined('USE_LARAVEL_API') && USE_LARAVEL_API && defined('LARAVEL_API_URL')) {
-                    $apiUrl = rtrim(LARAVEL_API_URL, '/') . '/auth/login';
-                    $payload = json_encode(['email' => $email, 'password' => $password]);
-                    $ctx = stream_context_create([
-                        'http' => [
-                            'method' => 'POST',
-                            'header' => "Content-Type: application/json\r\nAccept: application/json",
-                            'content' => $payload
-                        ]
-                    ]);
-                    $resp = @file_get_contents($apiUrl, false, $ctx);
-                    $code = 0;
-                    if (isset($http_response_header[0]) && preg_match('/\d{3}/', $http_response_header[0], $m)) {
-                        $code = (int)$m[0];
-                    }
-                    $data = $resp ? json_decode($resp, true) : null;
-                    if ($code === 200 && $data && !empty($data['data']['token'])) {
-                        $_SESSION['api_token'] = $data['data']['token'];
-                    }
-                }
-                
-                // Actualizar fecha_reciente
-                $stmtUpdate = $conn->prepare("UPDATE usuarios SET fecha_reciente = NOW() WHERE id = ?");
-                $stmtUpdate->bind_param("i", $user['usuario_id']);
-                $stmtUpdate->execute();
-                $stmtUpdate->close();
-                
-                $conn->close();
-                
+                $_SESSION['usuario_id'] = $uid;
+                $_SESSION['usuario_nombre'] = $user['nickname'] ?? $user['name'] ?? '';
+                $_SESSION['usuario_imagen'] = $user['imagen'] ?? $user['avatar'] ?? '';
+                $_SESSION['usuario_rol'] = (int)($user['rol_id'] ?? 1);
+                $_SESSION['cuenta_id'] = (int)($user['cuenta_id'] ?? 0);
+                $_SESSION['api_token'] = $token;
+                $_SESSION['nickname'] = $_SESSION['usuario_nombre'];
+                $_SESSION['imagen'] = $_SESSION['usuario_imagen'];
+                $_SESSION['descripcion'] = $user['descripcion'] ?? '';
+                $_SESSION['link'] = $user['link'] ?? '';
+                $_SESSION['estado_id'] = $estado_id;
+                $_SESSION['email'] = $user['email'] ?? $email;
+                $_SESSION['notifica_correo'] = (int)($user['notifica_correo'] ?? 0);
+                $_SESSION['notifica_push'] = (int)($user['notifica_push'] ?? 0);
+                $_SESSION['uso_datos'] = (int)($user['uso_datos'] ?? 0);
                 header("Location: ../index.php");
                 exit();
             }
         } else {
-            $error = 'Correo o contraseña incorrectos.';
+            $error = $result['message'] ?? 'Correo o contraseña incorrectos.';
+            if (!empty($result['errors']) && is_array($result['errors'])) {
+                $error = implode(' ', array_map(function ($e) { return is_array($e) ? implode(' ', $e) : $e; }, $result['errors']));
+            }
         }
-        
-        $conn->close();
-        
-    } else {
-        $error = 'Por favor completa todos los campos';
     }
 }
 ?>
@@ -331,8 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             btn.disabled = true;
             if (errEl) errEl.remove();
             try {
-                var base = typeof API_CONFIG !== 'undefined' ? API_CONFIG.LARAVEL_URL : (window.BASE_URL ? window.BASE_URL.replace(/\/$/, '') + '/../api/' : '');
-                if (typeof API_CONFIG !== 'undefined') base = API_CONFIG.LARAVEL_URL;
+                var base = (typeof API_CONFIG !== 'undefined' && API_CONFIG.LARAVEL_URL) ? API_CONFIG.LARAVEL_URL : (window.API_BASE_URL || window.LARAVEL_API_URL || '<?= rtrim(LARAVEL_API_URL, "/") ?>/');
                 var r = await fetch(base + 'auth/login', {
                     method: 'POST',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },

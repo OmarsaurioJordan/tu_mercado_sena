@@ -1,111 +1,61 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-$conn = getDBConnection();
-
-$usuario_id = $_SESSION['usuario_id'] ?? 0;
+$user = getCurrentUser();
+$usuario_id = $user['id'] ?? 0;
 if ($usuario_id <= 0) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-/* ===============================
-   LÓGICA DE USUARIOS BLOQUEADOS
-================================ */
 if (isset($_GET['desbloquear'])) {
     $desbloquear_id = (int)$_GET['desbloquear'];
-    $stmt = $conn->prepare("DELETE FROM bloqueados WHERE bloqueador_id = ? AND bloqueado_id = ?");
-    $stmt->bind_param("ii", $usuario_id, $desbloquear_id);
-    $stmt->execute();
-    $stmt->close();
+    apiDesbloquearUsuario($desbloquear_id);
     header("Location: perfil.php?section=privacidad&status=unblock_success");
     exit;
 }
 
-// Obtener lista de bloqueados
+$r_bloq = apiGetBloqueados();
 $lista_bloqueados = [];
-$stmt_bloq = $conn->prepare("
-    SELECT b.bloqueado_id, u.nickname, u.imagen 
-    FROM bloqueados b
-    JOIN usuarios u ON b.bloqueado_id = u.id
-    WHERE b.bloqueador_id = ?
-");
-$stmt_bloq->bind_param("i", $usuario_id);
-$stmt_bloq->execute();
-$res_bloq = $stmt_bloq->get_result();
-while ($row_bloq = $res_bloq->fetch_assoc()) {
-    $lista_bloqueados[] = $row_bloq;
-}
-$stmt_bloq->close();
-
-/* ===============================
-   OBTENER USUARIO + CUENTA
-================================ */
-$stmt = $conn->prepare("
-    SELECT 
-        u.id,
-        u.cuenta_id,
-        u.nickname,
-        u.descripcion,
-        u.link,
-        u.imagen,
-        u.estado_id,
-        u.fecha_actualiza,
-        c.email,
-        c.notifica_correo,
-        c.notifica_push,
-        c.uso_datos,
-        c.password
-    FROM usuarios u
-    JOIN cuentas c ON u.cuenta_id = c.id
-    WHERE u.id = ?
-    LIMIT 1
-");
-$stmt->bind_param("i", $usuario_id);
-$stmt->execute();
-$user = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-
-if (!$user) {
-    // Usuario no en BD local (login vía API Laravel): usar datos de sesión
-    $user = [
-        'id' => $usuario_id,
-        'cuenta_id' => $_SESSION['cuenta_id'] ?? 0,
-        'nickname' => $_SESSION['usuario_nombre'] ?? 'Usuario',
-        'descripcion' => '',
-        'link' => '',
-        'imagen' => $_SESSION['usuario_imagen'] ?? '',
-        'estado_id' => 1,
-        'fecha_actualiza' => null,
-        'email' => '',
-        'notifica_correo' => 0,
-        'notifica_push' => 0,
-        'uso_datos' => 0,
-        'password' => ''
-    ];
+if ($r_bloq['success'] && isset($r_bloq['data'])) {
+    $list = $r_bloq['data']['data'] ?? $r_bloq['data']['bloqueados'] ?? (isset($r_bloq['data'][0]) ? $r_bloq['data'] : []);
+    foreach (is_array($list) ? $list : [] as $b) {
+        $u = $b['usuario'] ?? $b['bloqueado'] ?? $b;
+        $lista_bloqueados[] = [
+            'bloqueado_id' => (int)($u['id'] ?? $b['bloqueado_id'] ?? 0),
+            'nickname' => $u['nickname'] ?? '',
+            'imagen' => $u['imagen'] ?? '',
+        ];
+    }
 }
 
-$cuenta_id = $user['cuenta_id'];
-
-$error = '';
-$success = '';
+$cuenta_id = $user['cuenta_id'] ?? 0;
+$error          = '';
+$success        = '';
 $active_section = $_GET['section'] ?? 'perfil';
 
-/* ===============================
-   POST
-================================ */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// 👇 AGREGA ESTO
+$statusMap = [
+    'ok'              => 'Configuración guardada correctamente.',
+    'password_ok'     => 'Contraseña cambiada correctamente.',
+    'avatar_success'  => 'Foto de perfil actualizada.',
+    'unblock_success' => 'Usuario desbloqueado correctamente.',
+];
+if (!empty($_GET['status'])) {
+    $success = $statusMap[$_GET['status']] ?? '';
+}
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $section = $_POST['section'] ?? 'perfil';
 
-    /* ===== PERFIL ===== */
     if ($section === 'perfil') {
-
         $nickname = sanitize($_POST['nickname'] ?? '');
         $descripcion = sanitize($_POST['descripcion'] ?? '');
         $link = sanitize($_POST['link'] ?? '');
@@ -119,145 +69,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!empty($link) && !filter_var($link, FILTER_VALIDATE_URL)) {
             $error = 'El enlace debe ser una URL válida (comenzar con http:// o https://)';
         } else {
-            // Verificar restricción de 24 horas
-            $puede_editar = true;
-            if ($user['fecha_actualiza'] && $user['fecha_actualiza'] != '2000-01-01 05:00:00') {
-                $ultima = strtotime($user['fecha_actualiza']);
-                $ahora = time();
-                $diferencia = $ahora - $ultima;
-                if ($diferencia < 86400) { // 24 horas en segundos
-                    $restante = ceil((86400 - $diferencia) / 3600);
-                    $error = "Solo puedes editar tu perfil cada 24 horas. Intenta en $restante hora(s).";
-                    $puede_editar = false;
-                }
-            }
-            
-            if ($puede_editar) {
-                $stmt = $conn->prepare("
-                    UPDATE usuarios 
-                    SET nickname = ?, descripcion = ?, link = ?, fecha_actualiza = NOW()
-                    WHERE id = ?
-                ");
-                $stmt->bind_param("sssi", $nickname, $descripcion, $link, $usuario_id);
-
-                if ($stmt->execute()) {
-                    $success = 'Perfil actualizado correctamente';
-                } else {
-                    $error = 'Error al actualizar el perfil';
-                }
-                $stmt->close();
-            }
-        }
-    }
-
-    /* ===== AVATAR ===== */
-    elseif ($section === 'avatar' && isset($_FILES['avatar_file'])) {
-
-        $file = $_FILES['avatar_file'];
-
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            $error = 'Error al subir el archivo';
-        } else {
-            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            $mime = mime_content_type($file['tmp_name']);
-
-            $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
-            $allowedMime = [
-                'image/jpeg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/avif',
-                'application/octet-stream'
-            ];
-
-            if (
-                in_array($ext, $allowedExt, true) &&
-                in_array($mime, $allowedMime, true) &&
-                $file['size'] <= 2097152
-            ) {
-                $name = uniqid('avatar_') . '.' . $ext;
-                $path = "../uploads/usuarios/$name";
-
-                if (move_uploaded_file($file['tmp_name'], __DIR__ . "/$path")) {
-                    $stmt = $conn->prepare("UPDATE usuarios SET imagen = ? WHERE id = ?");
-                    $stmt->bind_param("si", $name, $usuario_id);
-                    $stmt->execute();
-                    $stmt->close();
-
-                    header("Location: perfil.php?section=perfil&status=avatar_success");
-                    exit;
-                } else {
-                    $error = 'No se pudo guardar la imagen';
-                }
+            $res = apiEditarPerfil($usuario_id, [
+                'nickname' => $nickname,
+                'descripcion' => $descripcion,
+                'link' => $link,
+            ]);
+            if ($res['success']) {
+                $success = 'Perfil actualizado correctamente';
+                $user = getCurrentUser();
             } else {
-                $error = 'Formato o tamaño inválido';
+                $error = $res['message'] ?? 'Error al actualizar el perfil';
             }
         }
     }
 
-    /* ===== CONFIGURACIÓN Y PRIVACIDAD ===== */
-    elseif ($section === 'configuracion') {
-
-        // Datos de Configuración
-        $correo = isset($_POST['notifica_correo']) ? 1 : 0;
-        $push   = isset($_POST['notifica_push']) ? 1 : 0;
-        $datos  = isset($_POST['uso_datos']) ? 1 : 0;
-        
-        // 1. Actualizar tabla cuentas (Configuración)
-        $stmt = $conn->prepare("
-            UPDATE cuentas 
-            SET notifica_correo = ?, notifica_push = ?, uso_datos = ?
-            WHERE id = ?
-        ");
-        $stmt->bind_param("iiii", $correo, $push, $datos, $cuenta_id);
-        $res1 = $stmt->execute();
-        $stmt->close();
-
-        if ($res1) {
-            header("Location: perfil.php?section=configuracion&status=ok");
-            exit;
+    elseif ($section === 'avatar' && !empty($_FILES['avatar_file']['tmp_name'])) {
+        $file = $_FILES['avatar_file'];
+        $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, $allowedExt, true) && $file['size'] <= 2097152) {
+            $res = apiUpdateAvatar($usuario_id, 'avatar_file');
+            if ($res['success']) {
+                header("Location: perfil.php?section=perfil&status=avatar_success");
+                exit;
+            }
+            $error = $res['message'] ?? 'Error al subir la imagen';
         } else {
-            $error = 'Error al actualizar la configuración';
+            $error = 'Formato o tamaño inválido (máx. 2MB)';
         }
     }
 
-    /* ===== SEGURIDAD ===== */
     elseif ($section === 'seguridad') {
+    $actual  = $_POST['password_actual']  ?? '';
+    $nueva   = $_POST['password_nueva']   ?? '';
+    $confirm = $_POST['password_confirm'] ?? '';
 
-        $actual  = $_POST['password_actual'] ?? '';
-        $nueva   = $_POST['password_nueva'] ?? '';
-        $confirm = $_POST['password_confirm'] ?? '';
+    if ($actual === '') {
+        $error = 'Ingresa tu contraseña actual.';
+    } elseif ($nueva !== $confirm) {
+        $error = 'Las contraseñas no coinciden.';
+    } elseif (strlen($nueva) < 8) {
+        $error = 'La contraseña debe tener al menos 8 caracteres.';
+    } elseif (!preg_match('/[A-Z]/', $nueva)) {
+        $error = 'Debe contener al menos una mayúscula.';
+    } elseif (!preg_match('/[0-9]/', $nueva)) {
+        $error = 'Debe contener al menos un número.';
+    } else {
+    $res = apiRequest('/auth/cambiar-password', 'PATCH', [
+        'password_actual'       => $actual,
+        'password'              => $nueva,
+        'password_confirmation' => $confirm,
+    ], getToken());
 
-        if (!password_verify($actual, $user['password'])) {
-            $error = 'contraseña actual incorrecta';
-        } elseif ($nueva !== $confirm) {
-            $error = 'Las contraseñas no coinciden';
-        } elseif (strlen($nueva) < 8) {
-            $error = 'La contraseña debe tener al menos 8 caracteres';
-        } elseif (!preg_match('/[A-Z]/', $nueva)) {
-            $error = 'La contraseña debe contener al menos una mayúscula';
-        } elseif (!preg_match('/[a-z]/', $nueva)) {
-            $error = 'La contraseña debe contener al menos una minúscula';
-        } elseif (!preg_match('/[0-9]/', $nueva)) {
-            $error = 'La contraseña debe contener al menos un número';
-        } else {
-            $hash = password_hash($nueva, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("UPDATE cuentas SET password = ? WHERE id = ?");
-            $stmt->bind_param("si", $hash, $cuenta_id);
-            $stmt->execute();
-            $stmt->close();
-
-            header("Location: perfil.php?section=seguridad&status=password_ok");
-            exit;
-        }
+    if ($res['success']) {
+        header("Location: perfil.php?section=seguridad&status=password_ok");
+        exit;
     }
-    
+
+    if (!empty($res['errors']) && is_array($res['errors'])) {
+        $msgs = [];
+        foreach ($res['errors'] as $errores) {
+            foreach ((array)$errores as $msg) {
+                $msgs[] = htmlspecialchars($msg);
+            }
+        }
+        $error = implode('<br>', $msgs);
+    } else {
+        $error = $res['message'] ?? 'Error al cambiar la contraseña.';
+    }
+}
+}
 
     $active_section = $section;
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -391,8 +275,7 @@ $conn->close();
                     
 <div id="configuracion" class="settings-section <?php echo $active_section === 'configuracion' ? 'active' : ''; ?>">
     <h2>Configuración del Marketplace</h2>
-    <form method="POST" action="perfil.php" class="profile-form">
-        <input type="hidden" name="section" value="configuracion">
+    <form id="form-configuracion-estetico" class="profile-form" onsubmit="return false;">
         
         <div class="settings-group">
             <h3>Apariencia</h3>
@@ -464,7 +347,7 @@ $conn->close();
             </a>
         </div>
 
-        <button type="submit" class="btn-primary" style="margin-top: 20px;">Guardar Configuración</button>
+        <button type="button" class="btn-primary" style="margin-top: 20px;">Guardar Configuración</button>
     </form>
 </div>
 <!-- Sección: Privacidad -->

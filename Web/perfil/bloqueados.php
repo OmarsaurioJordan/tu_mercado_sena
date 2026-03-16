@@ -1,5 +1,7 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
@@ -7,32 +9,31 @@ if (!isLoggedIn()) {
 }
 
 $user = getCurrentUser();
-$conn = getDBConnection();
 
-// Desbloquear usuario
 if (isset($_GET['desbloquear'])) {
     $bloqueado_id = (int)$_GET['desbloquear'];
-    $stmt = $conn->prepare("DELETE FROM bloqueados WHERE bloqueador_id = ? AND bloqueado_id = ?");
-    $stmt->bind_param("ii", $user['id'], $bloqueado_id);
-    $stmt->execute();
-    $stmt->close();
+    apiDesbloquearUsuario($bloqueado_id);
     header("Location: bloqueados.php?msg=desbloqueado");
     exit;
 }
 
-// Obtener lista de bloqueados
-$stmt = $conn->prepare("
-    SELECT b.id, b.bloqueador_id, b.bloqueado_id, u.nickname, u.imagen, u.descripcion
-    FROM bloqueados b
-    INNER JOIN usuarios u ON b.bloqueado_id = u.id
-    WHERE b.bloqueador_id = ?
-    ORDER BY b.id DESC
-");
-$stmt->bind_param("i", $user['id']);
-$stmt->execute();
-$bloqueados = $stmt->get_result();
-$stmt->close();
-$conn->close();
+$r = apiGetBloqueados();
+$bloqueados_raw = [];
+if ($r['success'] && isset($r['data'])) {
+    $d = $r['data'];
+    $list = $d['data'] ?? $d['bloqueados'] ?? (isset($d[0]) ? $d : []);
+    foreach (is_array($list) ? $list : [] as $b) {
+    // ✅ ahora busca usuario_bloqueado también
+    $u = $b['usuario_bloqueado'] ?? $b['usuario'] ?? $b['bloqueado'] ?? $b;
+    $bloqueados_raw[] = [
+        'id'          => $b['id'] ?? 0,
+        'bloqueado_id'=> (int)($u['id'] ?? $b['bloqueado_id'] ?? 0),
+        'nickname'    => $u['nickname'] ?? '',
+        'imagen'      => $u['imagen']   ?? '',
+        'descripcion' => $u['descripcion'] ?? '',
+    ];
+}
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -61,31 +62,31 @@ $conn->close();
             <?php endif; ?>
             
             <div class="products-grid">
-                <?php if ($bloqueados->num_rows > 0): ?>
-                    <?php while ($b = $bloqueados->fetch_assoc()): ?>
+                <?php if (!empty($bloqueados_raw)): ?>
+                    <?php foreach ($bloqueados_raw as $b): ?>
                         <div class="product-card seller-card">
-                            <img src="<?= getAvatarUrl($b['imagen']); ?>" 
+                            <img src="<?= getAvatarUrl($b['imagen'] ?? ''); ?>" 
                                  alt="Avatar de <?= htmlspecialchars($b['nickname']); ?>"
                                  class="product-image">
                             <div class="product-info">
                                 <h3 class="product-name"><?= htmlspecialchars($b['nickname']); ?></h3>
                                 <?php if (!empty($b['descripcion'])): ?>
-                                    <p class="product-category"><?= htmlspecialchars(substr($b['descripcion'], 0, 50)); ?>...</p>
+                                    <p class="product-category"><?= htmlspecialchars(mb_substr($b['descripcion'], 0, 50)); ?>...</p>
                                 <?php endif; ?>
                             </div>
                             <div class="product-actions">
-                                <a href="bloqueados.php?desbloquear=<?= $b['bloqueado_id']; ?>" 
+                                <a href="bloqueados.php?desbloquear=<?= (int)$b['bloqueado_id']; ?>" 
                                    class="btn-primary"
                                    onclick="return confirm('¿Desbloquear a este usuario?');">
                                    Desbloquear
                                 </a>
                             </div>
                         </div>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
                     <div class="no-products">
                         <p>No has bloqueado a ningún usuario.</p>
-                        <a href="index.php" class="btn-primary">Explorar productos</a>
+                        <a href="../index.php" class="btn-primary">Explorar productos</a>
                     </div>
                 <?php endif; ?>
             </div>

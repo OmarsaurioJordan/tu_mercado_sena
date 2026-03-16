@@ -1,21 +1,17 @@
 /**
  * Configuración de API para JavaScript
- * Usa endpoints PHP locales (api/*.php) cuando USE_LARAVEL_API es false
+ * Usa la URL global definida en api_link.php (inyectada como window.API_BASE_URL)
  */
 
 // ============================================
-// API LOCAL O HOSTINGER (según config_api / api_config_boot)
+// URL GLOBAL DE LA API (api_link.php → api_config_boot.php)
 // ============================================
-var HOSTINGER_API_URL = window.HOSTINGER_API_URL || '';
-var HOSTINGER_STORAGE_URL = window.HOSTINGER_STORAGE_URL || '';
-var LARAVEL_API_URL = (typeof window !== 'undefined' && window.LARAVEL_API_URL) ? window.LARAVEL_API_URL : '';
-var USE_LARAVEL = (typeof window !== 'undefined' && window.USE_LARAVEL_API === true);
+var API_BASE_URL = (typeof window !== 'undefined' && window.API_BASE_URL) ? window.API_BASE_URL : (window.LARAVEL_API_URL || '');
 
 var API_CONFIG = {
-    USE_HOSTINGER: (typeof window !== 'undefined' && window.USE_HOSTINGER_API === true),
-    USE_LARAVEL: USE_LARAVEL,
-    LARAVEL_URL: LARAVEL_API_URL || HOSTINGER_API_URL,
-    LARAVEL_STORAGE_URL: (typeof window !== 'undefined' && window.LARAVEL_STORAGE_URL) ? window.LARAVEL_STORAGE_URL : HOSTINGER_STORAGE_URL,
+    USE_LARAVEL: true,
+    LARAVEL_URL: API_BASE_URL,
+    LARAVEL_STORAGE_URL: (typeof window !== 'undefined' && window.LARAVEL_STORAGE_URL) ? window.LARAVEL_STORAGE_URL : (API_BASE_URL ? API_BASE_URL.replace(/\/api\/?$/, '') + '/storage/' : ''),
     AUTH_ENDPOINTS: {
         iniciarRegistro: 'auth/iniciar-registro',
         register: 'auth/register',
@@ -27,25 +23,10 @@ var API_CONFIG = {
         recuperarValidarClave: 'auth/recuperar-contrasena/validar-clave-recuperacion',
         recuperarReestablecer: 'auth/recuperar-contrasena/reestablecer-contrasena'
     },
-    get PHP_URL() {
-        return (window.BASE_URL || '') + 'api/';
-    },
     get ACTIVE_URL() {
-        return this.USE_LARAVEL ? (this.LARAVEL_URL || '') : this.PHP_URL;
+        return this.LARAVEL_URL || '';
     }
 };
-
-if (typeof window !== 'undefined') {
-    if (window.LARAVEL_API_URL) API_CONFIG.LARAVEL_URL = window.LARAVEL_API_URL;
-    else if (window.HOSTINGER_API_URL) API_CONFIG.LARAVEL_URL = window.HOSTINGER_API_URL;
-    if (window.LARAVEL_STORAGE_URL) API_CONFIG.LARAVEL_STORAGE_URL = window.LARAVEL_STORAGE_URL;
-    else if (window.HOSTINGER_STORAGE_URL) API_CONFIG.LARAVEL_STORAGE_URL = window.HOSTINGER_STORAGE_URL;
-}
-if (typeof window.LARAVEL_STORAGE_URL !== 'undefined' && window.LARAVEL_STORAGE_URL) {
-    API_CONFIG.LARAVEL_STORAGE_URL = window.LARAVEL_STORAGE_URL;
-} else if (API_CONFIG.LARAVEL_URL) {
-    API_CONFIG.LARAVEL_STORAGE_URL = API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '/') + 'storage/';
-}
 // Sincronizar token de sesión a localStorage (siempre usar el del servidor cuando existe)
 if (typeof window.LARAVEL_API_TOKEN !== 'undefined' && window.LARAVEL_API_TOKEN && typeof localStorage !== 'undefined') {
     localStorage.setItem('api_token', window.LARAVEL_API_TOKEN);
@@ -71,14 +52,8 @@ function getApiUrl() {
  * @returns {string} URL completa del endpoint
  */
 function getApiEndpoint(endpoint) {
-    const baseUrl = getApiUrl();
-    
-    // Si usa Laravel, remover la extensión .php si existe
-    if (API_CONFIG.USE_LARAVEL) {
-        endpoint = endpoint.replace('.php', '');
-    }
-    
-    return baseUrl + endpoint;
+    endpoint = (endpoint || '').replace('.php', '');
+    return (getApiUrl() || '') + endpoint;
 }
 
 /**
@@ -87,16 +62,11 @@ function getApiEndpoint(endpoint) {
  * @returns {boolean}
  */
 function isUsingLaravelApi() {
-    return API_CONFIG.USE_LARAVEL;
+    return true;
 }
 
-/**
- * Verifica si se está usando la API de PHP
- * 
- * @returns {boolean}
- */
 function isUsingPhpApi() {
-    return !API_CONFIG.USE_LARAVEL;
+    return false;
 }
 
 /**
@@ -111,12 +81,8 @@ function getApiHeaders() {
         'Accept': 'application/json'
     };
     
-    if (API_CONFIG.USE_LARAVEL) {
-        const token = localStorage.getItem('api_token');
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-    }
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('api_token') : (window.LARAVEL_API_TOKEN || '');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     
     return headers;
 }
@@ -158,6 +124,7 @@ const ENDPOINT_MAPPING = {
     
     // Denuncias
     'denunciar_usuario.php': 'denuncias/crear',
+    'reportar_producto.php': 'denuncias',
     
     // Usuarios
     'perfil.php': 'usuarios/perfil',
@@ -166,6 +133,8 @@ const ENDPOINT_MAPPING = {
     // Otros
     'toggle_silencio.php': 'chats/toggle-silencio',
     'cerrar_chats_automatico.php': 'chats/cerrar-automatico',
+    'send_chat_image.php': 'chats',
+    'finalizar_venta.php': 'chats',
 };
 
 /**
@@ -175,10 +144,6 @@ const ENDPOINT_MAPPING = {
  * @returns {string} Endpoint correcto según la configuración
  */
 function mapEndpoint(phpEndpoint) {
-    if (!API_CONFIG.USE_LARAVEL) {
-        return phpEndpoint;
-    }
-    
     return ENDPOINT_MAPPING[phpEndpoint] || phpEndpoint;
 }
 
@@ -187,10 +152,9 @@ function mapEndpoint(phpEndpoint) {
  * Así el front puede usar la misma llamada con PHP o Laravel según configuración.
  *
  * @param {string} pathWithQuery - Ej: 'api/productos.php?page=1&limit=12'
- * @returns {string} URL completa (PHP o Laravel según USE_LARAVEL)
+ * @returns {string} URL completa
  */
 function getFullApiUrl(pathWithQuery) {
-    const phpBaseUrl = (window.BASE_URL || '') + 'api/';
     if (!pathWithQuery || !pathWithQuery.startsWith('api/')) {
         return (window.BASE_URL || '') + (pathWithQuery || '');
     }
@@ -198,15 +162,7 @@ function getFullApiUrl(pathWithQuery) {
     const path = idx >= 0 ? pathWithQuery.substring(0, idx) : pathWithQuery;
     const query = idx >= 0 ? pathWithQuery.substring(idx) : '';
     const fileName = path.replace('api/', '');
-    // Endpoints PHP que actúan como proxy o tienen formato distinto a Laravel: usar siempre la URL local
-    const usePhpProxy = ['toggle_visibilidad.php', 'toggle_bloqueo.php'];
-    if (usePhpProxy.includes(fileName)) {
-        return phpBaseUrl + fileName + query;
-    }
-    if (!API_CONFIG.USE_LARAVEL) {
-        return phpBaseUrl + pathWithQuery.replace('api/', '');
-    }
-    const baseUrl = API_CONFIG.LARAVEL_URL;
+    const baseUrl = API_CONFIG.LARAVEL_URL || '';
     const mapped = ENDPOINT_MAPPING[fileName];
     const endpoint = mapped || fileName.replace('.php', '');
     return baseUrl + endpoint + query;
@@ -228,9 +184,8 @@ async function apiRequest(endpoint, options = {}) {
         ...(options.headers || {})
     };
     
-    // Si usa Laravel y el body no es FormData, convertir a JSON
     let body = options.body;
-    if (API_CONFIG.USE_LARAVEL && body && !(body instanceof FormData)) {
+    if (body && !(body instanceof FormData)) {
         if (typeof body === 'string' && body.includes('=')) {
             // Convertir URL encoded a JSON
             const params = new URLSearchParams(body);
@@ -267,13 +222,9 @@ async function apiRequest(endpoint, options = {}) {
  * @returns {Object} Información de configuración
  */
 function getApiInfo() {
-    const apiType = API_CONFIG.USE_LARAVEL ? 'Laravel' : (API_CONFIG.USE_HOSTINGER ? 'Hostinger' : 'PHP');
     return {
-        using_hostinger: API_CONFIG.USE_HOSTINGER,
-        using_laravel: API_CONFIG.USE_LARAVEL,
         api_url: API_CONFIG.ACTIVE_URL,
-        api_type: apiType,
-        php_url: API_CONFIG.PHP_URL,
+        api_type: 'Hostinger (tumercadosena.shop)',
     };
 }
 
@@ -386,8 +337,7 @@ function getLaravelNotificacionUrl(notificacionId) {
  * Origen del storage en Hostinger (para reemplazar localhost en URLs que vengan de la API)
  */
 function getStorageOrigin() {
-    if (!API_CONFIG.USE_LARAVEL) return '';
-    return (API_CONFIG.LARAVEL_STORAGE_URL || (API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '') + 'storage/')).replace(/\/$/, '');
+    return (API_CONFIG.LARAVEL_STORAGE_URL || (API_CONFIG.LARAVEL_URL || '').replace(/\/api\/?$/, '') + 'storage/').replace(/\/$/, '');
 }
 
 /**
@@ -398,14 +348,14 @@ function getStorageOrigin() {
 function getAvatarUrl(path) {
     if (!path || typeof path !== 'string') return (window.BASE_URL || '') + 'assets/images/default-avatar.jpg';
     if (path.startsWith('http://') || path.startsWith('https://')) {
-        if (path.indexOf('localhost') !== -1 && API_CONFIG.USE_LARAVEL) {
+        if (path.indexOf('localhost') !== -1) {
             var storageOrigin = getStorageOrigin();
             var match = path.match(/\/(?:storage\/)?(usuarios\/[^?#]+|avatar[^?#]*)/i);
             return match ? storageOrigin + '/' + match[1].replace(/^\/storage\//, '') : (window.BASE_URL || '') + 'assets/images/default-avatar.jpg';
         }
         return path;
     }
-    if (API_CONFIG.USE_LARAVEL) {
+    if (API_CONFIG.LARAVEL_URL) {
         var base = API_CONFIG.LARAVEL_STORAGE_URL || (API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '/') + 'storage/');
         var clean = path.replace(/^uploads\/usuarios\//, 'usuarios/').replace(/^usuarios\//, 'usuarios/');
         return base + (clean.startsWith('usuarios/') ? clean : 'usuarios/' + clean);
@@ -422,7 +372,7 @@ function getAvatarUrl(path) {
 function getProductImageUrl(path, productId) {
     if (!path || typeof path !== 'string') return '';
     if (path.startsWith('http://') || path.startsWith('https://')) {
-        if (path.indexOf('localhost') !== -1 && API_CONFIG.USE_LARAVEL) {
+        if (path.indexOf('localhost') !== -1) {
             var storageOrigin = getStorageOrigin();
             var match = path.match(/\/(?:storage\/)?(productos\/[^?#]+)/i);
             return match ? storageOrigin + '/' + match[1].replace(/^\/storage\//, '') : path;
@@ -433,7 +383,7 @@ function getProductImageUrl(path, productId) {
         var origin = API_CONFIG.LARAVEL_URL ? API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '') : '';
         return origin ? (origin + path) : path;
     }
-    if (API_CONFIG.USE_LARAVEL) {
+    if (API_CONFIG.LARAVEL_URL) {
         var base = API_CONFIG.LARAVEL_STORAGE_URL || (API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '/') + 'storage/');
         var clean = path.replace(/^uploads\/productos\//, 'productos/').replace(/^productos\//, 'productos/');
         // Si path es solo filename (sin /) y tenemos productId, usar productos/{id}/{filename}

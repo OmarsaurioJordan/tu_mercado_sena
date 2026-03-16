@@ -22,14 +22,9 @@ if (session_status() === PHP_SESSION_NONE) {
 // Función helper para obtener la URL base relativa
 function getBaseUrl() {
     $script_name = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
-    $web_omi_pos = strpos($script_name, '/Web_omi/Web/');
     $web_pos = strpos($script_name, '/Web/');
     $frontend_pos = strpos($script_name, '/Frontend/');
-    if ($web_omi_pos !== false) {
-        $after = substr($script_name, $web_omi_pos + 13); // len('/Web_omi/Web/')
-        $slashes = substr_count($after, '/');
-        return $slashes == 0 ? './' : str_repeat('../', $slashes);
-    } elseif ($web_pos !== false) {
+    if ($web_pos !== false) {
         $after = substr($script_name, $web_pos + 5);
         $slashes = substr_count($after, '/');
         return $slashes == 0 ? './' : str_repeat('../', $slashes);
@@ -40,6 +35,18 @@ function getBaseUrl() {
     } else {
         return './'; // por defecto
     }
+}
+
+// Ruta base absoluta desde la raíz del servidor (ej: /ensayo_link/Web/) para enlaces de navegación
+function getBasePath() {
+    $script_name = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+    if (preg_match('#^(.*/Web)/#', $script_name, $m)) {
+        return $m[1] . '/';
+    }
+    if (preg_match('#^(.*/Frontend)/#', $script_name, $m)) {
+        return $m[1] . '/';
+    }
+    return '/';
 }
 
 // Cargar config_api para saber si usamos solo Laravel (después de getBaseUrl)
@@ -122,62 +129,27 @@ function getCurrentUser() {
         return null;
     }
 
-    // Solo API Laravel: usar datos de sesión (login vía API)
-    if (defined('USE_LARAVEL_API') && USE_LARAVEL_API) {
-        return [
-            'id' => $_SESSION['usuario_id'],
-            'nickname' => $_SESSION['usuario_nombre'] ?? $_SESSION['nickname'] ?? 'Usuario',
-            'imagen' => $_SESSION['usuario_imagen'] ?? $_SESSION['imagen'] ?? '',
-            'descripcion' => $_SESSION['descripcion'] ?? '',
-            'link' => $_SESSION['link'] ?? '',
-            'estado_id' => (int)($_SESSION['estado_id'] ?? 1),
-            'fecha_reciente' => $_SESSION['fecha_reciente'] ?? null,
-            'email' => $_SESSION['email'] ?? '',
-            'notifica_correo' => (int)($_SESSION['notifica_correo'] ?? 0),
-            'notifica_push' => (int)($_SESSION['notifica_push'] ?? 0),
-            'uso_datos' => (int)($_SESSION['uso_datos'] ?? 0)
-        ];
-    }
-
-    $conn = getDBConnection();
-    $id = $_SESSION['usuario_id'];
-    $query = "SELECT u.id, u.nickname, u.imagen, u.descripcion, u.link, u.estado_id, u.fecha_reciente, c.email, c.notifica_correo, c.notifica_push, c.uso_datos FROM usuarios u INNER JOIN cuentas c ON u.cuenta_id = c.id WHERE u.id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    $stmt->close();
-    $conn->close();
-
-    if ($user) {
-        return $user;
-    }
-
+    // Solo API (tumercadosena.shop): datos de sesión; sin SQL
     return [
         'id' => $_SESSION['usuario_id'],
-        'nickname' => $_SESSION['usuario_nombre'] ?? 'Usuario',
-        'imagen' => $_SESSION['usuario_imagen'] ?? '',
-        'descripcion' => '', 'link' => '', 'estado_id' => 1, 'fecha_reciente' => null,
-        'email' => '', 'notifica_correo' => 0, 'notifica_push' => 0, 'uso_datos' => 0
+        'nickname' => $_SESSION['usuario_nombre'] ?? $_SESSION['nickname'] ?? 'Usuario',
+        'imagen' => $_SESSION['usuario_imagen'] ?? $_SESSION['imagen'] ?? '',
+        'descripcion' => $_SESSION['descripcion'] ?? '',
+        'link' => $_SESSION['link'] ?? '',
+        'estado_id' => (int)($_SESSION['estado_id'] ?? 1),
+        'fecha_reciente' => $_SESSION['fecha_reciente'] ?? null,
+        'email' => $_SESSION['email'] ?? '',
+        'notifica_correo' => (int)($_SESSION['notifica_correo'] ?? 0),
+        'notifica_push' => (int)($_SESSION['notifica_push'] ?? 0),
+        'uso_datos' => (int)($_SESSION['uso_datos'] ?? 0)
     ];
 }
 
 
 function isSellerFavorite($votante_id, $vendedor_id) {
-    if (defined('USE_LARAVEL_API') && USE_LARAVEL_API) {
-        require_once __DIR__ . '/api/api_client.php';
-        $favoritos = apiGetFavoritos();
-        return in_array((int)$vendedor_id, $favoritos, true);
-    }
-    $conn = getDBConnection();
-    $stmt = $conn->prepare("SELECT id FROM favoritos WHERE votante_id = ? AND votado_id = ?");
-    $stmt->bind_param("ii", $votante_id, $vendedor_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $exists = $result->num_rows > 0;
-    $stmt->close();
-    return $exists;
+    require_once __DIR__ . '/api/api_client.php';
+    $favoritos = apiGetFavoritos();
+    return in_array((int)$vendedor_id, $favoritos, true);
 }
 function forceLightTheme() {
     echo "<script>
@@ -245,33 +217,13 @@ function formato_tiempo_relativo($timestamp_db) {
 }
 
 function getProductImage($productId) {
-    $conn = getDBConnection();
-    $stmt = $conn->prepare("
-        SELECT imagen 
-        FROM fotos 
-        WHERE producto_id = ? 
-        ORDER BY id ASC 
-        LIMIT 1
-    ");
-    $stmt->bind_param("i", $productId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    $row = $result->fetch_assoc();
     $base = getBaseUrl();
-    return $row ? ($base . 'uploads/productos/' . $row['imagen']) : ($base . 'assets/images/default-product.jpg');
+    return $base . 'assets/images/default-product.jpg';
 }
-function getProductMainImage($producto_id) {
-    $conn = getDBConnection();
-    $stmt = $conn->prepare("SELECT imagen FROM fotos WHERE producto_id = ? ORDER BY id ASC LIMIT 1");
-    $stmt->bind_param("i", $producto_id);
-    $stmt->execute();
-    $res = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-    $conn->close();
 
+function getProductMainImage($producto_id) {
     $base = getBaseUrl();
-    return $res ? ($base . 'uploads/productos/' . $res['imagen']) : ($base . 'assets/images/default-product.jpg');
+    return $base . 'assets/images/default-product.jpg';
 }
 
 /**

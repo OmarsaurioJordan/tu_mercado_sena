@@ -1,13 +1,17 @@
 // JavaScript para funcionalidades del marketplace
 
 // ==================== HELPER PARA RUTAS ====================
-// Usa api-config.js si está cargado (Laravel o PHP según config); si no, solo PHP
+// Siempre usa el link global de la API (api_link.php → API_BASE_URL)
 function getApiUrl(endpoint) {
     if (typeof window.getFullApiUrl === 'function') {
         return window.getFullApiUrl(endpoint);
     }
-    const baseUrl = window.BASE_URL || '';
-    return baseUrl + endpoint;
+    var base = (typeof window !== 'undefined' && (window.API_BASE_URL || (window.API_CONFIG && window.API_CONFIG.LARAVEL_URL))) ? (window.API_BASE_URL || window.API_CONFIG.LARAVEL_URL) : '';
+    if (!base) return (window.BASE_URL || '') + (endpoint || '');
+    var e = (endpoint || '');
+    var q = e.indexOf('?') >= 0 ? e.substring(e.indexOf('?')) : '';
+    var path = e.replace(/^api\//, '').replace(/\.php.*$/, '').replace(/\?.*$/, '');
+    return base + path + q;
 }
 
 // ==================== SISTEMA DE SONIDO DE NOTIFICACIÓN ====================
@@ -221,7 +225,7 @@ function toggleFavorito(btn) {
 
     const formData = new FormData();
     formData.append('vendedor_id', vendedorId);
-    const favoritosUrl = typeof getApiUrl === 'function' ? getApiUrl('api/toggle_favorito.php') : (window.BASE_URL || '') + 'api/toggle_favorito.php';
+    const favoritosUrl = getApiUrl('api/toggle_favorito.php');
     fetch(favoritosUrl, {
         method: 'POST',
         headers: { ...(window.getApiHeaders ? window.getApiHeaders() : {}) },
@@ -568,9 +572,7 @@ function loadNotifications(silent = false) {
                 };
                 applyNotificationsData(data, silent);
             })
-            .catch(error => {
-                console.error('Error al cargar notificaciones (Laravel):', error);
-            });
+            .catch(() => { /* CORS o red: no mostrar error en consola en localhost */ });
         return;
     }
 
@@ -581,9 +583,7 @@ function loadNotifications(silent = false) {
         .then(data => {
             if (data.success) applyNotificationsData(data, silent);
         })
-        .catch(error => {
-            console.error('Error al cargar notificaciones:', error);
-        });
+        .catch(() => {});
 }
 
 function normalizeLaravelChatsList(chats) {
@@ -1702,6 +1702,23 @@ function setupAjaxFilters() {
 
     // Mostrar/ocultar botón de limpiar según si hay filtros activos
     updateClearFiltersButton();
+
+    // Refresh (equivalente a RefreshControl onRefresh)
+    const refreshBtn = document.getElementById('refreshProductsBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function () {
+            if (refreshBtn.classList.contains('refreshing')) return;
+            refreshBtn.classList.add('refreshing');
+            refreshBtn.disabled = true;
+            if (typeof reloadProducts === 'function') {
+                reloadProducts();
+            }
+            setTimeout(function () {
+                refreshBtn.classList.remove('refreshing');
+                refreshBtn.disabled = false;
+            }, 800);
+        });
+    }
 }
 
 /**
@@ -2110,6 +2127,7 @@ function renderProducts(productos, container, isNewLoad = false) {
 function createProductCard(producto) {
     const card = document.createElement('div');
     card.className = 'product-card';
+    card.setAttribute('data-id', String(producto.id != null ? producto.id : ''));
 
     // Normalizar campos que pueden venir como string (PHP) o objeto (Laravel)
     const integridadVal = producto.integridad;
@@ -2628,38 +2646,50 @@ function changeMainImage(src, thumb) {
  * Toggle bloqueo de usuario
  */
 async function toggleBloqueo(usuarioId) {
-    if (!confirm('¿Estás seguro de que deseas bloquear a este usuario? No podrás ver sus productos ni recibir mensajes de él.')) {
-        return;
-    }
+    const esBloqueado = document.querySelector(`[data-vendedor-id="${usuarioId}"]`)
+        ?.classList.contains('bloqueado') ?? false;
+
+    const mensaje = esBloqueado
+        ? '¿Deseas desbloquear a este usuario?'
+        : '¿Estás seguro de que deseas bloquear a este usuario? No podrás ver sus productos ni recibir mensajes de él.';
+
+    if (!confirm(mensaje)) return;
 
     try {
-        const formData = new FormData();
-        formData.append('usuario_id', usuarioId);
+        const url = window.API_CONFIG.LARAVEL_URL + 'bloqueados/' + usuarioId;
+        const method = esBloqueado ? 'DELETE' : 'POST';
 
-        const bloqueoUrl = typeof getApiUrl === 'function' ? getApiUrl('api/toggle_bloqueo.php') : (window.BASE_URL || '') + 'api/toggle_bloqueo.php';
-        const response = await fetch(bloqueoUrl, {
-            method: 'POST',
-            headers: { ...(window.getApiHeaders ? window.getApiHeaders() : {}) },
-            body: formData
+        const response = await fetch(url, {
+            method: method,
+            headers: { ...(window.getApiHeaders ? window.getApiHeaders() : {}) }
         });
 
         const data = await response.json();
+        const ok = data.success || data.status === 'success';
 
-        if (data.success) {
-            if (data.action === 'bloqueado') {
-                showToast('Usuario bloqueado correctamente', 'success');
-                setTimeout(() => { window.location.href = (window.BASE_URL || '') + 'index.php'; }, 1500);
+        if (ok) {
+            if (esBloqueado) {
+                showToast('Usuario desbloqueado correctamente.', 'success');
+                // Actualizar botón
+                const btn = document.querySelector(`[data-vendedor-id="${usuarioId}"]`);
+                if (btn) {
+                    btn.classList.remove('bloqueado');
+                    btn.innerHTML = '<i class="ri-forbid-line"></i> Bloquear';
+                    btn.style.background = '#dc2626';
+                }
             } else {
-                showToast('Usuario desbloqueado. Recargando lista de productos…', 'success');
-                // Recargar índice para que la lista de productos se actualice y vuelvan a verse los del usuario desbloqueado
-                setTimeout(() => { window.location.href = (window.BASE_URL || '') + 'index.php'; }, 1200);
+                showToast('Usuario bloqueado correctamente.', 'success');
+                setTimeout(() => {
+                    window.location.href = (window.BASE_URL || '') + 'index.php';
+                }, 1500);
             }
         } else {
-            showToast(data.error || 'Error al procesar la solicitud', 'error');
+            showToast(data.message || 'Error al procesar la solicitud.', 'error');
         }
+
     } catch (error) {
         console.error('Error:', error);
-        showToast('Error de conexión', 'error');
+        showToast('Error de conexión.', 'error');
     }
 }
 
@@ -2689,7 +2719,10 @@ async function sendChatImage(chatId, file, mensaje = '') {
         formData.append('imagen', file);
         formData.append('mensaje', mensaje);
 
-        const response = await fetch(getApiUrl('api/send_chat_image.php'), {
+        const sendUrl = (typeof window.getLaravelSendMessageUrl === 'function' && window.API_CONFIG && window.API_CONFIG.LARAVEL_URL)
+            ? window.getLaravelSendMessageUrl(chatId)
+            : getApiUrl('api/send_chat_image.php');
+        const response = await fetch(sendUrl, {
             method: 'POST',
             headers: { ...(window.getApiHeaders ? window.getApiHeaders() : {}) },
             body: formData
@@ -2725,30 +2758,18 @@ async function finalizarVenta(chatId, precio = 0, cantidad = 1) {
     }
 
     try {
-        const useLaravel = window.API_CONFIG && window.API_CONFIG.USE_LARAVEL && typeof window.getLaravelIniciarCompraventaUrl === 'function';
         let response, data;
-
-        if (useLaravel) {
-            const url = window.getLaravelIniciarCompraventaUrl(chatId);
-            response = await fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    ...(window.getApiHeaders ? window.getApiHeaders() : {}),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ cantidad: cantidad || 1, precio: precio || 0 })
-            });
-        } else {
-            const formData = new FormData();
-            formData.append('chat_id', chatId);
-            if (precio > 0) formData.append('precio', precio);
-            formData.append('cantidad', cantidad);
-            response = await fetch(getApiUrl('api/finalizar_venta.php'), {
-                method: 'POST',
-                headers: { ...(window.getApiHeaders ? window.getApiHeaders() : {}) },
-                body: formData
-            });
-        }
+        const url = (window.getLaravelIniciarCompraventaUrl && window.API_CONFIG && window.API_CONFIG.LARAVEL_URL)
+            ? window.getLaravelIniciarCompraventaUrl(chatId)
+            : getApiUrl('api/finalizar_venta.php');
+        response = await fetch(url, {
+            method: (window.API_CONFIG && window.API_CONFIG.LARAVEL_URL) ? 'PATCH' : 'POST',
+            headers: {
+                ...(window.getApiHeaders ? window.getApiHeaders() : {}),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ cantidad: cantidad || 1, precio: precio || 0 })
+        });
 
         data = await response.json();
         const ok = data.success || data.status === 'success';
@@ -2776,13 +2797,13 @@ async function eliminarChat(chatId) {
     try {
         const formData = new FormData();
         formData.append('chat_id', chatId);
-        const eliminarUrl = (typeof window.getLaravelDeleteChatUrl === 'function' && window.API_CONFIG && window.API_CONFIG.USE_LARAVEL)
+        const eliminarUrl = (typeof window.getLaravelDeleteChatUrl === 'function' && window.API_CONFIG && window.API_CONFIG.LARAVEL_URL)
             ? window.getLaravelDeleteChatUrl(chatId)
-            : (typeof getApiUrl === 'function' ? getApiUrl('api/eliminar_chat.php') : (window.BASE_URL || '') + 'api/eliminar_chat.php');
+            : getApiUrl('api/eliminar_chat.php');
         const response = await fetch(eliminarUrl, {
-            method: (window.API_CONFIG && window.API_CONFIG.USE_LARAVEL) ? 'DELETE' : 'POST',
+            method: (window.API_CONFIG && window.API_CONFIG.LARAVEL_URL) ? 'DELETE' : 'POST',
             headers: { ...(window.getApiHeaders ? window.getApiHeaders() : {}) },
-            body: (window.API_CONFIG && window.API_CONFIG.USE_LARAVEL) ? undefined : formData
+            body: (window.API_CONFIG && window.API_CONFIG.LARAVEL_URL) ? undefined : formData
         });
         const data = await response.json();
         const ok = data.success || data.status === 'success';
@@ -2991,3 +3012,4 @@ document.addEventListener('keydown', function (e) {
         cerrarModalReporte();
     }
 });
+

@@ -1,6 +1,7 @@
 <?php
 require_once '../config.php';
-if (!defined('USE_LARAVEL_API')) require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
@@ -10,9 +11,7 @@ if (!isLoggedIn()) {
 $user = getCurrentUser();
 $error = '';
 $success = '';
-$mis_pqrs_list = []; // Lista normalizada (PHP o Laravel)
 
-// Motivos de PQRS (deben coincidir con los IDs de la tabla motivos en DB). Iconos planos Remix Icon.
 $motivos = [
     1 => ['nombre' => 'Pregunta', 'icon_class' => 'ri-question-line', 'descripcion' => 'Tengo una duda sobre el funcionamiento del sistema'],
     2 => ['nombre' => 'Queja', 'icon_class' => 'ri-error-warning-line', 'descripcion' => 'Quiero expresar mi inconformidad con algo'],
@@ -21,13 +20,11 @@ $motivos = [
     5 => ['nombre' => 'Agradecimiento', 'icon_class' => 'ri-heart-line', 'descripcion' => 'Quiero agradecer al equipo']
 ];
 
-$useLaravel = defined('USE_LARAVEL_API') && USE_LARAVEL_API;
-$mensaje_min = $useLaravel ? 20 : 20;
-$mensaje_max = $useLaravel ? 512 : 600; // Laravel API limita a 512
+$mensaje_min = 20;
+$mensaje_max = 512;
 
-// Procesar envío de PQRS
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $motivo_id = intval($_POST['motivo_id'] ?? 0);
+    $motivo_id = (int)($_POST['motivo_id'] ?? 0);
     $mensaje = sanitize($_POST['mensaje'] ?? '');
     
     if ($motivo_id < 1 || $motivo_id > 5) {
@@ -36,87 +33,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'El mensaje debe tener al menos ' . $mensaje_min . ' caracteres';
     } elseif (strlen($mensaje) > $mensaje_max) {
         $error = 'El mensaje no puede exceder ' . $mensaje_max . ' caracteres';
-    } elseif ($useLaravel && isset($_SESSION['api_token'])) {
-        // Enviar a API Laravel POST /api/pqrs
-        $apiUrl = rtrim(LARAVEL_API_URL, '/') . '/pqrs';
-        $payload = json_encode(['mensaje' => $mensaje, 'motivo_id' => $motivo_id]);
-        $ctx = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => implode("\r\n", [
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                    'Authorization: Bearer ' . $_SESSION['api_token']
-                ]),
-                'content' => $payload
-            ]
-        ]);
-        $resp = @file_get_contents($apiUrl, false, $ctx);
-        $code = 0;
-        if (isset($http_response_header[0]) && preg_match('/\d{3}/', $http_response_header[0], $m)) $code = (int)$m[0];
-        $data = $resp ? json_decode($resp, true) : null;
-        if ($code === 201 && $data && !empty($data['success'])) {
-            $success = $data['message'] ?? '¡Tu solicitud ha sido enviada correctamente! Te responderemos pronto.';
-        } else {
-            $error = ($data['message'] ?? null) ?: ($data['errors']['mensaje'][0] ?? $data['errors']['motivo_id'][0] ?? 'Error al enviar la solicitud. Intenta de nuevo.');
-        }
     } else {
-        // PHP nativo: insertar en BD
-        $conn = getDBConnection();
-        $estado_id = 1;
-        $stmt = $conn->prepare("INSERT INTO pqrs (usuario_id, mensaje, motivo_id, estado_id) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isii", $user['id'], $mensaje, $motivo_id, $estado_id);
-        if ($stmt->execute()) {
-            $success = '¡Tu solicitud ha sido enviada correctamente! Te responderemos pronto.';
+        $res = apiCrearPqrs($mensaje, $motivo_id);
+        if ($res['success'] || ($res['http_code'] ?? 0) === 201) {
+            $success = $res['message'] ?? '¡Tu solicitud ha sido enviada correctamente! Te responderemos pronto.';
         } else {
-            $error = 'Error al enviar la solicitud. Intenta de nuevo.';
+            $error = $res['message'] ?? ($res['errors']['mensaje'][0] ?? $res['errors']['motivo_id'][0] ?? 'Error al enviar la solicitud. Intenta de nuevo.');
         }
-        $stmt->close();
-        $conn->close();
     }
 }
 
-// Obtener PQRS anteriores del usuario
-if ($useLaravel && isset($_SESSION['api_token'])) {
-    $apiUrl = rtrim(LARAVEL_API_URL, '/') . '/pqrs';
-    $ctx = stream_context_create([
-        'http' => [
-            'method' => 'GET',
-            'header' => "Accept: application/json\r\nAuthorization: Bearer " . $_SESSION['api_token']
-        ]
-    ]);
-    $resp = @file_get_contents($apiUrl, false, $ctx);
-    $data = $resp ? json_decode($resp, true) : null;
-    if ($data && !empty($data['data']) && is_array($data['data'])) {
-        $raw = array_slice($data['data'], 0, 10);
-        foreach ($raw as $row) {
-            $mis_pqrs_list[] = [
-                'id' => $row['id'],
-                'usuario_id' => $row['usuario_id'],
-                'mensaje' => $row['mensaje'],
-                'motivo_id' => $row['motivo_id'],
-                'estado_id' => $row['estado_id'] ?? null,
-                'fecha_registro' => $row['fecha_registro'] ?? '',
-                'estado_nombre' => isset($row['estado']['nombre']) ? $row['estado']['nombre'] : 'pendiente'
-            ];
-        }
-    }
-} else {
-    $conn = getDBConnection();
-    $stmt = $conn->prepare("
-        SELECT p.id, p.usuario_id, p.mensaje, p.motivo_id, p.estado_id, p.fecha_registro, e.nombre as estado_nombre
-        FROM pqrs p
-        INNER JOIN estados e ON p.estado_id = e.id
-        WHERE p.usuario_id = ?
-        ORDER BY p.fecha_registro DESC
-        LIMIT 10
-    ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    while ($row = $res->fetch_assoc()) $mis_pqrs_list[] = $row;
-    $stmt->close();
-    $conn->close();
+$raw_pqrs = apiGetPqrs();
+$mis_pqrs_list = [];
+foreach (array_slice(is_array($raw_pqrs) ? $raw_pqrs : [], 0, 10) as $row) {
+    $mis_pqrs_list[] = [
+        'id' => $row['id'] ?? 0,
+        'usuario_id' => $row['usuario_id'] ?? 0,
+        'mensaje' => $row['mensaje'] ?? '',
+        'motivo_id' => (int)($row['motivo_id'] ?? 0),
+        'estado_id' => $row['estado_id'] ?? null,
+        'fecha_registro' => $row['fecha_registro'] ?? $row['created_at'] ?? '',
+        'estado_nombre' => $row['estado']['nombre'] ?? $row['estado_nombre'] ?? 'pendiente'
+    ];
 }
 ?>
 <!DOCTYPE html>

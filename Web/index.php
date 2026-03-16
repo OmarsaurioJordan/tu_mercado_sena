@@ -15,22 +15,13 @@ $user = getCurrentUser();
 $categoria_id = isset($_GET['categoria']) ? (int)$_GET['categoria'] : 0;
 $busqueda = isset($_GET['busqueda']) ? sanitize($_GET['busqueda']) : '';
 
-// Obtener categorías e integridad desde API Laravel
+// Categorías e integridad solo desde API (tumercadosena.shop); sin SQL
 $categorias_list = [];
 $integridad_list = [];
-if (defined('USE_LARAVEL_API') && USE_LARAVEL_API) {
-    $cats = apiGetCategorias();
-    $categorias_list = is_array($cats) ? $cats : [];
-    $integridad_list = apiGetIntegridad();
-    if (!is_array($integridad_list)) $integridad_list = [];
-} else {
-    $conn = getDBConnection();
-    $categorias_result = $conn->query("SELECT * FROM categorias ORDER BY nombre");
-    while ($r = $categorias_result->fetch_assoc()) $categorias_list[] = $r;
-    $integridad_result = $conn->query("SELECT * FROM integridad ORDER BY id");
-    while ($r = $integridad_result->fetch_assoc()) $integridad_list[] = $r;
-    $conn->close();
-}
+$cats = apiGetCategorias();
+$categorias_list = is_array($cats) ? $cats : [];
+$integridad_list = apiGetIntegridad();
+if (!is_array($integridad_list)) $integridad_list = [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -47,11 +38,18 @@ if (defined('USE_LARAVEL_API') && USE_LARAVEL_API) {
 
     <main class="main">
         <div class="container">
+            <!-- Cabecera: tu búsqueda y filtros existentes + botón actualizar -->
+            <div class="list-header">
             <div class="filters-section">
                 <div class="filters-form" id="filtersForm">
-                    <div class="filter-group">
+                    <div class="filter-group filter-group-search">
                         <input type="text" id="searchInput" placeholder="Buscar productos..." 
                                value="<?php echo htmlspecialchars($busqueda); ?>" class="search-input">
+                    </div>
+                    <div class="filter-group filter-group-refresh">
+                        <button type="button" id="refreshProductsBtn" class="btn-icon-refresh" title="Actualizar lista" aria-label="Actualizar">
+                            <i class="ri-refresh-line" id="refreshIcon"></i>
+                        </button>
                     </div>
                     <div class="filter-group">
                         <select id="categoryFilter" class="select-input">
@@ -91,8 +89,10 @@ if (defined('USE_LARAVEL_API') && USE_LARAVEL_API) {
                     <button type="button" id="clearFiltersBtn" class="btn-link" style="display: none;">Limpiar filtros</button>
                 </div>
             </div>
+            </div>
 
-            <!-- Contenedor de productos con Infinite Scroll -->
+            <!-- Contenido del listado (equivalente a FlatList contentContainerStyle paddingBottom) -->
+            <div class="products-list-content">
             <div class="products-grid" id="productsGrid">
                 <!-- Los productos se cargarán dinámicamente via JavaScript -->
             </div>
@@ -130,7 +130,8 @@ if (defined('USE_LARAVEL_API') && USE_LARAVEL_API) {
                     <a href="<?= getBaseUrl() ?>productos/publicar.php" class="btn-primary">Publicar Producto</a>
                 <?php endif; ?>
             </div>
-            
+            </div>
+
             <!-- Pasar filtros actuales a JavaScript -->
             <script>
                 // Variable global para rutas de API
