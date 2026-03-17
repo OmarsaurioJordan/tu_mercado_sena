@@ -9,7 +9,7 @@ from services.recursos import newSound
 
 if __name__ == "__main__":
     print("*** Tu Mercado Sena ***")
-    os.environ["QT_STYLE_OVERRIDE"] = "Fusion"
+    os.environ["QT_STYLE_OVERRIDE"] = ""
     # inicializar configuracion de la App
     app = QApplication(sys.argv)
     app.setFont(QFont("Times New Roman", 12))
