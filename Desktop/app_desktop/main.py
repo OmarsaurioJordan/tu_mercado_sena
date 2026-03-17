@@ -1,4 +1,4 @@
-import sys
+import sys, os
 from PySide6.QtWidgets import QApplication
 from core.window_manager import WindowManager
 from core.controllers_manager import ControllersManager
@@ -9,6 +9,7 @@ from services.recursos import newSound
 
 if __name__ == "__main__":
     print("*** Tu Mercado Sena ***")
+    os.environ["QT_STYLE_OVERRIDE"] = "Fusion"
     # inicializar configuracion de la App
     app = QApplication(sys.argv)
     app.setFont(QFont("Times New Roman", 12))

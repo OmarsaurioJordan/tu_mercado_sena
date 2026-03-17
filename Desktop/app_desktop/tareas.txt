@@ -1,5 +1,7 @@
 TAREAS:
 ...
+- en pantallas pequeñas se apreta verticalmente dañando widgets, quizá scroll
+- en portátil luego de re encenderlo de suspensión no dejó logout
 - guardar volumen y tiempo de bloqueo en archivo, cargarlos al inicio
 ...
 PRUEBAS:
