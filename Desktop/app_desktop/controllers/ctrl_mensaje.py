@@ -2,6 +2,7 @@ import requests
 from PySide6.QtCore import Signal, QObject
 from core.app_config import API_LIMIT_ITEMS, API_BASE_URL, TIME_OUT
 from models.mensaje import Mensaje
+from core.session import Session
 
 class CtrlMensajeSignal(QObject):
     hubo_cambio = Signal(int) # id mensaje
@@ -29,7 +30,9 @@ class CtrlMensaje:
 
     def api_mensaje(self, id=0):
         print("CtrlMensaje: api_mensaje-init")
-        params = {"id": id}
+        ses = Session()
+        admindata = ses.get_login()
+        params = { "id": id, "admin_email": admindata["email"], "admin_token": admindata["token"] }
         response = requests.get(API_BASE_URL + "mensajes", params=params, timeout=TIME_OUT)
         if response.status_code == 200:
             print("CtrlMensaje: api_mensaje-ok")
@@ -49,6 +52,9 @@ class CtrlMensaje:
             filtros["limite"] = API_LIMIT_ITEMS
             filtros["cursor_fecha"] = self.cursor_busqueda["cursor_fecha"]
             filtros["cursor_id"] = self.cursor_busqueda["cursor_id"]
+            ses = Session()
+            admindata = ses.get_login()
+            filtros = filtros | { "admin_email": admindata["email"], "admin_token": admindata["token"] }
             response = requests.get(API_BASE_URL + "mensajes", params=filtros, timeout=TIME_OUT)
             mensajes = []
             if response.status_code == 200:

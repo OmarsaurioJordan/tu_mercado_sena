@@ -49,7 +49,8 @@ class Usuario:
             self.worker = ImageWorker("")
             QThreadPool.globalInstance().start(self.worker)
             return
-        url = IMAGE_USER_LINK + self.imagen
+        url = IMAGE_USER_LINK + str(self.id) + "/" + self.imagen.split("/")[-1]
+        print("..." + url)
         self.worker = ImageWorker(url)
         self.worker.signals.finished.connect(self.set_image)
         QThreadPool.globalInstance().start(self.worker)

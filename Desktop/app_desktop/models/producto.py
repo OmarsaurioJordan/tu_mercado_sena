@@ -43,7 +43,7 @@ class Producto:
             descripcion = data.get('descripcion'),
             estado_id = int(data.get('estado_id')),
             disponibles = int(data.get('disponibles')),
-            precio = float(data.get('precio')),
+            precio = float(data.get('precio') or 0),
             fecha_registro = data.get('fecha_registro'),
             fecha_actualiza = data.get('fecha_actualiza'),
             imagenes = data.get("imagenes", [])
@@ -70,7 +70,7 @@ class Producto:
             self.workers.append(ImageWorker(""))
             QThreadPool.globalInstance().start(self.workers[-1])
             return
-        url = IMAGE_PROD_LINK + self.imagenes[img_ind]
+        url = IMAGE_PROD_LINK + str(self.id) + "/" + self.imagenes[img_ind]
         self.workers.append(ImageWorker(url))
         self.workers[-1].signals.finished.connect(
             lambda img, i = img_ind: self.set_image(img, i))

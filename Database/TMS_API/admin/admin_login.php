@@ -49,7 +49,7 @@ if ($info['rol_id'] != 2 && $info['rol_id'] != 3) {
 $admin_id = $info['id'];
 $admin_ip = $_SERVER['REMOTE_ADDR'];
 
-$sql = "INSERT INTO login_ip (usuario_id, ip_direccion) VALUES (?, ?)";
+$sql = "INSERT INTO login_ip (usuario_id, ip_direccion, informacion) VALUES (?, ?, '')";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("is", $admin_id, $admin_ip);
 $stmt->execute();

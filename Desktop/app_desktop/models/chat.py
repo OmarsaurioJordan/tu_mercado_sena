@@ -23,13 +23,13 @@ class Chat:
             vendedor_id = int(data.get('vendedor_id')),
             producto_id = int(data.get('producto_id')),
             estado_id = int(data.get('estado_id')),
-            precio = float(data.get('precio')),
-            cantidad = int(data.get('cantidad')),
-            calificacion = int(data.get('calificacion')),
-            comentario = data.get('comentario'),
+            precio = float(data.get('precio') or 0),
+            cantidad = int(data.get('cantidad') or 0),
+            calificacion = int(data.get('calificacion') or 0),
+            comentario = data.get('comentario') or "",
             fecha_venta = data.get('fecha_venta'),
             comprador_name = data.get('comprador_name'),
             producto_name = data.get('producto_name'),
             vendedor_name = data.get('vendedor_name'),
-            dias = int(data.get('dias'))
+            dias = int(data.get('dias') or 0)
         )

@@ -20,6 +20,6 @@ class Login:
             fecha_registro = data.get('fecha_registro'),
             nickname = data.get('nickname'),
             email = data.get('email'),
-            dias = int(data.get('dias')),
+            dias = int(data.get('dias') or 0),
             rol_id = int(data.get('rol_id'))
         )
