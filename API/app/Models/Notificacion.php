@@ -11,7 +11,7 @@ class Notificacion extends Model
     public $timestamps = true;
 
     const CREATED_AT = 'fecha_registro';
-    const UPDATE_AT = null;
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'usuario_id',

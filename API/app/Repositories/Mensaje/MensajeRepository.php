@@ -4,6 +4,7 @@ namespace App\Repositories\Mensaje;
 
 use App\Contracts\Mensaje\Repository\IMensajeRepository;
 use App\Models\Mensaje;
+use app\Models\Chat;
 
 class MensajeRepository implements IMensajeRepository
 {
@@ -21,5 +22,10 @@ class MensajeRepository implements IMensajeRepository
         }
 
         return $mensaje->delete();
+    }
+
+    public function esPrimerMensaje(Chat $chat): bool
+    {
+        return $chat->mensajes()->doesntExist();
     }
 }

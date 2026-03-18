@@ -72,7 +72,7 @@ class BloqueadoRepository implements IBloqueadoRepository
     /**
      * Función para obtener la lista de usuarios bloqueados por un usuario que retorna una colección de modelos Bloqueado
      * @param int $bloqueadorId
-     * @return Collection<int, Bloqueado>
+     * @return Collection<int, Usuario>
      */
     public function obtenerBloqueadosPorUsuario(int $bloqueadorId): Collection
     {

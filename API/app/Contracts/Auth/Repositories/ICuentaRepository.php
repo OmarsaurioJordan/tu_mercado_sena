@@ -60,4 +60,6 @@ interface ICuentaRepository
      * @return bool
      */
     public function esCorreoInstitucional(int $cuentaId): bool;
+
+    public function findByUsuarioId(int $usuarioId): ?Cuenta;
 }

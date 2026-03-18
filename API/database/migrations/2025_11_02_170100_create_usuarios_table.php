@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('cuenta_id')->unique()->constrained('cuentas')->cascadeOnDelete();
             $table->string('nickname', 32)->unique();
             $table->string('imagen', 80)->nullable();
-            $table->string('descripcion', 512);
+            $table->string('descripcion', 512)->nullable();
             $table->string('link', 128)->nullable();
             $table->foreignId('rol_id')->constrained('roles')->cascadeOnDelete();
             $table->foreignId('estado_id')->constrained('estados')->cascadeOnDelete();
@@ -31,7 +31,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('usuarios');
-        
+        Schema::enableForeignKeyConstraints();        
     }
 };

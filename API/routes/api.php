@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\ProductoController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\EstadosController;
 use App\Http\Controllers\Api\MensajeController;
+use App\Http\Controllers\Api\CategoriasController;
+use App\Http\Controllers\Api\SubCategoriasController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -202,6 +204,13 @@ Route::middleware('jwtVerify')->group(function (){
         Route::get('transferencias', [ChatController::class, 'transferencias']);
 
         Route::get('transferencias-filtros', [ChatController::class, 'filtrarTransferencias']);
+
+        Route::get('categorias', [CategoriasController::class, 'index']);
+        Route::get('categorias/{categoria}/subcategorias', [SubCategoriasController::class, 'index']);
+
+        Route::get('favoritos', [UsuarioController::class, 'mostrarFavoritos']);
+        Route::post('favoritos/{usuario}', [UsuarioController::class, 'añadirAFavoritos']);
+        Route::delete('favoritos/{usuario}', [UsuarioController::class, 'eliminarDeFavoritos']);
     });
 });
 

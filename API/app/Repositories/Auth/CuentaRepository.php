@@ -58,6 +58,17 @@ class CuentaRepository implements ICuentaRepository
         return $cuentaModelo->refresh();
     }
 
+    public function findByUsuarioId(int $usuarioId): ?Cuenta
+    {
+        $usuario = Usuario::find($usuarioId);
+
+        if (!$usuario) {
+            return null;
+        }
+
+        return $usuario->cuenta;
+    }
+
     public function actualizarClave(Cuenta $cuentaModelo, string $nuevaClave): ?Cuenta
     {
         $cuentaModelo->update([
