@@ -157,7 +157,9 @@ class ProductoRepository implements IProductoRepository
      */
     public function eliminar(int $id): bool
     {
-        return $this->cambiarEstado($id, 3); // 3 = eliminado según BD
+        return $this->cambiarEstado($id, 3); // 3 = eliminado según BD y ya deja de aparecerle al prosumer
+        // 3 = eliminado según BD y ya deja de aparecerle al prosumer
+        
     }
 
     /**
@@ -222,6 +224,11 @@ class ProductoRepository implements IProductoRepository
             $subQuery->select('bloqueador_id')
                 ->from('bloqueados')
                 ->where('bloqueado_id', $usuarioId);
-        });
+        })->whereNotIn('vendedor_id', function ($subQuery) use ($usuarioId) {
+	   // Excluir productos de usuarios con estado bloqueado
+	    $subQuery->select('id')
+		     ->from('usuarios')
+		     ->where('estado_id', 4);
+	});
     }
 }

@@ -75,7 +75,10 @@ class ProductoService implements IProductoService
     /**
      * Actualiza un producto existente
      */
-    public function actualizarProducto(InputDto $dto, ?array $imagenes = null, array $fotosExistentes = []): array
+    /**
+ * Actualiza un producto existente
+ */
+public function actualizarProducto(InputDto $dto, ?array $imagenes = null, array $fotosExistentes = []): array
 {
     Log::info('Actualizando producto', ['id' => $dto->id]);
 
@@ -92,27 +95,30 @@ class ProductoService implements IProductoService
             /*
             =====================================
             ELIMINAR FOTOS QUE YA NO EXISTEN
+            Solo si se enviaron IDs explícitamente.
+            Si fotosExistentes llega vacío, no se
+            toca ninguna foto existente.
             =====================================
             */
+            if (!empty($fotosExistentes)) {
+                $fotos = Foto::where('producto_id', $producto->id)->get();
 
-            $fotos = Foto::where('producto_id', $producto->id)->get();
+                foreach ($fotos as $foto) {
+                    if (!in_array($foto->id, $fotosExistentes)) {
 
-            foreach ($fotos as $foto) {
+                        Storage::disk('public')->move(
+                            "productos/{$producto->id}/{$foto->imagen}",
+                            "papelera/productos/{$producto->id}/{$foto->imagen}"
+                        );
 
-                if (!in_array($foto->id, $fotosExistentes)) {
+                        Papelera::create([
+                            "usuario_id" => Auth::user()->usuario->id,
+                            "mensaje"    => "Producto editado ID: {$producto->id}",
+                            "imagen"     => "papelera/productos/{$producto->id}/{$foto->imagen}",
+                        ]);
 
-                    Storage::disk('public')->move(
-                        "productos/{$producto->id}/{$foto->imagen}",
-                        "papelera/productos/{$producto->id}/{$foto->imagen}"
-                    );
-
-                    Papelera::create([
-                        "usuario_id" => Auth::user()->usuario->id,
-                        "mensaje" => "Producto editado ID: {$producto->id}",
-                        "imagen" => "papelera/productos/{$producto->id}/{$foto->imagen}",
-                    ]);
-
-                    $foto->delete();
+                        $foto->delete();
+                    }
                 }
             }
 
@@ -121,7 +127,6 @@ class ProductoService implements IProductoService
             SUBIR NUEVAS IMÁGENES
             =====================================
             */
-
             if ($imagenes && count($imagenes) > 0) {
                 $this->procesarImagenes($producto->id, $imagenes);
             }
@@ -137,7 +142,7 @@ class ProductoService implements IProductoService
             return [
                 'success' => true,
                 'message' => 'Producto actualizado exitosamente.',
-                'data' => OutputDto::fromModel($producto)->toArray()
+                'data'    => OutputDto::fromModel($producto)->toArray()
             ];
         });
 
@@ -145,7 +150,7 @@ class ProductoService implements IProductoService
 
         Log::error('Error al actualizar producto', [
             'error' => $e->getMessage(),
-            'id' => $dto->id,
+            'id'    => $dto->id,
         ]);
 
         throw $e;

@@ -98,7 +98,8 @@ class ChatService implements IChatService
     {
         $chat = $this->repository->findDetails($chat_id);
 
-        $chat->load('producto.vendedor', 'comprador');
+        $chat->load('producto.vendedor', 'producto.fotos', 'comprador');
+
 
         // Validar que el chat exista
         if (!$chat) {
@@ -129,7 +130,7 @@ class ChatService implements IChatService
 
         
         $mensajesPaginados = $chat->mensajes()
-            ->orderByDesc('fecha_registro') 
+            ->orderBy   ('fecha_registro', 'asc') // Ordenar de forma ascendente para mostrar el mensaje más antiguo primero
             ->paginate(20);
 
         return OutputDetailsDto::fromModel($chat, $bloqueo_mutuo, $mensajesPaginados);

@@ -39,10 +39,10 @@ class ValidateJWTToken
 
             // Verificar que el usuario esté activo
             // Estado_id: 1 = Activo, 2 = Invisible, 3 = Eliminado
-            if ($usuario->estado_id === 3) {
+            if ($usuario->estado_id === 3 || $usuario->estado_id === 4) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Usuario eliminado'
+                    'message' => 'Acceso no permitido'
                 ], 403);
             }
 

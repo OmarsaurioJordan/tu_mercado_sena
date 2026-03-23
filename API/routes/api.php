@@ -150,9 +150,6 @@ Route::middleware('jwtVerify')->group(function (){
     Route::get('notificaciones/no-vistas', [NotificacionController::class, 'notificacionesNoVistas']);
     Route::get('notificaciones/{notificacion}', [NotificacionController::class, 'show']);
     Route::delete('notificaciones/{notificacion}', [NotificacionController::class, 'destroy']);
-
-
-
     Route::middleware(['CheckGmailRestriction', 'throttle:api_usuario'])->group(function () {
     
         // ========================================
@@ -220,7 +217,7 @@ Route::middleware('jwtVerify')->group(function (){
     Route::get('/ping', function () {
         return response()->json([
             'message' => 'pong',
-	        'message_2' => 'Brahian estuvo aqui',
+	        'message_2' => 'Sebas estuvo aqui',
             'timestamp' => now()->toIso8601String()
         ]);
     });

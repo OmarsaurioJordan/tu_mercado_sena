@@ -73,14 +73,14 @@ class UsuarioService implements IUsuarioService
         }
 
         // Validar que el usuario tenga un correo institucional
-        $cuenta = $this->cuentaRepository->findByUsuarioId($usuarioId);
+        // $cuenta = $this->cuentaRepository->findByUsuarioId($usuarioId);
 
-        if (!$cuenta || !$this->cuentaRepository->esCorreoInstitucional($cuenta->id)) {
-            throw new BusinessException(
-                "Solo los que cuentan con correo institucional pueden cambiar su avatar",
-                422
-            );
-        }
+        // if (!$cuenta || !$this->cuentaRepository->esCorreoInstitucional($cuenta->id)) {
+        //     throw new BusinessException(
+        //         "Solo los que cuentan con correo institucional pueden cambiar su avatar",
+        //         422
+        //     );
+        // }
         
         return DB::transaction(function () use ($usuarioId, $dto) {
             $data = $dto->toArray();
