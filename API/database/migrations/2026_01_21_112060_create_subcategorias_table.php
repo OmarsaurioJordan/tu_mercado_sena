@@ -166,7 +166,6 @@ return new class extends Migration
         ];
 
         DB::table('subcategorias')->insert($subcategorias);
-
     }
 
     /**
