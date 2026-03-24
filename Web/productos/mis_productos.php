@@ -28,7 +28,7 @@ function apiBaseHost() {
 }
 
 function normalizarImagenProducto($producto) {
-    $defaultImage = getBaseUrl() . 'assets/images/default-product.jpg';
+    $defaultImage = getAbsoluteBaseUrl() . 'assets/images/default-product.jpg';
     $apiHost = apiBaseHost();
 
     if (empty($producto['fotos']) || !is_array($producto['fotos'])) {
@@ -190,7 +190,7 @@ if (!empty($_GET['debug_api'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Productos - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         .page-header {
             display: flex;
@@ -346,7 +346,7 @@ if (!empty($_GET['debug_api'])) {
                 <div class="empty-state">
                     <h2>No tienes productos publicados</h2>
                     <p>Aún no has creado productos en Tu Mercado SENA.</p>
-                    <a href="publicar.php" class="btn-link btn-primary">Publicar producto</a>
+                    <!-- <a href="publicar.php" class="btn-link btn-primary">Publicar producto</a> -->
                 </div>
             <?php else: ?>
                 <div class="products-grid">
@@ -366,7 +366,7 @@ if (!empty($_GET['debug_api'])) {
                                 src="<?= htmlspecialchars($imgUrl) ?>"
                                 alt="<?= htmlspecialchars($producto['nombre'] ?? 'Producto') ?>"
                                 class="product-image"
-                                onerror="this.onerror=null;this.src='<?= htmlspecialchars(getBaseUrl() . 'assets/images/default-product.jpg') ?>';"
+                                onerror="this.onerror=null;this.src='<?= htmlspecialchars(getAbsoluteBaseUrl() . 'assets/images/default-product.jpg') ?>';"
                             >
 
                             <div class="product-body">
@@ -451,6 +451,6 @@ if (!empty($_GET['debug_api'])) {
         </div>
     </footer>
 
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
 </body>
 </html>

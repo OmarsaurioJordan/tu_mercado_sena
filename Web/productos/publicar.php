@@ -267,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publicar Producto - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
@@ -417,7 +417,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <script>
-        window.BASE_URL = '<?= getBaseUrl() ?>';
+        window.BASE_URL = '<?= getAbsoluteBaseUrl() ?>';
 
         document.querySelector('.product-form').addEventListener('submit', function(e) {
             var input = document.getElementById('imagenes');
@@ -439,6 +439,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
 </body>
 </html>

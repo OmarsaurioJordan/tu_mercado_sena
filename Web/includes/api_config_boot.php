@@ -4,7 +4,7 @@
  * Incluir ANTES de script.js en páginas que usen fetch a la API.
  */
 if (!defined('LARAVEL_API_URL')) {
-    if (!function_exists('getBaseUrl')) {
+    if (!function_exists('getAbsoluteBaseUrl')) {
         require_once __DIR__ . '/../config.php';
     }
     require_once __DIR__ . '/../config_api.php';
@@ -14,7 +14,7 @@ if (!function_exists('isLoggedIn')) {
     require_once __DIR__ . '/../config.php';
 }
 
-$baseUrl = function_exists('getBaseUrl') ? getBaseUrl() : '/';
+$baseUrl = function_exists('getAbsoluteBaseUrl') ? getAbsoluteBaseUrl() : '/';
 $apiUrl = defined('LARAVEL_API_URL') ? rtrim(LARAVEL_API_URL, '/') : '';
 $storageUrl = defined('LARAVEL_STORAGE_URL') ? rtrim(LARAVEL_STORAGE_URL, '/') : '';
 
@@ -66,4 +66,4 @@ if (function_exists('isLoggedIn') && isLoggedIn() && function_exists('getCurrent
     };
 })();
 </script>
-<script src="<?= getBaseUrl() ?>js/api-config.js"></script>
+<script src="/js/api-config.js"></script>

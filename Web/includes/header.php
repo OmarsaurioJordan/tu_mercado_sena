@@ -6,8 +6,8 @@ if (!isset($user)) {
 }
 $user = $user ?? [];
 
-// Usar la función getBaseUrl() del config.php
-$base_url = getBaseUrl();
+// Usar la función getAbsoluteBaseUrl() del config.php
+$base_url = getAbsoluteBaseUrl();
 ?>
 <header class="header">
     <div class="container">

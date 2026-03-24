@@ -5,8 +5,8 @@
 // Detectar la página actual para marcar como activa
 $currentPage = basename($_SERVER['PHP_SELF']);
 
-// Usar la función getBaseUrl() del config.php
-$base_url = getBaseUrl();
+// Usar la función getAbsoluteBaseUrl() del config.php
+$base_url = getAbsoluteBaseUrl();
 ?>
 <!-- Barra de Navegación Inferior (solo móviles) -->
 <nav class="bottom-nav" id="bottomNav">

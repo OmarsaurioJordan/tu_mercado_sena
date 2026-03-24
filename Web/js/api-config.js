@@ -7,6 +7,8 @@
 // URL GLOBAL DE LA API (api_link.php → api_config_boot.php)
 // ============================================
 var API_BASE_URL = (typeof window !== 'undefined' && window.API_BASE_URL) ? window.API_BASE_URL : (window.LARAVEL_API_URL || '');
+// const API_BASE_URL = (typeof window !== 'undefined' && window.API_BASE_URL) ? window.API_BASE_URL : (window.LARAVEL_API_URL || 'https://tumercadosena.shop/api/api');
+
 
 var API_CONFIG = {
     USE_LARAVEL: true,
@@ -21,7 +23,7 @@ var API_CONFIG = {
         me: 'auth/me',
         recuperarValidarCorreo: 'auth/recuperar-contrasena/validar-correo',
         recuperarValidarClave: 'auth/recuperar-contrasena/validar-clave-recuperacion',
-        recuperarReestablecer: 'auth/recuperar-contrasena/reestablecer-contrasena'
+        recuperarReestablecer: 'auth/recuperar-contrasena/reestablecer-contrasena', 
     },
     get ACTIVE_URL() {
         return this.LARAVEL_URL || '';
@@ -92,49 +94,49 @@ function getApiHeaders() {
  */
 const ENDPOINT_MAPPING = {
     // Autenticación
-    'login.php': 'auth/login',
-    'register.php': 'auth/register',
-    'logout.php': 'auth/logout',
+    'login.php': '/auth/login',
+    'register.php': '/auth/register',
+    'logout.php': '/auth/logout',
     
     // Productos
-    'productos.php': 'productos',
-    'crear_producto.php': 'productos',
-    'editar_producto.php': 'productos',
-    'eliminar_producto.php': 'productos',
+    'productos.php': '/productos',
+    'crear_producto.php': '/productos',
+    'editar_producto.php': '/productos',
+    'eliminar_producto.php': '/productos',
     
     // Chats y mensajes
-    'chats.php': 'chats',
-    'get_messages.php': 'chats',
-    'send_message.php': 'chats',
-    'enviar_mensaje.php': 'mensajes/enviar',
-    'obtener_mensajes.php': 'mensajes/obtener',
-    'eliminar_chat.php': 'chats',
-    'get_chats_notificaciones.php': 'chats',
+    'chats.php': '/chats',
+    'get_messages.php': '/chats',
+    'send_message.php': '/chats',
+    'enviar_mensaje.php': '/mensajes/enviar',
+    'obtener_mensajes.php': '/mensajes/obtener',
+    'eliminar_chat.php': '/chats',
+    'get_chats_notificaciones.php': '/chats',
     
     // Favoritos y bloqueados (Laravel: POST/DELETE favoritos/{id}, bloqueados/{id})
-    'toggle_favorito.php': 'favoritos',
-    'toggle_bloqueo.php': 'bloqueados',
-    'toggle_visibilidad.php': 'productos',
+    'toggle_favorito.php': '/favoritos',
+    'toggle_bloqueo.php': '/bloqueados',
+    'toggle_visibilidad.php': '/productos',
     
     // Confirmaciones y Devoluciones
-    'solicitar_confirmacion.php': 'transacciones/solicitar-confirmacion',
-    'responder_confirmacion.php': 'transacciones/responder-confirmacion',
-    'solicitar_devolucion.php': 'transacciones/solicitar-devolucion',
-    'responder_devolucion.php': 'transacciones/responder-devolucion',
+    'solicitar_confirmacion.php': '/transacciones/solicitar-confirmacion',
+    'responder_confirmacion.php': '/transacciones/responder-confirmacion',
+    'solicitar_devolucion.php': '/transacciones/solicitar-devolucion',
+    'responder_devolucion.php': '/transacciones/responder-devolucion',
     
     // Denuncias
-    'denunciar_usuario.php': 'denuncias/crear',
-    'reportar_producto.php': 'denuncias',
+    'denunciar_usuario.php': '/denuncias/crear',
+    'reportar_producto.php': '/denuncias',
     
     // Usuarios
-    'perfil.php': 'usuarios/perfil',
-    'editar_perfil.php': 'usuarios/editar',
+    'perfil.php': '/usuarios/perfil',
+    'editar_perfil.php': '/usuarios/editar',
     
     // Otros
-    'toggle_silencio.php': 'chats/toggle-silencio',
-    'cerrar_chats_automatico.php': 'chats/cerrar-automatico',
-    'send_chat_image.php': 'chats',
-    'finalizar_venta.php': 'chats',
+    'toggle_silencio.php': '/chats/toggle-silencio',
+    'cerrar_chats_automatico.php': '/chats/cerrar-automatico',
+    'send_chat_image.php': '/chats',
+    'finalizar_venta.php': '/chats',
 };
 
 /**
@@ -248,89 +250,89 @@ function getLaravelProductosUrl(params) {
     const qs = params && typeof params === 'object' && Object.keys(params).length
         ? '?' + new URLSearchParams(params).toString()
         : '';
-    return API_CONFIG.LARAVEL_URL + 'productos' + qs;
+    return API_CONFIG.LARAVEL_URL + '/productos' + qs;
 }
 function getLaravelProductosBuscarUrl(busqueda, page, perPage) {
     const params = new URLSearchParams({ q: busqueda, per_page: perPage || 12 });
     if (page) params.set('page', page);
-    return API_CONFIG.LARAVEL_URL + 'productos/buscar?' + params.toString();
+    return API_CONFIG.LARAVEL_URL + '/productos/buscar?' + params.toString();
 }
 function getLaravelProductosVendedorUrl(vendedorId) {
-    return API_CONFIG.LARAVEL_URL + 'productos/vendedor/' + encodeURIComponent(vendedorId);
+    return API_CONFIG.LARAVEL_URL + '/productos/vendedor/' + encodeURIComponent(vendedorId);
 }
 
 function getLaravelChatsListUrl() {
-    return API_CONFIG.LARAVEL_URL + 'chats';
+    return API_CONFIG.LARAVEL_URL + '/chats';
 }
 function getLaravelChatDetailUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId);
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId);
 }
 function getLaravelSendMessageUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId) + '/mensajes';
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/mensajes';
 }
 function getLaravelDeleteChatUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId);
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId);
 }
 function getLaravelStartChatUrl(productId) {
-    return API_CONFIG.LARAVEL_URL + 'productos/' + encodeURIComponent(productId) + '/chats';
+    return API_CONFIG.LARAVEL_URL + '/productos/' + encodeURIComponent(productId) + '/chats';
 }
 function getLaravelDeleteMessageUrl(mensajeId) {
-    return API_CONFIG.LARAVEL_URL + 'mensajes/' + encodeURIComponent(mensajeId);
+    return API_CONFIG.LARAVEL_URL + '/mensajes/' + encodeURIComponent(mensajeId);
 }
 // Transferencias y compraventa (según documentación)
 function getLaravelIniciarCompraventaUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId) + '/iniciar-compraventas';
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/iniciar-compraventas';
 }
 function getLaravelTerminarCompraventaUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId) + '/terminar-compraventas';
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/terminar-compraventas';
 }
 function getLaravelIniciarDevolucionUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId) + '/iniciar-devoluciones';
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/iniciar-devoluciones';
 }
 function getLaravelTerminarDevolucionUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId) + '/terminar-devoluciones';
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/terminar-devoluciones';
 }
 function getLaravelEstadosUrl() {
-    return API_CONFIG.LARAVEL_URL + 'estados';
+    return API_CONFIG.LARAVEL_URL + '/estados';
 }
 function getLaravelTransferenciasUrl() {
-    return API_CONFIG.LARAVEL_URL + 'transferencias';
+    return API_CONFIG.LARAVEL_URL + '/transferencias';
 }
 function getLaravelTransferenciasFiltrosUrl(estados) {
     const qs = estados && estados.length ? '?' + estados.map(e => 'estados[]=' + e).join('&') : '';
-    return API_CONFIG.LARAVEL_URL + 'transferencias-filtros' + qs;
+    return API_CONFIG.LARAVEL_URL + '/transferencias-filtros' + qs;
 }
 // Favoritos: GET /api/favoritos, POST /api/favoritos/{id}, DELETE /api/favoritos/{id}
 function getLaravelFavoritosUrl() {
-    return API_CONFIG.LARAVEL_URL + 'favoritos';
+    return API_CONFIG.LARAVEL_URL + '/favoritos';
 }
 function getLaravelAddFavoritoUrl(usuarioId) {
-    return API_CONFIG.LARAVEL_URL + 'favoritos/' + encodeURIComponent(usuarioId);
+    return API_CONFIG.LARAVEL_URL + '/favoritos/' + encodeURIComponent(usuarioId);
 }
 function getLaravelDeleteFavoritoUrl(usuarioId) {
-    return API_CONFIG.LARAVEL_URL + 'favoritos/' + encodeURIComponent(usuarioId);
+    return API_CONFIG.LARAVEL_URL + '/favoritos/' + encodeURIComponent(usuarioId);
 }
 // Motivos: GET /api/motivos?tipo=denuncia|pqrs|notificacion
 function getLaravelMotivosUrl(tipo) {
-    return API_CONFIG.LARAVEL_URL + 'motivos' + (tipo ? '?tipo=' + encodeURIComponent(tipo) : '');
+    return API_CONFIG.LARAVEL_URL + '/motivos' + (tipo ? '?tipo=' + encodeURIComponent(tipo) : '');
 }
 // Denuncias: POST /api/denuncias
 function getLaravelDenunciasUrl() {
-    return API_CONFIG.LARAVEL_URL + 'denuncias';
+    return API_CONFIG.LARAVEL_URL + '/denuncias';
 }
 // PQRS: GET /api/pqrs, POST /api/pqrs
 function getLaravelPqrsUrl() {
-    return API_CONFIG.LARAVEL_URL + 'pqrs';
+    return API_CONFIG.LARAVEL_URL + '/pqrs';
 }
 // Notificaciones: GET /api/notificaciones, GET /api/notificaciones/no-vistas, GET/DELETE /api/notificaciones/{id}
 function getLaravelNotificacionesUrl() {
-    return API_CONFIG.LARAVEL_URL + 'notificaciones';
+    return API_CONFIG.LARAVEL_URL + '/notificaciones';
 }
 function getLaravelNotificacionesNoVistasUrl() {
-    return API_CONFIG.LARAVEL_URL + 'notificaciones/no-vistas';
+    return API_CONFIG.LARAVEL_URL + '/notificaciones/no-vistas';
 }
 function getLaravelNotificacionUrl(notificacionId) {
-    return API_CONFIG.LARAVEL_URL + 'notificaciones/' + encodeURIComponent(notificacionId);
+    return API_CONFIG.LARAVEL_URL + '/notificaciones/' + encodeURIComponent(notificacionId);
 }
 
 /**

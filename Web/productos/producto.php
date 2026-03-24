@@ -83,7 +83,7 @@ $imagen_url = !empty($fotos)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($producto['nombre']); ?> - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
@@ -271,16 +271,6 @@ $imagen_url = !empty($fotos)
                 <div class="reporte-opciones" id="motivosDenuncia">
                     <div class="loading-motivos">Cargando motivos...</div>
                 </div>
-
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label for="comentarioReporte">Comentario adicional (opcional)</label>
-                    <textarea
-                        id="comentarioReporte"
-                        rows="3"
-                        maxlength="300"
-                        placeholder="Describe el problema con más detalle..."
-                    ></textarea>
-                </div>
             </div>
 
             <div class="modal-footer">
@@ -420,7 +410,7 @@ $imagen_url = !empty($fotos)
 
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
 
-    <script src="<?= getBaseUrl(); ?>script.js?v=<?= time(); ?>"></script>
+    <script src="<?= getAbsoluteBaseUrl(); ?>script.js?v=<?= time(); ?>"></script>
 
     <script>
         let motivosDenunciaCache = [];
@@ -574,35 +564,36 @@ $imagen_url = !empty($fotos)
         }
 
         function renderizarMotivosDenuncia(motivos) {
-            const contenedor = document.getElementById('motivosDenuncia');
+            const contenedor = document.getElementById('motivosDenuncia')
+                            || document.querySelector('.reporte-opciones');
             if (!contenedor) return;
 
-            if (!Array.isArray(motivos) || motivos.length === 0) {
-                contenedor.innerHTML = `
-                    <div class="error-motivos">
-                        No hay motivos de denuncia disponibles.
-                    </div>
-                `;
-                return;
-            }
+            const iconoMap = (nombre) => {
+                const t = String(nombre).toLowerCase();
+                if (t.includes('ilegal') || t.includes('prohibido')) return 'ri-spam-line';
+                if (t.includes('precio'))   return 'ri-money-dollar-circle-line';
+                if (t.includes('descrip'))  return 'ri-file-warning-line';
+                if (t.includes('imagen') || t.includes('foto')) return 'ri-image-line';
+                if (t.includes('estafa') || t.includes('fraude')) return 'ri-error-warning-line';
+                if (t.includes('acoso'))    return 'ri-user-unfollow-line';
+                if (t.includes('bulling') || t.includes('bully')) return 'ri-emotion-unhappy-line';
+                if (t.includes('troll'))    return 'ri-ghost-line';
+                if (t.includes('spam'))     return 'ri-spam-2-line';
+                if (t.includes('sexual'))   return 'ri-alert-line';
+                if (t.includes('fake'))     return 'ri-file-warning-line';
+                if (t.includes('violencia'))return 'ri-error-warning-line';
+                return 'ri-flag-line';
+            };
 
-            contenedor.innerHTML = motivos.map((motivo, index) => {
-                const id = motivo.id ?? '';
-                const nombre = escapeHtml(motivo.nombre ?? motivo.titulo ?? 'Sin nombre');
-                const descripcion = escapeHtml(motivo.descripcion ?? motivo.detalle ?? '');
-                const icono = obtenerIconoMotivo(nombre, index);
-
-                return `
-                    <label class="reporte-opcion">
-                        <input type="radio" name="motivo_reporte" value="${id}">
-                        <span class="opcion-content">
-                            <i class="${icono}"></i>
-                            <strong>${nombre}</strong>
-                            <small>${descripcion}</small>
-                        </span>
-                    </label>
-                `;
-            }).join('');
+            contenedor.innerHTML = motivos.map(m => `
+                <label class="reporte-opcion">
+                    <input type="radio" name="motivo_reporte" value="${m.id}">
+                    <span class="opcion-content">
+                        <i class="${iconoMap(m.nombre)}"></i>
+                        <strong>${escapeHtml(m.nombre ?? '')}</strong>
+                    </span>
+                </label>
+            `).join('');
         }
 
         function obtenerIconoMotivo(nombre, index = 0) {
@@ -638,55 +629,47 @@ $imagen_url = !empty($fotos)
         async function enviarReporte() {
             const productoId = document.getElementById('reporteProductoId')?.value || '';
             const usuarioId = document.getElementById('reporteUsuarioId')?.value || '';
-            const comentario = document.getElementById('comentarioReporte')?.value.trim() || '';
-            const motivoSeleccionado = document.querySelector('input[name="motivo_reporte"]:checked');
+            const motivoInput = document.querySelector('input[name="motivo_reporte"]:checked');
 
-            if (!motivoSeleccionado) {
-                alert('Debes seleccionar un motivo de reporte.');
+            if (!motivoInput) {
+                showToast('Selecciona un motivo para el reporte', 'error');
                 return;
             }
 
-            const motivoId = motivoSeleccionado.value;
+            const body = {
+                motivo_id:  Number(motivoInput.value),
+                usuario_id: Number(usuarioId)
+            };
 
-            try {
-                const apiBase = getApiBaseUrl();
-                if (!apiBase) {
-                    throw new Error('No se encontró la URL base de la API');
-                }
+            if (productoId) {
+        body.producto_id = Number(productoId);
+    }
 
-                const response = await fetch(`${apiBase}/reportes`, {
-                    method: 'POST',
-                    headers: getApiHeaders({
-                        'Content-Type': 'application/json'
-                    }),
-                    body: JSON.stringify({
-                        producto_id: Number(productoId),
-                        usuario_reportado_id: Number(usuarioId),
-                        motivo_id: Number(motivoId),
-                        comentario: comentario
-                    })
-                });
-
-                const result = await response.json().catch(() => ({}));
-
-                if (!response.ok) {
-                    throw new Error(result.message || 'No se pudo enviar el reporte.');
-                }
-
-                alert(result.message || 'Reporte enviado correctamente.');
-                cerrarModalReporte();
-            } catch (error) {
-                console.error('Error enviando reporte:', error);
-                alert(error.message || 'Ocurrió un error al enviar el reporte.');
-            }
-        }
-
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('modalReporte');
-            if (event.target === modal) {
-                cerrarModalReporte();
-            }
+    try {
+        const response = await fetch(`${getApiBaseUrl()}/denuncias`, {
+            method: 'POST',
+            headers: getApiHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify(body)
         });
+
+        const data = await response.json();
+        const ok = data.success || data.status === 'success';
+
+        if (ok) {
+            showToast(data.message || 'Reporte enviado correctamente', 'success');
+            cerrarModalReporte();
+        } else {
+            const errores = data.errors
+                ? Object.values(data.errors).flat().join(', ')
+                : (data.message || 'Error al enviar el reporte');
+            showToast(errores, 'error');
+        }
+    } catch (error) {
+        console.error('Error enviando reporte:', error);
+        showToast('Error de conexión', 'error');
+    }
+}
+window.enviarReporte = enviarReporte;
     </script>
 </body>
 </html>

@@ -36,7 +36,7 @@ if ($crear['success'] && $crear['chat_id'] > 0) {
     exit;
 }
 
-$base = getBaseUrl();
+$base = getAbsoluteBaseUrl();
 $api_token = getToken();
 ?>
 <!DOCTYPE html>
@@ -65,7 +65,7 @@ $api_token = getToken();
             }
             if (token && typeof localStorage !== 'undefined') localStorage.setItem('api_token', token);
             var baseUrl = (window.API_CONFIG && window.API_CONFIG.LARAVEL_URL) ? window.API_CONFIG.LARAVEL_URL : window.LARAVEL_API_URL || '';
-            var url = baseUrl + 'productos/' + productoId + '/chats';
+            var url = baseUrl + '/productos/' + productoId + '/chats';
             fetch(url, {
                 method: 'POST',
                 headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }

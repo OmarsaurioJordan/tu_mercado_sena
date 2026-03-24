@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 
 require_once '../config.php';
 require_once __DIR__ . '/../config_api.php';
@@ -8,7 +10,7 @@ forceLightTheme();
 $error = '';
 
 if (isLoggedIn()) {
-    header("Location: ../index.php");
+    header("Location: /index.php");
     exit();
 }
 
@@ -48,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['notifica_correo'] = (int)($user['notifica_correo'] ?? 0);
                 $_SESSION['notifica_push'] = (int)($user['notifica_push'] ?? 0);
                 $_SESSION['uso_datos'] = (int)($user['uso_datos'] ?? 0);
-                header("Location: ../index.php");
+                header("Location: /index.php");
                 exit();
             }
         } else {
@@ -66,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="../styles.css?v=<?= time(); ?>">
 </head>
 <script>
     const savedTheme = localStorage.getItem("theme") || "light";
@@ -77,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Header superior -->
     <header class="header">
         <div class="header-content" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: flex-start; gap: 20px; padding: 0 20px;">
-            <img src="<?= getBaseUrl() ?>logo_new.png" alt="SENA" style="height: 70px; width: auto;">
+            <img src="../logo_new.png" alt="SENA" style="height: 70px; width: auto;">
             <span style="font-size: 1.5rem; font-weight: 800; color: white;">Tu Mercado SENA</span>
         </div>
     </header>
@@ -282,9 +284,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         window.USE_LARAVEL_API = true;
         window.LARAVEL_API_URL = <?= json_encode(defined('LARAVEL_API_URL') ? LARAVEL_API_URL : '') ?>;
     </script>
-    <script src="<?= getBaseUrl() ?>js/api-config.js"></script>
+    <script src="/js/api-config.js"></script>
     <script>
-        window.BASE_URL = <?= json_encode(getBaseUrl()) ?>;
+        window.BASE_URL = <?= json_encode(getAbsoluteBaseUrl()) ?>;
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             var btn = document.getElementById('btnLogin');
@@ -295,6 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (errEl) errEl.textContent = 'Completa correo y contraseña.';
                 return;
             }
+            console.log("Boton de login presionado. Iniciando proceso de autenticación...");
             btn.disabled = true;
             if (errEl) errEl.remove();
             try {
@@ -323,15 +326,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        usuario_id: user.id,
-                        nickname: user.nickname || '',
-                        imagen: user.imagen || '',
-                        rol_id: user.rol_id || 1,
-                        cuenta_id: user.cuenta_id || 0,
-                        api_token: token
+                        usuario_id:     user.id,
+                        nickname:       user.nickname       || '',
+                        imagen:         user.imagen         || '',
+                        rol_id:         user.rol_id         || 1,
+                        cuenta_id:      user.cuenta_id      || 0,
+                        api_token:      token,
+                        // 👇 campos que faltaban
+                        descripcion:    user.descripcion    || '',
+                        link:           user.link           || '',
+                        estado_id:      user.estado_id      || 1,
+                        email:          user.email          || email,
+                        notifica_correo: user.notifica_correo || 0,
+                        notifica_push:   user.notifica_push   || 0,
+                        uso_datos:       user.uso_datos       || 0,
                     })
                 });
-                window.location.href = (window.BASE_URL || '') + 'index.php';
+                window.location.href = '/index.php';
             } catch (err) {
                 var box = document.querySelector('.auth-box');
                 var div = document.createElement('div');

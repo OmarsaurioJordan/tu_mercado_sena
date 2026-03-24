@@ -597,15 +597,22 @@ function apiActualizarProducto($productoId, $data, $imagenes = null) {
     }
 
     $payload = [
-        '_method' => 'PATCH',
-        'nombre' => $data['nombre'] ?? '',
-        'descripcion' => $data['descripcion'] ?? '',
-        'subcategoria_id' => (int)($data['subcategoria_id'] ?? 0),
-        'integridad_id' => (int)($data['integridad_id'] ?? 0),
-        'estado_id' => (int)($data['estado_id'] ?? 1),
-        'precio' => $data['precio'] ?? 0,
-        'disponibles' => (int)($data['disponibles'] ?? 1)
+        '_method'        => 'PATCH',
+        'nombre'         => $data['nombre'] ?? '',
+        'descripcion'    => $data['descripcion'] ?? '',
+        'subcategoria_id'=> (int)($data['subcategoria_id'] ?? 0),
+        'integridad_id'  => (int)($data['integridad_id'] ?? 0),
+        'estado_id'      => (int)($data['estado_id'] ?? 1),
+        'precio'         => $data['precio'] ?? 0,
+        'disponibles'    => (int)($data['disponibles'] ?? 1)
     ];
+
+    // Agregar fotos_existentes si se enviaron
+    if (!empty($data['fotos_existentes']) && is_array($data['fotos_existentes'])) {
+        foreach ($data['fotos_existentes'] as $i => $fotoId) {
+            $payload["fotos_existentes[$i]"] = (int)$fotoId;
+        }
+    }
 
     return apiRequestMultipart('/productos/' . (int)$productoId, 'POST', $payload, $imagenes, $token);
 }
@@ -767,12 +774,16 @@ function apiGetHistorialCompras() {
 function apiGetChat($chatId) {
     $token = getToken();
     if (!$token) return null;
+
+    // Llamar al endpoint de detalle, no a la lista
     $r = apiRequest('/chats/' . (int)$chatId, 'GET', [], $token);
     if (!$r['success']) return null;
-    $d = $r['data']['data'] ?? $r['data']['chat'] ?? $r['data'];
-    return is_array($d) ? $d : null;
-}
 
+    $data = $r['data'] ?? [];
+
+    // El endpoint devuelve { status: 'success', data: {...} }
+    return $data['data'] ?? $data ?? null;
+}
 /**
  * Calificar chat/compra (como comprador).
  */

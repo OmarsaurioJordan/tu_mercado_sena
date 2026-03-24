@@ -14,7 +14,7 @@ $useLaravelAuth = true; // Solo API (tumercadosena.shop); sin SQL
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Recuperar contraseña - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         .step-indicator {
             display: flex;
@@ -139,7 +139,7 @@ $useLaravelAuth = true; // Solo API (tumercadosena.shop); sin SQL
 <?php if ($useLaravelAuth): ?>
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
     <script>
-        window.BASE_URL = <?= json_encode(getBaseUrl()) ?>;
+        window.BASE_URL = <?= json_encode(getAbsoluteBaseUrl()) ?>;
         var fpCuentaId = null;
         var apiBase = (typeof API_CONFIG !== 'undefined' && API_CONFIG.LARAVEL_URL) ? API_CONFIG.LARAVEL_URL : <?= json_encode(rtrim(LARAVEL_API_URL, '/') . '/') ?>;
 

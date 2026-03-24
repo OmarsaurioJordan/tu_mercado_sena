@@ -8,7 +8,7 @@ $success = '';
 
 // Si ya tiene sesión, redirigir
 if (isLoggedIn()) {
-    header("Location: ../index.php");
+    header("Location: /index.php");
     exit();
 }
 
@@ -20,7 +20,7 @@ if (isLoggedIn()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         .avatar-upload {
             display: flex;
@@ -94,7 +94,7 @@ if (isLoggedIn()) {
     <!-- Header superior -->
     <header class="header">
         <div class="header-content" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: flex-start; gap: 20px; padding: 0 20px;">
-            <img src="<?= getBaseUrl() ?>logo_new.png" alt="SENA" style="height: 70px; width: auto;">
+            <img src="<?= getAbsoluteBaseUrl() ?>logo_new.png" alt="SENA" style="height: 70px; width: auto;">
             <span style="font-size: 1.5rem; font-weight: 800; color: white;">Tu Mercado SENA</span>
         </div>
     </header>
@@ -166,7 +166,7 @@ if (isLoggedIn()) {
     </footer>
 </body>
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Preview de imagen de perfil (solo cuando existe el formulario PHP con campo imagen)
@@ -230,10 +230,13 @@ if (isLoggedIn()) {
         });
     </script>
     <script>
-        window.BASE_URL = <?= json_encode(getBaseUrl()) ?>;
+        window.BASE_URL = <?= json_encode(getAbsoluteBaseUrl()) ?>;
         var regCuentaId = null, regDatosEncriptados = null;
-        var apiBase = typeof API_CONFIG !== 'undefined' ? API_CONFIG.LARAVEL_URL : <?= json_encode(defined('LARAVEL_API_URL') ? LARAVEL_API_URL : 'https://tumercadosena.shop/api/api') ?>;
-        var setSessionUrl = (window.BASE_URL || '') + 'auth/set_session.php';
+        var apiBase = (typeof API_CONFIG !== 'undefined' && API_CONFIG.LARAVEL_URL
+            ? API_CONFIG.LARAVEL_URL
+            : <?= json_encode(defined('LARAVEL_API_URL') ? LARAVEL_API_URL : 'https://tumercadosena.shop/api/') ?>
+        ).replace(/\/?$/, '/');
+        var setSessionUrl = '/auth/set_session.php';
 
         document.getElementById('regLaravelForm1').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -296,7 +299,7 @@ if (isLoggedIn()) {
                 var token = payload.token;
                 if (user && token) {
                     if (typeof localStorage !== 'undefined') localStorage.setItem('api_token', token);
-                    window.location.href = (window.BASE_URL || '') + 'auth/login.php?registered=1';
+                    window.location.href = '/auth/login.php?registered=1';
                 } else {
                     err.style.display = 'block';
                     err.textContent = data.message || (data.errors && Object.values(data.errors).flat().join(' ')) || 'Error al completar el registro';

@@ -7,7 +7,7 @@ require_once '../config.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto Institucional - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         .contacto-container {
             max-width: 900px;
@@ -277,7 +277,7 @@ require_once '../config.php';
                 <?php else: ?>
                     <a href="../auth/login.php" class="btn-primary">Iniciar Sesión</a>
                 <?php endif; ?>
-                <a href="<?= getBaseUrl() ?>index.php" class="btn-secondary">← Volver</a>
+                <a href="<?= getAbsoluteBaseUrl() ?>index.php" class="btn-secondary">← Volver</a>
             </div>
         </div>
     </main>
@@ -288,6 +288,6 @@ require_once '../config.php';
         </div>
     </footer>
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
 </body>
 </html>

@@ -3,10 +3,9 @@ require_once '../config.php';
 
 // Si el usuario ya está logueado, redirigir al index
 if (isLoggedIn()) {
-    header('Location: ../index.php');
+    header('Location: index.php');
     exit;
 }
-
 // Forzar modo claro en welcome
 forceLightTheme();
 ?>
@@ -16,7 +15,7 @@ forceLightTheme();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenido - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="../styles.css?v=<?= time(); ?>">
     <style>
         * {
             margin: 0;
@@ -302,7 +301,7 @@ forceLightTheme();
     <!-- Header superior -->
     <header class="welcome-header">
         <div class="header-content" style="display: flex; align-items: center; gap: 20px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
-            <img src="<?= getBaseUrl() ?>logo_new.png" alt="SENA" class="header-logo" style="height: 90px; width: auto;">
+            <img src="../logo_new.png" alt="SENA" class="header-logo" style="height: 90px; width: auto;">
             <span class="header-title" style="font-size: 2.2rem; font-weight: 800; color: white;">Tu Mercado SENA</span>
         </div>
     </header>
@@ -313,7 +312,7 @@ forceLightTheme();
             <!-- Lado Izquierdo - Green -->
             <div class="card-hero">
                 <div class="hero-brand" style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
-                    <img src="<?= getBaseUrl() ?>logo_new.png" alt="Logo" class="hero-logo" style="width: 110px !important; height: auto;">
+                    <img src= "../logo_new.png" alt="Logo" class="hero-logo" style="width: 110px !important; height: auto;">
                     <h2 class="hero-title" style="margin: 0; font-size: 2.5rem; font-weight: 800;">Tu Mercado SENA</h2>
                 </div>
                 
@@ -343,7 +342,7 @@ forceLightTheme();
                 <!-- Video SENA -->
                 <div class="video-container">
                     <video autoplay loop controls playsinline>
-                        <source src="<?= getBaseUrl() ?>assets/videos/sena.mp4" type="video/mp4">
+                        <source src="../assets/videos/sena.mp4">
                         Tu navegador no soporta el elemento de video.
                     </video>
                 </div>

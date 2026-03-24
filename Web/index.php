@@ -5,7 +5,7 @@ require_once __DIR__ . '/api/api_client.php';
 
 // Redirigir a login si no está autenticado
 if (!isLoggedIn()) {
-    header('Location: auth/welcome.php');
+    header('Location: /auth/welcome.php');
     exit;
 }
 
@@ -29,7 +29,8 @@ if (!is_array($integridad_list)) $integridad_list = [];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tu Mercado SENA - Marketplace</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="/styles.css">
+
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
@@ -127,7 +128,7 @@ if (!is_array($integridad_list)) $integridad_list = [];
             <div class="no-products" id="noProducts" style="display: none;">
                 <p>No se encontraron productos. ¡Sé el primero en publicar!</p>
                 <?php if ($user): ?>
-                    <a href="<?= getBaseUrl() ?>productos/publicar.php" class="btn-primary">Publicar Producto</a>
+                    <a href="<?= getAbsoluteBaseUrl() ?>productos/publicar.php" class="btn-primary">Publicar Producto</a>
                 <?php endif; ?>
             </div>
             </div>
@@ -135,7 +136,7 @@ if (!is_array($integridad_list)) $integridad_list = [];
             <!-- Pasar filtros actuales a JavaScript -->
             <script>
                 // Variable global para rutas de API
-                window.BASE_URL = '<?= getBaseUrl() ?>';
+                window.BASE_URL = '<?= getAbsoluteBaseUrl() ?>';
                 
                 window.productFilters = {
                     categoria: <?php echo json_encode($categoria_id); ?>,
@@ -154,7 +155,20 @@ if (!is_array($integridad_list)) $integridad_list = [];
         </div>
     </footer>
     <?php include 'includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js?v=<?= time(); ?>"></script>
+    <script src="/script.js?v=<?= time(); ?>"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            /*
+                * Carga inicial de productos al abrir la página.
+                * Se llama a loadProducts con page=1 y 
+                * reset=true para cargar la primera página de productos
+                * Función del script.js que hace la llamada a la API y renderiza 
+                * los productos.
+            */
+            loadProducts(1, true);  
+        });
+
+    </script>
 </body>
 </html>
 

@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
@@ -205,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="file" id="avatarInputHidden" name="avatar_file" accept="image/*" style="display:none;">
 
             <button type="button" id="avatarEditButton" class="avatar-edit-btn" title="Cambiar foto de perfil">
-                <img src="<?= getBaseUrl() ?>assets/icons/icono-lapiz.png" alt="Editar">
+                <img src="<?= getAbsoluteBaseUrl() ?>assets/icons/icono-lapiz.png" alt="Editar">
             </button>
         </form>
     </div>
@@ -414,9 +414,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </footer>
     <script>
-        window.BASE_URL = '<?= getBaseUrl() ?>';
+        window.BASE_URL = '<?= getAbsoluteBaseUrl() ?>';
     </script>
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
 </body>
 </html>

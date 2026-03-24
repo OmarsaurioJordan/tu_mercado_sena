@@ -6,8 +6,8 @@
 
 // Configuración de la base de datos (algunas páginas como perfil aún la usan; categorías/productos van a la API de Hostinger)
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_USER', 'adso_user');
+define('DB_PASS', 'Adso24-tms-');
 define('DB_NAME', 'tu_mercado_sena');
 
 // Iniciar sesión
@@ -35,6 +35,13 @@ function getBaseUrl() {
     } else {
         return './'; // por defecto
     }
+}
+
+// Función helper para obtener la URL base absoluta (ej: https://tumercadosena.shop/)
+function getAbsoluteBaseUrl() {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+    $host = $_SERVER['HTTP_HOST'];
+    return $protocol . $host . '/';
 }
 
 // Ruta base absoluta desde la raíz del servidor (ej: /ensayo_link/Web/) para enlaces de navegación
@@ -82,7 +89,7 @@ function getDBConnection() {
  * Obtiene la ruta completa del avatar o el avatar por defecto
  */
 function getAvatarUrl($imagen) {
-    $baseUrl = getBaseUrl();
+    $baseUrl = getAbsoluteBaseUrl();
     
     if (empty($imagen)) {
         return $baseUrl . 'assets/images/default-avatar.jpg';
@@ -217,12 +224,12 @@ function formato_tiempo_relativo($timestamp_db) {
 }
 
 function getProductImage($productId) {
-    $base = getBaseUrl();
+    $base = getAbsoluteBaseUrl();
     return $base . 'assets/images/default-product.jpg';
 }
 
 function getProductMainImage($producto_id) {
-    $base = getBaseUrl();
+    $base = getAbsoluteBaseUrl();
     return $base . 'assets/images/default-product.jpg';
 }
 
@@ -233,7 +240,7 @@ function getProductMainImage($producto_id) {
  */
 function getProductImageUrlPHP($path) {
     if (empty($path) || !is_string($path)) {
-        return getBaseUrl() . 'assets/images/default-product.jpg';
+        return getAbsoluteBaseUrl() . 'assets/images/default-product.jpg';
     }
     if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
         if (defined('USE_LARAVEL_API') && USE_LARAVEL_API && defined('LARAVEL_STORAGE_URL') && (strpos($path, 'localhost') !== false || strpos($path, 'storage/') !== false)) {
@@ -249,7 +256,7 @@ function getProductImageUrlPHP($path) {
         if (strpos($clean, 'productos/') !== 0) $clean = 'productos/' . ltrim($clean, '/');
         return rtrim(LARAVEL_STORAGE_URL, '/') . '/' . $clean;
     }
-    $base = getBaseUrl();
+    $base = getAbsoluteBaseUrl();
     return (strpos($path, 'uploads/') === 0) ? ($base . $path) : ($base . 'uploads/productos/' . ltrim($path, '/'));
 }
 
