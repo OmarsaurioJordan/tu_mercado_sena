@@ -21,9 +21,9 @@ var API_CONFIG = {
         logout: 'auth/logout',
         refresh: 'auth/refresh',
         me: 'auth/me',
-        recuperarValidarCorreo: 'auth/recuperar-contrasena/validar-correo',
-        recuperarValidarClave: 'auth/recuperar-contrasena/validar-clave-recuperacion',
-        recuperarReestablecer: 'auth/recuperar-contrasena/reestablecer-contrasena', 
+        recuperarValidarCorreo: '/auth/recuperar-contrasena/validar-correo',
+        recuperarValidarClave: '/auth/recuperar-contrasena/validar-clave-recuperacion',
+        recuperarReestablecer: '/auth/recuperar-contrasena/reestablecer-contrasena', 
     },
     get ACTIVE_URL() {
         return this.LARAVEL_URL || '';

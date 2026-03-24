@@ -159,7 +159,7 @@ $useLaravelAuth = true; // Solo API (tumercadosena.shop); sin SQL
             var err = document.getElementById('fpError');
             err.style.display = 'none';
             try {
-                var r = await fetch(apiBase + 'auth/recuperar-contrasena/validar-correo', {
+                var r = await fetch(apiBase + '/auth/recuperar-contrasena/validar-correo', {
                     method: 'POST',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email })
@@ -190,7 +190,7 @@ $useLaravelAuth = true; // Solo API (tumercadosena.shop); sin SQL
             err.style.display = 'none';
             if (!fpCuentaId) { err.textContent = 'Sesión expirada. Vuelve a empezar.'; err.style.display = 'block'; return; }
             try {
-                var r = await fetch(apiBase + 'auth/recuperar-contrasena/validar-clave-recuperacion', {
+                var r = await fetch(apiBase + '/auth/recuperar-contrasena/validar-clave-recuperacion', {
                     method: 'POST',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ cuenta_id: fpCuentaId, clave: clave })
@@ -218,7 +218,7 @@ $useLaravelAuth = true; // Solo API (tumercadosena.shop); sin SQL
             if (password !== password_confirm) { err.textContent = 'Las contraseñas no coinciden'; err.style.display = 'block'; return; }
             if (!fpCuentaId) { err.textContent = 'Sesión expirada.'; err.style.display = 'block'; return; }
             try {
-                var r = await fetch(apiBase + 'auth/recuperar-contrasena/reestablecer-contrasena', {
+                var r = await fetch(apiBase + '/auth/recuperar-contrasena/reestablecer-contrasena', {
                     method: 'PATCH',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ cuenta_id: fpCuentaId, password: password, password_confirmation: password_confirm })
