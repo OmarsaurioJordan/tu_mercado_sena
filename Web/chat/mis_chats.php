@@ -1,74 +1,83 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-// Usuario autenticado
-
 $user = getCurrentUser();
-$conn = getDBConnection();
+$chats_raw = apiGetChats();
 
-// Crear tabla de eliminaciones si no existe
-$conn->query("
-    CREATE TABLE IF NOT EXISTS chats_eliminados (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        chat_id INT UNSIGNED NOT NULL,
-        usuario_id INT UNSIGNED NOT NULL,
-        fecha_eliminacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE KEY unique_chat_usuario (chat_id, usuario_id),
-        FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE,
-        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
-");
+function _normChat($c, $userId) {
+    $id = (int)($c['id'] ?? $c['chat_id'] ?? 0);
+    
+    // La API devuelve 'usuario' = el otro usuario del chat
+    $usuario = $c['usuario'] ?? [];
+    
+    $esComprador = ((int)($c['comprador_id'] ?? 0)) === $userId;
 
-// Obtener todos los chats del usuario (como comprador o como vendedor)
-// Excluir chats eliminados por este usuario
-$query = "SELECT 
-    c.id AS chat_id,
-    c.estado_id,
-    c.visto_comprador,
-    c.visto_vendedor,
-    c.fecha_venta,
-    p.id AS producto_id,
-    p.nombre AS producto_nombre,
-    p.precio AS producto_precio,
-    f.imagen AS producto_imagen,
-    u_comprador.id AS comprador_id,
-    u_comprador.nickname AS comprador_nombre,
-    u_comprador.imagen AS comprador_avatar,
-    u_vendedor.id AS vendedor_id,
-    u_vendedor.nickname AS vendedor_nombre,
-    u_vendedor.imagen AS vendedor_avatar,
-    (SELECT mensaje FROM mensajes WHERE chat_id = c.id ORDER BY fecha_registro DESC LIMIT 1) AS ultimo_mensaje,
-    (SELECT fecha_registro FROM mensajes WHERE chat_id = c.id ORDER BY fecha_registro DESC LIMIT 1) AS ultima_fecha,
-    (SELECT fecha_registro FROM mensajes WHERE chat_id = c.id ORDER BY fecha_registro ASC LIMIT 1) AS primera_fecha
-FROM chats c
-INNER JOIN productos p ON c.producto_id = p.id
-INNER JOIN usuarios u_comprador ON c.comprador_id = u_comprador.id
-INNER JOIN usuarios u_vendedor ON p.vendedor_id = u_vendedor.id
-LEFT JOIN fotos f ON f.producto_id = p.id
-WHERE (c.comprador_id = ? OR p.vendedor_id = ?) 
-AND c.estado_id != 3
-AND c.id NOT IN (
-    SELECT chat_id FROM chats_eliminados WHERE usuario_id = ?
-)
-GROUP BY c.id
-ORDER BY ultima_fecha DESC, primera_fecha DESC";
+    return [
+        'chat_id'          => $id,
+        'comprador_id'     => (int)($c['comprador_id'] ?? 0),
+        'vendedor_id'      => (int)($c['vendedor_id'] ?? 0),
+        // El otro usuario viene directo en 'usuario'
+        'otro_nombre'      => $usuario['nickname'] ?? $usuario['name'] ?? '',
+        'otro_avatar'      => $usuario['imagen'] ?? $usuario['avatar'] ?? '',
+        'visto_comprador'  => (int)($c['visto_comprador'] ?? 0),
+        'visto_vendedor'   => (int)($c['visto_vendedor'] ?? 0),
+        'fecha_venta'      => $c['fecha_venta'] ?? null,
+        'estado_id'        => (int)($c['estado_id'] ?? 1),
+        'producto_id'      => (int)($c['producto_id'] ?? 0),
+        'producto_nombre' => $c['producto']['nombre'] ?? $c['producto_nombre'] ?? '',
+        'producto_precio' => (float)($c['producto']['precio'] ?? $c['producto_precio'] ?? 0),
+        'producto_imagen' => $c['producto']['imagen'] ?? $c['producto_imagen'] ?? '',        'ultimo_mensaje'   => $c['ultimoMensajeTexto'] ?? $c['ultimo_mensaje'] ?? '',
+        'ultima_fecha'     => $c['fechaUltimoMensaje'] ?? $c['ultima_fecha'] ?? '',
+        'primera_fecha'    => $c['created_at'] ?? '',
+        'es_comprador'     => $esComprador,
+    ];
+}
 
-$stmt = $conn->prepare($query);
-$stmt->bind_param("iii", $user['id'], $user['id'], $user['id']);
-$stmt->execute();
-$chats_result = $stmt->get_result();
-$stmt->close();
 
-// Cargar configuración de días de espera
-require_once '../api/config_cierre_automatico.php';
+$chats_result = array_map(function ($c) use ($user) {
+    return _normChat($c, $user['id']);
+}, is_array($chats_raw) ? $chats_raw : []);
+
+// Si la API no incluyó producto en el chat, rellenar con apiGetProducto (máx. 10 para no saturar)
+$filled = 0;
+foreach ($chats_result as &$row) {
+    if ($filled >= 10) break;
+    if ($row['producto_id'] > 0 && (empty($row['producto_nombre']) || $row['producto_precio'] <= 0)) {
+        $prod = apiGetProducto($row['producto_id']);
+        if ($prod && is_array($prod)) {
+            $row['producto_nombre'] = $prod['nombre'] ?? $prod['name'] ?? $row['producto_nombre'];
+            $row['producto_precio'] = (float)($prod['precio'] ?? $prod['price'] ?? 0);
+            if (empty($row['producto_imagen'])) {
+                $first = $prod['imagenes'][0] ?? null;
+                $row['producto_imagen'] = $first && is_array($first) ? ($first['imagen'] ?? $first['url'] ?? '') : ($prod['imagen'] ?? $prod['image'] ?? '');
+            }
+            if (empty($row['vendedor_nombre']) && !empty($prod['vendedor'])) {
+                $v = $prod['vendedor'];
+                $row['vendedor_nombre'] = $v['nickname'] ?? $v['name'] ?? $v['nombre'] ?? '';
+                $row['vendedor_avatar'] = $v['imagen'] ?? $v['avatar'] ?? $row['vendedor_avatar'];
+            }
+            $filled++;
+        }
+    }
+}
+unset($row);
+
+// Ordenar por ultima_fecha descendente
+usort($chats_result, function ($a, $b) {
+    $ta = strtotime($a['ultima_fecha'] ?: $a['primera_fecha'] ?: '0');
+    $tb = strtotime($b['ultima_fecha'] ?: $b['primera_fecha'] ?: '0');
+    return $tb - $ta;
+});
+
+require_once __DIR__ . '/../api/config_cierre_automatico.php';
 $dias_espera = defined('DIAS_ESPERA_CIERRE') ? DIAS_ESPERA_CIERRE : 7;
-
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -76,7 +85,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Chats - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         /* Estilos específicos para la lista de chats */
         .chats-page-container {
@@ -278,83 +287,107 @@ $conn->close();
                 <h1><i class="ri-chat-3-line"></i> Mis Conversaciones</h1>
             </div>
 
-            <?php if ($chats_result->num_rows > 0): ?>
+            <?php if (!empty($chats_result)): ?>
                 <div class="chat-list">
-                    <?php while ($chat = $chats_result->fetch_assoc()): 
-                        // Determinar si el usuario actual es comprador o vendedor
-                        $es_comprador = ($user['id'] == $chat['comprador_id']);
-                        
-                        // Determinar el otro usuario (con quien se chatea)
-                        $otro_nombre = $es_comprador ? $chat['vendedor_nombre'] : $chat['comprador_nombre'];
-                        $otro_avatar = $es_comprador ? $chat['vendedor_avatar'] : $chat['comprador_avatar'];
-                        
-                        // Verificar si hay mensajes sin leer
+                    <?php foreach ($chats_result as $chat):
+                        // ✅ Usar las claves que sí devuelve _normChat()
+                        $otro_nombre = $chat['otro_nombre'] ?: 'Usuario';
+                        $otro_avatar = $chat['otro_avatar'] ?? '';
+
                         $sin_leer = false;
-                        if ($es_comprador && !$chat['visto_comprador']) {
+                        if ($chat['es_comprador'] && !$chat['visto_comprador']) {
                             $sin_leer = true;
-                        } elseif (!$es_comprador && !$chat['visto_vendedor']) {
+                        } elseif (!$chat['es_comprador'] && !$chat['visto_vendedor']) {
                             $sin_leer = true;
                         }
-                        
-                        // Calcular días restantes si hay fecha_venta
+
                         $dias_restantes = null;
                         if ($chat['fecha_venta'] && $chat['estado_id'] != 8) {
-                            $fecha_venta_obj = new DateTime($chat['fecha_venta']);
-                            $fecha_actual = new DateTime();
+                            $fecha_venta_obj    = new DateTime($chat['fecha_venta']);
+                            $fecha_actual       = new DateTime();
                             $dias_transcurridos = $fecha_actual->diff($fecha_venta_obj)->days;
-                            $dias_restantes = $dias_espera - $dias_transcurridos;
+                            $dias_restantes     = $dias_espera - $dias_transcurridos;
                         }
-                        
-                        // Formatear tiempo del último mensaje
-                        $tiempo = $chat['ultima_fecha'] ? formato_tiempo_relativo($chat['ultima_fecha']) : ($chat['primera_fecha'] ? formato_tiempo_relativo($chat['primera_fecha']) : 'Reciente');
+
+                        $tiempo = $chat['ultima_fecha']
+                            ? formato_tiempo_relativo($chat['ultima_fecha'])
+                            : ($chat['primera_fecha'] ? formato_tiempo_relativo($chat['primera_fecha']) : 'Reciente');
                     ?>
-                        <div class="chat-item <?= $sin_leer ? 'unread' : '' ?>">
-                            <a href="chat.php?id=<?= $chat['chat_id'] ?>" class="chat-item-link" style="display: contents;">
-                                <img src="<?= getAvatarUrl($otro_avatar) ?>" alt="<?= htmlspecialchars($otro_nombre) ?>" class="chat-avatar">
-                                <div class="chat-content">
-                                    <div class="chat-top-row">
-                                        <span class="chat-user-name">
-                                            <?= htmlspecialchars($otro_nombre) ?>
-                                            <?php if ($sin_leer): ?>
-                                                <span class="unread-badge">Nuevo</span>
-                                            <?php endif; ?>
-                                            <?php if ($chat['estado_id'] == 8): ?>
-                                                <span style="background: #e74c3c; color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 10px; margin-left: 0.5rem;">Cerrado</span>
-                                            <?php elseif ($dias_restantes !== null && $dias_restantes >= 0 && $dias_restantes <= 3): ?>
-                                                <span style="background: <?= $dias_restantes <= 1 ? '#e74c3c' : '#FFC107' ?>; color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 10px; margin-left: 0.5rem;">
-                                                    <i class="ri-time-line"></i> <?= $dias_restantes ?> día<?= $dias_restantes != 1 ? 's' : '' ?>
-                                                </span>
-                                            <?php endif; ?>
-                                        </span>
-                                        <span class="chat-time"><?= $tiempo ?></span>
-                                    </div>
-                                    <div class="chat-product-name"><i class="ri-box-3-line"></i> <?= htmlspecialchars($chat['producto_nombre']) ?> — <?= formatPrice($chat['producto_precio']) ?></div>
-                                    <div class="chat-last-message">
-                                        <?php if ($chat['ultimo_mensaje']): ?>
-                                            <?= htmlspecialchars(mb_substr($chat['ultimo_mensaje'], 0, 50)) ?><?= strlen($chat['ultimo_mensaje']) > 50 ? '...' : '' ?>
-                                        <?php else: ?>
-                                            <em>Sin mensajes aún</em>
+                        <div class="chat-item <?= $sin_leer ? 'unread' : '' ?>"
+                            onclick="window.location.href='<?= getAbsoluteBaseUrl() ?>chat/chat.php?id=<?= $chat['chat_id'] ?>'"
+                            style="cursor: pointer;">
+                            
+                            <img src="<?= getAvatarUrl($otro_avatar) ?>"
+                                alt="<?= htmlspecialchars($otro_nombre) ?>"
+                                class="chat-avatar"
+                                onerror="this.onerror=null;this.src='<?= getAbsoluteBaseUrl() ?>assets/images/default-avatar.jpg'">
+
+                            <div class="chat-content">
+                                <div class="chat-top-row">
+                                    <span class="chat-user-name">
+                                        <?= htmlspecialchars($otro_nombre) ?>
+                                        <?php if ($sin_leer): ?>
+                                            <span class="unread-badge">Nuevo</span>
                                         <?php endif; ?>
-                                    </div>
+                                        <?php if ($chat['estado_id'] == 8): ?>
+                                            <span style="background:#e74c3c;color:white;font-size:0.7rem;padding:0.2rem 0.5rem;border-radius:10px;margin-left:0.5rem;">Cerrado</span>
+                                        <?php elseif ($dias_restantes !== null && $dias_restantes >= 0 && $dias_restantes <= 3): ?>
+                                            <span style="background:<?= $dias_restantes <= 1 ? '#e74c3c' : '#FFC107' ?>;color:white;font-size:0.7rem;padding:0.2rem 0.5rem;border-radius:10px;margin-left:0.5rem;">
+                                                <i class="ri-time-line"></i> <?= $dias_restantes ?> día<?= $dias_restantes != 1 ? 's' : '' ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </span>
+                                    <span class="chat-time"><?= $tiempo ?></span>
                                 </div>
-                                <?php if (!empty($chat['producto_imagen'])): ?>
-                                    <img src="<?= getBaseUrl() ?>uploads/productos/<?= htmlspecialchars($chat['producto_imagen']) ?>" alt="Producto" class="chat-product-img" onerror="this.src='https://via.placeholder.com/50?text=Sin+Imagen'">
-                                <?php else: ?>
-                                    <div class="chat-product-img" style="background: var(--color-primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                                        <i class="ri-image-line" style="font-size: 1.5rem;"></i>
-                                    </div>
-                                <?php endif; ?>
-                            </a>
+
+                                <div class="chat-product-name">
+                                    <i class="ri-box-3-line"></i>
+                                    <?= htmlspecialchars($chat['producto_nombre'] ?: 'Producto') ?>
+                                    <?php if ($chat['producto_precio'] > 0): ?>
+                                        — <?= formatPrice($chat['producto_precio']) ?>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="chat-last-message">
+                                    <?php if (!empty($chat['ultimo_mensaje']) && $chat['ultimo_mensaje'] !== 'Sin mensajes aún'): ?>
+                                        <?= htmlspecialchars(mb_substr($chat['ultimo_mensaje'], 0, 50)) ?><?= mb_strlen($chat['ultimo_mensaje']) > 50 ? '...' : '' ?>
+                                    <?php else: ?>
+                                        <em>Sin mensajes aún</em>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <?php
+                            $imgUrl = '';
+                            if (!empty($chat['producto_imagen'])) {
+                                $imgUrl = strpos($chat['producto_imagen'], 'http') === 0
+                                    ? $chat['producto_imagen']
+                                    : (defined('LARAVEL_STORAGE_URL')
+                                        ? rtrim(LARAVEL_STORAGE_URL, '/') . '/' . ltrim($chat['producto_imagen'], '/')
+                                        : getAbsoluteBaseUrl() . 'uploads/productos/' . $chat['producto_imagen']);
+                            }
+                            ?>
+                            <?php if ($imgUrl): ?>
+                                <img src="<?= htmlspecialchars($imgUrl) ?>"
+                                    alt="producto"
+                                    class="chat-product-img"
+                                    onerror="this.onerror=null;this.src='<?= getAbsoluteBaseUrl() ?>assets/images/default-product.jpg'">
+                            <?php else: ?>
+                                <div class="chat-product-img" style="background:var(--color-primary);display:flex;align-items:center;justify-content:center;color:white;">
+                                    <i class="ri-image-line" style="font-size:1.5rem;"></i>
+                                </div>
+                            <?php endif; ?>
+
                             <?php if ($chat['estado_id'] == 8): ?>
-                                <button type="button" 
-                                        onclick="eliminarChat(<?= $chat['chat_id'] ?>);"
+                                <button type="button"
+                                        onclick="event.stopPropagation(); eliminarChat(<?= $chat['chat_id'] ?>);"
                                         class="btn-eliminar-chat"
                                         title="Eliminar chat">
                                     <i class="ri-delete-bin-line"></i>
                                 </button>
                             <?php endif; ?>
                         </div>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </div>
             <?php else: ?>
                 <div class="no-chats">
@@ -373,9 +406,10 @@ $conn->close();
         </div>
     </footer>
     <script>
-        window.BASE_URL = '<?= getBaseUrl() ?>';
+        window.BASE_URL = '<?= getAbsoluteBaseUrl() ?>';
     </script>
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js?v=<?= time(); ?>"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js?v=<?= time(); ?>"></script>
+    <script>console.log('Chats cargados');</script>
 </body>
 </html>

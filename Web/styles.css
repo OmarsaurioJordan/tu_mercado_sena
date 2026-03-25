@@ -486,6 +486,58 @@ body {
     font-size: 14px;
 }
 
+/* Listado: cabecera (tu búsqueda + filtros) + contenido con padding inferior */
+.list-header {
+    padding-top: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+}
+.filter-group-search {
+    flex: 1;
+    min-width: 120px;
+}
+.filter-group-refresh {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+.btn-icon-refresh {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    background: var(--color-bg);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.btn-icon-refresh:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+.btn-icon-refresh:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+.btn-icon-refresh .ri-refresh-line {
+    font-size: 1.35rem;
+}
+.btn-icon-refresh.refreshing .ri-refresh-line {
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.products-list-content {
+    padding-bottom: 120px;
+}
+
 /* Products Grid */
 .products-grid {
     display: grid;
@@ -510,12 +562,19 @@ body {
     box-shadow: var(--shadow-hover);
 }
 
-.product-card a {
+.product-card a,
+.product-card .product-card-link {
     text-decoration: none;
     color: inherit;
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     flex: 1;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 100%;
+    pointer-events: auto;
 }
 
 .product-image {
@@ -637,6 +696,21 @@ body {
 .status-3 {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+/* Tarjetas con botones (Mis Productos): el enlace no debe ocupar todo el espacio y los botones deben verse */
+.mis-productos-card .product-card-link {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+.mis-productos-card .product-actions {
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex !important;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    background-color: var(--color-bg-secondary);
 }
 
 .product-actions {
@@ -982,79 +1056,87 @@ body {
     background: var(--color-secondary);
 }
 
+/* Burbujas tipo WhatsApp */
 .message {
-    max-width: 70%;
-    margin-bottom: 1rem;
-    padding: 1rem 1.25rem;
-    border-radius: 12px;
+    max-width: 75%;
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 1rem 0.4rem;
     word-wrap: break-word;
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn 0.25s ease-out;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    position: relative;
+}
+
+.message p {
+    margin: 0 0 0.25rem 0;
+    line-height: 1.4;
+    font-size: 0.95rem;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
 }
 
+/* Enviados: verde tipo WhatsApp */
 .message-sent {
     align-self: flex-end;
     margin-left: auto;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    color: var(--color-white);
-    border-bottom-right-radius: 4px;
-
+    background: linear-gradient(135deg, #dcf8c6 0%, #d1f4c4 100%);
+    color: #111;
+    border-radius: 12px 12px 4px 12px;
+    border: none;
+}
+[data-theme="dark"] .message-sent {
+    background: linear-gradient(135deg, #005c4b 0%, #025144 100%);
+    color: #e9edef;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
+/* Recibidos: gris claro tipo WhatsApp */
 .message-received {
     align-self: flex-start;
     margin-right: auto;
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    border: 1px solid var(--border-color);
-    border-bottom-left-radius: 4px;
+    background: #fff;
+    color: #111;
+    border-radius: 12px 12px 12px 4px;
+    border: 1px solid #e9e9e9;
+}
+[data-theme="dark"] .message-received {
+    background: #2a2f32;
+    color: #e9edef;
+    border-color: #3b4043;
 }
 
 .message-time {
-    font-size: 0.75rem;
-    opacity: 0.7;
+    font-size: 0.7rem;
+    opacity: 0.75;
     display: block;
-    margin-top: 0.5rem;
+    margin-top: 0.35rem;
+    text-align: right;
 }
+.message-received .message-time { text-align: left; }
 
 .chat-input {
-    padding: 1.5rem;
-    border-top: 2px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
     background-color: var(--color-bg);
     border-radius: 0 0 12px 12px;
 }
 
 .message-form {
+    display: block;
+}
+
+.message-form .chat-input-bar {
     display: flex;
-    gap: 1rem;
+    align-items: flex-end;
+    gap: 0.5rem;
 }
 
 .message-form textarea {
-    flex: 1;
-    padding: 0.75rem;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    resize: none;
     font-family: inherit;
-    background-color: var(--color-bg);
     color: var(--color-text);
-    min-height: 60px;
-}
-
-.message-form textarea:focus {
-    outline: none;
-    border-color: var(--color-primary);
 }
 
 /* No Products */
@@ -2601,6 +2683,7 @@ input:checked+.slider:before {
     .chat-container {
         height: calc(100vh - 180px);
         margin-bottom: 80px;
+        overflow-x: hidden;
     }
 
     .chat-header {
@@ -2621,24 +2704,59 @@ input:checked+.slider:before {
     }
 
     .chat-input {
-        padding: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
         position: relative;
     }
 
     .message-form {
-        display: flex;
-        gap: 0.5rem;
-        align-items: flex-end;
+        display: block;
     }
 
-    .message-form textarea {
+    .message-form .chat-input-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.5rem 0.35rem 0.6rem;
+        border-radius: 22px;
+        min-height: 48px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .message-form .chat-input-row {
         flex: 1;
-        min-height: 45px;
+        min-width: 0;
+    }
+
+    .message-form .chat-input-wrap {
+        min-height: 44px;
+        gap: 0.4rem;
+    }
+
+    .message-form .chat-input-wrap textarea {
+        flex: 1;
+        min-height: 44px;
         max-height: 100px;
-        padding: 0.6rem 0.75rem;
+        padding: 0.5rem 0.5rem 0.5rem 0;
         font-size: 1rem;
-        border-radius: 20px;
         resize: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .message-form .btn-emoji {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        flex-shrink: 0;
+    }
+
+    .message-form .chat-send-btn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        flex-shrink: 0;
     }
 
     .message-form .btn-primary {
@@ -2647,6 +2765,24 @@ input:checked+.slider:before {
         padding: 0.6rem 1rem;
         border-radius: 20px;
         font-size: 0.9rem;
+    }
+
+    /* Panel emojis en móvil */
+    .emoji-picker-whatsapp {
+        left: 0;
+        right: 0;
+        max-height: min(280px, 50vh);
+        border-radius: 12px 12px 0 0;
+    }
+
+    .emoji-picker-grid {
+        grid-template-columns: repeat(7, 1fr);
+    }
+
+    .emoji-btn-wa {
+        width: 40px;
+        height: 40px;
+        font-size: 1.4rem;
     }
 
     /* Página de detalle de producto */

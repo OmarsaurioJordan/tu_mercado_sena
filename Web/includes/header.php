@@ -4,9 +4,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
 if (!isset($user)) {
     $user = getCurrentUser();
 }
+$user = $user ?? [];
 
-// Usar la función getBaseUrl() del config.php
-$base_url = getBaseUrl();
+// Usar la función getAbsoluteBaseUrl() del config.php
+$base_url = getAbsoluteBaseUrl();
 ?>
 <header class="header">
     <div class="container">
@@ -32,9 +33,9 @@ $base_url = getBaseUrl();
 
                     <a href="<?= $base_url ?>perfil/perfil.php" class="perfil-link <?= $current_page == 'perfil.php' ? 'active' : '' ?>">
                         <div class="user-avatar-container">
-                            <img src="<?= getAvatarUrl($user['imagen']); ?>" 
+                            <img src="<?= getAvatarUrl($user['imagen'] ?? ''); ?>" 
                                  class="avatar-header" id="headerAvatar" alt="Mi Avatar">
-                            <span class="user-name-footer"><?php echo htmlspecialchars($user['nickname']); ?></span>
+                            <span class="user-name-footer"><?php echo htmlspecialchars($user['nickname'] ?? 'Usuario'); ?></span>
                         </div>
                     </a>
                 </nav>

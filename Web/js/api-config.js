@@ -1,22 +1,19 @@
 /**
- * Configuración de APIs para JavaScript
- * 
- * Este archivo controla qué sistema de API se utiliza en el frontend
- * Debe estar sincronizado con config_api.php
+ * Configuración de API para JavaScript
+ * Usa la URL global definida en api_link.php (inyectada como window.API_BASE_URL)
  */
 
 // ============================================
-// CONFIGURACIÓN PRINCIPAL
+// URL GLOBAL DE LA API (api_link.php → api_config_boot.php)
 // ============================================
+var API_BASE_URL = (typeof window !== 'undefined' && window.API_BASE_URL) ? window.API_BASE_URL : (window.LARAVEL_API_URL || '');
+// const API_BASE_URL = (typeof window !== 'undefined' && window.API_BASE_URL) ? window.API_BASE_URL : (window.LARAVEL_API_URL || 'https://tumercadosena.shop/api/api');
 
-const API_CONFIG = {
-    // Usar API de Laravel (true) o PHP nativa (false). Se puede sobrescribir con window.USE_LARAVEL_API desde PHP.
-    USE_LARAVEL: false,
-    
-    // URL base de la API de Laravel (se puede sobrescribir con window.LARAVEL_API_URL desde PHP)
-    LARAVEL_URL: 'http://localhost:8000/api/',
-    
-    // Endpoints de autenticación Laravel (solo auth)
+
+var API_CONFIG = {
+    USE_LARAVEL: true,
+    LARAVEL_URL: API_BASE_URL,
+    LARAVEL_STORAGE_URL: (typeof window !== 'undefined' && window.LARAVEL_STORAGE_URL) ? window.LARAVEL_STORAGE_URL : (API_BASE_URL ? API_BASE_URL.replace(/\/api\/?$/, '') + '/storage/' : ''),
     AUTH_ENDPOINTS: {
         iniciarRegistro: 'auth/iniciar-registro',
         register: 'auth/register',
@@ -24,33 +21,17 @@ const API_CONFIG = {
         logout: 'auth/logout',
         refresh: 'auth/refresh',
         me: 'auth/me',
-        recuperarValidarCorreo: 'auth/recuperar-contrasena/validar-correo',
-        recuperarValidarClave: 'auth/recuperar-contrasena/validar-clave-recuperacion',
-        recuperarReestablecer: 'auth/recuperar-contrasena/reestablecer-contrasena'
+        recuperarValidarCorreo: '/auth/recuperar-contrasena/validar-correo',
+        recuperarValidarClave: '/auth/recuperar-contrasena/validar-clave-recuperacion',
+        recuperarReestablecer: '/auth/recuperar-contrasena/reestablecer-contrasena', 
     },
-    
-    // URL base de la API de PHP (se obtiene de window.BASE_URL)
-    get PHP_URL() {
-        return (window.BASE_URL || '') + 'api/';
-    },
-    
-    // Obtener URL activa según configuración
     get ACTIVE_URL() {
-        return this.USE_LARAVEL ? this.LARAVEL_URL : this.PHP_URL;
+        return this.LARAVEL_URL || '';
     }
 };
-
-// Sincronizar con PHP: un solo lugar (config_api.php) controla si se usa Laravel o PHP
-if (typeof window.USE_LARAVEL_API !== 'undefined') {
-    API_CONFIG.USE_LARAVEL = !!window.USE_LARAVEL_API;
-}
-if (typeof window.LARAVEL_API_URL !== 'undefined' && window.LARAVEL_API_URL) {
-    API_CONFIG.LARAVEL_URL = window.LARAVEL_API_URL;
-}
-if (typeof window.LARAVEL_STORAGE_URL !== 'undefined' && window.LARAVEL_STORAGE_URL) {
-    API_CONFIG.LARAVEL_STORAGE_URL = window.LARAVEL_STORAGE_URL;
-} else if (API_CONFIG.LARAVEL_URL) {
-    API_CONFIG.LARAVEL_STORAGE_URL = API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '/') + 'storage/';
+// Sincronizar token de sesión a localStorage (siempre usar el del servidor cuando existe)
+if (typeof window.LARAVEL_API_TOKEN !== 'undefined' && window.LARAVEL_API_TOKEN && typeof localStorage !== 'undefined') {
+    localStorage.setItem('api_token', window.LARAVEL_API_TOKEN);
 }
 
 // ============================================
@@ -73,14 +54,8 @@ function getApiUrl() {
  * @returns {string} URL completa del endpoint
  */
 function getApiEndpoint(endpoint) {
-    const baseUrl = getApiUrl();
-    
-    // Si usa Laravel, remover la extensión .php si existe
-    if (API_CONFIG.USE_LARAVEL) {
-        endpoint = endpoint.replace('.php', '');
-    }
-    
-    return baseUrl + endpoint;
+    endpoint = (endpoint || '').replace('.php', '');
+    return (getApiUrl() || '') + endpoint;
 }
 
 /**
@@ -89,16 +64,11 @@ function getApiEndpoint(endpoint) {
  * @returns {boolean}
  */
 function isUsingLaravelApi() {
-    return API_CONFIG.USE_LARAVEL;
+    return true;
 }
 
-/**
- * Verifica si se está usando la API de PHP
- * 
- * @returns {boolean}
- */
 function isUsingPhpApi() {
-    return !API_CONFIG.USE_LARAVEL;
+    return false;
 }
 
 /**
@@ -113,12 +83,8 @@ function getApiHeaders() {
         'Accept': 'application/json'
     };
     
-    if (API_CONFIG.USE_LARAVEL) {
-        const token = localStorage.getItem('api_token');
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-    }
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('api_token') : (window.LARAVEL_API_TOKEN || '');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     
     return headers;
 }
@@ -128,44 +94,49 @@ function getApiHeaders() {
  */
 const ENDPOINT_MAPPING = {
     // Autenticación
-    'login.php': 'auth/login',
-    'register.php': 'auth/register',
-    'logout.php': 'auth/logout',
+    'login.php': '/auth/login',
+    'register.php': '/auth/register',
+    'logout.php': '/auth/logout',
     
     // Productos
-    'productos.php': 'productos',
-    'crear_producto.php': 'productos',
-    'editar_producto.php': 'productos',
-    'eliminar_producto.php': 'productos',
+    'productos.php': '/productos',
+    'crear_producto.php': '/productos',
+    'editar_producto.php': '/productos',
+    'eliminar_producto.php': '/productos',
     
     // Chats y mensajes
-    'chats.php': 'chats',
-    'get_messages.php': 'chats',
-    'send_message.php': 'chats',
-    'enviar_mensaje.php': 'mensajes/enviar',
-    'obtener_mensajes.php': 'mensajes/obtener',
-    'eliminar_chat.php': 'chats',
-    'get_chats_notificaciones.php': 'chats',
+    'chats.php': '/chats',
+    'get_messages.php': '/chats',
+    'send_message.php': '/chats',
+    'enviar_mensaje.php': '/mensajes/enviar',
+    'obtener_mensajes.php': '/mensajes/obtener',
+    'eliminar_chat.php': '/chats',
+    'get_chats_notificaciones.php': '/chats',
     
-    // Bloqueados
-    'toggle_bloqueo.php': 'bloqueados',
+    // Favoritos y bloqueados (Laravel: POST/DELETE favoritos/{id}, bloqueados/{id})
+    'toggle_favorito.php': '/favoritos',
+    'toggle_bloqueo.php': '/bloqueados',
+    'toggle_visibilidad.php': '/productos',
     
     // Confirmaciones y Devoluciones
-    'solicitar_confirmacion.php': 'transacciones/solicitar-confirmacion',
-    'responder_confirmacion.php': 'transacciones/responder-confirmacion',
-    'solicitar_devolucion.php': 'transacciones/solicitar-devolucion',
-    'responder_devolucion.php': 'transacciones/responder-devolucion',
+    'solicitar_confirmacion.php': '/transacciones/solicitar-confirmacion',
+    'responder_confirmacion.php': '/transacciones/responder-confirmacion',
+    'solicitar_devolucion.php': '/transacciones/solicitar-devolucion',
+    'responder_devolucion.php': '/transacciones/responder-devolucion',
     
     // Denuncias
-    'denunciar_usuario.php': 'denuncias/crear',
+    'denunciar_usuario.php': '/denuncias/crear',
+    'reportar_producto.php': '/denuncias',
     
     // Usuarios
-    'perfil.php': 'usuarios/perfil',
-    'editar_perfil.php': 'usuarios/editar',
+    'perfil.php': '/usuarios/perfil',
+    'editar_perfil.php': '/usuarios/editar',
     
     // Otros
-    'toggle_silencio.php': 'chats/toggle-silencio',
-    'cerrar_chats_automatico.php': 'chats/cerrar-automatico',
+    'toggle_silencio.php': '/chats/toggle-silencio',
+    'cerrar_chats_automatico.php': '/chats/cerrar-automatico',
+    'send_chat_image.php': '/chats',
+    'finalizar_venta.php': '/chats',
 };
 
 /**
@@ -175,10 +146,6 @@ const ENDPOINT_MAPPING = {
  * @returns {string} Endpoint correcto según la configuración
  */
 function mapEndpoint(phpEndpoint) {
-    if (!API_CONFIG.USE_LARAVEL) {
-        return phpEndpoint;
-    }
-    
     return ENDPOINT_MAPPING[phpEndpoint] || phpEndpoint;
 }
 
@@ -187,11 +154,9 @@ function mapEndpoint(phpEndpoint) {
  * Así el front puede usar la misma llamada con PHP o Laravel según configuración.
  *
  * @param {string} pathWithQuery - Ej: 'api/productos.php?page=1&limit=12'
- * @returns {string} URL completa (PHP o Laravel según USE_LARAVEL)
+ * @returns {string} URL completa
  */
 function getFullApiUrl(pathWithQuery) {
-    // Usar directamente ACTIVE_URL para evitar cualquier recursión con getApiUrl de script.js
-    const baseUrl = API_CONFIG.USE_LARAVEL ? API_CONFIG.LARAVEL_URL : (window.BASE_URL || '') + 'api/';
     if (!pathWithQuery || !pathWithQuery.startsWith('api/')) {
         return (window.BASE_URL || '') + (pathWithQuery || '');
     }
@@ -199,9 +164,7 @@ function getFullApiUrl(pathWithQuery) {
     const path = idx >= 0 ? pathWithQuery.substring(0, idx) : pathWithQuery;
     const query = idx >= 0 ? pathWithQuery.substring(idx) : '';
     const fileName = path.replace('api/', '');
-    if (!API_CONFIG.USE_LARAVEL) {
-        return (window.BASE_URL || '') + pathWithQuery;
-    }
+    const baseUrl = API_CONFIG.LARAVEL_URL || '';
     const mapped = ENDPOINT_MAPPING[fileName];
     const endpoint = mapped || fileName.replace('.php', '');
     return baseUrl + endpoint + query;
@@ -223,9 +186,8 @@ async function apiRequest(endpoint, options = {}) {
         ...(options.headers || {})
     };
     
-    // Si usa Laravel y el body no es FormData, convertir a JSON
     let body = options.body;
-    if (API_CONFIG.USE_LARAVEL && body && !(body instanceof FormData)) {
+    if (body && !(body instanceof FormData)) {
         if (typeof body === 'string' && body.includes('=')) {
             // Convertir URL encoded a JSON
             const params = new URLSearchParams(body);
@@ -263,11 +225,8 @@ async function apiRequest(endpoint, options = {}) {
  */
 function getApiInfo() {
     return {
-        using_laravel: API_CONFIG.USE_LARAVEL,
-        api_url: getApiUrl(),
-        api_type: API_CONFIG.USE_LARAVEL ? 'Laravel' : 'PHP Nativo',
-        laravel_url: API_CONFIG.LARAVEL_URL,
-        php_url: API_CONFIG.PHP_URL,
+        api_url: API_CONFIG.ACTIVE_URL,
+        api_type: 'Hostinger (tumercadosena.shop)',
     };
 }
 
@@ -283,42 +242,159 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
  * URLs específicas para Chats/Mensajes cuando se usa API Laravel
  * Rutas según documentación: GET/POST/DELETE /api/chats, /api/chats/{id}, /api/chats/{id}/mensajes
  */
+/**
+ * URLs de Productos cuando se usa API Laravel
+ * GET /api/productos (filtros), GET /api/productos/buscar?q=, GET /api/productos/vendedor/{id}
+ */
+function getLaravelProductosUrl(params) {
+    const qs = params && typeof params === 'object' && Object.keys(params).length
+        ? '?' + new URLSearchParams(params).toString()
+        : '';
+    return API_CONFIG.LARAVEL_URL + '/productos' + qs;
+}
+function getLaravelProductosBuscarUrl(busqueda, page, perPage) {
+    const params = new URLSearchParams({ q: busqueda, per_page: perPage || 12 });
+    if (page) params.set('page', page);
+    return API_CONFIG.LARAVEL_URL + '/productos/buscar?' + params.toString();
+}
+function getLaravelProductosVendedorUrl(vendedorId) {
+    return API_CONFIG.LARAVEL_URL + '/productos/vendedor/' + encodeURIComponent(vendedorId);
+}
+
 function getLaravelChatsListUrl() {
-    return API_CONFIG.LARAVEL_URL + 'chats';
+    return API_CONFIG.LARAVEL_URL + '/chats';
 }
 function getLaravelChatDetailUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId);
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId);
 }
 function getLaravelSendMessageUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId) + '/mensajes';
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/mensajes';
 }
 function getLaravelDeleteChatUrl(chatId) {
-    return API_CONFIG.LARAVEL_URL + 'chats/' + encodeURIComponent(chatId);
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId);
 }
 function getLaravelStartChatUrl(productId) {
-    return API_CONFIG.LARAVEL_URL + 'productos/' + encodeURIComponent(productId) + '/chats';
+    return API_CONFIG.LARAVEL_URL + '/productos/' + encodeURIComponent(productId) + '/chats';
 }
 function getLaravelDeleteMessageUrl(mensajeId) {
-    return API_CONFIG.LARAVEL_URL + 'mensajes/' + encodeURIComponent(mensajeId);
+    return API_CONFIG.LARAVEL_URL + '/mensajes/' + encodeURIComponent(mensajeId);
+}
+// Transferencias y compraventa (según documentación)
+function getLaravelIniciarCompraventaUrl(chatId) {
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/iniciar-compraventas';
+}
+function getLaravelTerminarCompraventaUrl(chatId) {
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/terminar-compraventas';
+}
+function getLaravelIniciarDevolucionUrl(chatId) {
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/iniciar-devoluciones';
+}
+function getLaravelTerminarDevolucionUrl(chatId) {
+    return API_CONFIG.LARAVEL_URL + '/chats/' + encodeURIComponent(chatId) + '/terminar-devoluciones';
+}
+function getLaravelEstadosUrl() {
+    return API_CONFIG.LARAVEL_URL + '/estados';
+}
+function getLaravelTransferenciasUrl() {
+    return API_CONFIG.LARAVEL_URL + '/transferencias';
+}
+function getLaravelTransferenciasFiltrosUrl(estados) {
+    const qs = estados && estados.length ? '?' + estados.map(e => 'estados[]=' + e).join('&') : '';
+    return API_CONFIG.LARAVEL_URL + '/transferencias-filtros' + qs;
+}
+// Favoritos: GET /api/favoritos, POST /api/favoritos/{id}, DELETE /api/favoritos/{id}
+function getLaravelFavoritosUrl() {
+    return API_CONFIG.LARAVEL_URL + '/favoritos';
+}
+function getLaravelAddFavoritoUrl(usuarioId) {
+    return API_CONFIG.LARAVEL_URL + '/favoritos/' + encodeURIComponent(usuarioId);
+}
+function getLaravelDeleteFavoritoUrl(usuarioId) {
+    return API_CONFIG.LARAVEL_URL + '/favoritos/' + encodeURIComponent(usuarioId);
+}
+// Motivos: GET /api/motivos?tipo=denuncia|pqrs|notificacion
+function getLaravelMotivosUrl(tipo) {
+    return API_CONFIG.LARAVEL_URL + '/motivos' + (tipo ? '?tipo=' + encodeURIComponent(tipo) : '');
+}
+// Denuncias: POST /api/denuncias
+function getLaravelDenunciasUrl() {
+    return API_CONFIG.LARAVEL_URL + '/denuncias';
+}
+// PQRS: GET /api/pqrs, POST /api/pqrs
+function getLaravelPqrsUrl() {
+    return API_CONFIG.LARAVEL_URL + '/pqrs';
+}
+// Notificaciones: GET /api/notificaciones, GET /api/notificaciones/no-vistas, GET/DELETE /api/notificaciones/{id}
+function getLaravelNotificacionesUrl() {
+    return API_CONFIG.LARAVEL_URL + '/notificaciones';
+}
+function getLaravelNotificacionesNoVistasUrl() {
+    return API_CONFIG.LARAVEL_URL + '/notificaciones/no-vistas';
+}
+function getLaravelNotificacionUrl(notificacionId) {
+    return API_CONFIG.LARAVEL_URL + '/notificaciones/' + encodeURIComponent(notificacionId);
+}
+
+/**
+ * Origen del storage en Hostinger (para reemplazar localhost en URLs que vengan de la API)
+ */
+function getStorageOrigin() {
+    return (API_CONFIG.LARAVEL_STORAGE_URL || (API_CONFIG.LARAVEL_URL || '').replace(/\/api\/?$/, '') + 'storage/').replace(/\/$/, '');
+}
+
+/**
+ * URL completa para avatar (Laravel storage o PHP uploads)
+ * @param {string} path - Ruta: "usuarios/xxx.webp", "avatar_xx/yy.png", o URL absoluta
+ * @returns {string}
+ */
+function getAvatarUrl(path) {
+    if (!path || typeof path !== 'string') return (window.BASE_URL || '') + 'assets/images/default-avatar.jpg';
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        if (path.indexOf('localhost') !== -1) {
+            var storageOrigin = getStorageOrigin();
+            var match = path.match(/\/(?:storage\/)?(usuarios\/[^?#]+|avatar[^?#]*)/i);
+            return match ? storageOrigin + '/' + match[1].replace(/^\/storage\//, '') : (window.BASE_URL || '') + 'assets/images/default-avatar.jpg';
+        }
+        return path;
+    }
+    if (API_CONFIG.LARAVEL_URL) {
+        var base = API_CONFIG.LARAVEL_STORAGE_URL || (API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '/') + 'storage/');
+        var clean = path.replace(/^uploads\/usuarios\//, 'usuarios/').replace(/^usuarios\//, 'usuarios/');
+        return base + (clean.startsWith('usuarios/') ? clean : 'usuarios/' + clean);
+    }
+    return (window.BASE_URL || '') + (path.startsWith('uploads/') ? path : 'uploads/usuarios/' + path);
 }
 
 /**
  * URL completa para una imagen de producto (Laravel storage o PHP uploads)
- * @param {string} path - Ruta relativa: "productos/xxx.webp", "uploads/productos/xxx.jpg", o URL absoluta
+ * @param {string} path - Ruta: "productos/8/xxx.webp", "xxx.webp" (solo filename), o URL absoluta
+ * @param {number} [productId] - ID del producto (obligatorio si path es solo el nombre del archivo)
  * @returns {string}
  */
-function getProductImageUrl(path) {
+function getProductImageUrl(path, productId) {
     if (!path || typeof path !== 'string') return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    // Laravel asset() puede devolver ruta relativa /storage/productos/xxx.webp
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        if (path.indexOf('localhost') !== -1) {
+            var storageOrigin = getStorageOrigin();
+            var match = path.match(/\/(?:storage\/)?(productos\/[^?#]+)/i);
+            return match ? storageOrigin + '/' + match[1].replace(/^\/storage\//, '') : path;
+        }
+        return path;
+    }
     if (path.startsWith('/')) {
-        const origin = API_CONFIG.LARAVEL_URL ? API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '') : '';
+        var origin = API_CONFIG.LARAVEL_URL ? API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '') : '';
         return origin ? (origin + path) : path;
     }
-    if (API_CONFIG.USE_LARAVEL) {
-        const base = API_CONFIG.LARAVEL_STORAGE_URL || (API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '/') + 'storage/');
-        const clean = path.replace(/^uploads\/productos\//, 'productos/').replace(/^productos\//, 'productos/');
-        return base + (clean.startsWith('productos/') ? clean : 'productos/' + clean);
+    if (API_CONFIG.LARAVEL_URL) {
+        var base = API_CONFIG.LARAVEL_STORAGE_URL || (API_CONFIG.LARAVEL_URL.replace(/\/api\/?$/, '/') + 'storage/');
+        var clean = path.replace(/^uploads\/productos\//, 'productos/').replace(/^productos\//, 'productos/');
+        // Si path es solo filename (sin /) y tenemos productId, usar productos/{id}/{filename}
+        if (productId && clean.indexOf('/') === -1) {
+            clean = 'productos/' + productId + '/' + clean;
+        } else if (!clean.startsWith('productos/')) {
+            clean = 'productos/' + clean;
+        }
+        return base + clean;
     }
     return (window.BASE_URL || '') + (path.startsWith('uploads/') ? path : 'uploads/productos/' + path.replace(/^productos\//, ''));
 }
@@ -327,13 +403,33 @@ function getProductImageUrl(path) {
 window.getFullApiUrl = getFullApiUrl;
 window.getApiHeaders = getApiHeaders;
 window.getProductImageUrl = getProductImageUrl;
+window.getAvatarUrl = getAvatarUrl;
 window.API_CONFIG = API_CONFIG;
+window.getLaravelProductosUrl = getLaravelProductosUrl;
+window.getLaravelProductosBuscarUrl = getLaravelProductosBuscarUrl;
+window.getLaravelProductosVendedorUrl = getLaravelProductosVendedorUrl;
 window.getLaravelChatsListUrl = getLaravelChatsListUrl;
 window.getLaravelChatDetailUrl = getLaravelChatDetailUrl;
 window.getLaravelSendMessageUrl = getLaravelSendMessageUrl;
 window.getLaravelDeleteChatUrl = getLaravelDeleteChatUrl;
 window.getLaravelStartChatUrl = getLaravelStartChatUrl;
 window.getLaravelDeleteMessageUrl = getLaravelDeleteMessageUrl;
+window.getLaravelIniciarCompraventaUrl = getLaravelIniciarCompraventaUrl;
+window.getLaravelTerminarCompraventaUrl = getLaravelTerminarCompraventaUrl;
+window.getLaravelIniciarDevolucionUrl = getLaravelIniciarDevolucionUrl;
+window.getLaravelTerminarDevolucionUrl = getLaravelTerminarDevolucionUrl;
+window.getLaravelEstadosUrl = getLaravelEstadosUrl;
+window.getLaravelTransferenciasUrl = getLaravelTransferenciasUrl;
+window.getLaravelTransferenciasFiltrosUrl = getLaravelTransferenciasFiltrosUrl;
+window.getLaravelFavoritosUrl = getLaravelFavoritosUrl;
+window.getLaravelAddFavoritoUrl = getLaravelAddFavoritoUrl;
+window.getLaravelDeleteFavoritoUrl = getLaravelDeleteFavoritoUrl;
+window.getLaravelMotivosUrl = getLaravelMotivosUrl;
+window.getLaravelDenunciasUrl = getLaravelDenunciasUrl;
+window.getLaravelPqrsUrl = getLaravelPqrsUrl;
+window.getLaravelNotificacionesUrl = getLaravelNotificacionesUrl;
+window.getLaravelNotificacionesNoVistasUrl = getLaravelNotificacionesNoVistasUrl;
+window.getLaravelNotificacionUrl = getLaravelNotificacionUrl;
 
 // ============================================
 // EXPORTAR (si se usa como módulo)

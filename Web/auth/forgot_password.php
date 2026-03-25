@@ -5,65 +5,8 @@ forceLightTheme();
 
 $msg = '';
 $error = '';
-$step = 1; // 1: correo, 2: nueva contraseña (PHP) | 1: correo, 2: código, 3: nueva contraseña (Laravel)
-
-$useLaravelAuth = isUsingLaravelApi();
-
-if (!$useLaravelAuth) {
-    if (isset($_SESSION['recuperar_cuenta_id'])) $step = 2;
-    if (isset($_GET['cancelar'])) {
-        unset($_SESSION['recuperar_cuenta_id'], $_SESSION['recuperar_email']);
-        header("Location: forgot_password.php");
-        exit();
-    }
-}
-
-if (!$useLaravelAuth && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $conn = getDBConnection();
-    if (isset($_POST['email']) && !isset($_POST['password'])) {
-        $email = trim($_POST['email'] ?? '');
-        if (empty($email)) $error = "El correo es obligatorio";
-        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $error = "Correo inválido";
-        else {
-            $stmt = $conn->prepare("SELECT id FROM cuentas WHERE email = ?");
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->num_rows > 0) {
-                $cuenta = $result->fetch_assoc();
-                $_SESSION['recuperar_cuenta_id'] = $cuenta['id'];
-                $_SESSION['recuperar_email'] = $email;
-                $step = 2;
-                $msg = "Correo verificado. Ahora ingresa tu nueva contraseña.";
-            } else {
-                $error = "No existe una cuenta con ese correo.";
-            }
-            $stmt->close();
-        }
-    } elseif (isset($_POST['password'])) {
-        $password = $_POST['password'];
-        $passwordConfirm = $_POST['password_confirm'] ?? '';
-        $cuentaId = $_SESSION['recuperar_cuenta_id'] ?? null;
-        if (!$cuentaId) { $error = "Sesión expirada. Inicia el proceso de nuevo."; $step = 1; }
-        elseif (empty($password) || strlen($password) < 8) { $error = "La contraseña debe tener al menos 8 caracteres"; $step = 2; }
-        elseif ($password !== $passwordConfirm) { $error = "Las contraseñas no coinciden"; $step = 2; }
-        else {
-            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("UPDATE cuentas SET password = ? WHERE id = ?");
-            $stmt->bind_param("si", $passwordHash, $cuentaId);
-            if ($stmt->execute()) {
-                unset($_SESSION['recuperar_cuenta_id'], $_SESSION['recuperar_email']);
-                $conn->close();
-                header("Location: login.php?password_changed=1");
-                exit();
-            }
-            $stmt->close();
-            $error = "Error al restablecer la contraseña";
-            $step = 2;
-        }
-    }
-    $conn->close();
-}
+$step = 1;
+$useLaravelAuth = true; // Solo API (tumercadosena.shop); sin SQL
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -71,7 +14,7 @@ if (!$useLaravelAuth && $_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Recuperar contraseña - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         .step-indicator {
             display: flex;
@@ -194,11 +137,11 @@ if (!$useLaravelAuth && $_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 <?php if ($useLaravelAuth): ?>
-    <script src="<?= getBaseUrl() ?>js/api-config.js"></script>
+    <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
     <script>
-        window.BASE_URL = <?= json_encode(getBaseUrl()) ?>;
+        window.BASE_URL = <?= json_encode(getAbsoluteBaseUrl()) ?>;
         var fpCuentaId = null;
-        var apiBase = typeof API_CONFIG !== 'undefined' ? API_CONFIG.LARAVEL_URL : 'http://localhost:8000/api/';
+        var apiBase = (typeof API_CONFIG !== 'undefined' && API_CONFIG.LARAVEL_URL) ? API_CONFIG.LARAVEL_URL : <?= json_encode(rtrim(LARAVEL_API_URL, '/') . '/') ?>;
 
         function fpShowStep(n) {
             document.getElementById('fpWrap1').style.display = n === 1 ? 'block' : 'none';
@@ -216,21 +159,26 @@ if (!$useLaravelAuth && $_SERVER['REQUEST_METHOD'] === 'POST') {
             var err = document.getElementById('fpError');
             err.style.display = 'none';
             try {
-                var r = await fetch(apiBase + 'auth/recuperar-contrasena/validar-correo', {
+                var r = await fetch(apiBase + '/auth/recuperar-contrasena/validar-correo', {
                     method: 'POST',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email })
                 });
                 var data = await r.json();
-                if (data.cuenta_id) {
-                    fpCuentaId = data.cuenta_id;
+                var cuentaId = data.cuenta_id || (data.data && data.data.cuenta_id);
+                if (cuentaId) {
+                    fpCuentaId = cuentaId;
                     fpShowStep(2);
                 } else {
-                    err.textContent = data.message || (data.errors && Object.values(data.errors).flat().join(' ')) || 'Error al enviar el código';
+                    var msg = data.message || (data.errors && Object.values(data.errors).flat().join('. ')) || 'Error al enviar el código';
+                    if (r.status === 422 && data.errors) {
+                        msg = Object.entries(data.errors).map(function(p) { return p[1].join ? p[1].join('. ') : p[1]; }).join(' ');
+                    }
+                    err.textContent = msg || 'Los datos proporcionados no son válidos.';
                     err.style.display = 'block';
                 }
             } catch (x) {
-                err.textContent = 'Error de conexión. Comprueba que la API Laravel esté en marcha.';
+                err.textContent = 'Error de conexión. Comprueba que la API esté disponible.';
                 err.style.display = 'block';
             }
         });
@@ -242,13 +190,14 @@ if (!$useLaravelAuth && $_SERVER['REQUEST_METHOD'] === 'POST') {
             err.style.display = 'none';
             if (!fpCuentaId) { err.textContent = 'Sesión expirada. Vuelve a empezar.'; err.style.display = 'block'; return; }
             try {
-                var r = await fetch(apiBase + 'auth/recuperar-contrasena/validar-clave-recuperacion', {
+                var r = await fetch(apiBase + '/auth/recuperar-contrasena/validar-clave-recuperacion', {
                     method: 'POST',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ cuenta_id: fpCuentaId, clave: clave })
                 });
                 var data = await r.json();
-                if (data.success && data.clave_verificada) {
+                var ok = (data.success && data.clave_verificada) || data.status === 'success';
+                if (ok) {
                     fpShowStep(3);
                 } else {
                     err.textContent = data.message || (data.errors && Object.values(data.errors).flat().join(' ')) || 'Código incorrecto o expirado';
@@ -269,13 +218,14 @@ if (!$useLaravelAuth && $_SERVER['REQUEST_METHOD'] === 'POST') {
             if (password !== password_confirm) { err.textContent = 'Las contraseñas no coinciden'; err.style.display = 'block'; return; }
             if (!fpCuentaId) { err.textContent = 'Sesión expirada.'; err.style.display = 'block'; return; }
             try {
-                var r = await fetch(apiBase + 'auth/recuperar-contrasena/reestablecer-contrasena', {
+                var r = await fetch(apiBase + '/auth/recuperar-contrasena/reestablecer-contrasena', {
                     method: 'PATCH',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                     body: JSON.stringify({ cuenta_id: fpCuentaId, password: password, password_confirmation: password_confirm })
                 });
                 var data = await r.json();
-                if (data.success) {
+                var ok = r.ok && (data.success || data.status === 'success');
+                if (ok) {
                     window.location.href = (window.BASE_URL || '') + 'auth/login.php?password_changed=1';
                 } else {
                     err.textContent = data.message || (data.errors && Object.values(data.errors).flat().join(' ')) || 'Error al restablecer';

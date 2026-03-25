@@ -7,7 +7,7 @@ require_once '../config.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto Institucional - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         .contacto-container {
             max-width: 900px;
@@ -47,9 +47,10 @@ require_once '../config.php';
         }
         
         .contacto-card .icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 1rem;
             display: block;
+            color: var(--color-primary);
         }
         
         .contacto-card h3 {
@@ -134,6 +135,7 @@ require_once '../config.php';
             align-items: center;
             justify-content: center;
             font-size: 2rem;
+            color: white;
             flex-shrink: 0;
         }
         
@@ -178,20 +180,20 @@ require_once '../config.php';
     <main class="main">
         <div class="container contacto-container">
             <div class="contacto-header">
-                <h1>📞 Contacto Institucional</h1>
+                <h1><i class="ri-phone-line" aria-hidden="true" style="vertical-align: middle; margin-right: 0.25rem;"></i> Contacto Institucional</h1>
                 <p>Estamos aquí para ayudarte. Contáctanos a través de cualquiera de nuestros canales.</p>
             </div>
             
             <div class="contacto-grid">
                 <div class="contacto-card">
-                    <span class="icon">📧</span>
+                    <span class="icon"><i class="ri-mail-line" aria-hidden="true"></i></span>
                     <h3>Correo Electrónico</h3>
                     <p>Soporte técnico y consultas</p>
                     <a href="mailto:tumercado@sena.edu.co">tumercado@sena.edu.co</a>
                 </div>
                 
                 <div class="contacto-card">
-                    <span class="icon">📞</span>
+                    <span class="icon"><i class="ri-phone-line" aria-hidden="true"></i></span>
                     <h3>Teléfono</h3>
                     <p>Línea de atención</p>
                     <a href="tel:+576015461500">(601) 546 1500</a>
@@ -199,14 +201,14 @@ require_once '../config.php';
                 </div>
                 
                 <div class="contacto-card">
-                    <span class="icon">💬</span>
+                    <span class="icon"><i class="ri-chat-3-line" aria-hidden="true"></i></span>
                     <h3>WhatsApp</h3>
                     <p>Atención rápida</p>
                     <a href="https://wa.me/573001234567" target="_blank">+57 300 123 4567</a>
                 </div>
                 
                 <div class="contacto-card">
-                    <span class="icon">🏢</span>
+                    <span class="icon"><i class="ri-building-line" aria-hidden="true"></i></span>
                     <h3>Oficina</h3>
                     <p>Centro de Formación</p>
                     <p><strong>Edificio A, Piso 2, Oficina 201</strong></p>
@@ -214,7 +216,7 @@ require_once '../config.php';
             </div>
             
             <div class="horarios-section">
-                <h2>🕐 Horarios de Atención</h2>
+                <h2><i class="ri-time-line" aria-hidden="true" style="vertical-align: middle; margin-right: 0.25rem;"></i> Horarios de Atención</h2>
                 <div class="horarios-grid">
                     <div class="horario-item">
                         <h4>Lunes a Viernes</h4>
@@ -232,10 +234,10 @@ require_once '../config.php';
             </div>
             
             <div class="responsables-section">
-                <h2>👥 Equipo Responsable</h2>
+                <h2><i class="ri-team-line" aria-hidden="true" style="vertical-align: middle; margin-right: 0.25rem;"></i> Equipo Responsable</h2>
                 
                 <div class="responsable-card">
-                    <div class="responsable-avatar">👨‍💼</div>
+                    <div class="responsable-avatar"><i class="ri-user-line" aria-hidden="true"></i></div>
                     <div class="responsable-info">
                         <h4>Coordinador de Proyecto</h4>
                         <p>Responsable general de la plataforma Tu Mercado SENA</p>
@@ -244,7 +246,7 @@ require_once '../config.php';
                 </div>
                 
                 <div class="responsable-card">
-                    <div class="responsable-avatar">👩‍💻</div>
+                    <div class="responsable-avatar"><i class="ri-code-line" aria-hidden="true"></i></div>
                     <div class="responsable-info">
                         <h4>Soporte Técnico</h4>
                         <p>Asistencia técnica y resolución de problemas</p>
@@ -253,7 +255,7 @@ require_once '../config.php';
                 </div>
                 
                 <div class="responsable-card">
-                    <div class="responsable-avatar">👮</div>
+                    <div class="responsable-avatar"><i class="ri-shield-user-line" aria-hidden="true"></i></div>
                     <div class="responsable-info">
                         <h4>Moderación y Seguridad</h4>
                         <p>Gestión de denuncias y comportamiento en la plataforma</p>
@@ -263,19 +265,19 @@ require_once '../config.php';
             </div>
             
             <div class="mapa-section">
-                <h2>📍 Ubicación</h2>
+                <h2><i class="ri-map-pin-line" aria-hidden="true" style="vertical-align: middle; margin-right: 0.25rem;"></i> Ubicación</h2>
                 <div class="mapa-placeholder">
-                    <p>🗺️ SENA - Servicio Nacional de Aprendizaje<br>Bogotá, Colombia</p>
+                    <p><i class="ri-map-line" aria-hidden="true" style="vertical-align: middle; margin-right: 0.25rem;"></i> SENA - Servicio Nacional de Aprendizaje<br>Bogotá, Colombia</p>
                 </div>
             </div>
             
             <div style="text-align: center; margin-top: 2rem;">
                 <?php if (isLoggedIn()): ?>
-                    <a href="pqrs.php" class="btn-primary">📝 Enviar una PQRS</a>
+                    <a href="pqrs.php" class="btn-primary"><i class="ri-file-text-line" aria-hidden="true" style="vertical-align: middle; margin-right: 0.35rem;"></i> Enviar una PQRS</a>
                 <?php else: ?>
                     <a href="../auth/login.php" class="btn-primary">Iniciar Sesión</a>
                 <?php endif; ?>
-                <a href="<?= isLoggedIn() ? 'index.php' : 'welcome.php' ?>" class="btn-secondary">← Volver</a>
+                <a href="<?= getAbsoluteBaseUrl() ?>index.php" class="btn-secondary">← Volver</a>
             </div>
         </div>
     </main>
@@ -286,6 +288,6 @@ require_once '../config.php';
         </div>
     </footer>
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
 </body>
 </html>

@@ -8,135 +8,11 @@ $success = '';
 
 // Si ya tiene sesión, redirigir
 if (isLoggedIn()) {
-    header("Location: ../index.php");
+    header("Location: /index.php");
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $email = sanitize($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $password_confirm = $_POST['password_confirm'] ?? '';
-    $nombre = sanitize($_POST['nombre'] ?? '');
-    $descripcion = sanitize($_POST['descripcion'] ?? '');
-    $link = sanitize($_POST['link'] ?? '');
-    $imagenNombre = '';
-
-    // Procesar imagen de perfil si se subió
-    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
-        
-        $fileType = $_FILES['imagen']['type'];
-        $fileSize = $_FILES['imagen']['size'];
-        
-        if (!in_array($fileType, $allowedTypes)) {
-            $error = "Formato de imagen no válido. Use JPG, PNG, GIF o WEBP.";
-        } elseif ($fileSize > $maxSize) {
-            $error = "La imagen es muy grande. Máximo 5MB.";
-        } else {
-            // Generar nombre único para la imagen
-            $extension = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
-            $imagenNombre = 'avatar_' . uniqid() . '.' . $extension;
-            
-            // Crear directorio si no existe
-            $uploadDir = '../uploads/usuarios/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            
-            // Mover archivo
-            $destino = $uploadDir . $imagenNombre;
-            if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $destino)) {
-                $error = "Error al subir la imagen. Intenta de nuevo.";
-                $imagenNombre = '';
-            }
-        }
-    }
-
-    if (empty($error)) {
-        if (empty($email) || empty($password) || empty($password_confirm) || empty($nombre)) {
-            $error = "Todos los campos obligatorios deben completarse";
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = "Formato de correo inválido";
-        } elseif (!str_ends_with(strtolower($email), "@soy.sena.edu.co")) {
-            $error = "Debe usar un correo @soy.sena.edu.co";
-        } elseif ($password !== $password_confirm) {
-            $error = "Las contraseñas no coinciden";
-        } elseif (strlen($password) < 8) {
-            $error = "La contraseña debe tener al menos 8 caracteres";
-        } else {
-            $conn = getDBConnection();
-            
-            // Verificar si el correo ya existe
-            $stmt = $conn->prepare("SELECT id FROM cuentas WHERE email = ?");
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            
-            if ($result->num_rows > 0) {
-                $error = "Este correo ya está registrado";
-                $stmt->close();
-                
-                // Eliminar imagen subida si el registro falla
-                if (!empty($imagenNombre) && file_exists('../uploads/usuarios/' . $imagenNombre)) {
-                    unlink('../uploads/usuarios/' . $imagenNombre);
-                }
-            } else {
-                $stmt->close();
-                
-                // Hash de la contraseña
-                $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-                
-                // Iniciar transacción
-                $conn->begin_transaction();
-                
-                try {
-                    // Insertar cuenta
-                    $stmt = $conn->prepare("
-                        INSERT INTO cuentas (email, password, notifica_correo, notifica_push, uso_datos)
-                        VALUES (?, ?, 0, 0, 1)
-                    ");
-                    $stmt->bind_param("ss", $email, $passwordHash);
-                    $stmt->execute();
-                    $cuentaId = $conn->insert_id;
-                    $stmt->close();
-                    
-                    // Insertar usuario
-                    $stmt = $conn->prepare("
-                        INSERT INTO usuarios (cuenta_id, nickname, imagen, descripcion, link, rol_id, estado_id)
-                        VALUES (?, ?, ?, ?, ?, 3, 1)
-                    ");
-                    $stmt->bind_param("issss", $cuentaId, $nombre, $imagenNombre, $descripcion, $link);
-
-                    $stmt->execute();
-                    $stmt->close();
-                    
-                    // Confirmar transacción
-                    $conn->commit();
-                    
-                    $conn->close();
-                    
-                    // Redirigir al login con mensaje de éxito
-                    header("Location: ../auth/login.php?registered=1");
-                    exit();
-                    
-                } catch (Exception $e) {
-                    // Revertir transacción
-                    $conn->rollback();
-                    $error = "Error al crear la cuenta. Intenta de nuevo.";
-                    
-                    // Eliminar imagen subida si el registro falla
-                    if (!empty($imagenNombre) && file_exists('../uploads/usuarios/' . $imagenNombre)) {
-                        unlink('../uploads/usuarios/' . $imagenNombre);
-                    }
-                }
-            }
-            
-            $conn->close();
-        }
-    }
-}
+// Registro solo vía API (Hostinger). Sin SQL.
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -144,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         .avatar-upload {
             display: flex;
@@ -218,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Header superior -->
     <header class="header">
         <div class="header-content" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: flex-start; gap: 20px; padding: 0 20px;">
-            <img src="<?= getBaseUrl() ?>logo_new.png" alt="SENA" style="height: 70px; width: auto;">
+            <img src="<?= getAbsoluteBaseUrl() ?>logo_new.png" alt="SENA" style="height: 70px; width: auto;">
             <span style="font-size: 1.5rem; font-weight: 800; color: white;">Tu Mercado SENA</span>
         </div>
     </header>
@@ -226,13 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="auth-container" style="margin-top: 20px;">
         <div class="auth-box" style="width: 500px; margin: 40px 0;">
             <h1 class="auth-title">Registro</h1>
-            <?php if ($error): ?>
-                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-            <?php endif; ?>
-            <?php if ($success): ?>
-                <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
-            <?php endif; ?>
-<?php if (isUsingLaravelApi()): ?>
             <div id="registerLaravelWrap">
                 <div id="registerStep1">
                     <p class="auth-link" style="margin-bottom: 15px;">Correo @soy.sena.edu.co. Recibirás un código por correo.</p>
@@ -262,6 +131,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="r1_link">Link red social (opcional)</label>
                             <input type="url" id="r1_link" placeholder="https://instagram.com/...">
                         </div>
+                        <!-- Checkbox de términos -->
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <div style="display: flex; align-items: flex-start; gap: 8px;">
+                                <input type="checkbox" id="terms" name="terms" required style="width: 16px; height: 16px; min-width: 16px; margin-top: 3px; cursor: pointer;">
+                                <label for="terms" style="font-size: 0.85rem; color: #666; cursor: pointer; line-height: 1.3;">
+                                    Acepto los <a href="#" id="openModal" style="color: var(--color-primary); font-weight: bold; text-decoration: underline;">Términos y Condiciones</a> y la Política de Privacidad.
+                                </label>
+                            </div>
+                        </div>
                         <button type="submit" class="btn-primary">Enviar código al correo</button>
                     </form>
                 </div>
@@ -277,46 +155,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </form>
                 </div>
             </div>
-<?php else: ?>
-            <form method="POST" action="register.php" enctype="multipart/form-data">
-                
-                <!-- Campo de imagen de perfil -->
-                <div class="avatar-upload">
-                    <label for="imagen" class="avatar-preview" id="avatarPreview">
-                        <span class="avatar-icon">👤</span>
-                        <div class="overlay">Cambiar foto</div>
-                    </label>
-                    <input type="file" id="imagen" name="imagen" accept="image/jpeg,image/png,image/gif,image/webp" class="avatar-input">
-                    <span class="avatar-label">Foto de perfil (opcional)</span>
-                </div>
-                
-                <div class="form-group">
-                    <label for="nombre">Nombre de Usuario *</label>
-                    <input type="text" id="nombre" name="nombre" maxlength="24" required>
-                    <small>Máximo 24 caracteres</small>
-                </div>
-                <div class="form-group">
-                    <label for="email">Correo Electrónico (@soy.sena.edu.co) *</label>
-                    <input type="email" id="email" name="email" placeholder="usuario@soy.sena.edu.co" required>
-                    <small>Solo se aceptan correos del dominio @soy.sena.edu.co</small>
-                </div>
-                <div class="form-group">
-                    <label for="password">Contraseña *</label>
-                    <input type="password" id="password" name="password" required minlength="8">
-                    <small>Mínimo 8 caracteres</small>
-                </div>
-                <div class="form-group">
-                    <label for="password_confirm">Confirmar Contraseña *</label>
-                    <input type="password" id="password_confirm" name="password_confirm" required minlength="8">
-                </div>
-                <div class="form-group">
-                    <label for="descripcion">Descripción (opcional)</label>
-                    <textarea id="descripcion" name="descripcion" maxlength="300" rows="3" placeholder="Cuéntanos sobre ti..."></textarea>
-                    <small>Máximo 300 caracteres</small>
-                </div>
-                <button type="submit" class="btn-primary">Registrarse</button>
-            </form>
-<?php endif; ?>
             <p class="auth-link">¿Ya tienes cuenta? <a href="login.php" style="color: var(--color-primary);">Inicia sesión aquí</a></p>
             <p class="auth-link"><small>Debes tener un correo @sena.edu.co para registrarte</small></p>
         </div>
@@ -327,14 +165,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         © 2025 Tu Mercado SENA. Todos los derechos reservados.
     </footer>
 </body>
-
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Preview de imagen de perfil
+            // Preview de imagen de perfil (solo cuando existe el formulario PHP con campo imagen)
             const imagenInput = document.getElementById('imagen');
             const avatarPreview = document.getElementById('avatarPreview');
-            
+            if (imagenInput && avatarPreview) {
             imagenInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -364,13 +202,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     reader.readAsDataURL(file);
                 }
             });
-            
-            // Validación del dominio @soy.sena.edu.co en tiempo real
+            }
+            // Validación del dominio en tiempo real (solo formulario PHP)
             const emailInput = document.getElementById('email');
             if (emailInput) {
                 emailInput.addEventListener('blur', function() {
                     const email = this.value.trim().toLowerCase();
-                    if (email && !email.endsWith('@soy.sena.edu.co')) {
+                    if (email && !(email.endsWith('@soy.sena.edu.co') || email.endsWith('@gmail.com'))) {
                         this.setCustomValidity('El correo debe ser del dominio @soy.sena.edu.co');
                         this.style.borderColor = '#e74c3c';
                     } else {
@@ -382,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 emailInput.addEventListener('input', function() {
                     if (this.style.borderColor === 'rgb(231, 76, 60)') {
                         const email = this.value.trim().toLowerCase();
-                        if (email.endsWith('@soy.sena.edu.co')) {
+                        if (email.endsWith('@soy.sena.edu.co') || email.endsWith('@gmail.com')) {
                             this.setCustomValidity('');
                             this.style.borderColor = '#ddd';
                         }
@@ -391,25 +229,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
     </script>
-<?php if (isUsingLaravelApi()): ?>
-    <script src="<?= getBaseUrl() ?>js/api-config.js"></script>
     <script>
-        window.BASE_URL = <?= json_encode(getBaseUrl()) ?>;
+        window.BASE_URL = <?= json_encode(getAbsoluteBaseUrl()) ?>;
         var regCuentaId = null, regDatosEncriptados = null;
-        var apiBase = typeof API_CONFIG !== 'undefined' ? API_CONFIG.LARAVEL_URL : 'http://localhost:8000/api/';
-        var setSessionUrl = (window.BASE_URL || '') + 'auth/set_session.php';
+        var apiBase = (typeof API_CONFIG !== 'undefined' && API_CONFIG.LARAVEL_URL
+            ? API_CONFIG.LARAVEL_URL
+            : <?= json_encode(defined('LARAVEL_API_URL') ? LARAVEL_API_URL : 'https://tumercadosena.shop/api/') ?>
+        ).replace(/\/?$/, '/');
+        var setSessionUrl = '/auth/set_session.php';
 
         document.getElementById('regLaravelForm1').addEventListener('submit', async function(e) {
             e.preventDefault();
             var err = document.getElementById('regLaravelError');
             var nombre = document.getElementById('r1_nombre').value.trim();
-            var email = document.getElementById('r1_email').value.trim();
+            var email = document.getElementById('r1_email').value.trim().toLowerCase();
             var password = document.getElementById('r1_password').value;
             var password_confirm = document.getElementById('r1_password_confirm').value;
             var descripcion = document.getElementById('r1_descripcion').value.trim();
             var link = document.getElementById('r1_link').value.trim();
             if (password !== password_confirm) { err.style.display='block'; err.textContent = 'Las contraseñas no coinciden'; return; }
-            if (!email.toLowerCase().endsWith('@soy.sena.edu.co')) { err.style.display='block'; err.textContent = 'Solo correos @soy.sena.edu.co'; return; }
+            if (!(email.endsWith('@soy.sena.edu.co') || email.endsWith('@gmail.com'))) { err.style.display='block'; err.textContent = 'Solo correos @soy.sena.edu.co'; return; }
             err.style.display = 'none';
             try {
                 var r = await fetch(apiBase + 'auth/iniciar-registro', {
@@ -422,9 +261,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     })
                 });
                 var data = await r.json();
-                if (data.cuenta_id && data.datosEncriptados) {
-                    regCuentaId = data.cuenta_id;
-                    regDatosEncriptados = data.datosEncriptados;
+                var payload = data.data || data;
+                if (payload.cuenta_id && payload.datosEncriptados) {
+                    regCuentaId = payload.cuenta_id;
+                    regDatosEncriptados = payload.datosEncriptados;
                     document.getElementById('registerStep1').style.display = 'none';
                     document.getElementById('registerStep2').style.display = 'block';
                 } else {
@@ -454,10 +294,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     })
                 });
                 var data = await r.json();
-                var user = data.user;
-                var token = data.token;
+                var payload = data.data || data;
+                var user = payload.user;
+                var token = payload.token;
                 if (user && token) {
-                    window.location.href = (window.BASE_URL || '') + 'auth/login.php?registered=1';
+                    if (typeof localStorage !== 'undefined') localStorage.setItem('api_token', token);
+                    window.location.href = '/auth/login.php?registered=1';
                 } else {
                     err.style.display = 'block';
                     err.textContent = data.message || (data.errors && Object.values(data.errors).flat().join(' ')) || 'Error al completar el registro';
@@ -468,7 +310,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
     </script>
-<?php endif; ?>
 </body>
 </html>
 

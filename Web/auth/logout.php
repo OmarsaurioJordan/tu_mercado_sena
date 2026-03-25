@@ -8,7 +8,7 @@ session_destroy();
 // Si usamos API Laravel, la página redirige con JS tras llamar a logout y limpiar token
 if (isUsingLaravelApi()) {
     $laravelUrl = LARAVEL_API_URL;
-    $loginUrl   = getBaseUrl() . 'auth/login.php';
+    $loginUrl   = getAbsoluteBaseUrl() . 'auth/login.php';
     header('Content-Type: text/html; charset=utf-8');
     ?>
 <!DOCTYPE html>

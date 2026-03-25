@@ -1,5 +1,7 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
@@ -14,55 +16,40 @@ if ($chat_id <= 0) {
     exit;
 }
 
-$conn = getDBConnection();
-
-// Cargar la compra (solo si es del usuario y tiene fecha_venta)
-$stmt = $conn->prepare("
-    SELECT 
-        c.id as chat_id,
-        c.calificacion,
-        c.comentario,
-        c.fecha_venta,
-        p.id as producto_id,
-        p.nombre as producto_nombre,
-        u.nickname as vendedor_nombre,
-        u.imagen as vendedor_imagen
-    FROM chats c
-    INNER JOIN productos p ON c.producto_id = p.id
-    INNER JOIN usuarios u ON p.vendedor_id = u.id
-    WHERE c.id = ? AND c.comprador_id = ? AND c.fecha_venta IS NOT NULL
-");
-$stmt->bind_param("ii", $chat_id, $user['id']);
-$stmt->execute();
-$compra = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+// Cargar compra desde API: chat o desde historial
+$compra = apiGetChat($chat_id);
+if (!$compra) {
+    $compras = apiGetHistorialCompras();
+    foreach (is_array($compras) ? $compras : [] as $c) {
+        if ((int)($c['chat_id'] ?? $c['id'] ?? 0) === $chat_id) {
+            $compra = $c;
+            break;
+        }
+    }
+}
 
 if (!$compra) {
-    $conn->close();
     header('Location: historial.php');
     exit;
 }
 
-// Procesar envío del formulario
+$producto_id = $compra['producto_id'] ?? $compra['producto']['id'] ?? 0;
+$producto_nombre = $compra['producto_nombre'] ?? $compra['producto']['nombre'] ?? 'Producto';
+$vendedor_nombre = $compra['vendedor_nombre'] ?? $compra['vendedor']['nickname'] ?? $compra['vendedor']['nombre'] ?? '';
+$fecha_venta = $compra['fecha_venta'] ?? '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $calificacion = isset($_POST['calificacion']) ? (int)$_POST['calificacion'] : 0;
-    $comentario = isset($_POST['comentario']) ? trim(sanitize($_POST['comentario'])) : '';
-
+    $comentario = isset($_POST['comentario']) ? trim(sanitize($_POST['comentario'] ?? '')) : '';
     if ($calificacion >= 1 && $calificacion <= 5) {
         $comentario = mb_substr($comentario, 0, 512);
-        $stmt = $conn->prepare("UPDATE chats SET calificacion = ?, comentario = ? WHERE id = ? AND comprador_id = ?");
-        $stmt->bind_param("isii", $calificacion, $comentario, $chat_id, $user['id']);
-        $stmt->execute();
-        $stmt->close();
+        $res = apiCalificarChat($chat_id, $calificacion, $comentario);
     }
-    $conn->close();
     header('Location: historial.php?mensaje=calificado');
     exit;
 }
 
-$conn->close();
-
-$imgUrl = getProductMainImage($compra['producto_id']);
+$imgUrl = getProductMainImage($producto_id);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -70,7 +57,7 @@ $imgUrl = getProductMainImage($compra['producto_id']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calificar compra - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         .calificar-card { max-width: 500px; margin: 2rem auto; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 2rem; }
@@ -95,11 +82,11 @@ $imgUrl = getProductMainImage($compra['producto_id']);
                 <h1><i class="ri-star-smile-line"></i> Calificar tu compra</h1>
 
                 <div class="calificar-producto">
-                    <img src="<?= htmlspecialchars($imgUrl) ?>" alt="<?= htmlspecialchars($compra['producto_nombre']) ?>">
+                    <img src="<?= htmlspecialchars($imgUrl) ?>" alt="<?= htmlspecialchars($producto_nombre) ?>">
                     <div>
-                        <h3 style="margin: 0 0 0.25rem 0;"><?= htmlspecialchars($compra['producto_nombre']) ?></h3>
-                        <p style="margin: 0; color: #666;">Vendedor: <?= htmlspecialchars($compra['vendedor_nombre']) ?></p>
-                        <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;"><?= date('d/m/Y', strtotime($compra['fecha_venta'])) ?></p>
+                        <h3 style="margin: 0 0 0.25rem 0;"><?= htmlspecialchars($producto_nombre) ?></h3>
+                        <p style="margin: 0; color: #666;">Vendedor: <?= htmlspecialchars($vendedor_nombre) ?></p>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;"><?= $fecha_venta ? date('d/m/Y', strtotime($fecha_venta)) : '' ?></p>
                     </div>
                 </div>
 

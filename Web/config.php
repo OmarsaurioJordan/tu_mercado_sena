@@ -4,10 +4,10 @@
 // CONFIGURACIÓN DE LA BASE DE DATOS Y TIEMPO
 // =========================================================
 
-// Configuración de la base de datos
+// Configuración de la base de datos (algunas páginas como perfil aún la usan; categorías/productos van a la API de Hostinger)
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_USER', 'adso_user');
+define('DB_PASS', 'Adso24-tms-');
 define('DB_NAME', 'tu_mercado_sena');
 
 // Iniciar sesión
@@ -19,21 +19,46 @@ if (session_status() === PHP_SESSION_NONE) {
 // CONFIGURACIÓN DE RUTAS BASE
 // =========================================================
 
-// Obtener la ruta base del proyecto (hasta /Web/ o /Frontend/)
-$script_name = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
-$web_pos = strpos($script_name, '/Web/');
-$frontend_pos = strpos($script_name, '/Frontend/');
-if ($web_pos !== false) {
-    $GLOBALS['base_url'] = substr($script_name, 0, $web_pos + 5); // incluye "/Web/"
-} elseif ($frontend_pos !== false) {
-    $GLOBALS['base_url'] = substr($script_name, 0, $frontend_pos + 10); // incluye "/Frontend/"
-} else {
-    $GLOBALS['base_url'] = '/Web/'; // por defecto carpeta Web
+// Función helper para obtener la URL base relativa
+function getBaseUrl() {
+    $script_name = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+    $web_pos = strpos($script_name, '/Web/');
+    $frontend_pos = strpos($script_name, '/Frontend/');
+    if ($web_pos !== false) {
+        $after = substr($script_name, $web_pos + 5);
+        $slashes = substr_count($after, '/');
+        return $slashes == 0 ? './' : str_repeat('../', $slashes);
+    } elseif ($frontend_pos !== false) {
+        $after = substr($script_name, $frontend_pos + 10);
+        $slashes = substr_count($after, '/');
+        return $slashes == 0 ? './' : str_repeat('../', $slashes);
+    } else {
+        return './'; // por defecto
+    }
 }
 
-// Función helper para obtener la URL base
-function getBaseUrl() {
-    return $GLOBALS['base_url'];
+// Función helper para obtener la URL base absoluta (ej: https://tumercadosena.shop/)
+function getAbsoluteBaseUrl() {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+    $host = $_SERVER['HTTP_HOST'];
+    return $protocol . $host . '/';
+}
+
+// Ruta base absoluta desde la raíz del servidor (ej: /ensayo_link/Web/) para enlaces de navegación
+function getBasePath() {
+    $script_name = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+    if (preg_match('#^(.*/Web)/#', $script_name, $m)) {
+        return $m[1] . '/';
+    }
+    if (preg_match('#^(.*/Frontend)/#', $script_name, $m)) {
+        return $m[1] . '/';
+    }
+    return '/';
+}
+
+// Cargar config_api para saber si usamos solo Laravel (después de getBaseUrl)
+if (!defined('USE_LARAVEL_API')) {
+    require_once __DIR__ . '/config_api.php';
 }
 
 // =========================================================
@@ -64,7 +89,7 @@ function getDBConnection() {
  * Obtiene la ruta completa del avatar o el avatar por defecto
  */
 function getAvatarUrl($imagen) {
-    $baseUrl = getBaseUrl();
+    $baseUrl = getAbsoluteBaseUrl();
     
     if (empty($imagen)) {
         return $baseUrl . 'assets/images/default-avatar.jpg';
@@ -75,14 +100,18 @@ function getAvatarUrl($imagen) {
         return $imagen;
     }
     
-    // Si ya trae la ruta uploads/usuarios/, usarla directamente
+    // Solo API Laravel: usar storage de Laravel
+    if (defined('USE_LARAVEL_API') && USE_LARAVEL_API && defined('LARAVEL_STORAGE_URL')) {
+        $path = (strpos($imagen, 'usuarios/') === 0 || strpos($imagen, 'uploads/') === 0) ? $imagen : 'usuarios/' . ltrim($imagen, '/');
+        return rtrim(LARAVEL_STORAGE_URL, '/') . '/' . ltrim($path, '/');
+    }
+    
+    // PHP local: uploads/usuarios/
     if (strpos($imagen, 'uploads/usuarios/') === 0) {
         $fullPath = $imagen;
     } else {
         $fullPath = 'uploads/usuarios/' . $imagen;
     }
-
-    // Verificar si el archivo existe (usando ruta del servidor)
     $serverPath = $_SERVER['DOCUMENT_ROOT'] . str_replace('//', '/', $baseUrl . $fullPath);
     if (file_exists($serverPath)) {
         return $baseUrl . $fullPath;
@@ -99,56 +128,35 @@ function isLoggedIn() {
 
 /**
  * Obtener información del usuario actual
+ * Con USE_LARAVEL_API: solo usa sesión (sin BD).
+ * Sin Laravel: consulta BD local.
  */
 function getCurrentUser() {
     if (!isset($_SESSION['usuario_id'])) {
         return null;
     }
 
-    $conn = getDBConnection();
-    $id = $_SESSION['usuario_id'];
-
-   $query = "
-        SELECT 
-            u.id,
-            u.nickname,
-            u.imagen,
-            u.descripcion,
-            u.link,
-            u.estado_id,
-            u.fecha_reciente,
-            c.email,
-            c.notifica_correo,
-            c.notifica_push,
-            c.uso_datos
-        FROM usuarios u
-        INNER JOIN cuentas c ON u.cuenta_id = c.id
-        WHERE u.id = ?
-    ";
-
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-
-    $stmt->close();
-    $conn->close();
-
-    return $user ?: null;;
+    // Solo API (tumercadosena.shop): datos de sesión; sin SQL
+    return [
+        'id' => $_SESSION['usuario_id'],
+        'nickname' => $_SESSION['usuario_nombre'] ?? $_SESSION['nickname'] ?? 'Usuario',
+        'imagen' => $_SESSION['usuario_imagen'] ?? $_SESSION['imagen'] ?? '',
+        'descripcion' => $_SESSION['descripcion'] ?? '',
+        'link' => $_SESSION['link'] ?? '',
+        'estado_id' => (int)($_SESSION['estado_id'] ?? 1),
+        'fecha_reciente' => $_SESSION['fecha_reciente'] ?? null,
+        'email' => $_SESSION['email'] ?? '',
+        'notifica_correo' => (int)($_SESSION['notifica_correo'] ?? 0),
+        'notifica_push' => (int)($_SESSION['notifica_push'] ?? 0),
+        'uso_datos' => (int)($_SESSION['uso_datos'] ?? 0)
+    ];
 }
 
 
 function isSellerFavorite($votante_id, $vendedor_id) {
-    $conn = getDBConnection();
-    $stmt = $conn->prepare("SELECT id FROM favoritos WHERE votante_id = ? AND votado_id = ?");
-    $stmt->bind_param("ii", $votante_id, $vendedor_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $exists = $result->num_rows > 0;
-    $stmt->close();
-    return $exists;
+    require_once __DIR__ . '/api/api_client.php';
+    $favoritos = apiGetFavoritos();
+    return in_array((int)$vendedor_id, $favoritos, true);
 }
 function forceLightTheme() {
     echo "<script>
@@ -216,33 +224,40 @@ function formato_tiempo_relativo($timestamp_db) {
 }
 
 function getProductImage($productId) {
-    $conn = getDBConnection();
-    $stmt = $conn->prepare("
-        SELECT imagen 
-        FROM fotos 
-        WHERE producto_id = ? 
-        ORDER BY id ASC 
-        LIMIT 1
-    ");
-    $stmt->bind_param("i", $productId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    $row = $result->fetch_assoc();
-    $base = getBaseUrl();
-    return $row ? ($base . 'uploads/productos/' . $row['imagen']) : ($base . 'assets/images/default-product.jpg');
+    $base = getAbsoluteBaseUrl();
+    return $base . 'assets/images/default-product.jpg';
 }
-function getProductMainImage($producto_id) {
-    $conn = getDBConnection();
-    $stmt = $conn->prepare("SELECT imagen FROM fotos WHERE producto_id = ? ORDER BY id ASC LIMIT 1");
-    $stmt->bind_param("i", $producto_id);
-    $stmt->execute();
-    $res = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-    $conn->close();
 
-    $base = getBaseUrl();
-    return $res ? ($base . 'uploads/productos/' . $res['imagen']) : ($base . 'assets/images/default-product.jpg');
+function getProductMainImage($producto_id) {
+    $base = getAbsoluteBaseUrl();
+    return $base . 'assets/images/default-product.jpg';
+}
+
+/**
+ * URL de imagen de producto (Hostinger storage o uploads locales)
+ * @param string $path Ruta: "productos/xxx.jpg", "uploads/productos/xxx.jpg" o URL completa
+ * @return string URL completa para usar en <img src="">
+ */
+function getProductImageUrlPHP($path) {
+    if (empty($path) || !is_string($path)) {
+        return getAbsoluteBaseUrl() . 'assets/images/default-product.jpg';
+    }
+    if (strpos($path, 'http://') === 0 || strpos($path, 'https://') === 0) {
+        if (defined('USE_LARAVEL_API') && USE_LARAVEL_API && defined('LARAVEL_STORAGE_URL') && (strpos($path, 'localhost') !== false || strpos($path, 'storage/') !== false)) {
+            $m = [];
+            if (preg_match('@/(?:storage/)?(productos/[^\?&#]+)@i', $path, $m)) {
+                return rtrim(LARAVEL_STORAGE_URL, '/') . '/' . $m[1];
+            }
+        }
+        return $path;
+    }
+    if (defined('USE_LARAVEL_API') && USE_LARAVEL_API && defined('LARAVEL_STORAGE_URL')) {
+        $clean = preg_replace('#^uploads/productos/#', 'productos/', $path);
+        if (strpos($clean, 'productos/') !== 0) $clean = 'productos/' . ltrim($clean, '/');
+        return rtrim(LARAVEL_STORAGE_URL, '/') . '/' . $clean;
+    }
+    $base = getAbsoluteBaseUrl();
+    return (strpos($path, 'uploads/') === 0) ? ($base . $path) : ($base . 'uploads/productos/' . ltrim($path, '/'));
 }
 
 /**
@@ -251,6 +266,27 @@ function getProductMainImage($producto_id) {
  * @param int $userId El ID del usuario.
  * @return string La URL del avatar (o un placeholder).
  */
+
+/**
+ * Envía un correo de notificación (usa mail() de PHP).
+ * Para producción puede sustituirse por SMTP (ej. PHPMailer).
+ * @param string $para_email Destinatario
+ * @param string $asunto Asunto del correo
+ * @param string $cuerpo_plain Cuerpo en texto plano
+ * @return bool true si se envió, false en caso contrario
+ */
+function enviar_correo_notificacion($para_email, $asunto, $cuerpo_plain) {
+    if (empty($para_email) || !filter_var($para_email, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-type: text/plain; charset=UTF-8',
+        'From: Tu Mercado SENA <noreply@' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '>',
+        'X-Mailer: PHP/' . phpversion()
+    ];
+    return @mail($para_email, $asunto, $cuerpo_plain, implode("\r\n", $headers));
+}
 
 ?>
 

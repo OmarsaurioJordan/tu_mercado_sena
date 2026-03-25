@@ -1,5 +1,7 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
@@ -7,84 +9,29 @@ if (!isLoggedIn()) {
 }
 
 $user = getCurrentUser();
-$conn = getDBConnection();
+$ventas = apiGetHistorialVentas();
+$compras = apiGetHistorialCompras();
+$ventas = is_array($ventas) ? $ventas : [];
+$compras = is_array($compras) ? $compras : [];
 
-// Obtener ventas finalizadas (como vendedor)
-$stmt = $conn->prepare("
-    SELECT 
-        c.id as chat_id,
-        c.precio as precio_acordado,
-        c.cantidad,
-        c.calificacion,
-        c.comentario,
-        c.fecha_venta,
-        p.id as producto_id,
-        p.nombre as producto_nombre,
-        p.precio as precio_original,
-        u.nickname as comprador_nombre,
-        u.imagen as comprador_imagen,
-        f.imagen as producto_imagen
-    FROM chats c
-    INNER JOIN productos p ON c.producto_id = p.id
-    INNER JOIN usuarios u ON c.comprador_id = u.id
-    LEFT JOIN fotos f ON f.producto_id = p.id
-    WHERE p.vendedor_id = ? AND c.fecha_venta IS NOT NULL
-    GROUP BY c.id
-    ORDER BY c.fecha_venta DESC
-");
-$stmt->bind_param("i", $user['id']);
-$stmt->execute();
-$ventas = $stmt->get_result();
-$stmt->close();
+$total_ventas = count($ventas);
+$total_compras = count($compras);
 
-// Obtener compras finalizadas (como comprador)
-$stmt = $conn->prepare("
-    SELECT 
-        c.id as chat_id,
-        c.precio as precio_acordado,
-        c.cantidad,
-        c.calificacion,
-        c.comentario,
-        c.fecha_venta,
-        p.id as producto_id,
-        p.nombre as producto_nombre,
-        p.precio as precio_original,
-        u.nickname as vendedor_nombre,
-        u.imagen as vendedor_imagen,
-        f.imagen as producto_imagen
-    FROM chats c
-    INNER JOIN productos p ON c.producto_id = p.id
-    INNER JOIN usuarios u ON p.vendedor_id = u.id
-    LEFT JOIN fotos f ON f.producto_id = p.id
-    WHERE c.comprador_id = ? AND c.fecha_venta IS NOT NULL
-    GROUP BY c.id
-    ORDER BY c.fecha_venta DESC
-");
-$stmt->bind_param("i", $user['id']);
-$stmt->execute();
-$compras = $stmt->get_result();
-$stmt->close();
+$sum_cal = 0;
+$total_calificaciones = 0;
+foreach ($ventas as $v) {
+    $c = $v['calificacion'] ?? null;
+    if ($c !== null && $c !== '') {
+        $sum_cal += (float)$c;
+        $total_calificaciones++;
+    }
+}
+$promedio = $total_calificaciones > 0 ? round($sum_cal / $total_calificaciones, 1) : 0;
 
-// Estadísticas
-
-$total_ventas = $ventas->num_rows;
-$total_compras = $compras->num_rows;
-
-// calificación promedio como vendedor
-$stmt = $conn->prepare("
-    SELECT AVG(c.calificacion) as promedio, COUNT(c.calificacion) as total
-    FROM chats c
-    INNER JOIN productos p ON c.producto_id = p.id
-    WHERE p.vendedor_id = ? AND c.calificacion IS NOT NULL
-");
-$stmt->bind_param("i", $user['id']);
-$stmt->execute();
-$stats = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-$conn->close();
-
-$promedio = $stats['promedio'] ? round($stats['promedio'], 1) : 0;
-$total_calificaciones = $stats['total'];
+function _h($arr, $key, $alt = '') {
+    $v = $arr[$key] ?? $arr[lcfirst(str_replace('_', '', ucwords($key, '_')))] ?? $alt;
+    return $v === null || $v === '' ? $alt : $v;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -92,7 +39,7 @@ $total_calificaciones = $stats['total'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historial de Transacciones - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
         .historial-stats {
             display: grid;
@@ -213,33 +160,33 @@ $total_calificaciones = $stats['total'];
             
             <div id="ventas" class="tab-content active">
                 <?php if ($total_ventas > 0): ?>
-                    <?php $ventas->data_seek(0); while ($v = $ventas->fetch_assoc()): ?>
+                    <?php foreach ($ventas as $v): ?>
                         <div class="transaccion-card">
-                            <img src="<?= $v['producto_imagen'] ? getBaseUrl().'uploads/productos/'.$v['producto_imagen'] : 'https://picsum.photos/80' ?>" 
+                            <?php $pImg = _h($v, 'producto_imagen'); ?>
+                            <img src="<?= $pImg ? getProductMainImage(_h($v, 'producto_id')) : 'https://picsum.photos/80' ?>" 
                                  class="transaccion-img" alt="Producto">
                             <div class="transaccion-info">
-                                <h3><?= htmlspecialchars($v['producto_nombre']) ?></h3>
+                                <h3><?= htmlspecialchars(_h($v, 'producto_nombre')) ?></h3>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                    <img src="<?= getAvatarUrl($v['comprador_imagen']) ?>" 
-                                         alt="<?= htmlspecialchars($v['comprador_nombre']) ?>"
+                                    <img src="<?= getAvatarUrl(_h($v, 'comprador_imagen')) ?>" 
+                                         alt="<?= htmlspecialchars(_h($v, 'comprador_nombre')) ?>"
                                          style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
-                                    <p style="margin: 0;"><strong>Comprador:</strong> <?= htmlspecialchars($v['comprador_nombre']) ?></p>
+                                    <p style="margin: 0;"><strong>Comprador:</strong> <?= htmlspecialchars(_h($v, 'comprador_nombre')) ?></p>
                                 </div>
-                                <p><strong>Precio acordado:</strong> <?= formatPrice($v['precio_acordado'] ?? $v['precio_original']) ?></p>
-                                <p><strong>Cantidad:</strong> <?= $v['cantidad'] ?? 1 ?></p>
-                                <p><strong>Fecha:</strong> <?= date('d/m/Y', strtotime($v['fecha_venta'])) ?></p>
-                                <?php if ($v['calificacion']): ?>
+                                <p><strong>Precio acordado:</strong> <?= formatPrice(_h($v, 'precio_acordado') ?: _h($v, 'precio_original')) ?></p>
+                                <p><strong>Cantidad:</strong> <?= _h($v, 'cantidad', '1') ?></p>
+                                <p><strong>Fecha:</strong> <?= date('d/m/Y', strtotime(_h($v, 'fecha_venta', 'now'))) ?></p>
+                                <?php if (_h($v, 'calificacion')): ?>
                                     <div class="estrellas">
-                                        <?= str_repeat('★', $v['calificacion']) . str_repeat('☆', 5 - $v['calificacion']) ?>
-
+                                        <?= str_repeat('★', (int)_h($v, 'calificacion')) . str_repeat('☆', 5 - (int)_h($v, 'calificacion')) ?>
                                     </div>
                                 <?php endif; ?>
-                                <?php if ($v['comentario']): ?>
-                                    <div class="comentario-box">"<?= htmlspecialchars($v['comentario']) ?>"</div>
+                                <?php if (_h($v, 'comentario')): ?>
+                                    <div class="comentario-box">"<?= htmlspecialchars(_h($v, 'comentario')) ?>"</div>
                                 <?php endif; ?>
                             </div>
                         </div>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
                     <div class="no-products"><p>Aún no has realizado ventas.</p></div>
 
@@ -248,29 +195,28 @@ $total_calificaciones = $stats['total'];
             
             <div id="compras" class="tab-content">
                 <?php if ($total_compras > 0): ?>
-                    <?php while ($c = $compras->fetch_assoc()): ?>
+                    <?php foreach ($compras as $c): ?>
                         <div class="transaccion-card">
-                            <img src="<?= $c['producto_imagen'] ? getBaseUrl().'uploads/productos/'.$c['producto_imagen'] : 'https://picsum.photos/80' ?>" 
+                            <img src="<?= getProductMainImage(_h($c, 'producto_id')) ?: 'https://picsum.photos/80' ?>" 
                                  class="transaccion-img" alt="Producto">
                             <div class="transaccion-info">
-                                <h3><?= htmlspecialchars($c['producto_nombre']) ?></h3>
+                                <h3><?= htmlspecialchars(_h($c, 'producto_nombre')) ?></h3>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                    <img src="<?= getAvatarUrl($c['vendedor_imagen']) ?>" 
-                                         alt="<?= htmlspecialchars($c['vendedor_nombre']) ?>"
+                                    <img src="<?= getAvatarUrl(_h($c, 'vendedor_imagen')) ?>" 
+                                         alt="<?= htmlspecialchars(_h($c, 'vendedor_nombre')) ?>"
                                          style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
-                                    <p style="margin: 0;"><strong>Vendedor:</strong> <?= htmlspecialchars($c['vendedor_nombre']) ?></p>
+                                    <p style="margin: 0;"><strong>Vendedor:</strong> <?= htmlspecialchars(_h($c, 'vendedor_nombre')) ?></p>
                                 </div>
-                                <p><strong>Precio:</strong> <?= formatPrice($c['precio_acordado'] ?? $c['precio_original']) ?></p>
-                                <p><strong>Fecha:</strong> <?= date('d/m/Y', strtotime($c['fecha_venta'])) ?></p>
-                                <?php if ($c['calificacion']): ?>
-                                    <div class="estrellas">Tu calificación: <?= str_repeat('★', $c['calificacion']) ?></div>
-
+                                <p><strong>Precio:</strong> <?= formatPrice(_h($c, 'precio_acordado') ?: _h($c, 'precio_original')) ?></p>
+                                <p><strong>Fecha:</strong> <?= date('d/m/Y', strtotime(_h($c, 'fecha_venta', 'now'))) ?></p>
+                                <?php if (_h($c, 'calificacion')): ?>
+                                    <div class="estrellas">Tu calificación: <?= str_repeat('★', (int)_h($c, 'calificacion')) ?></div>
                                 <?php else: ?>
-                                    <a href="calificar.php?chat_id=<?= $c['chat_id'] ?>" class="btn-small">Calificar</a>
+                                    <a href="calificar.php?chat_id=<?= (int)_h($c, 'chat_id') ?>" class="btn-small">Calificar</a>
                                 <?php endif; ?>
                             </div>
                         </div>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
                     <div class="no-products"><p>Aún no has realizado compras.</p></div>
 
@@ -292,6 +238,6 @@ $total_calificaciones = $stats['total'];
         }
     </script>
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
 </body>
 </html>

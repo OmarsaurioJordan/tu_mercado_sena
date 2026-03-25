@@ -1,73 +1,64 @@
 <?php
+session_start();
+
 
 require_once '../config.php';
 require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 forceLightTheme();
 
 $error = '';
 
-// Si ya tiene sesión, redirigir
 if (isLoggedIn()) {
-    header("Location: ../index.php");
+    header("Location: /index.php");
     exit();
 }
 
+// Login solo vía API (tumercadosena.shop); sin SQL
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
-    
-    if (!empty($email) && !empty($password)) {
-        
-        $conn = getDBConnection();
-        
-        // Buscar cuenta por email
-        $stmt = $conn->prepare("
-            SELECT c.id AS cuenta_id, c.password, c.email,
-            u.id AS usuario_id, u.nickname, u.imagen, u.rol_id, u.estado_id
-            FROM cuentas c
-            INNER JOIN usuarios u ON u.cuenta_id = c.id
-            WHERE c.email = ?
-            LIMIT 1
-        ");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
-        
-        if ($user && password_verify($password, $user['password'])) {
-            // Verificar estado del usuario
-            if ($user['estado_id'] == 4) { // bloqueado
+
+    if (empty($email) || empty($password)) {
+        $error = 'Por favor completa todos los campos';
+    } else {
+        $result = apiLogin($email, $password);
+        $data = $result['data'] ?? [];
+        $user = $data['data']['user'] ?? $data['user'] ?? [];
+        $token = $data['data']['token'] ?? $data['token'] ?? '';
+
+        if ($result['success'] && !empty($token) && !empty($user['id'])) {
+            $uid = (int)$user['id'];
+            $estado_id = (int)($user['estado_id'] ?? 1);
+            if ($estado_id == 4) {
                 $error = 'Tu cuenta ha sido bloqueada. Contacta al administrador.';
-            } elseif ($user['estado_id'] == 3) { // eliminado
+            } elseif ($estado_id == 3) {
                 $error = 'Esta cuenta ya no existe.';
             } else {
-                // Login exitoso - Guardar datos en sesión
-                $_SESSION['usuario_id'] = $user['usuario_id'];
-                $_SESSION['usuario_nombre'] = $user['nickname'];
-                $_SESSION['usuario_rol'] = $user['rol_id'];
-                $_SESSION['usuario_imagen'] = $user['imagen'];
-                $_SESSION['cuenta_id'] = $user['cuenta_id'];
-                
-                // Actualizar fecha_reciente
-                $stmtUpdate = $conn->prepare("UPDATE usuarios SET fecha_reciente = NOW() WHERE id = ?");
-                $stmtUpdate->bind_param("i", $user['usuario_id']);
-                $stmtUpdate->execute();
-                $stmtUpdate->close();
-                
-                $conn->close();
-                
-                header("Location: ../index.php");
+                $_SESSION['usuario_id'] = $uid;
+                $_SESSION['usuario_nombre'] = $user['nickname'] ?? $user['name'] ?? '';
+                $_SESSION['usuario_imagen'] = $user['imagen'] ?? $user['avatar'] ?? '';
+                $_SESSION['usuario_rol'] = (int)($user['rol_id'] ?? 1);
+                $_SESSION['cuenta_id'] = (int)($user['cuenta_id'] ?? 0);
+                $_SESSION['api_token'] = $token;
+                $_SESSION['nickname'] = $_SESSION['usuario_nombre'];
+                $_SESSION['imagen'] = $_SESSION['usuario_imagen'];
+                $_SESSION['descripcion'] = $user['descripcion'] ?? '';
+                $_SESSION['link'] = $user['link'] ?? '';
+                $_SESSION['estado_id'] = $estado_id;
+                $_SESSION['email'] = $user['email'] ?? $email;
+                $_SESSION['notifica_correo'] = (int)($user['notifica_correo'] ?? 0);
+                $_SESSION['notifica_push'] = (int)($user['notifica_push'] ?? 0);
+                $_SESSION['uso_datos'] = (int)($user['uso_datos'] ?? 0);
+                header("Location: /index.php");
                 exit();
             }
         } else {
-            $error = 'Correo o contraseña incorrectos.';
+            $error = $result['message'] ?? 'Correo o contraseña incorrectos.';
+            if (!empty($result['errors']) && is_array($result['errors'])) {
+                $error = implode(' ', array_map(function ($e) { return is_array($e) ? implode(' ', $e) : $e; }, $result['errors']));
+            }
         }
-        
-        $conn->close();
-        
-    } else {
-        $error = 'Por favor completa todos los campos';
     }
 }
 ?>
@@ -77,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="../styles.css?v=<?= time(); ?>">
 </head>
 <script>
     const savedTheme = localStorage.getItem("theme") || "light";
@@ -88,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Header superior -->
     <header class="header">
         <div class="header-content" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: flex-start; gap: 20px; padding: 0 20px;">
-            <img src="<?= getBaseUrl() ?>logo_new.png" alt="SENA" style="height: 70px; width: auto;">
+            <img src="../logo_new.png" alt="SENA" style="height: 70px; width: auto;">
             <span style="font-size: 1.5rem; font-weight: 800; color: white;">Tu Mercado SENA</span>
         </div>
     </header>
@@ -118,14 +109,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-group" style="margin-bottom: 25px;">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" name="password" required autocomplete="current-password" style="margin-bottom: 5px;">
-                    
-                    <!-- Checkbox pegado al campo -->
-                    <div style="display: flex; align-items: flex-start; gap: 8px; margin-top: 10px;">
-                        <input type="checkbox" id="terms" name="terms" required style="width: 16px; height: 16px; min-width: 16px; margin-top: 3px; cursor: pointer;">
-                        <label for="terms" style="font-size: 0.85rem; color: #666; cursor: pointer; line-height: 1.3;">
-                            Acepto los <a href="#" id="openModal" style="color: var(--color-primary); font-weight: bold; text-decoration: underline;">Términos y Condiciones</a> y la Política de Privacidad.
-                        </label>
-                    </div>
                 </div>
 
                 <button type="submit" class="btn-primary" id="btnLogin">Iniciar Sesión</button>
@@ -299,11 +282,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php if (isUsingLaravelApi()): ?>
     <script>
         window.USE_LARAVEL_API = true;
-        window.LARAVEL_API_URL = <?= json_encode(defined('LARAVEL_API_URL') ? LARAVEL_API_URL : 'http://localhost:8000/api/') ?>;
+        window.LARAVEL_API_URL = <?= json_encode(defined('LARAVEL_API_URL') ? LARAVEL_API_URL : '') ?>;
     </script>
-    <script src="<?= getBaseUrl() ?>js/api-config.js"></script>
+    <script src="/js/api-config.js"></script>
     <script>
-        window.BASE_URL = <?= json_encode(getBaseUrl()) ?>;
+        window.BASE_URL = <?= json_encode(getAbsoluteBaseUrl()) ?>;
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             var btn = document.getElementById('btnLogin');
@@ -314,11 +297,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (errEl) errEl.textContent = 'Completa correo y contraseña.';
                 return;
             }
+            console.log("Boton de login presionado. Iniciando proceso de autenticación...");
             btn.disabled = true;
             if (errEl) errEl.remove();
             try {
-                var base = typeof API_CONFIG !== 'undefined' ? API_CONFIG.LARAVEL_URL : (window.BASE_URL ? window.BASE_URL.replace(/\/$/, '') + '/../api/' : '');
-                if (typeof API_CONFIG !== 'undefined') base = API_CONFIG.LARAVEL_URL;
+                var base = (typeof API_CONFIG !== 'undefined' && API_CONFIG.LARAVEL_URL) ? API_CONFIG.LARAVEL_URL : (window.API_BASE_URL || window.LARAVEL_API_URL || '<?= rtrim(LARAVEL_API_URL, "/") ?>/');
                 var r = await fetch(base + 'auth/login', {
                     method: 'POST',
                     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -343,14 +326,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        usuario_id: user.id,
-                        nickname: user.nickname || '',
-                        imagen: user.imagen || '',
-                        rol_id: user.rol_id || 1,
-                        cuenta_id: user.cuenta_id || 0
+                        usuario_id:     user.id,
+                        nickname:       user.nickname       || '',
+                        imagen:         user.imagen         || '',
+                        rol_id:         user.rol_id         || 1,
+                        cuenta_id:      user.cuenta_id      || 0,
+                        api_token:      token,
+                        // 👇 campos que faltaban
+                        descripcion:    user.descripcion    || '',
+                        link:           user.link           || '',
+                        estado_id:      user.estado_id      || 1,
+                        email:          user.email          || email,
+                        notifica_correo: user.notifica_correo || 0,
+                        notifica_push:   user.notifica_push   || 0,
+                        uso_datos:       user.uso_datos       || 0,
                     })
                 });
-                window.location.href = (window.BASE_URL || '') + 'index.php';
+                window.location.href = '/index.php';
             } catch (err) {
                 var box = document.querySelector('.auth-box');
                 var div = document.createElement('div');

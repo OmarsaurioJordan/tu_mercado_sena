@@ -1,66 +1,26 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-// Usuario autenticado
-
 $user = getCurrentUser();
-$conn = getDBConnection();
 
-/* ---------------------------
-   🔄 AGREGAR / QUITAR FAVORITO
---------------------------- */
+/* Toggle favorito vía API */
 if (isset($_GET['vendedor_id'])) {
     $vendedor_id = (int)$_GET['vendedor_id'];
-    $usuario_id = $user['id'];
-
-    // Revisar si ya existe
-    $stmt = $conn->prepare("SELECT id FROM favoritos WHERE votante_id = ? AND votado_id = ?");
-    $stmt->bind_param("ii", $usuario_id, $vendedor_id);
-    $stmt->execute();
-    $existe = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
-    if ($existe) {
-        // Si ya existe → eliminar
-        $stmt = $conn->prepare("DELETE FROM favoritos WHERE votante_id = ? AND votado_id = ?");
-    } else {
-        // Si no existe → agregar
-        $stmt = $conn->prepare("INSERT INTO favoritos (votante_id, votado_id) VALUES (?, ?)");
-    }
-
-    $stmt->bind_param("ii", $usuario_id, $vendedor_id);
-    $stmt->execute();
-    $stmt->close();
-
-    header("Location: favoritos.php");
+    $ids = apiGetFavoritos();
+    $quitar = in_array($vendedor_id, $ids, true);
+    apiToggleFavorito($vendedor_id, !$quitar);
+    header('Location: ' . getBasePath() . 'perfil/favoritos.php');
     exit;
 }
 
-/* ---------------------------
-   📌 OBTENER VENDEDORES FAVORITOS
---------------------------- */
-$query = "
-    SELECT u.id, u.nickname, u.descripcion, u.link, u.imagen
-    FROM favoritos f
-    INNER JOIN usuarios u ON f.votado_id = u.id
-    WHERE f.votante_id = ?
-";
-
-$stmt = $conn->prepare($query);
-
-if (!$stmt) {
-    die("❌ Error en prepare(): " . $conn->error . "<br><pre>$query</pre>");
-}
-
-$stmt->bind_param("i", $user['id']);
-$stmt->execute();
-$vendedores_favoritos = $stmt->get_result();
-$stmt->close();
+$vendedores_favoritos = apiGetFavoritosVendedores();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -68,7 +28,7 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Favoritos - Tu Mercado SENA</title>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
@@ -82,19 +42,19 @@ $stmt->close();
             </div>
             
            <div class="products-grid">
-<?php if ($vendedores_favoritos->num_rows > 0): ?>
-    <?php while ($v = $vendedores_favoritos->fetch_assoc()): ?>
+<?php if (!empty($vendedores_favoritos)): ?>
+    <?php foreach ($vendedores_favoritos as $v): ?>
         
         <div class="product-card seller-card">
 
             <!-- Avatar del vendedor -->
-            <img src="<?php echo getAvatarUrl($v['imagen']); ?>"
-                alt="Avatar de <?php echo htmlspecialchars($v['nickname']); ?>"
+            <img src="<?php echo getAvatarUrl($v['imagen'] ?? ''); ?>"
+                alt="Avatar de <?php echo htmlspecialchars($v['nickname'] ?? ''); ?>"
                 class="product-image">
 
             <div class="product-info">
                 <h3 class="product-name">
-                    <?php echo htmlspecialchars($v['nickname']); ?>
+                    <?php echo htmlspecialchars($v['nickname'] ?? ''); ?>
                 </h3>
 
                 <p class="product-category">
@@ -111,11 +71,11 @@ $stmt->close();
             </div>
 
             <div class="product-actions">
-                <a href="perfil_publico.php?id=<?php echo $v['id']; ?>" class="btn-primary">
+                <a href="<?= getBasePath() ?>perfil/vendedor.php?id=<?= (int)$v['id'] ?>" class="btn-primary">
                     Ver Perfil
                 </a>
 
-                <a href="favoritos.php?vendedor_id=<?php echo $v['id']; ?>"
+                <a href="<?= getBasePath() ?>perfil/favoritos.php?vendedor_id=<?= (int)$v['id'] ?>"
                    class="btn-small"
                    onclick="return confirm('¿Quieres quitar a este vendedor de tus favoritos?');">
                     Quitar de Favoritos
@@ -124,12 +84,12 @@ $stmt->close();
 
         </div>
 
-    <?php endwhile; ?>
+    <?php endforeach; ?>
 
 <?php else: ?>
     <div class="no-products">
         <p>No has agregado vendedores a tus favoritos todavía.</p>
-        <a href="index.php" class="btn-primary">Explorar</a>
+        <a href="<?= getAbsoluteBaseUrl() ?>index.php" class="btn-primary">Explorar</a>
     </div>
 <?php endif; ?>
 </div>
@@ -142,6 +102,6 @@ $stmt->close();
         </div>
     </footer>
     <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js"></script>
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
 </body>
 </html>

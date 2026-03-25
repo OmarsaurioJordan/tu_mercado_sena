@@ -1,25 +1,27 @@
 <?php
 require_once 'config.php';
-
+require_once __DIR__ . '/config_api.php';
+require_once __DIR__ . '/api/api_client.php';
 
 // Redirigir a login si no está autenticado
 if (!isLoggedIn()) {
-    header('Location: auth/welcome.php');
+    header('Location: /auth/welcome.php');
     exit;
 }
 
-// Usuario ya está autenticado via sesión PHP
-
-$conn = getDBConnection();
 $user = getCurrentUser();
 
 // Filtros (se pasan a JavaScript para la API)
 $categoria_id = isset($_GET['categoria']) ? (int)$_GET['categoria'] : 0;
 $busqueda = isset($_GET['busqueda']) ? sanitize($_GET['busqueda']) : '';
 
-// Obtener categorías para el filtro
-$categorias_query = "SELECT * FROM categorias ORDER BY nombre";
-$categorias_result = $conn->query($categorias_query);
+// Categorías e integridad solo desde API (tumercadosena.shop); sin SQL
+$categorias_list = [];
+$integridad_list = [];
+$cats = apiGetCategorias();
+$categorias_list = is_array($cats) ? $cats : [];
+$integridad_list = apiGetIntegridad();
+if (!is_array($integridad_list)) $integridad_list = [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -27,7 +29,8 @@ $categorias_result = $conn->query($categorias_query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tu Mercado SENA - Marketplace</title>
-    <link rel="stylesheet" href="styles.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="/styles.css">
+
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
@@ -36,33 +39,38 @@ $categorias_result = $conn->query($categorias_query);
 
     <main class="main">
         <div class="container">
+            <!-- Cabecera: tu búsqueda y filtros existentes + botón actualizar -->
+            <div class="list-header">
             <div class="filters-section">
                 <div class="filters-form" id="filtersForm">
-                    <div class="filter-group">
+                    <div class="filter-group filter-group-search">
                         <input type="text" id="searchInput" placeholder="Buscar productos..." 
                                value="<?php echo htmlspecialchars($busqueda); ?>" class="search-input">
+                    </div>
+                    <div class="filter-group filter-group-refresh">
+                        <button type="button" id="refreshProductsBtn" class="btn-icon-refresh" title="Actualizar lista" aria-label="Actualizar">
+                            <i class="ri-refresh-line" id="refreshIcon"></i>
+                        </button>
                     </div>
                     <div class="filter-group">
                         <select id="categoryFilter" class="select-input">
                             <option value="0">Categorías</option>
-                            <?php while ($cat = $categorias_result->fetch_assoc()): ?>
+                            <?php foreach ($categorias_list as $cat): ?>
                                 <option value="<?php echo $cat['id']; ?>" 
                                         <?php echo $categoria_id == $cat['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($cat['nombre']); ?>
+                                    <?php echo htmlspecialchars($cat['nombre'] ?? ''); ?>
                                 </option>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="filter-group">
                         <select id="integridadFilter" class="select-input">
                             <option value="0">Condición</option>
-                            <?php
-                            $integridad_result = $conn->query("SELECT * FROM integridad ORDER BY id");
-                            while ($int = $integridad_result->fetch_assoc()): ?>
+                            <?php foreach ($integridad_list as $int): ?>
                                 <option value="<?php echo $int['id']; ?>">
-                                    <?php echo htmlspecialchars($int['nombre']); ?>
+                                    <?php echo htmlspecialchars($int['nombre'] ?? ''); ?>
                                 </option>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="filter-group filter-price">
@@ -82,8 +90,10 @@ $categorias_result = $conn->query($categorias_query);
                     <button type="button" id="clearFiltersBtn" class="btn-link" style="display: none;">Limpiar filtros</button>
                 </div>
             </div>
+            </div>
 
-            <!-- Contenedor de productos con Infinite Scroll -->
+            <!-- Contenido del listado (equivalente a FlatList contentContainerStyle paddingBottom) -->
+            <div class="products-list-content">
             <div class="products-grid" id="productsGrid">
                 <!-- Los productos se cargarán dinámicamente via JavaScript -->
             </div>
@@ -118,14 +128,15 @@ $categorias_result = $conn->query($categorias_query);
             <div class="no-products" id="noProducts" style="display: none;">
                 <p>No se encontraron productos. ¡Sé el primero en publicar!</p>
                 <?php if ($user): ?>
-                    <a href="productos/publicar.php" class="btn-primary">Publicar Producto</a>
+                    <a href="<?= getAbsoluteBaseUrl() ?>productos/publicar.php" class="btn-primary">Publicar Producto</a>
                 <?php endif; ?>
             </div>
-            
+            </div>
+
             <!-- Pasar filtros actuales a JavaScript -->
             <script>
                 // Variable global para rutas de API
-                window.BASE_URL = '<?= getBaseUrl() ?>';
+                window.BASE_URL = '<?= getAbsoluteBaseUrl() ?>';
                 
                 window.productFilters = {
                     categoria: <?php echo json_encode($categoria_id); ?>,
@@ -144,10 +155,20 @@ $categorias_result = $conn->query($categorias_query);
         </div>
     </footer>
     <?php include 'includes/api_config_boot.php'; ?>
-    <script src="script.js?v=<?= time(); ?>"></script>
+    <script src="/script.js?v=<?= time(); ?>"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            /*
+                * Carga inicial de productos al abrir la página.
+                * Se llama a loadProducts con page=1 y 
+                * reset=true para cargar la primera página de productos
+                * Función del script.js que hace la llamada a la API y renderiza 
+                * los productos.
+            */
+            loadProducts(1, true);  
+        });
+
+    </script>
 </body>
 </html>
-<?php
-$conn->close();
-?>
 

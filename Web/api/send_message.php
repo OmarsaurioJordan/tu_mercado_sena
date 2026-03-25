@@ -80,6 +80,39 @@ if ($stmt->execute()) {
     $stmt2->execute();
     $stmt2->close();
 
+    // Notificación emergente para el destinatario (registro en BD)
+    $destinatario_id = $es_comprador ? (int)$chat['vendedor_id'] : (int)$chat['comprador_id'];
+    $stmt_prod = $conn->prepare("SELECT nombre FROM productos WHERE id = ?");
+    $stmt_prod->bind_param("i", $chat['producto_id']);
+    $stmt_prod->execute();
+    $prod = $stmt_prod->get_result()->fetch_assoc();
+    $stmt_prod->close();
+    $nombre_producto = $prod ? $prod['nombre'] : 'Chat';
+    $mensaje_notif = 'Nuevo mensaje en chat: ' . $nombre_producto;
+    $motivo_id = 8; // comprador/contacto
+    $stmt_ins = $conn->prepare("INSERT INTO notificaciones (usuario_id, motivo_id, mensaje, visto) VALUES (?, ?, ?, 0)");
+    $stmt_ins->bind_param("iis", $destinatario_id, $motivo_id, $mensaje_notif);
+    $stmt_ins->execute();
+    $stmt_ins->close();
+
+    // Notificación por correo si el destinatario tiene notifica_correo activo
+    $stmt_cuenta = $conn->prepare("
+        SELECT c.email, c.notifica_correo
+        FROM usuarios u
+        INNER JOIN cuentas c ON u.cuenta_id = c.id
+        WHERE u.id = ?
+    ");
+    $stmt_cuenta->bind_param("i", $destinatario_id);
+    $stmt_cuenta->execute();
+    $cuenta_dest = $stmt_cuenta->get_result()->fetch_assoc();
+    $stmt_cuenta->close();
+    if ($cuenta_dest && !empty($cuenta_dest['notifica_correo']) && !empty($cuenta_dest['email'])) {
+        $asunto = 'Nuevo mensaje en Tu Mercado SENA';
+        $cuerpo = "Tienes un nuevo mensaje en el chat del producto: " . $nombre_producto . ".\n\n";
+        $cuerpo .= "Entra a la aplicación para verlo.\n\n— Tu Mercado SENA";
+        enviar_correo_notificacion($cuenta_dest['email'], $asunto, $cuerpo);
+    }
+
     // RECUPERAR EL MENSAJE Y LA FECHA REAL GUARDADA
     $stmt3 = $conn->prepare("SELECT id, es_comprador, mensaje, fecha_registro FROM mensajes WHERE id = ?");
     $stmt3->bind_param("i", $message_id);

@@ -1,44 +1,188 @@
 <?php
 require_once '../config.php';
+require_once __DIR__ . '/../config_api.php';
+require_once __DIR__ . '/../api/api_client.php';
 
 if (!isLoggedIn()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-// Usuario autenticado
-
 $user = getCurrentUser();
-$conn = getDBConnection();
+$user = $user ?? [];
 
-// Obtener productos del usuario
-$stmt = $conn->prepare("
-    SELECT p.*, 
-           sc.nombre AS subcategoria_nombre, 
-           c.nombre AS categoria_nombre,
-           e.nombre AS estado_nombre,
-           f.imagen AS producto_imagen
-    FROM productos p
-    INNER JOIN subcategorias sc ON p.subcategoria_id = sc.id
-    INNER JOIN categorias c ON sc.categoria_id = c.id
-    INNER JOIN estados e ON p.estado_id = e.id
-    LEFT JOIN (
-        SELECT producto_id, MIN(id) AS min_id
-        FROM fotos
-        GROUP BY producto_id
-    ) fmin ON fmin.producto_id = p.id
-    LEFT JOIN fotos f ON f.id = fmin.min_id
-    WHERE p.vendedor_id = ?
-    ORDER BY p.fecha_registro DESC
-");
+if (isset($user['estado_id']) && (int)$user['estado_id'] !== 1) {
+    header("Location: bloqueado.php");
+    exit;
+}
 
-$stmt->bind_param("i", $user['id']);
-$stmt->execute();
-$productos_result = $stmt->get_result();
-$stmt->close();
-$conn->close();
+$error = '';
+$success = '';
+$productos_list = [];
 
-// Las imágenes de esta página vienen de la BD PHP (tabla fotos); siempre están en uploads/productos/
+function apiBaseHost() {
+    if (!defined('API_BASE_URL')) {
+        return '';
+    }
+    return preg_replace('#/api/?$#', '', rtrim(API_BASE_URL, '/'));
+}
+
+function normalizarImagenProducto($producto) {
+    $defaultImage = getAbsoluteBaseUrl() . 'assets/images/default-product.jpg';
+    $apiHost = apiBaseHost();
+
+    if (empty($producto['fotos']) || !is_array($producto['fotos'])) {
+        return $defaultImage;
+    }
+
+    $foto = $producto['fotos'][0] ?? null;
+    if (!$foto || !is_array($foto)) {
+        return $defaultImage;
+    }
+
+    $url = $foto['url'] ?? $foto['imagen_url'] ?? $foto['path'] ?? $foto['imagen'] ?? null;
+    if (!$url || !is_string($url)) {
+        return $defaultImage;
+    }
+
+    $url = trim($url);
+    if ($url === '') {
+        return $defaultImage;
+    }
+
+    if (preg_match('#^https?://#i', $url)) {
+        return $url;
+    }
+
+    if (strpos($url, '/storage/') === 0 || strpos($url, '/uploads/') === 0) {
+        return $apiHost . $url;
+    }
+
+    if (strpos($url, 'storage/') === 0 || strpos($url, 'uploads/') === 0) {
+        return $apiHost . '/' . ltrim($url, '/');
+    }
+
+    return $apiHost . '/storage/' . ltrim($url, '/');
+}
+
+function obtenerCategoriaNombre($producto) {
+    return $producto['subcategoria']['categoria']['nombre'] ?? '';
+}
+
+function obtenerSubcategoriaNombre($producto) {
+    return $producto['subcategoria']['nombre'] ?? '';
+}
+
+function obtenerEstadoNombre($producto) {
+    return $producto['estado']['nombre'] ?? '';
+}
+
+function obtenerEstadoId($producto) {
+    return (int)($producto['estado_id'] ?? $producto['estado']['id'] ?? 0);
+}
+
+function obtenerPrecioProducto($producto) {
+    return number_format((float)($producto['precio'] ?? 0), 0, ',', '.');
+}
+
+function obtenerDisponibles($producto) {
+    return (int)($producto['disponibles'] ?? 0);
+}
+
+/* =========================
+   Acciones por API
+   1 = activo
+   2 = invisible
+   3 = eliminado
+========================= */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $accion = $_POST['accion'] ?? '';
+    $productoId = (int)($_POST['producto_id'] ?? 0);
+
+    if ($productoId <= 0) {
+        header('Location: mis_productos.php?msg_error=producto_invalido');
+        exit;
+    }
+
+    if ($accion === 'eliminar') {
+        $resp = apiEliminarProducto($productoId);
+
+        if (!empty($resp['success'])) {
+            header('Location: mis_productos.php?msg=eliminado');
+            exit;
+        }
+
+        header('Location: mis_productos.php?msg_error=eliminar');
+        exit;
+    }
+
+    if ($accion === 'ocultar') {
+        $resp = apiCambiarEstadoProducto($productoId, 2);
+
+        if (!empty($resp['success'])) {
+            header('Location: mis_productos.php?msg=ocultado');
+            exit;
+        }
+
+        header('Location: mis_productos.php?msg_error=ocultar');
+        exit;
+    }
+
+    if ($accion === 'activar') {
+        $resp = apiCambiarEstadoProducto($productoId, 1);
+
+        if (!empty($resp['success'])) {
+            header('Location: mis_productos.php?msg=activado');
+            exit;
+        }
+
+        header('Location: mis_productos.php?msg_error=activar');
+        exit;
+    }
+}
+
+if (!empty($_GET['msg'])) {
+    if ($_GET['msg'] === 'eliminado') {
+        $success = 'Producto eliminado correctamente.';
+    } elseif ($_GET['msg'] === 'ocultado') {
+        $success = 'Producto ocultado correctamente.';
+    } elseif ($_GET['msg'] === 'activado') {
+        $success = 'Producto activado correctamente.';
+    }
+}
+
+if (!empty($_GET['msg_error'])) {
+    if ($_GET['msg_error'] === 'producto_invalido') {
+        $error = 'Producto inválido.';
+    } elseif ($_GET['msg_error'] === 'eliminar') {
+        $error = 'No se pudo eliminar el producto.';
+    } elseif ($_GET['msg_error'] === 'ocultar') {
+        $error = 'No se pudo ocultar el producto.';
+    } elseif ($_GET['msg_error'] === 'activar') {
+        $error = 'No se pudo activar el producto.';
+    }
+}
+
+/* =========================
+   Cargar productos solo por API
+========================= */
+$productos_list = apiGetMisProductos();
+
+if (!is_array($productos_list)) {
+    $productos_list = [];
+}
+
+/* Mostrar activos e invisibles. Ocultar solo eliminados */
+$productos_list = array_values(array_filter($productos_list, function ($producto) {
+    return obtenerEstadoId($producto) !== 3;
+}));
+
+if (!empty($_GET['debug_api'])) {
+    echo "<div style='background:#111;color:#0f0;padding:10px;margin:10px;font-family:monospace;font-size:12px'>";
+    echo "<strong>DEBUG apiGetMisProductos()</strong><pre>";
+    print_r($productos_list);
+    echo "</pre></div>";
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -46,119 +190,258 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Productos - Tu Mercado SENA</title>
-    <script>
-        (function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();
-    </script>
-    <link rel="stylesheet" href="<?= getBaseUrl() ?>styles.css?v=<?= time(); ?>">
-
+    <link rel="stylesheet" href="<?= getAbsoluteBaseUrl() ?>styles.css?v=<?= time(); ?>">
     <style>
-        .btn-delete {
-            background: var(--color-danger);
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 14px;
-            transition: .2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-delete:hover {
-            filter: brightness(0.9);
-            transform: translateY(-1px);
-        }
-        .product-actions {
+        .page-header {
             display: flex;
-            gap: 8px;
-            margin-top: 15px;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            margin: 0;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
             flex-wrap: wrap;
         }
-    </style>
 
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+            border: 1px solid #e9e9e9;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+            background: #f5f5f5;
+        }
+
+        .product-body {
+            padding: 16px;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 8px;
+        }
+
+        .product-price {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1d4ed8;
+            margin: 0 0 10px;
+        }
+
+        .product-meta {
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .btn-action,
+        .btn-link {
+            border: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e9e9e9;
+            margin-top: 20px;
+        }
+
+        .message-success,
+        .message-error {
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin: 16px 0;
+        }
+
+        .message-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .message-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+    </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
-    
     <?php include '../includes/bottom_nav.php'; ?>
 
     <main class="main">
         <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Mis Productos</h1>
 
-            <!-- MENSAJE CUANDO SE ELIMINA UN PRODUCTO -->
-            <?php if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'producto_eliminado'): ?>
-                <div class="alert-success">
-                    ✅ Producto eliminado correctamente.
+                <div class="top-actions">
+                    <a href="publicar.php" class="btn-link btn-primary">Publicar producto</a>
                 </div>
+            </div>
+
+            <?php if ($success): ?>
+                <div class="message-success"><?= htmlspecialchars($success) ?></div>
             <?php endif; ?>
 
-            <div class="page-header">
-                <h1>Mis Productos</h1>
-                <a href="publicar.php" class="btn-primary">Publicar Nuevo Producto</a>
-            </div>
-            
-            <div class="products-grid">
-                <?php if ($productos_result->num_rows > 0): ?>
-                    <?php while ($producto = $productos_result->fetch_assoc()): ?>
+            <?php if ($error): ?>
+                <div class="message-error"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+
+            <?php if (empty($productos_list)): ?>
+                <div class="empty-state">
+                    <h2>No tienes productos publicados</h2>
+                    <p>Aún no has creado productos en Tu Mercado SENA.</p>
+                    <!-- <a href="publicar.php" class="btn-link btn-primary">Publicar producto</a> -->
+                </div>
+            <?php else: ?>
+                <div class="products-grid">
+                    <?php foreach ($productos_list as $producto): ?>
+                        <?php
+                        $productoId = (int)($producto['id'] ?? 0);
+                        $estadoId = obtenerEstadoId($producto);
+                        $imgUrl = normalizarImagenProducto($producto);
+                        $categoriaNombre = obtenerCategoriaNombre($producto);
+                        $subcategoriaNombre = obtenerSubcategoriaNombre($producto);
+                        $estadoNombre = obtenerEstadoNombre($producto);
+                        $precioFormateado = obtenerPrecioProducto($producto);
+                        $disponibles = obtenerDisponibles($producto);
+                        ?>
                         <div class="product-card">
-                            <a href="producto.php?id=<?php echo $producto['id']; ?>">
+                            <img
+                                src="<?= htmlspecialchars($imgUrl) ?>"
+                                alt="<?= htmlspecialchars($producto['nombre'] ?? 'Producto') ?>"
+                                class="product-image"
+                                onerror="this.onerror=null;this.src='<?= htmlspecialchars(getAbsoluteBaseUrl() . 'assets/images/default-product.jpg') ?>';"
+                            >
 
-<?php if (!empty($producto['producto_imagen'])): ?>
-    <?php
-    $imgPath = htmlspecialchars($producto['producto_imagen']);
-    $imgUrl = getBaseUrl() . 'uploads/productos/' . $imgPath;
-    ?>
-    <img src="<?= $imgUrl ?>"
-         alt="<?php echo htmlspecialchars($producto['nombre']); ?>"
-         class="product-image">
-<?php else: ?>
-    <img src="https://picsum.photos/seed/<?php echo $producto['id']; ?>/400/300"
-         alt="<?php echo htmlspecialchars($producto['nombre']); ?>"
-         class="product-image">
-<?php endif; ?>
+                            <div class="product-body">
+                                <h2 class="product-title">
+                                    <?= htmlspecialchars($producto['nombre'] ?? 'Sin nombre') ?>
+                                </h2>
 
+                                <div class="product-price">$ <?= $precioFormateado ?></div>
 
+                                <?php if ($categoriaNombre !== ''): ?>
+                                    <div class="product-meta">
+                                        <strong>Categoría:</strong>
+                                        <?= htmlspecialchars($categoriaNombre) ?>
+                                    </div>
+                                <?php endif; ?>
 
-                                <div class="product-info">
-                                    <h3 class="product-name"><?php echo htmlspecialchars($producto['nombre']); ?></h3>
-                                    <p class="product-price"><?php echo formatPrice($producto['precio']); ?></p>
-                                    <p class="product-category"><?php echo htmlspecialchars($producto['categoria_nombre']); ?> - 
-                                       <?php echo htmlspecialchars($producto['subcategoria_nombre']); ?></p>
-                                    <span class="product-status status-<?php echo $producto['estado_id']; ?>">
-                                        <?php echo htmlspecialchars($producto['estado_nombre']); ?>
-                                    </span>
-                                    <span class="product-stock">Disponibles: <?php echo $producto['disponibles']; ?></span>
+                                <?php if ($subcategoriaNombre !== ''): ?>
+                                    <div class="product-meta">
+                                        <strong>Subcategoría:</strong>
+                                        <?= htmlspecialchars($subcategoriaNombre) ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="product-meta">
+                                    <strong>Disponibles:</strong>
+                                    <?= $disponibles ?>
                                 </div>
-                            </a>
 
-                            <div class="product-actions" style="display: flex; gap: 4px; flex-wrap: wrap;">
-                                <a href="editar_producto.php?id=<?php echo $producto['id']; ?>" class="btn-small">Editar</a>
-                                
-                                <button type="button" 
-                                        onclick="toggleVisibilidad(<?php echo $producto['id']; ?>, this)" 
-                                        class="btn-small" 
-                                        style="background: var(--color-secondary); color: white;">
-                                    <?php echo $producto['estado_id'] == 1 ? 'Ocultar' : 'Mostrar'; ?>
-                                </button>
+                                <?php if ($estadoNombre !== ''): ?>
+                                    <div class="product-meta">
+                                        <strong>Estado:</strong>
+                                        <?= htmlspecialchars($estadoNombre) ?>
+                                    </div>
+                                <?php endif; ?>
 
-                                <a href="eliminar_producto.php?id=<?php echo $producto['id']; ?>"
-                                   class="btn-delete"
-                                   onclick="return confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.');">
-                                   Eliminar
-                                </a>
+                                <div class="product-actions">
+                                    <a href="producto.php?id=<?= $productoId ?>" class="btn-link btn-primary">
+                                        Ver
+                                    </a>
+
+                                    <a href="editar_producto.php?id=<?= $productoId ?>" class="btn-link btn-secondary">
+                                        Editar
+                                    </a>
+
+                                    <?php if ($estadoId === 1): ?>
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="producto_id" value="<?= $productoId ?>">
+                                            <input type="hidden" name="accion" value="ocultar">
+                                            <button type="submit" class="btn-action btn-secondary">
+                                                Ocultar
+                                            </button>
+                                        </form>
+                                    <?php elseif ($estadoId === 2): ?>
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="producto_id" value="<?= $productoId ?>">
+                                            <input type="hidden" name="accion" value="activar">
+                                            <button type="submit" class="btn-action btn-secondary">
+                                                Activar
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
+
+                                    <form method="POST" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?');">
+                                        <input type="hidden" name="producto_id" value="<?= $productoId ?>">
+                                        <input type="hidden" name="accion" value="eliminar">
+                                        <button type="submit" class="btn-action btn-danger">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-
-
                         </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <div class="no-products">
-                        <p>No has publicado ningún producto todavía.</p>
-
-                        <a href="publicar.php" class="btn-primary">Publicar tu primer producto</a>
-                    </div>
-                <?php endif; ?>
-            </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </main>
 
@@ -167,37 +450,7 @@ $conn->close();
             <p>&copy; 2025 Tu Mercado SENA. Todos los derechos reservados.</p>
         </div>
     </footer>
-    <script>
-    function toggleVisibilidad(id, btn) {
-        var baseUrl = '<?= getBaseUrl() ?>';
-        fetch(baseUrl + 'api/toggle_visibilidad.php?id=' + id)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const card = btn.closest('.product-card');
-                    const statusSpan = card.querySelector('.product-status');
-                    
-                    if (data.nuevo_estado === 2) {
-                        btn.textContent = 'Mostrar';
-                        statusSpan.textContent = 'invisible';
-                        statusSpan.className = 'product-status status-2';
-                    } else {
-                        btn.textContent = 'Ocultar';
-                        statusSpan.textContent = 'activo';
-                        statusSpan.className = 'product-status status-1';
-                    }
-                    alert('Visibilidad actualizada');
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(err => alert('Error de conexion'));
-    }
-    </script>
-    <?php include __DIR__ . '/../includes/api_config_boot.php'; ?>
-    <script src="<?= getBaseUrl() ?>script.js?v=<?= time(); ?>"></script>
+
+    <script src="<?= getAbsoluteBaseUrl() ?>script.js"></script>
 </body>
 </html>
-
-
-
