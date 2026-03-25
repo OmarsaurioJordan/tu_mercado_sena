@@ -111,14 +111,22 @@ class ChatRepository implements IChatRepository
             ->where(function ($query) use ($usuario_id) {
                 // Chats donde el usuario es comprador
                 $query->where('comprador_id', $usuario_id)
-                    ->whereNotIn('estado_id', [13, 14]) // comprador eliminó o ambos eliminaron → oculto
+                    ->whereNotIn('estado_id', [13, 14])
                     // Chats donde el usuario es vendedor
                     ->orWhere(function($q) use ($usuario_id) {
                         $q->whereHas('producto', function ($prod) use ($usuario_id) {
                             $prod->where('vendedor_id', $usuario_id);
                         })
-                        ->whereNotIn('estado_id', [12, 14]); // vendedor eliminó o ambos eliminaron → oculto
+                        ->whereNotIn('estado_id', [12, 14]);
                     });
+            })
+            // Excluir chats donde el comprador fue bloqueado/eliminado 
+            ->whereHas('comprador', function ($q) {
+                $q->whereNotIn('estado_id', [3, 4]);
+            })
+            // Excluir chats donde el vendedor fue bloqueado/eliminado 
+            ->whereHas('producto.vendedor', function ($q) {
+                $q->whereNotIn('estado_id', [3, 4]);
             })
             ->get();
     }
@@ -164,7 +172,7 @@ class ChatRepository implements IChatRepository
             'producto.vendedor:id,nickname,imagen',
             'producto.fotos:id,producto_id,imagen', // Necesario para la foto del producto
             'mensajes' => function ($query) {
-                $query->orderBy('fecha_registro', 'asc'); // O 'fecha_registro' si usas nombres personalizados
+                $query->orderBy('fecha_registro', 'desc'); // O 'fecha_registro' si usas nombres personalizados
             }
         ])->find($chatId);
     }

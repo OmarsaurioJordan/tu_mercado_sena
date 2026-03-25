@@ -27,6 +27,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'jwtVerify' => \App\Http\Middleware\ValidateJWTToken::class,
             'CheckChatBlock' => \App\Http\Middleware\CheckChatBlock::class,
             'CheckGmailRestriction' => \App\Http\Middleware\CheckGmailRestriction::class,
+            'CheckDenuncia' => \App\Http\Middleware\CheckDenuncia::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -133,10 +134,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     ]);
                 }
 
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => $message,
-                ], $code);
+                return $request->expectsJson()
+                    ? response()->json(['error' => $message], $code)
+                    : response($message, $code);
             }
         });
     })->create();

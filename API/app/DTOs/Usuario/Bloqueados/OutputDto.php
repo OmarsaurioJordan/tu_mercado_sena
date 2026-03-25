@@ -46,7 +46,8 @@ readonly class OutputDto implements Arrayable
             bloqueador_id: $bloqueadorId,
             usuario_bloqueado: [
                 'id'       => $bloqueado->id,
-                'nickname' => $bloqueado->nickname
+                'nickname' => $bloqueado->nickname,
+                'imagen'   => $bloqueado->imagen
             ]
         );
     }

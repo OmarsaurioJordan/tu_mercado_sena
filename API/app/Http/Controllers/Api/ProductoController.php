@@ -119,23 +119,31 @@ class ProductoController extends Controller
      * PUT/PATCH /api/productos/{id}
      */
     public function update(ActualizarProductoRequest $request, int $id): JsonResponse
-{
+    {
     try {
+
         $dto = InputDto::fromRequest($request->validated(), $id);
-        
-        // Mismo código
+
         $imagenes = null;
-        
+
         if ($request->hasFile('imagenes')) {
             $archivos = $request->file('imagenes');
             $imagenes = is_array($archivos) ? $archivos : [$archivos];
         }
 
-        $resultado = $this->productoService->actualizarProducto($dto, $imagenes);
+        // NUEVO: obtener fotos existentes
+        $fotosExistentes = $request->input('fotos_existentes', []);
+
+        $resultado = $this->productoService->actualizarProducto(
+            $dto,
+            $imagenes,
+            $fotosExistentes
+        );
 
         return response()->json($resultado, 200);
 
     } catch (ValidationException $e) {
+
         return response()->json([
             'success' => false,
             'message' => 'Error de validación.',
@@ -143,6 +151,7 @@ class ProductoController extends Controller
         ], 422);
 
     } catch (\Exception $e) {
+
         return response()->json([
             'success' => false,
             'message' => $e->getMessage(),
@@ -217,7 +226,7 @@ class ProductoController extends Controller
     public function misProductos(): JsonResponse
     {
         try {
-            $resultado = $this->productoService->obtenerProductosDeVendedor(Auth::id());
+            $resultado = $this->productoService->obtenerProductosDeVendedor(Auth::user()->usuario->id);
 
             return response()->json($resultado, 200);
 

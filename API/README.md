@@ -509,20 +509,45 @@ Ruta: http://localhost:8000/api/auth/me
 Respuesta:
 
 ```JSON
- {
+{
   "data": {
-    "id": 1,
-    "cuenta_id": 1,
-    "nickname": "xxxxx",
-    "imagen": "Foto.jpg",
-    "descripcion": "Estudiante de desarrollo",
-    "link": "https://instagram.com/xxxx",
+    "id": 2,
+    "cuenta_id": 2,
+    "nickname": "Xxxxxxxxxx",
+    "imagen": null,
+    "descripcion": null,
+    "link": null,
     "rol_id": 1,
     "estado_id": 1,
-    "fecha_registro": "2025-12-27 05:46:43",
-    "fecha_actualiza": "2025-12-27 06:10:14",
-    "fecha_reciente": "2025-12-27 01:10:14",
-    "is_recently_active": true
+    "cuenta": {
+      "id": 2,
+      "notifica_push": true,
+      "notifica_correo": false
+    },
+    "productos": [
+      {
+        "id": 1,
+        "vendedor_id": 2,
+        "integridad_id": 1,
+        "estado_id": 1,
+        "subcategoria_id": 4,
+        "nombre": "Mouse Gamer",
+        "precio": 120000,
+        "integridad": {
+          "id": 1,
+          "nombre": "nuevo"
+        },
+        "estado": {
+          "id": 1,
+          "nombre": "activo"
+        },
+        "subcategoria": {
+          "id": 4,
+          "nombre": "carne o huevos"
+        },
+        "fotos": []
+      }
+    ]
   }
 }
 ```
@@ -553,6 +578,7 @@ Ejemplo de uso:
   "password-old": "ContraseñaVieja",
   "password": "NuevaContraseña",
   "password_confirmation": "ConfirmacionNuevaContraseña"
+  "notifica_correo": false
 }
 ```
 
@@ -1551,7 +1577,7 @@ Si el usuario marca varios transferencias para su consulta. Ejemplo **?estados[]
 ```
 
 
-**Favoritos**
+**Modulo Favoritos**
 
 
 **1️⃣Ver usuarios favoritos**
@@ -1645,10 +1671,358 @@ MÉTODO: **DELETE**
     "message": "Usuario eliminado de favoritos exitosamente."
 }
 ```
+**Motivos**
+
+**1️⃣Obtener motivos**
+
+
+**👁️OJO**
+
+El parámetro tipo es opcional. Si no se envía, retorna todos los motivos. Los valores válidos son denuncia, pqrs y notificacion.
+
+RUTA: **http://127.0.0.1:8000/api/motivos**
+
+MÉTODO: **GET**
+
+**Ejemplos de uso**
+
+```
+GET /api/motivos
+GET /api/motivos?tipo=denuncia
+GET /api/motivos?tipo=pqrs
+GET /api/motivos?tipo=notificacion
+```
+```Json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 18,
+      "nombre": "acoso",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento de acoso sexual en un chat o imágenes"
+    },
+    {
+      "id": 19,
+      "nombre": "bulling",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento de burlas o insultos en un chat o imágenes"
+    },
+    {
+      "id": 20,
+      "nombre": "violencia",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento que incita al odio o amenzada directamente"
+    },
+    {
+      "id": 21,
+      "nombre": "ilegal",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento asociado a drogas, armas, prostitución y demás"
+    },
+    {
+      "id": 22,
+      "nombre": "troll",
+      "tipo": "denuncia",
+      "descripcion": "comportamiento enfocado en molestar y hacer perder el tiempo"
+    },
+    {
+      "id": 23,
+      "nombre": "fraude",
+      "tipo": "denuncia",
+      "descripcion": "se trata de vender algo malo o mediante trampas, tratan de tumbar al otro con fraudes"
+    },
+    {
+      "id": 24,
+      "nombre": "fake",
+      "tipo": "denuncia",
+      "descripcion": "un producto o perfil es meme o chisto o simplemente hace perder el tiempo"
+    },
+    {
+      "id": 25,
+      "nombre": "spam",
+      "tipo": "denuncia",
+      "descripcion": "un producto o perfil aparece muchas veces como si lo pusieran en demasia para llamar la atención"
+    },
+    {
+      "id": 26,
+      "nombre": "sexual",
+      "tipo": "denuncia",
+      "descripcion": "un perfil o producto exhibe temáticas sexuales o provocativas"
+    }
+  ]
+}
+```
+**Denuncias**
+
+**1️⃣Crear denuncia**
+
+**👁️OJO**
+
+El motivo_id debe corresponder a un motivo de tipo denuncia. Usar la ruta GET /api/motivos?tipo=denuncia para obtener los motivos válidos.
+
+RUTA: **http://127.0.0.1:8000/api/denuncias**
+
+MÉTODO: **POST**
+
+**RESTRICCIONES**
+
+✖️ No puedes denunciarte a ti mismo.
+
+✖️ Solo puedes tener una denuncia abierta por chat.
+
+✖️ Solo puedes tener una denuncia abierta por producto.
+
+✖️ Solo puedes tener una denuncia abierta contra un usuario (sin chat ni producto).
+
+✖️ El producto_id debe existir en la base de datos.
+
+⚠️ Si un usuario o producto acumula 3 o más denuncias abiertas, su estado cambia automáticamente a denunciado.
+
+**Casos de uso**
+
+Denuciar dentro de un chat
+
+```Json
+{
+  "motivo_id": 23,
+  "usuario_id": 5,
+  "chat_id": 12
+}
+```
+
+Denuciar un producto específico
+
+```Json
+{
+  "motivo_id": 23,
+  "usuario_id": 5,
+  "chat_id": 12
+}
+```
+
+Denuciar solo al usuario
+
+```Json
+{
+  "motivo_id": 19,
+  "usuario_id": 5
+}
+```
+
+**Salida Json**
+
+```Json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "denunciante_id": 3,
+    "usuario_id": 5,
+    "producto_id": null,
+    "chat_id": 12,
+    "motivo_id": 23,
+    "estado_id": 1
+  }
+}
+```
+
+
+**Modulo PQRS**
+
+**1️⃣Ver PQRS realizadas**
+
+RUTA: **http://127.0.0.1:8000/api/pqrs**
+
+MÉTODO: **GET**
+
+**Si el usuario no tiene pqrs**
+
+
+```Json
+{
+    "success":true,
+    "message":"No hay PQRS realizadas",
+    "data":[]
+}
+```
+
+
+**Salida Json**
+
+```Json
+{
+  "success": true,
+  "message": "PQRS obtenidas exitosamente",
+  "data": [
+    {
+      "id": 2,
+      "usuario_id": 1,
+      "mensaje": "El sistema es muy bueno",
+      "motivo_id": 5,
+      "estado_id": 1,
+      "fecha_registro": "2026-03-07T17:04:54.000000Z",
+      "estado": {
+        "id": 1,
+        "nombre": "activo"
+      },
+      "motivo": {
+        "id": 5,
+        "nombre": "agradecimiento"
+      }
+    }
+  ]
+}
+```
+
+
+**2️⃣Crear PQRS**
+
+RUTA: **http://127.0.0.1:8000/api/pqrs**
+
+MÉTODO: **POST**
+
+**RESTRICCIONES**
+
+✖️ La Pqrs debe estar acompañado de un mensaje obligatorio
+
+✖️ El motivo debe ser uno de los siguientes: pregunta(id=1), queja(id=2), reclamo(id=3), sugerencia(id=4) o agradecimiento(id=5).
+
+✖️ Solo se permite 5 Pqrs por usuario, para crear una más debe tener al menos una es estado resuelto(estado_id=11) 
+
+**Posibles Errores**
+
+
+```Json
+{
+  "status": "error",
+  "message": "Los datos proporcionados no son válidos.",
+  "errors": {
+    "mensaje": [
+      "El mensaje es obligatorio."
+    ],
+    "motivo_id": [
+      "El motivo debe ser uno de los siguientes: pregunta, queja, reclamo, sugerencia o agradecimiento."
+    ]
+  }
+}
+```
+
+```Json
+{
+  "status": "error",
+  "type": "BusinessException",
+  "message": "EL USUARIO HA ALCANZADO EL LÍMITE DE PQRS CREADAS"
+}
+```
 
 
 
-**Código	Significado**
+**Salida Json**
+
+```Json
+{
+  "sucess": true,
+  "message": "PQRS CREADA EXITOSAMENTE, ESPERA RESPUESTA DEL ADMINISTRADOR"
+}
+```
+
+
+**Modulo Notificaciones**
+
+**1️⃣Ver todas las notificaciones**
+
+RUTA: **http://127.0.0.1:8000/api/notificaciones**
+
+MÉTODO: **GET**
+
+**Salida Json**
+
+
+```Json
+{
+  "success": true,
+  "message": "Notificaciones obtenidas correctamente",
+  "data": [
+    {
+      "id": 5,
+      "usuario_id": 1,
+      "motivo_id": 16,
+      "mensaje": "El usuario: XXXXXX ha concretado la devolución",
+      "visto": 0,
+      "fecha_registro": "2026-03-04T02:38:49.000000Z"
+    },
+    {
+      "id": 2,
+      "usuario_id": 1,
+      "motivo_id": 13,
+      "mensaje": "El usuario: XXXX ha enviado solicitud para consolidar la venta",
+      "visto": 0,
+      "fecha_registro": "2026-03-04T02:36:19.000000Z"
+    }
+  ]
+}
+```
+
+**2️⃣Obtener el número de notificaciones no vistas**
+
+RUTA: **http://127.0.0.1:8000/api/notificaciones/no-vistas**
+
+MÉTODO: **GET**
+
+**Salida Json**
+
+
+```Json
+{
+  "success": true,
+  "message": "Número de notificaciones no vistas obtenidas correctamente",
+  "data": 2
+}
+```
+
+
+**3️⃣Marcar una notificacion como vista**
+
+RUTA: **http://127.0.0.1:8000/api/notificaciones/{notificacion_id}**
+
+MÉTODO: **GET**
+
+**Salida Json**
+
+
+```Json
+{
+  "success": true,
+  "message": "Notificación obtenida correctamente",
+  "data": {
+    "id": 2,
+    "usuario_id": 1,
+    "motivo_id": 13,
+    "mensaje": "El usuario:XXXXXXXX ha enviado solicitud para consolidar la venta",
+    "visto": true,
+    "fecha_registro": "2026-03-04T02:36:19.000000Z"
+  }
+}
+```
+
+**4️⃣Borrar una notificación**
+
+RUTA: **http://127.0.0.1:8000/api/notificaciones/{notificacion_id}**
+
+MÉTODO: **DELETE**
+
+**Salida Json**
+
+
+```Json
+{
+  "success": true,
+  "message": "Notificación eliminada correctamente"
+}
+```
+
+**Código Significado**
 
 200	Operación exitosa
 

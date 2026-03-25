@@ -95,8 +95,11 @@ class ProductoRepository implements IProductoRepository
         }
 
         // Excluir mis propios productos en el listado general si no se filtra por vendedor
-        if (Auth::check() && !isset($filtros['vendedor_id'])) {
-            $query->where('vendedor_id', '<>', Auth::id());
+        // if (Auth::check() && !isset($filtros['vendedor_id'])) {
+        //     $query->where('vendedor_id', '<>', Auth::user()->usuario->id);
+        // }
+        if (Auth::check() && !isset($filtros["vendedor_id"]) && Auth::user()->usuario){
+            $query->where("vendedor_id", "<>", Auth::user()->usuario->id);
         }
 
         // Ordenamiento
@@ -112,12 +115,19 @@ class ProductoRepository implements IProductoRepository
      */
     public function obtenerPorVendedor(int $vendedorId, array $relaciones = []): Collection
     {
-        $query = Producto::porVendedor($vendedorId);
+    $query = Producto::porVendedor($vendedorId)
+        ->whereIn('estado_id', [1, 2]); // activos e invisibles
 
-        // Si el usuario autenticado no es el vendedor, aplicar filtro de bloqueados
-        if (Auth::check() && Auth::id() !== $vendedorId) {
+    if (Auth::check() && Auth::user()->usuario->id !== $vendedorId){
+
+        $usuarioId = Auth::check() && Auth::user()->usuario 
+            ? Auth::user()->usuario->id 
+            : null;
+
+        if ($usuarioId !== null && $usuarioId !== $vendedorId) {
             $query = $this->aplicarFiltroBloqueados($query);
         }
+    }
 
         if (!empty($relaciones)) {
             $query->with($relaciones);
@@ -131,9 +141,15 @@ class ProductoRepository implements IProductoRepository
      */
     public function cambiarEstado(int $id, int $estadoId): bool
     {
-        return Producto::where('id', $id)->update([
-            'estado_id' => $estadoId,
-        ]) > 0;
+        $producto = Producto::find($id);
+
+        if (!$producto) {
+            return false;
+        }
+
+        $producto->estado_id = $estadoId;
+
+        return $producto->save();
     }
 
     /**
@@ -141,7 +157,9 @@ class ProductoRepository implements IProductoRepository
      */
     public function eliminar(int $id): bool
     {
-        return $this->cambiarEstado($id, 3); // 3 = eliminado según BD
+        return $this->cambiarEstado($id, 3); // 3 = eliminado según BD y ya deja de aparecerle al prosumer
+        // 3 = eliminado según BD y ya deja de aparecerle al prosumer
+        
     }
 
     /**
@@ -181,8 +199,8 @@ class ProductoRepository implements IProductoRepository
         }
 
         // Excluir mis propios productos en la búsqueda general
-        if (Auth::check()) {
-            $query->where('vendedor_id', '<>', Auth::id());
+        if (Auth::check() && Auth::user()->usuario) {
+            $query->where('vendedor_id', '<>', Auth::user()->usuario->id);
         }
 
         return $query->orderBy('fecha_registro', 'desc')->paginate($perPage);
@@ -195,7 +213,7 @@ class ProductoRepository implements IProductoRepository
      */
     protected function aplicarFiltroBloqueados($query)
     {
-        $usuarioId = Auth::id();
+        $usuarioId = Auth::user()->usuario->id;
 
         return $query->whereNotIn('vendedor_id', function ($subQuery) use ($usuarioId) {
             $subQuery->select('bloqueado_id')
@@ -206,6 +224,11 @@ class ProductoRepository implements IProductoRepository
             $subQuery->select('bloqueador_id')
                 ->from('bloqueados')
                 ->where('bloqueado_id', $usuarioId);
-        });
+        })->whereNotIn('vendedor_id', function ($subQuery) use ($usuarioId) {
+	   // Excluir productos de usuarios con estado bloqueado
+	    $subQuery->select('id')
+		     ->from('usuarios')
+		     ->where('estado_id', 4);
+	});
     }
 }

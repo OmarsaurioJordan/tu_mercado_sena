@@ -8,6 +8,8 @@ use App\Contracts\Producto\Repositories\IProductoRepository;
 use App\DTOs\Producto\InputDto;
 use App\DTOs\Producto\OutputDto;
 use App\Models\Foto;
+use App\Models\Papelera;
+use App\Exceptions\BusinessException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +35,8 @@ class ProductoService implements IProductoService
 
     try {
         return DB::transaction(function () use ($dto, $imagenes) {
+
+
             $producto = $this->productoRepository->crear($dto->toArray());
             
             Log::info('SERVICE: Producto creado', ['id' => $producto->id]);
@@ -71,43 +75,87 @@ class ProductoService implements IProductoService
     /**
      * Actualiza un producto existente
      */
-    public function actualizarProducto(InputDto $dto, ?array $imagenes = null): array
-    {
-        Log::info('Actualizando producto', ['id' => $dto->id]);
+    /**
+ * Actualiza un producto existente
+ */
+public function actualizarProducto(InputDto $dto, ?array $imagenes = null, array $fotosExistentes = []): array
+{
+    Log::info('Actualizando producto', ['id' => $dto->id]);
 
-        try {
-            // Verificar que el producto existe y pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::id())) {
-                throw new \Exception('No tienes permiso para editar este producto.');
+    try {
+
+        if (!$this->productoRepository->perteneceAVendedor($dto->id, Auth::user()->usuario->id)) {
+            throw new \Exception('No tienes permiso para editar este producto.');
+        }
+
+        return DB::transaction(function () use ($dto, $imagenes, $fotosExistentes) {
+
+            $producto = $this->productoRepository->actualizar($dto->id, $dto->toArray());
+
+            /*
+            =====================================
+            ELIMINAR FOTOS QUE YA NO EXISTEN
+            Solo si se enviaron IDs explícitamente.
+            Si fotosExistentes llega vacío, no se
+            toca ninguna foto existente.
+            =====================================
+            */
+            if (!empty($fotosExistentes)) {
+                $fotos = Foto::where('producto_id', $producto->id)->get();
+
+                foreach ($fotos as $foto) {
+                    if (!in_array($foto->id, $fotosExistentes)) {
+
+                        Storage::disk('public')->move(
+                            "productos/{$producto->id}/{$foto->imagen}",
+                            "papelera/productos/{$producto->id}/{$foto->imagen}"
+                        );
+
+                        Papelera::create([
+                            "usuario_id" => Auth::user()->usuario->id,
+                            "mensaje"    => "Producto editado ID: {$producto->id}",
+                            "imagen"     => "papelera/productos/{$producto->id}/{$foto->imagen}",
+                        ]);
+
+                        $foto->delete();
+                    }
+                }
             }
 
-            return DB::transaction(function () use ($dto, $imagenes) {
-                // Actualizar el producto
-                $producto = $this->productoRepository->actualizar($dto->id, $dto->toArray());
+            /*
+            =====================================
+            SUBIR NUEVAS IMÁGENES
+            =====================================
+            */
+            if ($imagenes && count($imagenes) > 0) {
+                $this->procesarImagenes($producto->id, $imagenes);
+            }
 
-                // Procesar nuevas imágenes si existen
-                if ($imagenes && count($imagenes) > 0) {
-                    $this->procesarImagenes($producto->id, $imagenes);
-                }
-
-                // Cargar relaciones
-                $producto->load(['vendedor', 'subcategoria.categoria', 'integridad', 'estado', 'fotos']);
-
-                return [
-                    'success' => true,
-                    'message' => 'Producto actualizado exitosamente.',
-                    'data' => OutputDto::fromModel($producto)->toArray()
-                ];
-            });
-
-        } catch (\Exception $e) {
-            Log::error('Error al actualizar producto', [
-                'error' => $e->getMessage(),
-                'id' => $dto->id,
+            $producto->load([
+                'vendedor',
+                'subcategoria.categoria',
+                'integridad',
+                'estado',
+                'fotos'
             ]);
-            throw $e;
-        }
+
+            return [
+                'success' => true,
+                'message' => 'Producto actualizado exitosamente.',
+                'data'    => OutputDto::fromModel($producto)->toArray()
+            ];
+        });
+
+    } catch (\Exception $e) {
+
+        Log::error('Error al actualizar producto', [
+            'error' => $e->getMessage(),
+            'id'    => $dto->id,
+        ]);
+
+        throw $e;
     }
+}
 
     /**
      * Obtiene un producto por su ID
@@ -216,8 +264,10 @@ class ProductoService implements IProductoService
         ]);
 
         try {
+
+
             // Verificar que el producto pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::id())) {
+            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
                 throw new \Exception('No tienes permiso para modificar este producto.');
             }
 
@@ -247,38 +297,44 @@ class ProductoService implements IProductoService
      */
     public function eliminarProducto(int $productoId): array
     {
-        Log::info('Eliminando producto', ['producto_id' => $productoId]);
+    Log::info('Eliminando producto', ['producto_id' => $productoId]);
 
-        try {
-            // Verificar que el producto pertenece al usuario autenticado
-            if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::id())) {
-                throw new \Exception('No tienes permiso para eliminar este producto.');
-            }
+    try {
 
-            return DB::transaction(function () use ($productoId) {
-                // Eliminar las imágenes del storage
-                $this->eliminarImagenesProducto($productoId);
-
-                // Eliminar el producto de la BD 
-                $producto = \App\Models\Producto::findOrFail($productoId);
-                $producto->delete();
-
-                Log::info('Producto eliminado', ['producto_id' => $productoId]);
-
-                return [
-                    'success' => true,
-                    'message' => 'Producto eliminado exitosamente.',
-                ];
-            });
-
-        } catch (\Exception $e) {
-            Log::error('Error al eliminar producto', [
-                'error' => $e->getMessage(),
-                'producto_id' => $productoId,
-            ]);
-            throw $e;
+        if (!$this->productoRepository->perteneceAVendedor($productoId, Auth::user()->usuario->id)) {
+            throw new \Exception('No tienes permiso para eliminar este producto.');
         }
+
+        return DB::transaction(function () use ($productoId) {
+
+            // mover imágenes
+            $this->eliminarImagenesProducto($productoId);
+
+            // marcar producto como eliminado
+            $producto = \App\Models\Producto::findOrFail($productoId);
+            $producto->estado_id = 3;
+            $producto->save();
+
+            Log::info('Producto marcado como eliminado', [
+                'producto_id' => $productoId
+            ]);
+
+            return [
+                'success' => true,
+                'message' => 'Producto eliminado exitosamente.',
+            ];
+        });
+
+    } catch (\Exception $e) {
+
+        Log::error('Error al eliminar producto', [
+            'error' => $e->getMessage(),
+            'producto_id' => $productoId,
+        ]);
+
+        throw $e;
     }
+}
 
     /**
      * Busca productos por texto
@@ -335,7 +391,10 @@ class ProductoService implements IProductoService
                 ->toString();
 
             // Guardar imagen en storage - Laravel crea las carpetas automáticamente
-            Storage::disk('public')->put('productos/' . $nombreArchivo, $imageContent);
+            Storage::disk('public')->put("productos/{$productoId}/" . $nombreArchivo, $imageContent);
+
+            // Guardar en la papelera para poder tener registro de las imágenes eliminadas
+            Storage::disk('public')->put("papelera/productos/{$productoId}/" . $nombreArchivo, $imageContent);
 
             // Guardar en base de datos
             Foto::create([
@@ -351,11 +410,23 @@ class ProductoService implements IProductoService
     protected function eliminarImagenesProducto(int $productoId): void
     {
         $fotos = Foto::where('producto_id', $productoId)->get();
+        
+        // Log confirmando que use la papelera
+        Log::info("Moviendo imagenes hacia la papelera");
 
         foreach ($fotos as $foto) {
             // Eliminar archivo del storage
-            Storage::disk('public')->delete('productos/' . $foto->imagen);
-            
+            Storage::disk('public')->move(
+            "productos/{$productoId}/{$foto->imagen}",
+            "papelera/productos/{$productoId}/{$foto->imagen}"
+        );
+
+            Papelera::create([
+                "usuario_id" => Auth::user()->usuario->id,
+                "mensaje" => "Producto ID: {$productoId}",
+                "imagen" => "papelera/productos/{$productoId}/" . $foto->imagen,
+            ]);
+                
             // Eliminar registro de BD
             $foto->delete();
         }

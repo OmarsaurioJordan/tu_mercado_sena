@@ -12,6 +12,7 @@ readonly class OutputDto implements Arrayable
         public int $id,
         public array $usuario,
         public string $ultimoMensajeTexto,
+        public array $producto,
         public bool $visto_comprador,
         public bool $visto_vendedor,
         public ?string $fechaUltimoMensaje
@@ -23,6 +24,7 @@ readonly class OutputDto implements Arrayable
         return [
             'id' => $this->id,
             'usuario' => $this->usuario,
+            "producto" => $this->producto,
             'visto_comprador' => $this->visto_comprador,
             'visto_vendedor' => $this->visto_vendedor,
             'ultimoMensajeTexto' => $this->ultimoMensajeTexto,
@@ -42,11 +44,22 @@ readonly class OutputDto implements Arrayable
             id: $chat->id,
             usuario: $otroUsuario
                 ? [
-                    'id' => $otroUsuario->id,
+                    'id'       => $otroUsuario->id,
                     'nickname' => $otroUsuario->nickname,
-                    'imagen' => $bloqueo_mutuo ? null : $otroUsuario->imagen
+                    'imagen'   => $otroUsuario->imagen
+                        ? asset($otroUsuario->imagen)  // ← url() no asset()
+                        : asset('images/default-avatar.jpg')                                             // ← null si no tiene foto
                 ]
                 : [],
+            producto: $chat->producto
+                ? [
+                    'id'     => $chat->producto->id,
+                    'nombre' => $chat->producto->nombre,
+                    'precio' => $chat->producto->precio,
+                    'imagen' => $chat->producto->imagen
+                        ? asset($chat->producto->fotos()->first()?->imagen)
+                        : asset('images/default-product.jpg')
+                ] : [],
             visto_comprador: $chat->visto_comprador,
             visto_vendedor: $chat->visto_vendedor,
             ultimoMensajeTexto: $chat->ultimoMensaje?->mensaje ?? 'Sin mensajes aún',

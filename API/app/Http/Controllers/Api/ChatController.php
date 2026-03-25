@@ -6,18 +6,13 @@ use App\Http\Controllers\Api\Controller;
 use App\Contracts\Chat\Services\IChatService;
 use App\DTOs\Chat\InputDto;
 use App\DTOs\Chat\UpdateInputDto;
-use App\Http\Requests\Chat\CompraventaRequest;
 use App\Models\Chat;
 use App\Models\Producto;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Chat\CreateChatRequest;
-use App\Http\Requests\Chat\IniciarCompraventa;
 use App\Http\Requests\Chat\IniciarCompraventaRequest;
-use App\Http\Requests\Chat\ModifyChatRequest;
-use App\Http\Requests\Chat\TerminarCompraventa;
 use App\Http\Requests\Chat\TerminarCompraventaRequest;
 use App\Http\Requests\Chat\TransferenciasRequest;
-use Illuminate\Support\Facades\Request;
 
 class ChatController extends Controller
 {

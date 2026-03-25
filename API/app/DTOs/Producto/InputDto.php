@@ -34,7 +34,7 @@ readonly class InputDto implements Arrayable
     public static function fromRequest(array $data, ?int $productoId = null): self
     {
         return new self(
-            vendedor_id: Auth::id(),
+            vendedor_id: Auth::user()->usuario->id,
             nombre: $data['nombre'],
             subcategoria_id: $data['subcategoria_id'],
             integridad_id: $data['integridad_id'],

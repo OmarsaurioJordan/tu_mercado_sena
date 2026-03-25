@@ -9,14 +9,14 @@ use App\DTOs\Usuario\EditarPerfil\InputDto;
 use App\Exceptions\BusinessException;
 use App\Models\Usuario;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Auth\Access\AuthorizationException;
+use App\Models\Papelera;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Auth\Access\AuthorizationException;
 
 
 
@@ -41,45 +41,53 @@ class UsuarioService implements IUsuarioService
             );
         }
 
-        // ======== QUE SOLO SE PUEDA EDITAR EL PERFIL EN UN PLAZO DE 24 HORAS =======
-        $usuario = Auth::user()->usuario;
-
-        // Verificamos si ya ha sido editado antes
-        $yaFueEditado = $usuario->fecha_registro->ne($usuario->fecha_actualiza);
-
-        // Usamos copy() para no alterar el objeto original del modelo
-        $proximaEdicion = $usuario->fecha_actualiza->copy()->addDay();
-        $ahora = Carbon::now();
-
-        // // Si ya fue editado Y aún no se cumple el plazo de 24h, bloqueamos
-        // if ($yaFueEditado && $ahora->lt($proximaEdicion)) {
-            
-        //     $horasRestantes = (int) $ahora->diffInHours($proximaEdicion);
-        //     $minutosRestantes = (int) $ahora->diffInMinutes($proximaEdicion);
-
-        //     $mensaje = $horasRestantes >= 1 
-        //         ? "Solo puede editar una vez al día. Podrás editar tu perfil en $horasRestantes" . ($horasRestantes == 1 ? " hora" : " horas")
-        //         : "Solo puede editar una vez al día. Podrás editar tu perfil en $minutosRestantes" . ($minutosRestantes == 1 ? " minuto" : " minutos");
-
-        //     throw new BusinessException($mensaje, 422);
-        // }
+        // Permitir editar el perfil en un plazo de 24 horas
+        if (config('services.allow_time_edit_profile')) {
+            // ======== QUE SOLO SE PUEDA EDITAR EL PERFIL EN UN PLAZO DE 24 HORAS =======
+            $usuario = Auth::user()->usuario;
+    
+            // Verificamos si ya ha sido editado antes
+            $yaFueEditado = $usuario->fecha_registro->ne($usuario->fecha_actualiza);
+    
+            // Usamos copy() para no alterar el objeto original del modelo
+            $proximaEdicion = $usuario->fecha_actualiza->copy()->addDay();
+            $ahora = Carbon::now();
+    
+            // Si ya fue editado Y aún no se cumple el plazo de 24h, bloqueamos
+            if ($yaFueEditado && $ahora->lt($proximaEdicion)) {
+                
+                $horasRestantes = (int) $ahora->diffInHours($proximaEdicion);
+                $minutosRestantes = (int) $ahora->diffInMinutes($proximaEdicion);
+    
+                $mensaje = $horasRestantes >= 1 
+                    ? "Solo puede editar una vez al día. Podrás editar tu perfil en $horasRestantes" . ($horasRestantes == 1 ? " hora" : " horas")
+                    : "Solo puede editar una vez al día. Podrás editar tu perfil en $minutosRestantes" . ($minutosRestantes == 1 ? " minuto" : " minutos");
+    
+                throw new BusinessException($mensaje, 422);
+            }
+        }
 
 
         if (empty($dto->toArray())) {
             throw new BusinessException('No hay datos para actualizar', 422);
         }
 
+        // Validar que el usuario tenga un correo institucional
+        // $cuenta = $this->cuentaRepository->findByUsuarioId($usuarioId);
+
+        // if (!$cuenta || !$this->cuentaRepository->esCorreoInstitucional($cuenta->id)) {
+        //     throw new BusinessException(
+        //         "Solo los que cuentan con correo institucional pueden cambiar su avatar",
+        //         422
+        //     );
+        // }
+        
         return DB::transaction(function () use ($usuarioId, $dto) {
+            $data = $dto->toArray();
             if ($dto->imagen){
-                // Validar que el usuario tenga un correo institucional
-                if (!$this->cuentaRepository->esCorreoInstitucional($usuarioId)) {
-                    throw new BusinessException(
-                        "Solo los que cuentan con correo institucional pueden cambiar su avatar",
-                        422
-                    );
-                }
+
                 // Validar que haya llegado la ruta de la imagen del mapeado de los datos
-                $file = request()->file('imagen');
+                $file = $dto->imagen;
 
                 // Inicializar la ruta
                 $ruta = null;
@@ -102,6 +110,7 @@ class UsuarioService implements IUsuarioService
                     // Enviar la imagen a una ruta temporal
                     Storage::disk('public')->put($ruta, $image->toString());             
                     Storage::disk('public')->put($rutaPapelera, $image->toString());
+                    $data['imagen'] = $ruta;
                 }
 
                 Log::info("Creando el registro en la base de datos", [
@@ -120,7 +129,7 @@ class UsuarioService implements IUsuarioService
 
             // Cambiar las opciones de las notificaciones
             if ($dto->notifica_push !== null || $dto->notifica_correo !== null) {
-                $cuentaUsuario = Auth::user();
+                $cuentaUsuario = Auth::user()->usuario->cuenta;
 
                 $cuentaUsuario->update([
                     'notifica_push' => $dto->notifica_push ?? $cuentaUsuario->notifica_push,
@@ -145,7 +154,16 @@ class UsuarioService implements IUsuarioService
                 ]);
             }
 
-            $usuario_actualizado = $this->usuarioRepository->update($usuarioId, $dto->toArray());
+            // Si el usuario quiere cambiar su descripción, validamos que no sea la misma que la actual para agregar la descripción anterior a la papelera
+            if ($dto->descripcion && $dto->descripcion !== Auth::user()->usuario->descripcion) {
+                Papelera::create([
+                    'usuario_id' => $usuarioId,
+                    'mensaje' => Auth::user()->usuario->descripcion,
+                    'imagen' => null,
+                ]);
+            }
+
+            $usuario_actualizado = $this->usuarioRepository->update($usuarioId, $data);
         
             if (!$usuario_actualizado) {
                 throw new BusinessException('No se pudo actualizar el perfil del usuario.', 500);
@@ -156,7 +174,6 @@ class UsuarioService implements IUsuarioService
             $usuario_actualizado->notifica_push = $usuario_actualizado->cuenta->notifica_push;
             $usuario_actualizado->notifica_correo = $usuario_actualizado->cuenta->notifica_correo;
 
-            // Eliminamos la relación cargada para que no ensucie el JSON de salida
             $usuario_actualizado->unsetRelation('cuenta');
 
             return $usuario_actualizado;

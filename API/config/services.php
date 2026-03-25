@@ -14,6 +14,8 @@ return [
     |
     */
     'allow_gmail' => env('ALLOW_GMAIL', false),
+    'allow_gmail_products' => env('ALLOW_GMAIL_PRODUCTS', false),
+    'allow_time_edit_profile' => env('ALLOW_TIME_EDIT_PROFILE', true),
 
 
     'postmark' => [

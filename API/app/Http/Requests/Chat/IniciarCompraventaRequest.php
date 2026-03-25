@@ -41,6 +41,7 @@ class IniciarCompraventaRequest extends FormRequest
                 'required',
                 'integer',
                 'exists:estados,id',
+                'in:' . self::ESTADO_ESPERANDO,
             ],
             'cantidad' => [
                 'required',

@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Notificacion;
-
+use App\Models\Papelera;
 
 class MensajeService implements IMensajeService
 {
@@ -43,7 +43,6 @@ class MensajeService implements IMensajeService
             // Log de información
             Log::info('Datos del mensaje a crear:', $data);
 
-            $rutaPapelera = null;
             // Redimensionar y crear la ruta de la imagen, que se guardara en la base de datos
             if ($file instanceof UploadedFile) {
 
@@ -57,15 +56,13 @@ class MensajeService implements IMensajeService
 
                 $nombre = uniqid() . '.webp';
                 $ruta = "mensajes/{$chat->id}/{$nombre}";
-                $rutaPapelera = "papelera/chats/{$chat->id}/{$nombre}";
 
                 Storage::disk('public')->put($ruta, $image->toString());
-                Storage::disk('public')->put($rutaPapelera, $image->toString());
 
                 $data['imagen'] = $ruta;
             }
 
-            
+            // Crear el mensaje utilizando el repositorio
             $mensaje = $this->mensajeRepository->create($data);
 
             // Validar que el mensaje se haya creado correctamente
@@ -78,7 +75,7 @@ class MensajeService implements IMensajeService
 
             Log::info("¿Es primer mensaje?: " . ($this->mensajeRepository->esPrimerMensaje($chat) ? 'SI' : 'NO'));
             
-            // Crear el mensaje utilizando el repositorio
+           
 
 
             // Si el mensaje es el primero del chat, crear una notificación para el vendedor
@@ -117,15 +114,6 @@ class MensajeService implements IMensajeService
                     if (!$esCorreoInstitucional) {
                         throw new BusinessException("Solo las cuentas con correo institucional pueden subir imagenes", 422);
                         }
-                        
-                    $compradorId = $chat->comprador->id;
-
-                    DB::table('papelera')->insert([
-                        'usuario_id' => $compradorId,
-                        'mensaje' => $data['mensaje'] ?? null,
-                        'imagen' => $rutaPapelera,
-                        'fecha_registro' => Carbon::now()
-                    ]);
                 }
 
                 $chat->update([
@@ -137,15 +125,6 @@ class MensajeService implements IMensajeService
                     if (!$esCorreoInstitucional) {
                         throw new BusinessException("Solo las cuentas con correo institucional pueden subir imagenes", 422);
                     }
-
-                    $vendedorId = $chat->producto->vendedor->id;
-
-                    DB::table('papelera')->insert([
-                        'usuario_id' => $vendedorId,
-                        'mensaje' => $data['mensaje'] ?? null,
-                        'imagen' => $rutaPapelera,
-                        'fecha_registro' => Carbon::now()
-                    ]);
                 }
 
                 $chat->update([
@@ -174,8 +153,27 @@ class MensajeService implements IMensajeService
         }
 
         return DB::transaction(function () use ($mensaje) {
+
+            if ($mensaje->imagen) {
+                $rutaPapelera = "papelera/chats/{$mensaje->chat->id}/" . basename($mensaje->imagen);
+
+                // Eliminar la imagen del almacenamiento
+                if (Storage::disk('public')->exists($mensaje->imagen)) {
+                    Storage::disk('public')->move(($mensaje->imagen), $rutaPapelera);
+                }
+            }
+
+            // Crear el registro en la papelera para el mensaje eliminado
+            Papelera::create([
+                'usuario_id' => Auth::user()->usuario->id,
+                'mensaje' => "Mensaje: " . $mensaje->mensaje ?? null,
+                'imagen' => $rutaPapelera ?? null,
+            ]);
+
+           // Eliminar el mensaje utilizando el repositorio
            $mensajeBorrado = $this->mensajeRepository->delete($mensaje->id);
 
+            // Validar que el mensaje se haya eliminado correctamente
             if (!$mensajeBorrado) {
                 throw new \Exception("No se pudo eliminar el mensaje, Intente nuevamente.", 500);
             }

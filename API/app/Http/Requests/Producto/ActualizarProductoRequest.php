@@ -30,7 +30,7 @@ class ActualizarProductoRequest extends FormRequest
             'precio' => ['required', 'numeric', 'min:0', 'max:999999999'],
             'disponibles' => ['required', 'integer', 'min:0', 'max:32767'],
             'imagenes' => ['nullable', 'array', 'max:5'],
-            'imagenes.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'imagenes.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ];
     }
 

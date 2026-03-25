@@ -8,7 +8,7 @@ class Foto extends Model
 {
     protected $table = 'fotos';
     public $timestamps = true;
-    
+    protected $appends = ['url'];
     const CREATED_AT = null;
     const UPDATED_AT = 'actualiza';
 
@@ -20,6 +20,10 @@ class Foto extends Model
     public function producto()
     {
         return $this->belongsTo(Producto::class, 'producto_id');
+    }
+    public function getUrlAttribute()
+    {
+    return asset("storage/productos/{$this->producto_id}/{$this->imagen}");
     }
     
 }

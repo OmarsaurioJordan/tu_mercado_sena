@@ -26,7 +26,7 @@ class InputDto implements Arrayable
     public static function fromRequest(array $data): self
     {
         return new self(
-            comprador_id: Auth::id(),
+            comprador_id: $data["comprador_id"] ?? Auth::user()->usuario->id,
             producto_id: $data['producto_id'] ?? null,
             estado_id: $data['estado_id']
         );

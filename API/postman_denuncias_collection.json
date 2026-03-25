@@ -1,0 +1,158 @@
+{
+  "info": {
+    "name": "Denuncias API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"secret\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Motivos (denuncia)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost/api/motivos?tipo=denuncia",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "api",
+            "motivos"
+          ],
+          "query": [
+            {
+              "key": "tipo",
+              "value": "denuncia"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Crear Denuncia Usuario",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"usuario_id\": 2,\n    \"motivo_id\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost/api/denuncias",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "api",
+            "denuncias"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Crear Denuncia Producto",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"usuario_id\": 2,\n    \"producto_id\": 5,\n    \"motivo_id\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost/api/denuncias",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "api",
+            "denuncias"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Crear Denuncia Chat",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"chat_id\": 3,\n    \"motivo_id\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost/api/denuncias",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "api",
+            "denuncias"
+          ]
+        }
+      }
+    }
+  ]
+}
